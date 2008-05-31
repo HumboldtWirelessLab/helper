@@ -281,7 +281,7 @@ esac
 
 exit 0
 
-#svnversion
+#svnversion 0.9.1 release-0.9.1
 #svnversion
 #svnversion
 #svnversion
