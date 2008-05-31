@@ -1,0 +1,5 @@
+SIMULATOR=ns2
+RADIO=shadowing11b
+FORGEINNODES=no
+TIME=20
+MES=receiver.mes

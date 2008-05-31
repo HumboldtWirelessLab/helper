@@ -1,0 +1,23 @@
+Reboot nodes:
+
+NODELIST="sk110 sk111 sk112" ../../lab/helper/host/bin/system.sh reboot
+
+
+Start a single Test:
+
+REVISION=3500 STATUSFD=5 /home/sombrutz/lab/helper/softwaretest/monitormode_2/test_monitor.sh 5>&1 1>> ../../lab/measurement_final/master.log 2>&1
+
+
+Install a revision:
+
+REVISION=3500 MODULSDIR=/home/sombrutz/lab/click-i586/lib/modules/ ./madwifi_svn.sh installrev
+
+
+Test the svn (Single Revision):
+
+MODULSDIR=/home/sombrutz/lab/click-i586/lib/modules/ TESTSCRIPT=/home/sombrutz/lab/helper/softwaretest/monitormode/test_monitor.sh REVISION=3624 LOGDIR=/home/sombrutz/develop/software/log.complete ./madwifi_test.sh single
+
+
+Test the svn (complete)
+
+MODULSDIR=/home/sombrutz/lab/click-i586/lib/modules/ TESTSCRIPT=/home/sombrutz/lab/helper/softwaretest/monitormode/test_monitor.sh STARTREVISION=3495 ENDREVISION=3620 LOGDIR=/home/sombrutz/develop/software/log.complete_5 ./madwifi_test.sh complete
