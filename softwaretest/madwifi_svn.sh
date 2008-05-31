@@ -281,20 +281,13 @@ esac
 
 exit 0
 
-#svnversion 0.9.1 release-0.9.1
-#svnversion
-#svnversion
-#svnversion
-#svnversion
-#svnversion
-#svnversion
-#svnversion
-#svnversion
-#svnversion
-#svnversion
-#svnversion
-#svnversion
+#help 
 
-#svnversion
-#svnversion
-#svnversion
+#svnversion 0.9.1	release-0.9.1
+#svnversion brn-0.9.1	brn-madwifi-0.9.1
+#svnversion brn-0.9.3	brn-madwifi-0.9.3
+#svnversion mad-0.9.1	madwifi-0.9.1
+#svnversion mad-0.9.2.1	madwifi-0.9.2.1
+
+#arch mips mipsel-linux-
+
