@@ -23,31 +23,36 @@ case "$1" in
 		echo "Use $0 run"
 		;;
 	"run")
-		SIMDIS=$2
+		POSTFIX=ns2
+		TCLFILE="tmp.tcl"
+	    
+		POSTFIX=$POSTFIX $DIR/prepare-sim.sh prepare $2
+	
+		SIMDIS=$2.$POSTFIX
 		. $SIMDIS
-		NODELIST=`cat $MES | grep -v "#" | awk '{print $1}' | sort -u`
-		NODECOUNT=`cat $MES | grep -v "#" | wc -l`
-		cat $DIR/../etc/ns/radio/$RADIO\.tcl > tmp.tcl
-		echo "set xsize 200" >> tmp.tcl
-		echo "set ysize 200" >> tmp.tcl
-		echo "set nodecount $NODECOUNT"	>> tmp.tcl
-		echo "set stoptime $TIME" >> tmp.tcl
+		NODELIST=`cat $NODETABLE | grep -v "#" | awk '{print $1}' | sort -u`
+		NODECOUNT=`cat $NODETABLE | grep -v "#" | wc -l`
+		cat $DIR/../etc/ns/radio/$RADIO\.tcl > $TCLFILE
+		echo "set xsize 200" >> $TCLFILE
+		echo "set ysize 200" >> $TCLFILE
+		echo "set nodecount $NODECOUNT"	>> $TCLFILE
+		echo "set stoptime $TIME" >> $TCLFILE
 		
-		cat $DIR/../etc/ns/script_01.tcl >> tmp.tcl
+		cat $DIR/../etc/ns/script_01.tcl >> $TCLFILE
 		
 		i=0
 		for node in $NODELIST; do
-		    NODEDEVICELIST=`cat $MES | grep "^$node" | awk '{print $2}'`
+		    NODEDEVICELIST=`cat $NODETABLE | grep "^$node" | awk '{print $2}'`
 		    for nodedevice in $NODEDEVICELIST; do		    
-			CLICK=`cat $MES | grep -v "#" | grep $node | grep $nodedevice | awk '{print $5}'`
-			echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> tmp.tcl
+			CLICK=`cat $NODETABLE | grep -v "#" | grep $node | grep $nodedevice | awk '{print $5}'`
+			echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
 			i=`expr $i + 1`
 		    done
 		done
 		
-		echo "for {set i 0} {\$i < \$nodecount} {incr i} {" >> tmp.tcl
-		echo "     \$ns_ at 0.0 \"[\$node_(\$i) entry] runclick\"" >> tmp.tcl
-		echo " }" >> tmp.tcl
+		echo "for {set i 0} {\$i < \$nodecount} {incr i} {" >> $TCLFILE
+		echo "     \$ns_ at 0.0 \"[\$node_(\$i) entry] runclick\"" >> $TCLFILE
+		echo " }" >> $TCLFILE
 		
 		i=0
 		for node in $NODELIST; do
@@ -55,24 +60,25 @@ case "$1" in
 		    POS_Y=`cat $DIR/../../host/etc/nodeplacement/placement.default | grep -v "#" | grep $node | awk '{print $3}'`
 		    POS_Z=`cat $DIR/../../host/etc/nodeplacement/placement.default | grep -v "#" | grep $node | awk '{print $4}'`
 		    
-		    NODEDEVICELIST=`cat $MES | grep "^$node" | awk '{print $2}'`
+		    NODEDEVICELIST=`cat $NODETABLE | grep "^$node" | awk '{print $2}'`
 		
 		    for nodedevice in $NODEDEVICELIST; do		    
 
-		        echo "\$node_($i) set X_ $POS_X" >> tmp.tcl
-			echo "\$node_($i) set Y_ $POS_Y" >> tmp.tcl
-			echo "\$node_($i) set Z_ $POS_Z" >> tmp.tcl
-#		    	echo "\$node_($i) label \$node_mac($i).$node" >> tmp.tcl
-			echo "\$node_($i) label $node.$nodedevice" >> tmp.tcl
+		        echo "\$node_($i) set X_ $POS_X" >> $TCLFILE
+			echo "\$node_($i) set Y_ $POS_Y" >> $TCLFILE
+			echo "\$node_($i) set Z_ $POS_Z" >> $TCLFILE
+			echo "\$node_($i) label $node.$nodedevice" >> $TCLFILE
 			
 			POS_X=`expr $POS_X + 1`
 			i=`expr $i + 1`
 		    done
 		done
 
-		cat $DIR/../etc/ns/script_02.tcl >> tmp.tcl
+		cat $DIR/../etc/ns/script_02.tcl >> $TCLFILE
 		
-		ns tmp.tcl
+		ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1
+
+		POSTFIX=$POSTFIX $DIR/prepare-sim.sh cleanup $2
 
 		;;
 	*)

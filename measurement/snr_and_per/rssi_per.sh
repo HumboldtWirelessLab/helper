@@ -18,8 +18,6 @@ case "$SIGN" in
       ;;
 esac
 
-NODELIST=`cat $DIR/rssi_per.mes | grep -v "#" | awk '{print $1}' | sort -u`
-	       
 LOGDIR=/home/sombrutz/lab/measurement/
 RESULTDIR=/home/sombrutz/lab/result/
 EVALRESULT=/home/sombrutz/lab/evalresult/
@@ -47,7 +45,7 @@ for chan in 1 2 3 4 5 6 7 8 9 10 11 12 13 36 40 44 48 52 56 60 64; do
 	    cat /home/sombrutz/lab/helper/nodes/etc/wifi/monitor.default | sed -e "s\POWER=15\POWER=$receiverpower\g" -e "s\CHANNEL=11\CHANNEL=$chan\g" > $LOGDIR/monitor_receiver
 	    
 
-	    RESULT=`CONFIGFILE=$DIR/rssi_per.mes MARKER=22 STATUSFD=5 TIME=140 MNAME=RSSI_PER /home/sombrutz/lab/helper/host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
+	    RESULT=`CONFIGFILE=$DIR/rssi_per.mes MARKER=22 STATUSFD=5 TIME=140 ID=RSSI_PER /home/sombrutz/lab/helper/host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
 
 	    mv $LOGDIR/monitor_sender $LOGDIR/$senderpower\_monitor_sender
 	    mv $LOGDIR/monitor_receiver $LOGDIR/$senderpower\_monitor_receiver
