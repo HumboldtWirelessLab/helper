@@ -31,6 +31,6 @@ fphy[1]
 -> [0]pw;
 
 Script(
-  wait 600,
+  wait RUNTIME,
   stop
 );
