@@ -97,7 +97,7 @@ done
 
 check_nodes
 
-SCREENNAME="measurement_$MNAME"
+SCREENNAME="measurement_$ID"
     
 screen -d -m -S $SCREENNAME
 sleep 0.2
