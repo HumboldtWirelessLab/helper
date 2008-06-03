@@ -1,0 +1,2 @@
+#NODE		DEVICE		MODULSDIR						WIFICONFIG		CLICKSCRIPT	LOGFILE
+sk112		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		todump.click	/home/sombrutz/Download/receiver.log

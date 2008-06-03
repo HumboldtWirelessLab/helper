@@ -37,27 +37,12 @@ case "$1" in
 	    
 	    PHYDEV=`get_phy_dev $DEVICE`
 	    
-	    case "$CONFIG" in
-		"station.default")
-			. $DIR/../../nodes/etc/wifi/station.default
-			;;
-		"monitor.default")
-			. $DIR/../../nodes/etc/wifi/monitor.default
-			;;
-		"ap.default")
-			. $DIR/../../nodes/etc/wifi/ap.default
-			;;
-		"managed.default")
-			. $DIR/../../nodes/etc/wifi/managed.default
-			;;
-		"adhoc.default")
-			. $DIR/../../nodes/etc/wifi/adhoc.default
-			;;
-		*)
-			. $CONFIG
-			;;
-	    esac
-		    
+	    if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
+		. $DIR/../../nodes/etc/wifi/$CONFIG
+	    else
+		. $CONFIG
+	    fi
+	    
 	    echo "/usr/sbin/wlanconfig $DEVICE create wlandev $PHYDEV wlanmode $MODE"
 	    /usr/sbin/wlanconfig $DEVICE create wlandev $PHYDEV wlanmode $MODE
     
@@ -76,26 +61,11 @@ case "$1" in
 	    
 	    PHYDEV=`get_phy_dev $DEVICE`
 	    
-	    case "$CONFIG" in
-		"station.default")
-			. $DIR/../../nodes/etc/wifi/station.default
-			;;
-		"monitor.default")
-			. $DIR/../../nodes/etc/wifi/monitor.default
-			;;
-		"ap.default")
-			. $DIR/../../nodes/etc/wifi/ap.default
-			;;
-		"managed.default")
-			. $DIR/../../nodes/etc/wifi/managed.default
-			;;
-		"adhoc.default")
-			. $DIR/../../nodes/etc/wifi/adhoc.default
-			;;
-		*)	
-			. $CONFIG
-			;;
-	    esac
+	    if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
+		. $DIR/../../nodes/etc/wifi/$CONFIG
+	    else
+		. $CONFIG
+	    fi
 
 	    echo "/usr/sbin/iwconfig $DEVICE channel $CHANNEL"
 	    /usr/sbin/iwconfig $DEVICE channel $CHANNEL
