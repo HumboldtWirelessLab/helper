@@ -17,12 +17,6 @@ case "$SIGN" in
       exit -1
       ;;
 esac
-
-NODELIST=`cat $DIR/rssi_per.mes | grep -v "#" | awk '{print $1}' | sort -u`
-	
-echo "Reboot all Nodes and wait 60 seconds"	
-NODELIST=$NODELIST /home/sombrutz/lab/helper/host/bin/system.sh reboot
-sleep 100
 	       
 LOGDIR=/home/sombrutz/lab/measurement/
 RESULTDIR=/home/sombrutz/lab/result/
