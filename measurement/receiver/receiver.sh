@@ -18,10 +18,7 @@ case "$SIGN" in
       ;;
 esac
 
-NODELIST=`cat $DIR/receiver.mes | grep -v "#" | awk '{print $1}' | sort -u`
-	
-LOGDIR=/home/sombrutz/Download/
 
-RESULT=`CONFIGFILE=$DIR/receiver.mes MARKER=21 STATUSFD=5 TIME=260 MNAME=RECEIVER $DIR/../../host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
+RESULT=`CONFIGFILE=$DIR/receiver.mes MARKER=21 STATUSFD=5 TIME=260 ID=RECEIVER $DIR/../../host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
 
 exit 0

@@ -1,13 +1,10 @@
-AddressInfo(my_wlan ath0:eth);
+AddressInfo(my_wlan DEVICE:eth);
 
-FromDevice(ath0)
- ->AthdescDecap()
-// ->Prism2Decap()
-// ->RadiotapDecap()
--> ftx :: FilterTX()
--> ff :: FilterFailures()
--> fphy :: FilterPhyErr()
--> pw :: PrintWifi(TIMESTAMP true)
+FROMDEVICE
+  -> ftx :: FilterTX()
+  -> ff :: FilterFailures()
+  -> fphy :: FilterPhyErr()
+  -> pw :: PrintWifi(TIMESTAMP true)
 //->td :: ToDump("/home/sombrutz/Download/r.dump");
   ->Discard;
   
@@ -19,8 +16,7 @@ BRN2PacketSource(1000, 1000, my_wlan, ff:ff:ff:ff:ff:ff)
  -> wlan_out_queue :: NotifierQueue(50);
 
 wlan_out_queue
- -> AthdescEncap()
- -> ToDevice(ath0);
+-> TODEVICE;
 
 ftx[1]
 -> Print("TX")
@@ -34,8 +30,7 @@ fphy[1]
 -> Print("Phy")
 -> [0]pw;
 
-
-Script(                                                                                                                                                                                                             
-  wait 600,                                                                                                                                                                                                      
-  stop                                                                                                                                                                                                            
+Script(
+  wait 600,
+  stop
 );

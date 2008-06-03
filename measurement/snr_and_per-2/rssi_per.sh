@@ -63,7 +63,7 @@ for rate in 2 12 24 108; do
 		SEDARG="s#24#$RATE#g"
 		cat /home/sombrutz/lab/helper/measurement/snr_and_per/sender.click | sed -e $SEDARG > /home/sombrutz/lab/helper/measurement/snr_and_per/sender.tmp.click
 	
-		RESULT=`CONFIGFILE=$DIR/rssi_per.mes MARKER=22 STATUSFD=5 TIME=140 MNAME=RSSI_PER /home/sombrutz/lab/helper/host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
+		RESULT=`CONFIGFILE=$DIR/rssi_per.mes MARKER=22 STATUSFD=5 TIME=140 ID=RSSI_PER /home/sombrutz/lab/helper/host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
 
 		mv $LOGDIR/monitor_sender $LOGDIR/$senderpower\_monitor_sender
 		mv $LOGDIR/monitor_receiver $LOGDIR/$senderpower\_monitor_receiver

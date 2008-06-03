@@ -27,7 +27,7 @@ SEDARG2="s#LOGDIR#$LOGDIR#g"
 SEDARG3="s#CURRENTDIR#$DIR#g"
 cat $DIR/monitortest.mes | grep -v "#" | grep -e "." | awk '{print  $1" "$2" MODULSDIR "$4" "$5" "$6}' | sed -e $SEDARG -e $SEDARG2 -e $SEDARG3 > $DIR/monitortest.mes.tmp 
 
-RESULT=`CONFIGFILE=$DIR/monitortest.mes.tmp MARKER=$REVISION STATUSFD=5 MNAME=txfeedback TIME=$TIME $DIR/../../host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
+RESULT=`CONFIGFILE=$DIR/monitortest.mes.tmp MARKER=$REVISION STATUSFD=5 ID=txfeedback TIME=$TIME $DIR/../../host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
 
 rm -f $DIR/monitortest.mes.tmp
 
