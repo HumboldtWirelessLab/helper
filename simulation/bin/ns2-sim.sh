@@ -24,12 +24,12 @@ case "$1" in
 		;;
 	"run")
 		POSTFIX=ns2
-		TCLFILE="tmp.tcl"
 	    
 		POSTFIX=$POSTFIX $DIR/prepare-sim.sh prepare $2
 	
 		SIMDIS=$2.$POSTFIX
 		. $SIMDIS
+		TCLFILE="$NAME.tcl"
 		NODELIST=`cat $NODETABLE | grep -v "#" | awk '{print $1}' | sort -u`
 		NODECOUNT=`cat $NODETABLE | grep -v "#" | wc -l`
 		cat $DIR/../etc/ns/radio/$RADIO\.tcl > $TCLFILE
@@ -80,6 +80,7 @@ case "$1" in
 
 		POSTFIX=$POSTFIX $DIR/prepare-sim.sh cleanup $2
 
+		rm $TCLFILE
 		;;
 	*)
 		$0 help
