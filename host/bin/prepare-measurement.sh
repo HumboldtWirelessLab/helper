@@ -75,7 +75,7 @@ case "$1" in
 		    done
 		done
 		
-		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5"."$1"."$2" "$6}' > $NODETABLE.$POSTFIX
+		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5"."$1"."$2" "$6}' | sed -e "s#LOGDIR#$LOGDIR#g" > $NODETABLE.$POSTFIX
 		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" > $SIMDIS.$POSTFIX
 		;;
 	"cleanup")

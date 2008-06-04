@@ -19,6 +19,14 @@ case "$SIGN" in
 esac
 
 
-RESULT=`CONFIGFILE=$DIR/receiver.mes MARKER=21 STATUSFD=5 TIME=260 ID=RECEIVER $DIR/../../host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
+../../host/bin/prepare-measurement.sh prepare receiver.dis
+
+. $DIR/receiver.dis.real
+
+RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME $DIR/../../host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
+
+../../host/bin/prepare-measurement.sh cleanup receiver.dis
+
+echo "$RESULT"
 
 exit 0

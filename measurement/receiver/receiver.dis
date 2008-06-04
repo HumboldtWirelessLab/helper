@@ -1,3 +1,4 @@
+NAME=receiver
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
@@ -7,5 +8,7 @@ TIME=20
 NODETABLE=receiver.mes
 NODEPLACEMENT=placement.default
 
-LOGDIR=/home/robert/Downloads
+LOGDIR=/home/sombrutz/Download/
 LOGFILE=measurement.log
+
+RESULTDIR=/home/sombrutz/Download/
