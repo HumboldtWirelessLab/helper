@@ -80,6 +80,14 @@ update_svn() {
 build_svn() {
   if [ -e $DIR/madwifi ]; then
     if [ -e $DIR/$KERNELDIR ]; then
+      if [ ! "x$ARCH" = "x" ]; then
+	HAVEARCH=`cat $PROG | grep "#arch" | grep " $ARCH" | wc -l`
+	
+	if [ $HAVEARCH -gt 0 ]; then
+	    CROSS_COMPILE=`cat $PROG | grep "#arch" | grep " $ARCH" | awk '{ print $3 }'`
+	fi
+      fi
+    
       if [ "x$CROSS_COMPILE" = "x" ]; then
         ( cd $DIR/madwifi; make KERNELPATH=$DIR/$KERNELDIR; )
       else
@@ -214,12 +222,28 @@ case "$1" in
 	if [ $HAVEREV -gt 0 ]; then
 	    REVISIONDIR=`cat $PROG | grep "#svnversion" | grep " $REVISION" | awk '{ print $3 }'`
 	    if [ ! -e $DIR/$REVISIONDIR ]; then
-		echo "No release-0.9.1 !"
+		echo "No $REVISIONDIR !"
 		exit 0
 	    fi
-	    ( cd $DIR/release-0.9.1; make clean );
-	    ( cd $DIR/release-0.9.1; make KERNELPATH=$DIR/$KERNELDIR );
-	    ( cd $DIR/release-0.9.1; find . -name "*.ko" -print0 | xargs -0 cp --target=$MODULSDIR );
+	    
+	    if [ ! "x$ARCH" = "x" ]; then
+		HAVEARCH=`cat $PROG | grep "#arch" | grep " $ARCH" | wc -l`
+	
+		if [ $HAVEARCH -gt 0 ]; then
+		    CROSS_COMPILE=`cat $PROG | grep "#arch" | grep " $ARCH" | awk '{ print $3 }'`
+		fi
+    	    fi
+
+	    ( cd $DIR/$REVISIONDIR; make clean )
+	    
+    	    if [ "x$CROSS_COMPILE" = "x" ]; then
+		( cd $DIR/$REVISIONDIR; make KERNELPATH=$DIR/$KERNELDIR )
+	    else
+    		( cd $DIR/$REVISIONDIR; make KERNELPATH=$DIR/$KERNELDIR  CROSS_COMPILE=$CROSS_COMPILE; )
+	    fi
+	    
+	    ( cd $DIR/$REVISIONDIR; find . -name "*.ko" -print0 | xargs -0 cp --target=$MODULSDIR );
+	    
 	else
 	    if [ ! -e $DIR/madwifi ]; then
 		echo "No svn ! use '$0 initsvn' to setup the svn !"
@@ -231,48 +255,6 @@ case "$1" in
 	    REVISION=$REVISION MODULSDIR=$MODULSDIR $0 installsvn
 	fi
 	
-	case "$REVISION" in
-	    "0.9.1")
-		    ;;
-	    "brn-0.9.3")
-		    if [ ! -e $DIR/brn-madwifi-0.9.3 ]; then
-			echo "No brn-madwifi-0.9.3 !"
-		        exit 0
-		    fi
-		    ( cd $DIR/brn-madwifi-0.9.3; make clean );
-		    ( cd $DIR/brn-madwifi-0.9.3; make KERNELPATH=$DIR/$KERNELDIR );
-		    ( cd $DIR/brn-madwifi-0.9.3; find . -name "*.ko" -print0 | xargs -0 cp --target=$MODULSDIR );
-		    ;;
-	    "brn-0.9.1")
-		    if [ ! -e $DIR/brn-madwifi-0.9.1 ]; then
-			echo "No brn-madwifi-0.9.1 !"
-		        exit 0
-		    fi
-		    ( cd $DIR/brn-madwifi-0.9.1; make clean );
-		    ( cd $DIR/brn-madwifi-0.9.1; make KERNELPATH=$DIR/$KERNELDIR );
-		    ( cd $DIR/brn-madwifi-0.9.1; find . -name "*.ko" -print0 | xargs -0 cp --target=$MODULSDIR );
-		    ;;
-	    "mad-0.9.1")
-		    if [ ! -e $DIR/madwifi-0.9.1 ]; then
-			echo "No madwifi-0.9.1 !"
-		        exit 0
-		    fi
-		    ( cd $DIR/madwifi-0.9.1; make clean );
-		    ( cd $DIR/madwifi-0.9.1; make KERNELPATH=$DIR/$KERNELDIR );
-		    ( cd $DIR/madwifi-0.9.1; find . -name "*.ko" -print0 | xargs -0 cp --target=$MODULSDIR );
-		    ;;
-	    "mad-0.9.2.1")
-		    if [ ! -e $DIR/madwifi-0.9.2.1-modified ]; then
-			echo "No madwifi-0.9.2.1-modified !"
-		        exit 0
-		    fi
-		    ( cd $DIR/madwifi-0.9.2.1-modified; make clean );
-		    ( cd $DIR/madwifi-0.9.2.1-modified; make KERNELPATH=$DIR/$KERNELDIR );
-		    ( cd $DIR/madwifi-0.9.2.1-modified; find . -name "*.ko" -print0 | xargs -0 cp --target=$MODULSDIR );
-		    ;;
-		*)
-		    ;;
-	esac
 	;;
    "showrev")
 	if [ ! -e $DIR/madwifi ]; then
@@ -306,4 +288,3 @@ exit 0
 #svnversion mad-0.9.2.1	madwifi-0.9.2.1
 
 #arch mips mipsel-linux-
-
