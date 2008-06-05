@@ -30,10 +30,16 @@ case "$1" in
 		echo "Use NODELIS"
 		;;
 	"setup")
+		ssh root@127.0.0.1 "ifdown eth0"
 		ssh root@127.0.0.1 "ifconfig eth0 up"
 		ssh root@127.0.0.1 "ifconfig eth0:1 192.168.4.3 up"
 		ssh root@127.0.0.1 "/etc/init.d/arno-iptables-firewall stop"
 		ssh root@127.0.0.1 "/etc/init.d/nfs-kernel-server restart"		
+		;;
+	"stop")
+		ssh root@127.0.0.1 "ifconfig eth0 down"
+		ssh root@127.0.0.1 "/etc/init.d/arno-iptables-firewall start"
+		ssh root@127.0.0.1 "/etc/init.d/nfs-kernel-server restart"
 		;;
 	*)
 		$0 help
