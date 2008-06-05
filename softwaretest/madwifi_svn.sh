@@ -80,11 +80,11 @@ update_svn() {
 build_svn() {
   if [ -e $DIR/madwifi ]; then
     if [ -e $DIR/$KERNELDIR ]; then
-      if [ ! "x$ARCH" = "x" ]; then
-	HAVEARCH=`cat $PROG | grep "#arch" | grep " $ARCH" | wc -l`
+      if [ ! "x$CPU" = "x" ]; then
+	HAVEARCH=`cat $PROG | grep "#arch" | grep " $CPU" | wc -l`
 	
 	if [ $HAVEARCH -gt 0 ]; then
-	    CROSS_COMPILE=`cat $PROG | grep "#arch" | grep " $ARCH" | awk '{ print $3 }'`
+	    CROSS_COMPILE=`cat $PROG | grep "#arch" | grep " $CPU" | awk '{ print $3 }'`
 	fi
       fi
     
@@ -226,11 +226,11 @@ case "$1" in
 		exit 0
 	    fi
 	    
-	    if [ ! "x$ARCH" = "x" ]; then
-		HAVEARCH=`cat $PROG | grep "#arch" | grep " $ARCH" | wc -l`
+	    if [ ! "x$CPU" = "x" ]; then
+		HAVEARCH=`cat $PROG | grep "#arch" | grep " $CPU" | wc -l`
 	
 		if [ $HAVEARCH -gt 0 ]; then
-		    CROSS_COMPILE=`cat $PROG | grep "#arch" | grep " $ARCH" | awk '{ print $3 }'`
+		    CROSS_COMPILE=`cat $PROG | grep "#arch" | grep " $CPU" | awk '{ print $3 }'`
 		fi
     	    fi
 
