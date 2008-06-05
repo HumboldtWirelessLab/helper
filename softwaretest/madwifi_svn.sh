@@ -8,16 +8,24 @@ SIGN=`echo $dir | cut -b 1`
 case "$SIGN" in
   "/")
 	DIR=$dir
+	PROG=$0
         ;;
   ".")
 	DIR=$pwd/$dir
+	PROG=$pwd/$0
 	;;
    *)
-	echo "Error while getting directory"
-	exit -1
+	COMPLETEDIR=`which $0`
+	echo $COMPLETEDIR
+	if [ "x$COMPLETEDIR" = "x$0" ]; then
+	    DIR=$pwd/$dir
+	    PROG=$pwd/$0
+	else
+	    DIR=$(dirname "$COMPLETEDIR")
+	    PROG=$COMPLETEDIR
+	fi
 	;;
 esac
-
 
 AC_MADWIFIREVISION=0
 HIGHEST_MADWIFIREVISION=0
@@ -200,15 +208,31 @@ case "$1" in
 	  echo "use REVISION=xxx to set the wanted revision"
           exit 0
         fi
+	
+	HAVEREV=`cat $PROG | grep "#svnversion" | grep " $REVISION" | wc -l`
+	
+	if [ $HAVEREV -gt 0 ]; then
+	    REVISIONDIR=`cat $PROG | grep "#svnversion" | grep " $REVISION" | awk '{ print $3 }'`
+	    if [ ! -e $DIR/$REVISIONDIR ]; then
+		echo "No release-0.9.1 !"
+		exit 0
+	    fi
+	    ( cd $DIR/release-0.9.1; make clean );
+	    ( cd $DIR/release-0.9.1; make KERNELPATH=$DIR/$KERNELDIR );
+	    ( cd $DIR/release-0.9.1; find . -name "*.ko" -print0 | xargs -0 cp --target=$MODULSDIR );
+	else
+	    if [ ! -e $DIR/madwifi ]; then
+		echo "No svn ! use '$0 initsvn' to setup the svn !"
+		exit 0
+	    fi
+
+	    REVISION=$REVISION MODULSDIR=$MODULSDIR $0 cleansvn
+	    REVISION=$REVISION MODULSDIR=$MODULSDIR KERNELDIR=$KERNELDIR CROSS_COMPILE=$CROSS_COMPILE $0 buildrev
+	    REVISION=$REVISION MODULSDIR=$MODULSDIR $0 installsvn
+	fi
+	
 	case "$REVISION" in
 	    "0.9.1")
-		    if [ ! -e $DIR/release-0.9.1 ]; then
-			echo "No release-0.9.1 !"
-		        exit 0
-		    fi
-		    ( cd $DIR/release-0.9.1; make clean );
-		    ( cd $DIR/release-0.9.1; make KERNELPATH=$DIR/$KERNELDIR );
-		    ( cd $DIR/release-0.9.1; find . -name "*.ko" -print0 | xargs -0 cp --target=$MODULSDIR );
 		    ;;
 	    "brn-0.9.3")
 		    if [ ! -e $DIR/brn-madwifi-0.9.3 ]; then
@@ -247,14 +271,6 @@ case "$1" in
 		    ( cd $DIR/madwifi-0.9.2.1-modified; find . -name "*.ko" -print0 | xargs -0 cp --target=$MODULSDIR );
 		    ;;
 		*)
-		    if [ ! -e $DIR/madwifi ]; then
-			echo "No svn ! use '$0 initsvn' to setup the svn !"
-			exit 0
-		    fi
-
-		    REVISION=$REVISION MODULSDIR=$MODULSDIR $0 cleansvn
-		    REVISION=$REVISION MODULSDIR=$MODULSDIR KERNELDIR=$KERNELDIR CROSS_COMPILE=$CROSS_COMPILE $0 buildrev
-		    REVISION=$REVISION MODULSDIR=$MODULSDIR $0 installsvn
 		    ;;
 	esac
 	;;
