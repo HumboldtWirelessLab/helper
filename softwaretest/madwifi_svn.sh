@@ -31,8 +31,23 @@ AC_MADWIFIREVISION=0
 HIGHEST_MADWIFIREVISION=0
 
 if [ "x$KERNELDIR" = "x" ]; then
-  KERNELDIR=linux-2.6.19.2/linux
+    KERNELDIR=$DIR/linux-2.6.19.2/linux
+else
+
+    SIGN=`echo $KERNELDIR | cut -b 1`
+
+    case "$SIGN" in
+	"/")
+    	    ;;
+	*)
+	    KERNELDIR=$pwd/$KERNELDIR
+	    ;;
+    esac
+
 fi
+
+
+
 
 if [ "x$MODULSDIR" = "x" ]; then
   MODULSDIR=$DIR/module
@@ -79,7 +94,7 @@ update_svn() {
 
 build_svn() {
   if [ -e $DIR/madwifi ]; then
-    if [ -e $DIR/$KERNELDIR ]; then
+    if [ -e $KERNELDIR ]; then
       if [ ! "x$CPU" = "x" ]; then
 	HAVEARCH=`cat $PROG | grep "#arch" | grep " $CPU" | wc -l`
 	
@@ -89,9 +104,9 @@ build_svn() {
       fi
     
       if [ "x$CROSS_COMPILE" = "x" ]; then
-        ( cd $DIR/madwifi; make KERNELPATH=$DIR/$KERNELDIR; )
+        ( cd $DIR/madwifi; make KERNELPATH=$KERNELDIR; )
       else
-        ( cd $DIR/madwifi; make KERNELPATH=$DIR/$KERNELDIR CROSS_COMPILE=$CROSS_COMPILE; )
+        ( cd $DIR/madwifi; make KERNELPATH=$KERNELDIR CROSS_COMPILE=$CROSS_COMPILE; )
       fi
     else
       echo "kernelsourece doesn't exist"
@@ -116,7 +131,6 @@ install_svn_modules() {
       mkdir -p $1
     fi
     ( cd $DIR/madwifi; find . -name "*.ko" -print0 | xargs -0 cp --target=$1 )
-    #( cd $DIR/madwifi; make DESTDIR=$1 KERNELPATH=$DIR/$KERNELDIR install-modules)
   else
     echo "SVN doesn't exist"
   fi
@@ -237,9 +251,9 @@ case "$1" in
 	    ( cd $DIR/$REVISIONDIR; make clean )
 	    
     	    if [ "x$CROSS_COMPILE" = "x" ]; then
-		( cd $DIR/$REVISIONDIR; make KERNELPATH=$DIR/$KERNELDIR )
+		( cd $DIR/$REVISIONDIR; make KERNELPATH=$KERNELDIR )
 	    else
-    		( cd $DIR/$REVISIONDIR; make KERNELPATH=$DIR/$KERNELDIR  CROSS_COMPILE=$CROSS_COMPILE; )
+    		( cd $DIR/$REVISIONDIR; make KERNELPATH=$KERNELDIR  CROSS_COMPILE=$CROSS_COMPILE; )
 	    fi
 	    
 	    ( cd $DIR/$REVISIONDIR; find . -name "*.ko" -print0 | xargs -0 cp --target=$MODULSDIR );
