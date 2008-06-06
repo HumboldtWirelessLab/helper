@@ -1,3 +1,3 @@
-#NODE		DEVICE		MODULSDIR						WIFICONFIG		CLICKSCRIPT							LOGFILE
-#sk110		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		/home/sombrutz/lab/helper/measurement/receiver/receiver.click	LOGDIR/receiver.log
-wgt73		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/mips	monitor.default		/home/sombrutz/lab/helper/measurement/receiver/receiver.click	LOGDIR/receiver.log
+#NODE		DEVICE		MODULSDIR							WIFICONFIG		CLICKSCRIPT								LOGFILE
+sk111		ath0		/home/all/trash/measurement/helper/nodes/lib/modules/i586	monitor.default		/home/all/trash/measurement/helper/measurement/receiver/receiver.click	LOGDIR/receiver.log
+#wgt73		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/mips		monitor.default		/home/sombrutz/lab/helper/measurement/receiver/receiver.click		LOGDIR/receiver.log
