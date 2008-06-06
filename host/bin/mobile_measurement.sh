@@ -37,7 +37,7 @@ case "$1" in
 		ssh root@127.0.0.1 "/etc/init.d/dhcp3-server restart"
 		;;
 	"stop")
-		ssh root@127.0.0.1 "ifconfig eth0"
+		ssh root@127.0.0.1 "ifconfig eth0 down"
 		ssh root@127.0.0.1 "/etc/init.d/arno-iptables-firewall start"
 		ssh root@127.0.0.1 "/etc/init.d/nfs-kernel-server restart"
 		ssh root@127.0.0.1 "/etc/init.d/dhcp3-server restart"
