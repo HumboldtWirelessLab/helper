@@ -5,10 +5,11 @@ FROMDEVICE
  -> BRN2PrintWifi()
  -> Discard;  
 
-BRN2PacketSource(1000, 1000, my_wlan, ff:ff:ff:ff:ff:ff)
+BRN2PacketSource(1000, 100, 1000)
  -> SetTimestamp()
- -> EtherEncap(0x8086, my_wlan, ff:ff:ff:ff:ff:ff)
+ -> EtherEncap(0x8087, my_wlan, ff:ff:ff:ff:ff:ff)
  -> WifiEncap(0x00, 0:0:0:0:0:0)
+ -> Print("pa: ", 200)
  -> SetTXRate(22)
  -> wlan_out_queue :: NotifierQueue(50);
 	  
