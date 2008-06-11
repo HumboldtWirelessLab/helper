@@ -68,7 +68,7 @@ sleep 2
 for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | grep "^$node" | awk '{print $2}'`
 	for nodedevice in $NODEDEVICELIST; do
-		CONFIG=`cat $CONFIGFILE | grep "^$node" | awk '{print $4}'`
+		CONFIG=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $4}'`
 		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/wlandevices.sh create
 	done
 done
@@ -79,7 +79,7 @@ sleep 2
 for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | grep "^$node" | awk '{print $2}'`
 	for nodedevice in $NODEDEVICELIST; do
-		CONFIG=`cat $CONFIGFILE | grep "^$node" | awk '{print $4}'`
+		CONFIG=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $4}'`
 		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/wlandevices.sh start
 	done
 done
@@ -90,7 +90,7 @@ sleep 2
 for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | grep "^$node" | awk '{print $2}'`
 	for nodedevice in $NODEDEVICELIST; do
-		CONFIG=`cat $CONFIGFILE | grep "^$node" | awk '{print $4}'`
+		CONFIG=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $4}'`
 		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/wlandevices.sh config
 	done
 done
@@ -110,8 +110,8 @@ for node in $NODELIST; do
 	NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
 	
 	for nodedevice in $NODEDEVICELIST; do
-		CLICKSCRIPT=`cat $CONFIGFILE | grep "^$node" | awk '{print $5}'`
-		LOGFILE=`cat $CONFIGFILE | grep "^$node" | awk '{print $6}'`
+		CLICKSCRIPT=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $5}'`
+		LOGFILE=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $6}'`
 		
 		if [ ! "x$CLICKSCRIPT" = "x" ]; then
 		if [ ! "x$CLICKSCRIPT" = "x-" ]; then
@@ -129,8 +129,8 @@ done
 for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | grep "^$node" | awk '{print $2}'`
 	for nodedevice in $NODEDEVICELIST; do
-		CLICKSCRIPT=`cat $CONFIGFILE | grep "^$node" | awk '{print $5}'`
-		LOGFILE=`cat $CONFIGFILE | grep "^$node" | awk '{print $6}'`
+		CLICKSCRIPT=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $5}'`
+		LOGFILE=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $6}'`
 
 		if [ ! "x$CLICKSCRIPT" = "x" ]; then
 		if [ ! "x$CLICKSCRIPT" = "x-" ]; then

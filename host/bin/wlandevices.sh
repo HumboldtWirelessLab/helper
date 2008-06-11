@@ -34,8 +34,9 @@ case "$1" in
 		    echo "use NODE to set the node"
 		    exit 0
 		fi
+		
 		for device in $DEVICES; do
-		    echo "create $NODE $device"
+		    echo "create $NODE $device with $CONFIG"
 		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh create" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
 		done
 		;;
