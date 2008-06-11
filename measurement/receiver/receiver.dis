@@ -3,12 +3,12 @@ SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=20
+TIME=120
 
 NODETABLE=receiver.mes
 NODEPLACEMENT=placement.default
 
-LOGDIR=/home/sombrutz/lab/helper/measurement/receiver/
+LOGDIR=/home/all/trash/measurement/lab/helper/measurement/receiver/
 LOGFILE=measurement.log
 
-RESULTDIR=/home/sombrutz/lab/helper/measurement/receiver/
+RESULTDIR=/home/all/trash/measurement/lab/helper/measurement/receiver/
