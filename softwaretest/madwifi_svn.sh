@@ -300,5 +300,6 @@ exit 0
 #svnversion brn-0.9.3	brn-madwifi-0.9.3
 #svnversion mad-0.9.1	madwifi-0.9.1
 #svnversion mad-0.9.2.1	madwifi-0.9.2.1
-
+#svnversion k-07	kamikaze-7.07
+#svnversion k-trunk	kamikaze-trunk
 #arch mips mipsel-linux-
