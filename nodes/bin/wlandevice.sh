@@ -45,7 +45,6 @@ case "$1" in
 	    
 	    echo "/usr/sbin/wlanconfig $DEVICE create wlandev $PHYDEV wlanmode $MODE"
 	    /usr/sbin/wlanconfig $DEVICE create wlandev $PHYDEV wlanmode $MODE
-    
 	;;
     "delete")
 	    echo "ifconfig $DEVICE down"
