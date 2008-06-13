@@ -1,6 +1,6 @@
 AddressInfo(my_wlan DEVICE:eth);
 
-FROMDEVICE
+FROMRAWDEVICE
  -> ToDump("/home/sombrutz/Download/r.dump");
 
 Script(
