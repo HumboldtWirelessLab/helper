@@ -1,5 +1,5 @@
 #NODE		DEVICE		MODULSDIR						WIFICONFIG		CLICKSCRIPT	LOGFILE
 sk110		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		sender.click	/dev/shm/receiver.log
-sk110		ath1		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		sender.click	/dev/shm/receiver.log
-sk111		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		sender.click	/dev/shm/receiver.log
-sk112		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		sender.click	/dev/shm/receiver.log
+#sk110		ath1		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		sender.click	/dev/shm/receiver.log
+#sk111		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		sender.click	/dev/shm/receiver.log
+#sk112		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		sender.click	/dev/shm/receiver.log

@@ -7,8 +7,7 @@ FROMRAWDEVICE
   -> ff :: FilterFailures()
   -> fphy :: FilterPhyErr()
   -> pw :: PrintWifi(TIMESTAMP true)
-  -> Print("Pa: ",100)
-  -> Discard;
+  -> Discard();
 
 rawtee[1]
 ->td :: ToDump("/home/sombrutz/lab/helper/measurement/receiver/NODE.DEVICE.dump");

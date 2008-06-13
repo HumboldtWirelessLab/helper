@@ -72,6 +72,7 @@ case "$1" in
 			esac
 			
 			cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> $WIFIDECAP#g" -e "s#TODEVICE#$WIFIENCAP -> TORAWDEVICE#g" | sed -e "s#FROMRAWDEVICE#FromDevice(DEVICE)#g" -e "s#TORAWDEVICE#ToDevice(DEVICE)#g" | sed -e "s#DEVICE#$nodedevice#g" -e "s#NODE#$node#g" | sed -e "s#RUNTIME#$TIME#g" > $CLICK.$node.$nodedevice
+
 		    done
 		done
 		
