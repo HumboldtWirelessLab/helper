@@ -8,7 +8,7 @@ TIME=120
 NODETABLE=receiver.mes
 NODEPLACEMENT=placement.default
 
-LOGDIR=/home/all/trash/measurement/lab/helper/measurement/receiver/
+LOGDIR=WORKDIR
 LOGFILE=measurement.log
 
-RESULTDIR=/home/all/trash/measurement/lab/helper/measurement/receiver/
+RESULTDIR=WORKDIR

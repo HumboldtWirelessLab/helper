@@ -22,6 +22,10 @@ if [ "x$POSTFIX" = "x" ]; then
     POSTFIX="real"
 fi
 
+if [ "x$WORKDIR" = "x" ]; then
+    WORKDIR=$pwd
+fi
+
 case "$1" in
 	"help")
 		echo "Use $0 run"
@@ -71,12 +75,14 @@ case "$1" in
 				;;
 			esac
 			
-			cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> $WIFIDECAP#g" -e "s#TODEVICE#$WIFIENCAP -> TORAWDEVICE#g" | sed -e "s#FROMRAWDEVICE#FromDevice(DEVICE)#g" -e "s#TORAWDEVICE#ToDevice(DEVICE)#g" | sed -e "s#DEVICE#$nodedevice#g" | sed -e "s#NODE#$node#g" | sed -e "s#RUNTIME#$TIME#g" > $CLICK.$node.$nodedevice
+			CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g"`
+			
+			cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAP#g" -e "s#TODEVICE#WIFIENCAP -> TORAWDEVICE#g" | sed -e "s#WIFIDECAP#$WIFIDECAP#g" -e "s#WIFIENCAP#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(DEVICE)#g" -e "s#TORAWDEVICE#ToDevice(DEVICE)#g" | sed -e "s#DEVICE#$nodedevice#g" -e "s#NODE#$node#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" > $CLICK.$node.$nodedevice
 		    done
 		done
 		
-		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5"."$1"."$2" "$6}' | sed -e "s#LOGDIR#$LOGDIR#g" > $NODETABLE.$POSTFIX
-		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" > $SIMDIS.$POSTFIX
+		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5"."$1"."$2" "$6}' | sed -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$WORKDIR#g" > $NODETABLE.$POSTFIX
+		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" > $SIMDIS.$POSTFIX
 		;;
 	"cleanup")
 		SIMDIS=$2

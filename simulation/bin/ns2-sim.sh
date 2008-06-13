@@ -38,7 +38,11 @@ case "$1" in
 		echo "set nodecount $NODECOUNT"	>> $TCLFILE
 		echo "set stoptime $TIME" >> $TCLFILE
 		
-		cat $DIR/../etc/ns/script_01.tcl >> $TCLFILE
+		if [ "x$RESULTDIR" = "x" ]; then
+		    RESULTDIR=.
+		fi
+		
+		cat $DIR/../etc/ns/script_01.tcl | sed -e "s#NAME#$NAME#g" -e "s#RESULTDIR#$RESULTDIR#g" >> $TCLFILE
 		
 		i=0
 		for node in $NODELIST; do
@@ -75,6 +79,15 @@ case "$1" in
 		done
 
 		cat $DIR/../etc/ns/script_02.tcl >> $TCLFILE
+	
+		if [ ! -e $LOGDIR ]; then
+		    echo "Create $LOGDIR"
+		    mkdir -p $LOGDIR
+		fi
+		if [ ! -e $RESULTDIR ]; then
+		    echo "Create $RESULTDIR"
+		    mkdir -p $RESULTDIR
+		fi
 		
 		ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1
 
