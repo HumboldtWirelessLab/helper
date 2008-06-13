@@ -10,7 +10,7 @@ FROMRAWDEVICE
   -> Discard();
 
 rawtee[1]
-->td :: ToDump("/home/sombrutz/lab/helper/measurement/receiver/NODE.DEVICE.dump");
+->td :: ToDump("/home/all/trash/measurement/lab/helper/measurement/receiver/NODE.DEVICE.dump");
 
 Script(
   wait RUNTIME,
