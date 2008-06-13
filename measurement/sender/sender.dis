@@ -8,7 +8,7 @@ TIME=20
 NODETABLE=sender.mes
 NODEPLACEMENT=placement.default
 
-LOGDIR=/home/sombrutz/Download/
+LOGDIR=/home/robert/Downloads/
 LOGFILE=measurement.log
 
-RESULTDIR=/home/sombrutz/Download/
+RESULTDIR=/home/robert/Downloads/

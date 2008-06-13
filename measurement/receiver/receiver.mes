@@ -1,7 +1,7 @@
-#NODE		DEVICE		MODULSDIR						WIFICONFIG		CLICKSCRIPT							LOGFILE
-sk110		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		/home/sombrutz/lab/helper/measurement/receiver/receiver.click	LOGDIR/receiver_1.log
-sk111		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		/home/sombrutz/lab/helper/measurement/receiver/receiver.click	LOGDIR/receiver_2.log
-sk112		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		/home/sombrutz/lab/helper/measurement/receiver/receiver.click	LOGDIR/receiver_3.log
+#NODE		DEVICE		MODULSDIR							WIFICONFIG		CLICKSCRIPT									LOGFILE
+sk110		ath0		/home/all/trash/measurement/lab/helper/nodes/lib/modules/i586	monitor.default		/home/all/trash/measurement/lab/helper/measurement/receiver/receiver.click	LOGDIR/receiver_1.log
+sk111		ath0		/home/all/trash/measurement/lab/helper/nodes/lib/modules/i586	monitor.default		/home/all/trash/measurement/lab/helper/measurement/receiver/receiver.click	LOGDIR/receiver_2.log
+sk112		ath0		/home/all/trash/measurement/lab/helper/nodes/lib/modules/i586	monitor.default		/home/all/trash/measurement/lab/helper/measurement/receiver/receiver.click	LOGDIR/receiver_3.log
 #sk110		ath1		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		/home/sombrutz/lab/helper/measurement/receiver/receiver.click	LOGDIR/receiver_4.log
 #sk111		ath1		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		/home/sombrutz/lab/helper/measurement/receiver/receiver.click	LOGDIR/receiver_5.log
 #sk112		ath1		/home/sombrutz/lab/helper/nodes/lib/modules/i586	monitor.default		/home/sombrutz/lab/helper/measurement/receiver/receiver.click	LOGDIR/receiver_6.log
