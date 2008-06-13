@@ -19,11 +19,32 @@ case "$SIGN" in
 esac
 
 
+if [ -e $DIR/$1 ]; then
+    echo "Measurement already exits"
+    exit 0
+fi
+
+mkdir $DIR/$1
+
+if [ -e ../../host/bin/gps.sh ]; then
+    echo "get gpsdata"
+    ../../host/bin/gps.sh getdata > gps.info
+fi
+
+vi $DIR/info
+
+echo "prepare everything"
 ../../host/bin/prepare-measurement.sh prepare receiver.dis
 
 . $DIR/receiver.dis.real
 
 RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME $DIR/../../host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
+
+mv *.dump $DIR/$1/
+mv *.log $DIR/$1/
+mv *info $DIR/$1/
+cp *.click* $DIR/$1/
+cp *.real $DIR/$1/
 
 ../../host/bin/prepare-measurement.sh cleanup receiver.dis
 
