@@ -1,7 +1,7 @@
 AddressInfo(my_wlan DEVICE:eth);
 
 FROMDEVICE
- -> ToDump("/home/sombrutz/Download/r.dump");
+ -> ToDump("RESULTDIR/NODE.DEVICE.dump");
 
 Script(
   wait RUNTIME,

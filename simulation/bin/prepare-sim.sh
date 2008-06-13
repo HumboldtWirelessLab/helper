@@ -22,6 +22,10 @@ if [ "x$POSTFIX" = "x" ]; then
     POSTFIX="simulation"
 fi
 
+if [ "x$WORKDIR" = "x" ]; then
+    WORKDIR=$pwd
+fi
+
 case "$1" in
 	"help")
 		echo "Use $0 run"
@@ -36,13 +40,13 @@ case "$1" in
 		for node in $NODELIST; do
 		    NODEDEVICELIST=`cat $NODETABLE | grep "^$node" | awk '{print $2}'`
 		    for nodedevice in $NODEDEVICELIST; do		    
-			CLICK=`cat $NODETABLE | grep -v "#" | grep $node | grep $nodedevice | awk '{print $5}'`
-			cat $CLICK | sed -e "s#FROMDEVICE#FromSimDevice(DEVICE,4096) -> Strip(14)#g" -e "s#TODEVICE#AddEtherNsclick() -> ToSimDevice(DEVICE)#g" | sed -e "s#DEVICE#eth0#g" -e "s#RUNTIME#$TIME#g" > $CLICK.$node.$nodedevice
+			CLICK=`cat $NODETABLE | grep -v "#" | grep $node | grep $nodedevice | awk '{print $5}' | sed -e "s#WORKDIR#$WORKDIR#g"`
+			cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAP#g" -e "s#TODEVICE#WIFIENCAP -> TORAWDEVICE#g" -e "s#FROMRAWDEVICE#FromSimDevice(DEVICE,4096)#g" -e "s#WIFIDECAP#Strip(14)#g" -e "s#TORAWDEVICE#ToSimDevice(DEVICE)#g" -e "s#WIFIENCAP#AddEtherNsclick()#g" | sed -e "s#DEVICE#eth0#g" -e"s#NODE#$node#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" > $CLICK.$node.$nodedevice
 		    done
 		done
 		
-		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5"."$1"."$2" "$6}' | sed -e "s#LOGDIR#$LOGDIR#g" > $NODETABLE.$POSTFIX
-		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" > $SIMDIS.$POSTFIX
+		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5"."$1"."$2" "$6}' | sed -e "s#LOGDIR#$LOGDIR#g"  -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" > $NODETABLE.$POSTFIX
+		cat $SIMDIS | sed -e "s#$NODETABLE#$NODETABLE.$POSTFIX#g" -e "s#WORKDIR#$WORKDIR#g" > $SIMDIS.$POSTFIX
 		;;
 	"cleanup")
 		SIMDIS=$2

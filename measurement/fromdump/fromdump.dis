@@ -1,6 +1,14 @@
+NAME=fromdump
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
+
 TIME=20
+
 NODETABLE=fromdump.mes
 NODEPLACEMENT=placement.default
+
+LOGDIR=WORKDIR
+LOGFILE=measurement.log
+
+RESULT=WORKDIR

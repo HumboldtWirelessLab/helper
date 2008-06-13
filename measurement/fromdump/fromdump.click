@@ -1,10 +1,8 @@
-AddressInfo(my_wlan DEVICE:eth);
-
-FromDump("/home/robert/Downloads/receiver.dump")
- -> AthdescDecap()
-// -> ftx :: FilterTX()
-// -> ff :: FilterFailures()
-// -> rate_clf :: Classifier(8/00%70)
+FromDump("WORKDIR/NODE.DEVICE.dump")
+  -> AthdescDecap()
+//-> ftx :: FilterTX()
+//-> ff :: FilterFailures()
+//-> rate_clf :: Classifier(8/00%70)
  -> fphy :: FilterPhyErr()
  -> pw :: Print("Receive: ")
 //-> pw :: PrintWifi(TIMESTAMP true)
@@ -21,3 +19,8 @@ FromDump("/home/robert/Downloads/receiver.dump")
 fphy[1]
 -> Print("Phy: ")
 -> [0]pw;
+
+Script(
+  wait RUNTIME,
+  stop
+);

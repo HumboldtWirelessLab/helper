@@ -39,8 +39,8 @@ set ns_		[new Simulator]
 #
 # Create and activate trace files.
 #
-set tracefd     [open "simple.tr" w]
-set namtrace    [open "simple.nam" w]
+set tracefd     [open "RESULTDIR/NAME.tr" w]
+set namtrace    [open "RESULTDIR/NAME.nam" w]
 $ns_ trace-all $tracefd
 $ns_ namtrace-all-wireless $namtrace $xsize $ysize
 $ns_ use-newtrace
