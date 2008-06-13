@@ -1,0 +1,14 @@
+NAME=sender
+SIMULATOR=ns2
+RADIO=shadowing11b
+FORGEINNODES=no
+
+TIME=20
+
+NODETABLE=networkcoding.mes
+NODEPLACEMENT=placement.default
+
+LOGDIR=WORKDIR
+LOGFILE=measurement.log
+
+RESULTDIR=WORKDIR
