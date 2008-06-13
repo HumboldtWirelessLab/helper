@@ -42,13 +42,13 @@ check_nodes() {
 echo "check all nodes"
 NODELIST="$NODELIST" $DIR/system.sh waitfornodes
 
-echo "reboot all nodes"
-NODELIST="$NODELIST" $DIR/system.sh reboot
+#echo "reboot all nodes"
+#NODELIST="$NODELIST" $DIR/system.sh reboot
      
-echo "wait for all nodes"
-sleep 20
-NODELIST="$NODELIST" $DIR/system.sh waitfornodes
-sleep 20
+#echo "wait for all nodes"
+#sleep 20
+#NODELIST="$NODELIST" $DIR/system.sh waitfornodes
+#sleep 20
 
 echo "Setup environment"
 NODELIST="$NODELIST" $DIR/environment.sh mount

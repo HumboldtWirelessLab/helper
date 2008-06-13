@@ -26,7 +26,7 @@ case "$1" in
 		echo "Use $0 getdata "
 		;;
 	"getdata")
-		gpspipe -t -r -n 20	
+		gpspipe -t -r -n 40	
 		;;
 	"help")
 		echo "Take a look at http://www.kowoma.de/gps/zusatzerklaerungen/NMEA.htm"

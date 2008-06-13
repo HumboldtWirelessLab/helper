@@ -43,7 +43,7 @@ RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME $DIR/.
 mv *.dump $DIR/$1/
 mv *.log $DIR/$1/
 mv *info $DIR/$1/
-cp *.click $DIR/$1/
+cp *.click* $DIR/$1/
 cp *.real $DIR/$1/
 
 ../../host/bin/prepare-measurement.sh cleanup receiver.dis
