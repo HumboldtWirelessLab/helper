@@ -36,7 +36,7 @@ fi
 vi $DIR/info
 
 echo "prepare everything"
-../../host/bin/prepare-measurement.sh prepare receiver.dis
+../../host/bin/prepare_measurement.sh prepare receiver.dis
 
 . $DIR/receiver.dis.real
 
@@ -48,7 +48,7 @@ mv *info $DIR/$1/
 cp *.click* $DIR/$1/
 cp *.real $DIR/$1/
 
-../../host/bin/prepare-measurement.sh cleanup receiver.dis
+../../host/bin/prepare_measurement.sh cleanup receiver.dis
 
 echo "$RESULT"
 

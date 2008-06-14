@@ -18,7 +18,7 @@ case "$SIGN" in
       ;;
 esac
 
-../../host/bin/prepare-measurement.sh prepare todump.dis
+../../host/bin/prepare_measurement.sh prepare todump.dis
 
 . $DIR/todump.dis.real
 
