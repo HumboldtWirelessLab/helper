@@ -75,14 +75,10 @@ case "$1" in
 				;;
 			esac
 			
-<<<<<<< HEAD:host/bin/prepare_maesurement.sh
 			CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g"`
 			
 			cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAP#g" -e "s#TODEVICE#WIFIENCAP -> TORAWDEVICE#g" | sed -e "s#WIFIDECAP#$WIFIDECAP#g" -e "s#WIFIENCAP#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(DEVICE)#g" -e "s#TORAWDEVICE#ToDevice(DEVICE)#g" | sed -e "s#DEVICE#$nodedevice#g" -e "s#NODE#$node#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" > $CLICK.$node.$nodedevice
-=======
-			cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> $WIFIDECAP#g" -e "s#TODEVICE#$WIFIENCAP -> TORAWDEVICE#g" | sed -e "s#FROMRAWDEVICE#FromDevice(DEVICE)#g" -e "s#TORAWDEVICE#ToDevice(DEVICE)#g" | sed -e "s#DEVICE#$nodedevice#g" -e "s#NODE#$node#g" | sed -e "s#RUNTIME#$TIME#g" > $CLICK.$node.$nodedevice
 
->>>>>>> dc69b9d808723132f434925e6192f0650f849352:host/bin/prepare-measurement.sh
 		    done
 		done
 		
