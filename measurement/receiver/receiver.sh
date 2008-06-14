@@ -26,7 +26,9 @@ fi
 
 mkdir $DIR/$1
 
-if [ -e ../../host/bin/gps.sh ]; then
+GPSD=`ps -le | grep gpsd | wc -l | awk '{print $1}'`
+
+if [ $GPSD -ge 1 ]; then
     echo "get gpsdata"
     ../../host/bin/gps.sh getdata > gps.info
 fi
