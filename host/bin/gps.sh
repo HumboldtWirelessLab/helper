@@ -136,7 +136,7 @@ case "$1" in
 	"help")
 		echo "Use $0 getdata "
 		;;
-	"actualdata")
+	"rawdata")
 		if [ "x$2" = "x" ]; then
 		    N=20
 		else
@@ -202,6 +202,35 @@ case "$1" in
 			    ;;
 		    esac
 		done < $2
+		;;
+	"getposition")
+		BEST=`$0 readdata $2`
+		if [ "x$BEST" = "x" ]; then
+		    echo "No valid data"
+		    exit 0
+		fi
+		DATE=`echo "$BEST" | grep Time | awk '{print $2}'`
+		LAT=`echo "$BEST" | grep Latitude | awk '{print $2}'`
+		LATPR=`echo $LAT | sed "s#\.# #g" | awk '{print $1}'`
+		LATPO=`echo $LAT | sed "s#\.# #g" | awk '{print $2}'`
+		LATPR1=`echo $LATPR | cut -b 1,2`
+		LATPR2=`echo $LATPR | cut -b 3,4`
+		LATITUDE=`expr $LATPR2$LATPO / 6`
+		LONG=`echo "$BEST" | grep Longitude | awk '{print $2}'`
+		LONGPR=`echo $LONG | sed "s#\.# #g" | awk '{print $1}'`
+		LONGPO=`echo $LONG | sed "s#\.# #g" | awk '{print $2}'`
+		LONGPR1=`echo $LONGPR | cut -b 1,2`
+		LONGPR2=`echo $LONGPR | cut -b 3,4`
+		LONGITUDE=`expr $LONGPR2$LONGPO / 6`
+		echo "$DATE $LATPR1.$LATITUDE $LONGPR1.$LONGITUDE"
+		;;
+	"maps")
+		GPS_DATA=`$0 getposition $2`
+		echo "$GPS_DATA"
+		LATITUDE=`echo "$GPS_DATA" | awk '{print $2}'`
+		LONGITUDE=`echo "$GPS_DATA" | awk '{print $3}'`
+		URL="http://maps.google.com/maps?t=k&hl=de&ie=UTF8&ll=$LATITUDE,$LONGITUDE&spn=0.001521,0.004442&z=18"
+		firefox "$URL"
 		;;
 	"help")
 		echo "Take a look at http://www.kowoma.de/gps/zusatzerklaerungen/NMEA.htm"
