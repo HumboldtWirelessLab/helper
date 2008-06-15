@@ -20,14 +20,12 @@ esac
 
 . $DIR/functions.sh
 
-if [ "x$NODELIST" = "x" ]; then
-    ls  $DIR/../etc/nodegroups/
-fi
-
 case "$1" in
 	"help")
-		echo "Use $0 setup"
-		echo "Use NODELIS"
+		echo "Use $0 setup | stop"
+		;;
+	"start"
+		$0 setup
 		;;
 	"setup")
 		ssh root@127.0.0.1 "ifdown eth0"
