@@ -18,6 +18,7 @@ case "$SIGN" in
 	;;
 esac
 
+
 STATUSFD=5
 
 if [ "x$STARTREVISION" = "x" ]; then
@@ -51,7 +52,6 @@ test_parameters() {
 }
 
 test_revision() {
-	MAXREVISION=`$DIR/madwifi_svn.sh showremoterev`
         if [ "x$MAXREVISION" = "x" ]; then
 	  echo "Error on svn"
 	  exit 0

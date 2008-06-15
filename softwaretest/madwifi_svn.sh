@@ -47,8 +47,6 @@ else
 fi
 
 
-
-
 if [ "x$MODULSDIR" = "x" ]; then
   MODULSDIR=$DIR/module
 fi
@@ -63,7 +61,7 @@ get_revision() {
 }
 
 get_remote_revision() {
-  HIGHEST_MADWIFIREVISION=`( cd $DIR/madwifi/; LANG=C svn status -u 2>&1 | grep "revision" | awk '{print $4}' )`
+  HIGHEST_MADWIFIREVISION=`( cd $DIR/madwifi/; LANG=C svn status -u 2>&1 | grep "revision" | tail -n 1 | awk '{print $4}' )`
   if [ "x$HIGHEST_MADWIFIREVISION" = "x" ]; then
     HIGHEST_MADWIFIREVISION=0
   fi
