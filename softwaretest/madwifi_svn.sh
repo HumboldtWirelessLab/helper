@@ -141,6 +141,7 @@ case "$1" in
 	echo "use MODULSDIR=/path/to/moduls to set modulstarget"
 	echo "use REVISION=XXX to set revision"
 	echo "use KERNELDIR=/path/to/linux to set the kerneldir"
+	echo "use CPU=arch to set the Architecture"
 	echo "use CROSS_COMPILE=compiler-prefix to setup cross-compiling ( e.g. "CROSS_COMPILE=arm-linux-" )"
 	;;
   "initsvn")
