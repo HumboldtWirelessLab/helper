@@ -38,10 +38,10 @@ case "$1" in
 
 		#Prepare click
 		for node in $NODELIST; do
-		    NODEDEVICELIST=`cat $NODETABLE | grep "^$node" | awk '{print $2}'`
+		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		    for nodedevice in $NODEDEVICELIST; do		    
-			CLICK=`cat $NODETABLE | grep -v "#" | grep $node | grep $nodedevice | awk '{print $5}'`
-			WIFICONFIG=`cat $NODETABLE | grep -v "#" | grep $node | grep $nodedevice | awk '{print $4}'`
+			CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
+			WIFICONFIG=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $4}'`
 			if [ -f  $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then                                                                                                                                                   
 			    . $DIR/../../nodes/etc/wifi/$WIFICONFIG
 			else
