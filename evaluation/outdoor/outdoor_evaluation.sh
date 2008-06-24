@@ -96,6 +96,10 @@ echo -n "$i "
 	NODE=`echo $dump | sed "s#\.# #g" | awk '{print $1}'`
 	DEVICE=`echo $dump | sed "s#\.# #g" | awk '{print $2}'`
     
+#########################################################
+#####################     G P S  S T U F F   #######################
+#########################################################
+
 	if [ "x$NODE$DEVICE" = "x" ]; then
 	    echo "Error to detect node and device"
 	    exit 0
@@ -155,6 +159,10 @@ echo -n "$i "
 
 	echo "$SENDERNODE;$SENDERDEVICE;$SENDERLONG;$SENDERLAT;$SENDERHOG;" >> $RESULTDIR/sender.csv.tmp
 
+#########################################################
+################      P A C K E T S T U F F   #########################
+#########################################################
+
 	if [ ! -e $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.raw ] || [ "x$EMODE" = "xall" ]; then
 	    cat $DIR/outdoor_evaluation.click | sed -e "s#NODE#$NODE#g" -e "s#DEVICE#$DEVICE#g" > $AC_EVALUATIONDIR/$NODE.$DEVICE.click
 
@@ -176,18 +184,21 @@ echo -n "$i "
 	        PACKETSTATS="$PACKETSTATS $r"
 	    done
 
-	    echo "$PACKETSTATS" | awk '{print $1" "$3" "$5" "$7" "$9" "$11" "$13" "$15" "$17" "$19" "$21" "$23" "$25}' > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.stats
+	    echo "$PACKETSTATS" | awk '{print $2" "$4" "$6" "$8" "$10" "$12" "$14" "$16" "$18" "$20" "$22" "$24}' > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.stats
 	    
 	fi
 
 	if [ -e $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all ]; then
-	    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | grep "OKPacket" > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.ok
-	    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | grep "CRCerror" > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.crc
-	    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | grep "Phyerror" > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.phy
 	    PACKETS_ALL_ALL=`wc -l $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | awk '{print $1}'`
-	    PACKETS_ALL_OK=`wc -l $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.ok | awk '{print $1}'`
-	    PACKETS_ALL_CRC=`wc -l $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.crc | awk '{print $1}'`
-	    PACKETS_ALL_PHY=`wc -l $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.phy | awk '{print $1}'`
+	    PACKETS_ALL_OK=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | grep "OKPacket" | wc -l | awk '{print $1}'`
+	    PACKETS_ALL_CRC=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | grep "CRCerror" | wc -l | awk '{print $1}'`
+	    PACKETS_ALL_PHY=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | grep "Phyerror" | wc -l | awk '{print $1}'`
+
+	    rm -f $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab
+	    rm -f $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.csv
+	
+	    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | sed -e "s#:##g" -e "s#|##g" -e "s#Mb# #g" -e "s#+# #g" -e "s#/# #g" -e "s#Type.*EXTRA##g" | awk '{print $2";"$1";"gsub("80870000","muell",$7)";"$3";"$4";"strtonum("0x"$8)";"$5}' | sed -e "s#OKPacket#0#g" -e "s#CRCerror#1#g" -e "s#Phyerror#2#g" > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.csv
+	    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.csv | sed -e "s#;# #g" > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab
 	else
 	    PACKETS_ALL_ALL=0
 	    PACKETS_ALL_OK=0
@@ -220,16 +231,12 @@ echo -n "$i "
 		SIZEWIFI=`expr $SIZE + 32`
 
 		if [ -e $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all ]; then
-		    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | egrep ":[ ]*$SIZEWIFI \| " | grep "data nods FF:FF:FF:FF:FF:FF" | grep " $BITRATE\Mb " > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.own.$SIZE.$BITRATE.all
-		    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.ok | egrep ":[ ]*$SIZEWIFI \| " | grep "data nods FF:FF:FF:FF:FF:FF" | grep " $BITRATE\Mb " > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.own.$SIZE.$BITRATE.ok
-		    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.crc | egrep ":[ ]*$SIZEWIFI \| " | grep "data nods FF:FF:FF:FF:FF:FF" | grep " $BITRATE\Mb " > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.own.$SIZE.$BITRATE.crc
-		    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.phy | egrep ":[ ]*$SIZEWIFI \| " | grep "data nods FF:FF:FF:FF:FF:FF" | grep " $BITRATE\Mb " > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.own.$SIZE.$BITRATE.phy
-		    PACKETS_OWN_ALL=`wc -l $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.own.$SIZE.$BITRATE.all | awk '{print $1}'`
-		    PACKETS_OWN_OK=`wc -l $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.own.$SIZE.$BITRATE.ok | awk '{print $1}'`
-		    PACKETS_OWN_CRC=`wc -l $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.own.$SIZE.$BITRATE.crc | awk '{print $1}'`
-		    PACKETS_OWN_PHY=`wc -l $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.own.$SIZE.$BITRATE.phy | awk '{print $1}'`
+		    PACKETS_OWN_ALL=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | egrep ":[ ]*$SIZEWIFI \| " | grep "EXTRA: 8087" | grep " $BITRATE\Mb " | wc -l | awk '{print $1}'`
+		    PACKETS_OWN_OK=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | grep "OKPacket" | egrep ":[ ]*$SIZEWIFI \| " | grep "EXTRA: 8087" | grep " $BITRATE\Mb " | wc -l | awk '{print $1}'`
+		    PACKETS_OWN_CRC=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | grep "CRCerror" | egrep ":[ ]*$SIZEWIFI \| " | grep "EXTRA: 8087" | grep " $BITRATE\Mb " | wc -l | awk '{print $1}'`
+		    PACKETS_OWN_PHY=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | grep "Phyerror" | egrep ":[ ]*$SIZEWIFI \| " | grep "EXTRA: 8087" | grep " $BITRATE\Mb " | wc -l | awk '{print $1}'`
 
-		    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.own.$SIZE.$BITRATE.all | sed -e "s#^.*$SIZEWIFI | ##g" -e "s# | data.*\$##g" -e "s#+# #g" -e "s#/# #g" | awk '{print $2}' > $AC_EVALUATIONDIR/$NODE.$DEVICE.rssi.own.$SIZE.$BITRATE.all
+		    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab | awk '{print $2" "$3" "$4" "$5" "$7}' | egrep "^0 1 $SIZEWIFI $BITRATE" | awk '{print $5}' > $AC_EVALUATIONDIR/$NODE.$DEVICE.rssi.own.$SIZE.$BITRATE.all
 		    cp $AC_EVALUATIONDIR/$NODE.$DEVICE.rssi.own.$SIZE.$BITRATE.all $AC_EVALUATIONDIR/rssi.own.all
 		    FILESIZE=`wc -l $AC_EVALUATIONDIR/rssi.own.all | awk '{print $1}'`
 
@@ -247,7 +254,7 @@ echo -n "$i "
                         PACKETS_OVERALL=`echo "scale=5; $DURATIONMS/$INTERVAL; quit" | calc | sed -e "s#~##g" | awk '{print $1}'`
 		    SUCCESS=`echo "scale=5; $PACKETS_OWN_OK/$PACKETS_OVERALL; quit" | calc | sed -e "s#~##g" | awk '{print $1}'`
 		     PER=`echo "scale=5; 1 - $SUCCESS; quit" | calc | sed -e "s#~##g" | awk '{print $1}'`
-		   		
+		   
 		else
 		    PACKETS_OWN_ALL=0
 		    PACKETS_OWN_OK=0
