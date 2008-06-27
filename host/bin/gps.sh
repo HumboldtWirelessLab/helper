@@ -153,7 +153,7 @@ case "$1" in
 		    if [ $QUAL -eq 1 ] || [ $QUAL -eq 2 ]; then
 		        PREC=`gpgga_print "$line" | grep "HDOP" | awk '{print $2}' | sed "s#\..*##g"`
 		        if [ "x$PREC" != "x" ] && [ $PREC -le 4 ]; then
-			    gpspipe -t -r -n 10	
+			    gpspipe -t -r -n 30	
 			    exit 0
 			fi
 		    fi
