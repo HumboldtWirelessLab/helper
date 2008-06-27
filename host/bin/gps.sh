@@ -145,19 +145,25 @@ case "$1" in
 		gpspipe -t -r -n $N	
 		;;
 	"getdata")
-		line=`gpspipe -t -r -n 1`
-		echo "$line" 
-		TYPE=`echo $line | sed -e  "s#^.*:.G#G#g" -e "s#^.*:.PG#PG#g" -e "s#^.*:G#G#g" -e "s#,# #g" | awk '{print $1}'`
-		if [ "$TYPE" = "GPGGA" ]; then
-		    QUAL=`gpgga_print "$line" | grep "Qualtity" | awk '{print $2}'`
-		    if [ $QUAL -eq 1 ] || [ $QUAL -eq 2 ]; then
-		        PREC=`gpgga_print "$line" | grep "HDOP" | awk '{print $2}' | sed "s#\..*##g"`
-		        if [ "x$PREC" != "x" ] && [ $PREC -le 4 ]; then
-			    gpspipe -t -r -n 30	
-			    exit 0
+		while true; do
+		    line=`gpspipe -t -r -n 5`
+		    echo $line
+		    TYPE=`echo $line | grep GPGGA | tail -n 1 | sed -e  "s#^.*:.G#G#g" -e "s#^.*:.PG#PG#g" -e "s#^.*:G#G#g" -e "s#,# #g" | awk '{print $1}'`
+		    line=`echo $line | grep GPGGA | tail -n 1`
+		    echo $TYPE
+		    if [ "$TYPE" = "GPGGA" ]; then
+			QUAL=`gpgga_print "$line" | grep "Qualtity" | awk '{print $2}'`
+			echo $QUAL
+			if [ $QUAL -eq 1 ] || [ $QUAL -eq 2 ]; then
+		    	    PREC=`gpgga_print "$line" | grep "HDOP" | awk '{print $2}' | sed "s#\..*##g"`
+			    echo "Pre: $PREC"
+		    	    if [ "x$PREC" != "x" ] && [ $PREC -le 4 ]; then
+				gpspipe -t -r -n 15	
+				exit 0
+			    fi
 			fi
 		    fi
-		fi
+		done
 		;;
 	"readdata")
 		while read line; do
