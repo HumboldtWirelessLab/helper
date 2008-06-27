@@ -1,0 +1,1 @@
+/home/all/trash/measurement/lab/helper/host/bin/run_measurement.sh

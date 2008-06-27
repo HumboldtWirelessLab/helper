@@ -124,7 +124,7 @@ if (~isempty(own_rec))
     ylabel('FG RSSI');
     
 %    %exportfig(gcf, strcat(sname, '.eps'),'LineStyleMap',[],'Color','rgb');
-    fname = strcat(rname, str2num(psize),psize,'.png');
+    fname = strcat(rname,'.', num2str(psize - 32),'.',num2str(bitrate),'.png');
     print('-dpng', fname);
 end
 end
