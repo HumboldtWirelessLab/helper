@@ -294,6 +294,7 @@ exit 0
 
 #help 
 
+#svnversion ubi		madwifi-dfs-r3319-20080201
 #svnversion 0.9.1	release-0.9.1
 #svnversion brn-0.9.1	brn-madwifi-0.9.1
 #svnversion brn-0.9.3	brn-madwifi-0.9.3
