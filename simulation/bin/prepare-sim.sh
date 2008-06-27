@@ -38,9 +38,9 @@ case "$1" in
 
 		#Prepare click
 		for node in $NODELIST; do
-		    NODEDEVICELIST=`cat $NODETABLE | grep "^$node" | awk '{print $2}'`
-		    for nodedevice in $NODEDEVICELIST; do		    
-			CLICK=`cat $NODETABLE | grep -v "#" | grep $node | grep $nodedevice | awk '{print $5}' | sed -e "s#WORKDIR#$WORKDIR#g"`
+		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+		    for nodedevice in $NODEDEVICELIST; do
+			CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}' | sed -e "s#WORKDIR#$WORKDIR#g"`
 			cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAP#g" -e "s#TODEVICE#WIFIENCAP -> TORAWDEVICE#g" -e "s#FROMRAWDEVICE#FromSimDevice(DEVICE,4096)#g" -e "s#WIFIDECAP#Strip(14)#g" -e "s#TORAWDEVICE#ToSimDevice(DEVICE)#g" -e "s#WIFIENCAP#AddEtherNsclick()#g" | sed -e "s#DEVICE#eth0#g" -e"s#NODE#$node#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" > $CLICK.$node.$nodedevice
 		    done
 		done

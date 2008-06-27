@@ -24,7 +24,7 @@ case "$1" in
 	"help")
 		echo "Use $0 setup | stop"
 		;;
-	"start"
+	"start")
 		$0 setup
 		;;
 	"setup")

@@ -33,8 +33,30 @@ case "$1" in
 		NODELIST=`cat $NODETABLE | grep -v "#" | awk '{print $1}' | sort -u`
 		NODECOUNT=`cat $NODETABLE | grep -v "#" | wc -l`
 		cat $DIR/../etc/ns/radio/$RADIO\.tcl > $TCLFILE
-		echo "set xsize 200" >> $TCLFILE
-		echo "set ysize 200" >> $TCLFILE
+
+		POS_X_MAX=0
+		POS_Y_MAX=0
+		POS_Z_MAX=0
+		for node in $NODELIST; do
+		    POS_X=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENT | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
+		    POS_Y=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENT | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
+		    POS_Z=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENT | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
+		    if [ $POS_X -gt $POS_X_MAX ]; then
+			POS_X_MAX=$POS_X;
+		    fi
+		    if [ $POS_Y -gt $POS_Y_MAX ]; then
+			POS_Y_MAX=$POS_Y;
+		    fi
+		    if [ $POS_Z -gt $POS_Z_MAX ]; then
+			POS_Z_MAX=$POS_Z;
+		    fi
+		done
+		
+		POS_X_MAX=`expr $POS_X_MAX + 50`
+		POS_Y_MAX=`expr $POS_Y_MAX + 50`
+		POS_Z_MAX=`expr $POS_Z_MAX + 50`
+		echo "set xsize $POS_X_MAX" >> $TCLFILE
+		echo "set ysize $POS_Y_MAX" >> $TCLFILE
 		echo "set nodecount $NODECOUNT"	>> $TCLFILE
 		echo "set stoptime $TIME" >> $TCLFILE
 		
@@ -46,9 +68,9 @@ case "$1" in
 		
 		i=0
 		for node in $NODELIST; do
-		    NODEDEVICELIST=`cat $NODETABLE | grep "^$node" | awk '{print $2}'`
+		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		    for nodedevice in $NODEDEVICELIST; do		    
-			CLICK=`cat $NODETABLE | grep -v "#" | grep $node | grep $nodedevice | awk '{print $5}'`
+			CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
 			echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
 			i=`expr $i + 1`
 		    done
@@ -60,11 +82,11 @@ case "$1" in
 		
 		i=0
 		for node in $NODELIST; do
-		    POS_X=`cat $DIR/../../host/etc/nodeplacement/placement.default | grep -v "#" | grep $node | awk '{print $2}'`
-		    POS_Y=`cat $DIR/../../host/etc/nodeplacement/placement.default | grep -v "#" | grep $node | awk '{print $3}'`
-		    POS_Z=`cat $DIR/../../host/etc/nodeplacement/placement.default | grep -v "#" | grep $node | awk '{print $4}'`
+		    POS_X=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENT | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
+		    POS_Y=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENT | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
+		    POS_Z=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENT | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
 		    
-		    NODEDEVICELIST=`cat $NODETABLE | grep "^$node" | awk '{print $2}'`
+		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		
 		    for nodedevice in $NODEDEVICELIST; do		    
 
@@ -93,7 +115,7 @@ case "$1" in
 
 		POSTFIX=$POSTFIX $DIR/prepare-sim.sh cleanup $2
 
-		rm $TCLFILE
+#		rm $TCLFILE
 		;;
 	*)
 		$0 help
