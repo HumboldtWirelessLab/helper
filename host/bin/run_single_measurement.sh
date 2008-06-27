@@ -39,61 +39,69 @@ check_nodes() {
     fi
 }
 
-echo "check all nodes"
-NODELIST="$NODELIST" $DIR/system.sh waitfornodes
+if [ "x$RUNMODE" = "x" ]; then
+    RUNMODE=ALL
+fi
 
-echo "reboot all nodes"
-NODELIST="$NODELIST" $DIR/system.sh reboot
+if [ "x$RUNMODE" = "xALL" ]; then
+    echo "check all nodes"
+    NODELIST="$NODELIST" $DIR/system.sh waitfornodes
+
+#    echo "reboot all nodes"
+#    NODELIST="$NODELIST" $DIR/system.sh reboot
      
-echo "wait for all nodes"
-sleep 20
-NODELIST="$NODELIST" $DIR/system.sh waitfornodes
-sleep 20
+#    echo "wait for all nodes"
+#    sleep 20
+#    NODELIST="$NODELIST" $DIR/system.sh waitfornodes
+#    sleep 20
 
-echo "Setup environment"
-NODELIST="$NODELIST" $DIR/environment.sh mount
+    echo "Setup environment"
+    NODELIST="$NODELIST" $DIR/environment.sh mount
+fi
 
 NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/status.sh setmarker
 
-NODELIST="$NODELIST" $DIR/wlanmodules.sh rmmod
+if [ "x$RUNMODE" = "xALL" ]; then
+    NODELIST="$NODELIST" $DIR/wlanmodules.sh rmmod
 
-for node in $NODELIST; do
-	MODULSDIR=`cat $CONFIGFILE | grep "^$node" | awk '{print $3}' | tail -n 1`
+    for node in $NODELIST; do
+	MODULSDIR=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $3}' | tail -n 1`
 	NODELIST="$node" MODULSDIR=$MODULSDIR $DIR/wlanmodules.sh insmod
-done
+    done
 
-check_nodes
-sleep 2
+    check_nodes
+    sleep 2
 
-for node in $NODELIST; do
-	NODEDEVICELIST=`cat $CONFIGFILE | grep "^$node" | awk '{print $2}'`
+    for node in $NODELIST; do
+	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	for nodedevice in $NODEDEVICELIST; do
-		CONFIG=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $4}'`
+		CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $4}'`
 		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/wlandevices.sh create
 	done
-done
+    done
 
-check_nodes
-sleep 2
+    check_nodes
+    sleep 2
 
-for node in $NODELIST; do
-	NODEDEVICELIST=`cat $CONFIGFILE | grep "^$node" | awk '{print $2}'`
+    for node in $NODELIST; do
+	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	for nodedevice in $NODEDEVICELIST; do
-		CONFIG=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $4}'`
+		CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $4}'`
 		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/wlandevices.sh start
 	done
-done
+    done
 
-check_nodes
-sleep 2
+    check_nodes
+    sleep 2
 
-for node in $NODELIST; do
-	NODEDEVICELIST=`cat $CONFIGFILE | grep "^$node" | awk '{print $2}'`
+    for node in $NODELIST; do
+	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	for nodedevice in $NODEDEVICELIST; do
-		CONFIG=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $4}'`
+		CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $4}'`
 		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/wlandevices.sh config
 	done
-done
+    done
+fi
 
 check_nodes
 
@@ -105,13 +113,13 @@ sleep 0.2
 NODEBINDIR="$DIR/../../nodes/bin"
 
 for node in $NODELIST; do
-	NODEDEVICELIST=`cat $CONFIGFILE | grep "^$node" | awk '{print $2}'`
+	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	
 	NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
 	
 	for nodedevice in $NODEDEVICELIST; do
-		CLICKSCRIPT=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $5}'`
-		LOGFILE=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $6}'`
+		CLICKSCRIPT=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
+		LOGFILE=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $6}'`
 		
 		if [ ! "x$CLICKSCRIPT" = "x" ]; then
 		if [ ! "x$CLICKSCRIPT" = "x-" ]; then
@@ -127,10 +135,10 @@ for node in $NODELIST; do
 done
 
 for node in $NODELIST; do
-	NODEDEVICELIST=`cat $CONFIGFILE | grep "^$node" | awk '{print $2}'`
+	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	for nodedevice in $NODEDEVICELIST; do
-		CLICKSCRIPT=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $5}'`
-		LOGFILE=`cat $CONFIGFILE | grep "^$node" | grep "$nodedevice" | awk '{print $6}'`
+		CLICKSCRIPT=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
+		LOGFILE=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $6}'`
 
 		if [ ! "x$CLICKSCRIPT" = "x" ]; then
 		if [ ! "x$CLICKSCRIPT" = "x-" ]; then
