@@ -3,7 +3,9 @@
 SENDERFILE=$1/sender.csv
 RECEIVERFILE=$1/result.csv
 INFOFILE=$1/info.csv
-KMLFILE=$1/network.kml
+KMLFILE=$1/google/network.kml
+GOOGLEDIR=$1/google
+mkdir $GOOGLEDIR
 
 cat > $KMLFILE << EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -165,6 +167,34 @@ done < $RECEIVERFILE
 
 cat >> $KMLFILE << EOF
 			</table>
+			<h3>	Graphs</h3>
+EOF
+
+#echo "$POINT $NAME $DEVICE"
+
+DIFFSIZES=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$19" "$20}' | grep "^$POINT $NAME $DEVICE " | awk '{print $4}' | sort -u`
+for dsize in $DIFFSIZES; do
+	DIFFBR=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$19" "$20}' | grep "^$POINT $NAME $DEVICE $dsize " | awk '{print $5}' | sort -u`
+	for dbr in $DIFFBR; do
+#		echo "$dsize $dbr $POINT"
+		if [ -e $1/$POINT/$NAME.$DEVICE.packets.all.all.matlab.$dsize.$dbr.png ]; then
+			if [ ! -e $GOOGLEDIR/$POINT ]; then
+				mkdir $GOOGLEDIR/$POINT
+			fi
+
+			cp $1/$POINT/$NAME.$DEVICE.packets.all.all.matlab.$dsize.$dbr.png $GOOGLEDIR/$POINT/ 
+cat >> $KMLFILE << EOF
+			          <h4>Node: $NAME Device: $DEVICE Packetsize: $dsize Bitrate: $dbr</h4>
+				<img src="$POINT/$NAME.$DEVICE.packets.all.all.matlab.$dsize.$dbr.png" alt="graph">
+				<p>
+EOF
+		fi
+	done
+done
+
+			
+
+cat >> $KMLFILE << EOF
 			<h3>Info</h3>
 EOF
 			if [ -e $INFODIR/info ]; then
@@ -172,9 +202,11 @@ EOF
 			else
 				echo "No Info" >> $KMLFILE
 			fi
-
+			
 cat >> $KMLFILE << EOF
 		<p>
+		<h3>Headman</h3>
+		<img src="az.png" alt="Headman">
 		]]>
 		</description>
 		<Point>
@@ -183,7 +215,6 @@ cat >> $KMLFILE << EOF
 	</Placemark>
 EOF
 
-
 fi #END of valid coord
 done 
 
@@ -191,6 +222,11 @@ cat >> $KMLFILE << EOF
 </Document>
 </kml>
 EOF
+
+cp az.png $GOOGLEDIR/
+rm $GOOGLEDIR/../network.kmz
+(cd $GOOGLEDIR/; zip -r ../network.kmz *)
+rm -rf $GOOGLEDIR
 
 exit 0
 

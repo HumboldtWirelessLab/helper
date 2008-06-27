@@ -196,9 +196,19 @@ echo -n "$i "
 
 	    rm -f $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab
 	    rm -f $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.csv
+	    echo "TIMESTAMP;ERROR;OWN;PACKETSIZE;BITRATE;ID;RSSI;" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.csv
 	
-	    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | sed -e "s#:##g" -e "s#|##g" -e "s#Mb# #g" -e "s#+# #g" -e "s#/# #g" -e "s#Type.*EXTRA##g" | awk '{print $2";"$1";"gsub("80870000","muell",$7)";"$3";"$4";"strtonum("0x"$8)";"$5}' | sed -e "s#OKPacket#0#g" -e "s#CRCerror#1#g" -e "s#Phyerror#2#g" > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.csv
-	    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.csv | sed -e "s#;# #g" > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab
+	    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all | sed -e "s#:##g" -e "s#|##g" -e "s#Mb# #g" -e "s#+# #g" -e "s#/# #g" -e "s#Type.*EXTRA##g" | awk '{print $2";"$1";"gsub("80870000","muell",$7)";"$3";"$4";"strtonum("0x"$8)";"$5";"}' | sed -e "s#OKPacket#0#g" -e "s#CRCerror#1#g" -e "s#Phyerror#2#g" | sed -e "s#[[:space:]]*[0-9]*,[0-9]*e+[0-9]*[[:space:]]*# 0 #g" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.csv
+	    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.csv | grep -v "TIMESTAMP" | sed -e "s#;# #g" > $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab
+
+	    MATLAB_AVAILABLE=`ping -c 1 gruenau.informatik.hu-berlin.de 2>&1 | grep trans | awk '{print $4}'`
+
+	    if [ "x$MATLAB_AVAILABLE" = "x1" ]; then
+		ssh sombrutz@gruenau.informatik.hu-berlin.de "mkdir ~/tmp" > /dev/null 2>&1
+		scp $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab sombrutz@gruenau.informatik.hu-berlin.de:~/tmp/ > /dev/null 2>&1
+		scp $DIR/rssi_per.m sombrutz@gruenau.informatik.hu-berlin.de:~/tmp/ > /dev/null 2>&1
+	    fi
+
 	else
 	    PACKETS_ALL_ALL=0
 	    PACKETS_ALL_OK=0
@@ -253,8 +263,8 @@ echo -n "$i "
 		    DURATIONMS=`expr $DURATION \* 1000`
                         PACKETS_OVERALL=`echo "scale=5; $DURATIONMS/$INTERVAL; quit" | calc | sed -e "s#~##g" | awk '{print $1}'`
 		    SUCCESS=`echo "scale=5; $PACKETS_OWN_OK/$PACKETS_OVERALL; quit" | calc | sed -e "s#~##g" | awk '{print $1}'`
-		     PER=`echo "scale=5; 1 - $SUCCESS; quit" | calc | sed -e "s#~##g" | awk '{print $1}'`
-		   
+		    PER=`echo "scale=5; 1 - $SUCCESS; quit" | calc | sed -e "s#~##g" | awk '{print $1}'`
+
 		else
 		    PACKETS_OWN_ALL=0
 		    PACKETS_OWN_OK=0
@@ -289,7 +299,26 @@ echo -n "$i "
 
 	done < $DATADIR/$SENDERNUM/sender.packets
 
+	if [ "x$MATLAB_AVAILABLE" = "x1" ]; then
+		for rssifile in `(cd $AC_EVALUATIONDIR/; ls $NODE.$DEVICE.rssi.own.*.all)`; do
+		      PACKETSIZE=`echo "$rssifile" | sed -e "s#\.# #g" | awk '{print $5}'`
+		      BITRATE=`echo "$rssifile" | sed -e "s#\.# #g" | awk '{print $6}'`
+		      INTERVAL=`cat $DATADIR/$SENDERNUM/sender.packets | egrep "^$PACKETSIZE[[:space:]]*$BITRATE[[:space:]]" | awk '{print $3}'`
+	
+                          SIZEWIFI=`expr $PACKETSIZE + 32`
 
+		      cat $DIR/rssi_per_func.m | sed -e "s#FILENAME#$NODE.$DEVICE.packets.all.all.matlab#g" -e "s#BITRATE#$BITRATE#g" -e "s#PACKETSIZE#$SIZEWIFI#g"  -e "s#INTERVAL#$INTERVAL#g" > $AC_EVALUATIONDIR/rssi_per_func.m
+		      scp $AC_EVALUATIONDIR/rssi_per_func.m sombrutz@gruenau.informatik.hu-berlin.de:~/tmp > /dev/null 2>&1
+		      ssh sombrutz@gruenau.informatik.hu-berlin.de "cd ~/tmp;/usr/local/bin/matlab -nodesktop -nojvm -nosplash -r \"rssi_per_func;exit\"" > /dev/null 2>&1
+ 		      rm -f $AC_EVALUATIONDIR/rssi_per_func.m
+		done
+ 
+                    scp sombrutz@gruenau.informatik.hu-berlin.de:~/tmp/*.png  $AC_EVALUATIONDIR/ > /dev/null 2>&1
+
+	fi
+
+	ssh sombrutz@gruenau.informatik.hu-berlin.de "rm -rf ~/tmp" > /dev/null 2>&1
+	
     done
 
 done
