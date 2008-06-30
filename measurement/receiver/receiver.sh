@@ -43,7 +43,7 @@ echo "prepare everything"
 GPSD=`ps -le | grep gpsd | wc -l | awk '{print $1}'`
 
 if [ $GPSD -eq 0 ]; then
-    echo "Warning: no GPS ! exit (y/n)"
+    echo -n "Warning: no GPS ! Exit (y/n) ?"
     read key
     
     if [ "x$key" = "xy" ]; then

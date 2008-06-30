@@ -78,7 +78,7 @@ mkdir -p $RESULTDIR
 echo -n "EVALUATIONSNUMBER;POINT;NODE;DEVICE;LONG;LAT;HOG;SENDERNODE;SENDERDEVICE;SENDERLONG;SENDERLAT;SENDERHOG;DISTANCE;DURATION;" > $RESULTDIR/result.csv
 echo -n "PACKETS_ALL_ALL;PACKETS_ALL_OK;PACKETS_ALL_CRC;PACKETS_ALL_PHY;" >> $RESULTDIR/result.csv
 echo -n "PACKETS_OWN_SIZE;PACKETS_OWN_BITRATE;PACKETS_OWN_INTERVAL;PACKETS_OWN_ALL;PACKETS_OWN_OK;PACKETS_OWN_CRC;PACKETS_OWN_PHY;" >> $RESULTDIR/result.csv
-echo "PER;MEANRSSI;STDRSSI;" >> $RESULTDIR/result.csv
+echo "PER;MEANRSSI;STDRSSI;FORMEANRSSI;FORSTDRSSI;" >> $RESULTDIR/result.csv
 
 rm -f $RESULTDIR/info.csv
 
@@ -260,8 +260,24 @@ echo -n "$i "
 		    fi
 
 		    rm $AC_EVALUATIONDIR/rssi.own.all
+
+		    cat $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab | awk '{print $2" "$3" "$4" "$5" "$7}' | egrep -v "^0 1 $SIZEWIFI $BITRATE" | grep "^0" | awk '{print $5}' > $AC_EVALUATIONDIR/$NODE.$DEVICE.rssi.foreign.$SIZE.$BITRATE.all
+		    cp $AC_EVALUATIONDIR/$NODE.$DEVICE.rssi.foreign.$SIZE.$BITRATE.all $AC_EVALUATIONDIR/rssi.own.all
+		    FILESIZE=`wc -l $AC_EVALUATIONDIR/rssi.own.all | awk '{print $1}'`
+
+		    if [ $FILESIZE -gt 0 ]; then
+			(cd $AC_EVALUATIONDIR ; octave $DIR/rssi.m | egrep "me =|st =" ) > $AC_EVALUATIONDIR/$NODE.$DEVICE.rssi.foreign.$SIZE.$BITRATE.stat
+			FORMEANRSSI=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.rssi.foreign.$SIZE.$BITRATE.stat | grep "me" | awk '{print $3}'`
+			FORSTDRSSI=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.rssi.foreign.$SIZE.$BITRATE.stat | grep "st" | awk '{print $3}'`
+		    else
+			FORMEANRSSI=0
+			FORSTDRSSI=0
+		    fi
+
+		    rm $AC_EVALUATIONDIR/rssi.own.all
+
 		    DURATIONMS=`expr $DURATION \* 1000`
-                        PACKETS_OVERALL=`echo "scale=5; $DURATIONMS/$INTERVAL; quit" | calc | sed -e "s#~##g" | awk '{print $1}'`
+                    PACKETS_OVERALL=`echo "scale=5; $DURATIONMS/$INTERVAL; quit" | calc | sed -e "s#~##g" | awk '{print $1}'`
 		    SUCCESS=`echo "scale=5; $PACKETS_OWN_OK/$PACKETS_OVERALL; quit" | calc | sed -e "s#~##g" | awk '{print $1}'`
 		    PER=`echo "scale=5; 1 - $SUCCESS; quit" | calc | sed -e "s#~##g" | awk '{print $1}'`
 
@@ -272,8 +288,11 @@ echo -n "$i "
 		    PACKETS_OWN_PHY=0
 		    MEANRSSI=0
 		    STDRSSI=0
+		    FORMEANRSSI=0
+		    FORSTDRSSI=0
 		    PER=1.0
 		fi
+		
 		echo "" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
 		echo "PACKETS_OWN_SIZE=$SIZE" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
 		echo "PACKETS_OWN_BITRATE=$BITRATE" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
@@ -285,14 +304,16 @@ echo -n "$i "
 	   	echo "PER=$PER" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
 	    	echo "MEANRSSI=$MEANRSSI" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
 	    	echo "STDRSSI=$STDRSSI" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
+	    	echo "FORMEANRSSI=$FORMEANRSSI" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
+	    	echo "FORSTDRSSI=$FORSTDRSSI" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
 
 	    	echo -n "$EVALUATIONNUMBER;$i;$NODE;$DEVICE;$LONG;$LAT;$HOG;$SENDERNODE;$SENDERDEVICE;$SENDERLONG;$SENDERLAT;$SENDERHOG;$DISTANCE;$DURATION;" >> $RESULTDIR/result.csv
 	    	echo -n "$PACKETS_ALL_ALL;$PACKETS_ALL_OK;$PACKETS_ALL_CRC;$PACKETS_ALL_PHY;"  >> $RESULTDIR/result.csv
-		echo "$SIZE;$BITRATE;$INTERVAL;$PACKETS_OWN_ALL;$PACKETS_OWN_OK;$PACKETS_OWN_CRC;$PACKETS_OWN_PHY;$PER;$MEANRSSI;$STDRSSI;" >> $RESULTDIR/result.csv
+		echo "$SIZE;$BITRATE;$INTERVAL;$PACKETS_OWN_ALL;$PACKETS_OWN_OK;$PACKETS_OWN_CRC;$PACKETS_OWN_PHY;$PER;$MEANRSSI;$STDRSSI;$FORMEANRSSI;$FORSTDRSSI;" >> $RESULTDIR/result.csv
 	    
 	    	echo "$EVALUATIONNUMBER;\"$DATADIR/$i\";" >> $RESULTDIR/info.csv
 	
-	          EVALUATIONNUMBER=`expr $EVALUATIONNUMBER + 1`
+	        EVALUATIONNUMBER=`expr $EVALUATIONNUMBER + 1`
 
 	    fi
 
