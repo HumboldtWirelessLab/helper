@@ -11,8 +11,15 @@ FromDump("NODE.DEVICE.dump")
 			      
 status_clf[0]
   -> Strip(11)
-  -> brnpacket_clf :: Classifier(30/8087, - )
-  -> BRN2CRCerror()
+  -> WifiDecap()
+  -> brnpacket_clf :: Classifier(12/8087, - )
+  -> EtherDecap()
+  -> maxlen :: CheckLength(MAXLEN)
+  -> minlen :: CheckLength(MINLEN)
+  -> Discard;
+  
+  minlen[1]
+  -> BRN2CRCerror("",BITRATE)
   -> Discard;
 
 brnpacket_clf[1]
