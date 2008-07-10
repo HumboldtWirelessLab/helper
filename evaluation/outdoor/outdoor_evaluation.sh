@@ -85,6 +85,9 @@ rm -f $RESULTDIR/info.csv
 
 MATLAB_AVAILABLE=`ping -c 1 gruenau.informatik.hu-berlin.de 2>&1 | grep trans | awk '{print $4}'`
 
+mkdir -p $RESULTDIR/$SENDERNUM/
+cat $DATADIR/$SENDERNUM/sender.info |  egrep -v "#|^[[:space:]]*$" |awk '{print FNR": "$0}' > $RESULTDIR/$SENDERNUM/sender.info.index
+
 for i in `ls $DATADIR`; do
 echo -n "$i "    
 
@@ -114,14 +117,16 @@ echo -n "$i "
           MESFILE=`cat $DATADIR/$i/$DISFILE | grep "NODETABLE" | sed -e "s#=# #g" | awk '{print $2}'`
 
 	if [ -e $DATADIR/$i/$MESFILE ]; then
-		WIFICONFIG=`cat $DATADIR/$i/$MESFILE | sed -e "s#/# #g" | awk '{print $NF}'`
+		WIFICONFIG=`cat $DATADIR/$i/$MESFILE | egrep "$NODE[[:space:]]*$DEVICE" | awk '{print $4}' | sed -e "s#/# #g" | awk '{print $NF}'`
 		CHANNEL=`cat $DATADIR/$i/$WIFICONFIG | grep "CHANNEL" | sed -e "s#=# #g" | awk '{print $2}'`;
 		WIFITYPE=`cat $DATADIR/$i/$WIFICONFIG | grep "WIFITYPE" | sed -e "s#=# #g" | awk '{print $2}'`;
 	else
 		echo "cannot find out wifitype and channel of the sender"
 		exit 0
 	fi
- 
+
+	echo "$WIFICONFIG $CHANNEL $WIFITYPE"
+
 #########################################################
 #####################     G P S  S T U F F   #######################
 #########################################################
@@ -237,13 +242,13 @@ echo -n "$i "
 #	if [ "x$MATLAB_AVAILABLE" = "x1" ]; then
 #		ssh sombrutz@gruenau.informatik.hu-berlin.de "mkdir ~/tmp" > /dev/null 2>&1
 #	fi
-	
-	cat $DATADIR/$SENDERNUM
 
-	SENDERPARAMS=`cat $AC_EVALUATIONDIR/../$SENDERNUM/sender.info | awk '{print $1}'`
+	SENDERPARAMS=`cat $AC_EVALUATIONDIR/../$SENDERNUM/sender.info.index | awk '{print $4 $1}' | grep "^$CHANNEL" | awk '{print $2}'`
 
           for num_senderparm in $SENDERPARAMS; do
-		line=`cat $AC_EVALUATIONDIR/../$SENDERNUM/sender.packets | grep "^$num_senderparm" | awk '{print $2" "$3" "$4}'`
+		line=`cat $AC_EVALUATIONDIR/../$SENDERNUM/sender.info.index | grep "^$num_senderparm " | awk '{print $7" "$8" "$9}'`
+
+		echo "------------- $line --------------"
 		SIZE=`echo $line | awk '{print $1}'`
 		BITRATE=`echo $line | awk '{print $2}'`
 		INTERVAL=`echo $line | awk '{print $3}'`
