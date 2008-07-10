@@ -5,7 +5,7 @@ case "$1" in
 	if [ "x$MODOPTIONS" = "x" ]; then
 	    . ../etc/madwifi/modoptions.default
 	else
-	    .$MODOPTIONS
+	    . $MODOPTIONS
 	fi
 	
 	echo insmod ath_hal

@@ -79,8 +79,6 @@ for n in $NODELIST; do
         
 done
 
-exit 0
-
 if [ "x$RUNMODE" = "x" ]; then
     RUNMODE=ALL
 fi
