@@ -95,7 +95,7 @@ echo "NODE: $n"
     while [ $key -le 0 ] || [ $key -gt 10 ]; do
 	echo -n "LOS ? 1(full) 2(full,very small obstacle) 3(full,small obstacles) ..... 8(obstacle,very small los) 9(obstacle, nolos) 10(fat obstacle) (1-10): "
 	read key
-	NUMINPUT=`echo $key | egrep "^[1-6]$" | wc -l | awk '{print $1}'`
+	NUMINPUT=`echo $key | egrep "^[1-9]$|^10$" | wc -l | awk '{print $1}'`
 	if [ $NUMINPUT -eq 0 ]; then
 	    key=0
 	fi
