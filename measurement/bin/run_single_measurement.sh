@@ -146,7 +146,7 @@ if [ $RUNMODENUM -le 5 ]; then
     for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	for nodedevice in $NODEDEVICELIST; do
-		echo "Deviceconfig for $node\:$nodedevice" 
+		echo "Deviceconfig for $node:$nodedevice" 
 		NODE=$node DEVICES=$nodedevice $DIR/wlandevices.sh getiwconfig
 	done
     done
