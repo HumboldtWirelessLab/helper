@@ -76,6 +76,8 @@ NODELIST=`cat $NODETABLE | grep -v "^#" | awk '{print $1}' | sort -u`
 
 for n in $NODELIST; do
 
+echo "NODE: $n"
+
     if [ $GPSD -ge 1 ]; then
 	echo "Get GPS -Data"
     
