@@ -43,11 +43,9 @@ $DIR/../../host/bin/prepare_measurement.sh prepare receiver.dis
 echo "DISFILE: receiver.dis.real" > $DIR/measurement.info
 
 NODELIST=`cat $DIR/receiver.mes.real | grep -v "^#" | awk '{print $1}' | sort -u`
-echo "$NODELIST"
 
 for node in $NODELIST; do
 	NODEDEVICELIST=`cat $DIR/receiver.mes.real | egrep "^$node[[:space:]]" | awk '{print $2}'`
-	echo "$NODEDEVICELIST"
 
 	for nodedevice in $NODEDEVICELIST; do
 		WIFICONFIG=`cat $DIR/receiver.mes.real | awk '{print $1" "$2" "$4}' | grep "^$node $nodedevice" | awk '{print $3}' | sort -u`
@@ -84,7 +82,7 @@ echo "NODE: $n"
     if [ $GPSD -ge 1 ]; then
 	echo "Get GPS -Data"
     
-        echo -n "Get Position for $n"
+        echo -n "Get Position for $n ! Press any key !"
         read key
 	
         $DIR/../../host/bin/gps.sh getdata > $n\_gps.info
