@@ -101,7 +101,7 @@ for n in $NODELIST; do
 done
 
 if [ "x$RUNMODE" = "x" ]; then
-    RUNMODE=CONFIGURE
+    RUNMODE=CLICK
 fi
 
 RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/../../host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
@@ -112,7 +112,7 @@ mv *info $DIR/$1/
 cp *.click* $DIR/$1/
 cp *.real $DIR/$1/
 
-../../host/bin/prepare_measurement.sh cleanup receiver.dis
+$DIR/../../host/bin/prepare_measurement.sh cleanup receiver.dis
 
 echo "$RESULT"
 
