@@ -79,12 +79,12 @@ for rline in $RESULTLINES; do
 	NUMBER=`echo "$line" | sed "s#;# #g" | awk '{print $1}'`
 	POINT=`echo "$line" | sed "s#;# #g" | awk '{print $2}'`
 	NAME=`echo "$line" | sed "s#;# #g" | awk '{print $3}'`
-          DEVICE=`echo "$line" | sed "s#;# #g" | awk '{print $4}'`
+	DEVICE=`echo "$line" | sed "s#;# #g" | awk '{print $4}'`
 	LONG=`echo "$line" | sed "s#;# #g" | awk '{print $5}'`
 	LAT=`echo "$line" | sed "s#;# #g" | awk '{print $6}'`
 	HOG=`echo "$line" | sed "s#;# #g" | awk '{print $7}'`
 	SENDERNAME=`echo "$line" | sed "s#;# #g" | awk '{print $8}'`
-          SENDERDEVICE=`echo "$line" | sed "s#;# #g" | awk '{print $9}'`
+	SENDERDEVICE=`echo "$line" | sed "s#;# #g" | awk '{print $9}'`
 	SENDERLONG=`echo "$line" | sed "s#;# #g" | awk '{print $10}'`
 	SENDERLAT=`echo "$line" | sed "s#;# #g" | awk '{print $11}'`
 	SENDERHOG=`echo "$line" | sed "s#;# #g" | awk '{print $12}'`
@@ -92,7 +92,7 @@ for rline in $RESULTLINES; do
 	DURATION=`echo "$line" | sed "s#;# #g" | awk '{print $14}'`
 
 	PACKETS_ALL_ALL=`echo "$line" | sed "s#;# #g" | awk '{print $15}'`
-          PACKETS_ALL_OK=`echo "$line" | sed "s#;# #g" | awk '{print $16}'`
+	PACKETS_ALL_OK=`echo "$line" | sed "s#;# #g" | awk '{print $16}'`
 	PACKETS_ALL_CRC=`echo "$line" | sed "s#;# #g" | awk '{print $17}'`
 	PACKETS_ALL_PHY=`echo "$line" | sed "s#;# #g" | awk '{print $18}'`
 
@@ -184,10 +184,18 @@ for dsize in $DIFFSIZES; do
 
 			cp $1/$POINT/$NAME.$DEVICE.packets.all.all.matlab.$dsize.$dbr.png $GOOGLEDIR/$POINT/ 
 cat >> $KMLFILE << EOF
-			          <h4>Node: $NAME Device: $DEVICE Packetsize: $dsize Bitrate: $dbr</h4>
+			        <h4>Node: $NAME Device: $DEVICE Packetsize: $dsize Bitrate: $dbr</h4>
 				<img src="$POINT/$NAME.$DEVICE.packets.all.all.matlab.$dsize.$dbr.png" alt="graph">
 				<p>
 EOF
+			if [ -e $1/$POINT/$NAME.$DEVICE.$dsize.$dbr.crc.error.png ]; then
+			    cp $1/$POINT/$NAME.$DEVICE.$dsize.$dbr.crc.error.png $GOOGLEDIR/$POINT/
+cat >> $KMLFILE << EOF
+			        CRC
+				<img src="$POINT/$NAME.$DEVICE.$dsize.$dbr.crc.error.png" alt="crc">
+				<p>
+EOF
+			fi			    
 		fi
 	done
 done
@@ -229,4 +237,3 @@ rm $GOOGLEDIR/../network.kmz
 rm -rf $GOOGLEDIR
 
 exit 0
-

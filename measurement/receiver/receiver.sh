@@ -36,14 +36,35 @@ echo "" >> $DIR/info
 echo "DATE: $DATE" > $DIR/measurement.info
 
 echo "prepare everything"
-../../host/bin/prepare_measurement.sh prepare receiver.dis
+$DIR/../../host/bin/prepare_measurement.sh prepare receiver.dis
 
 . $DIR/receiver.dis.real
+
+echo "DISFILE: receiver.dis.real" > $DIR/measurement.info
+
+for n in $NODELIST; do
+	NODEDEVICELIST=`cat $DIR/receiver.mes.real | egrep "^$node[[:space:]]" | awk '{print $2}'`
+
+	for nodedevice in $NODEDEVICELIST; do
+		WIFICONFIG=`cat $DIR/receiver.mes.real | awk '{print $1" "$2" "$4}' | grep "^$n $nodedevice" | awk '{print $3}' | sort -u`
+		for wificonfig_ac in $WIFICONFIG; do
+			if [ -e $wificonfig_ac ]; then
+				cp $wificonfig_ac $DIR/$1/
+			fi
+			if [ -e $DIR/$wificonfig_ac ]; then
+				cp $DIR/$wificonfig_ac $DIR/$1/
+			fi
+			if [ -e $DIR/../../nodes/etc/wifi/$wificonfig_ac ]; then
+				cp $DIR/../../nodes/etc/wifi/$wificonfig_ac $DIR/$1/
+			fi
+		done
+	done
+done
 
 GPSD=`ps -le | grep gpsd | wc -l | awk '{print $1}'`
 
 if [ $GPSD -eq 0 ]; then
-    echo -n "Warning: no GPS ! Exit (y/n) ?"
+    echo -n "Warning: no GPS ! Exit (y/n) ? "
     read key
     
     if [ "x$key" = "xy" ]; then
@@ -61,13 +82,13 @@ for n in $NODELIST; do
         echo -n "Get Position for $n"
         read key
 	
-        ../../host/bin/gps.sh getdata > $n\_gps.info
+        $DIR/../../host/bin/gps.sh getdata > $n\_gps.info
     fi
 
     key=0
     
-    while [ $key -le 0 ] || [ $key -gt 6 ]; do
-	echo -n "LOS ? 1(full) 2(full,small obstacle) 3(full,more obstacle) 4(obstacle,small los) 5(obstacle, nolos) 6 (fat obstacle) (1-6): "
+    while [ $key -le 0 ] || [ $key -gt 10 ]; do
+	echo -n "LOS ? 1(full) 2(full,very small obstacle) 3(full,small obstacles) ..... 8(obstacle,very small los) 9(obstacle, nolos) 10(fat obstacle) (1-10): "
 	read key
 	NUMINPUT=`echo $key | egrep "^[1-6]$" | wc -l | awk '{print $1}'`
 	if [ $NUMINPUT -eq 0 ]; then
@@ -82,7 +103,7 @@ done
 exit 0
 
 if [ "x$RUNMODE" = "x" ]; then
-    RUNMODE=ALL
+    RUNMODE=CONFIGURE
 fi
 
 RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/../../host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
@@ -98,3 +119,4 @@ cp *.real $DIR/$1/
 echo "$RESULT"
 
 exit 0
+

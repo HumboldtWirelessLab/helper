@@ -14,21 +14,18 @@ status_clf[0]
   -> ok :: Counter
   -> Strip(11)
   -> BRN2PrintWifi("OKPacket",TIMESTAMP true)
-//-> PrintWifi("OKPacket",TIMESTAMP true)
   -> Discard;
 
 status_clf[1]
   -> crc :: Counter
   -> Strip(11)
   -> BRN2PrintWifi("CRCerror",TIMESTAMP true)
-//-> PrintWifi("CRCerror",TIMESTAMP true)
   -> Discard;
 
 status_clf[2]
   -> phy :: Counter
   -> Strip(11)
   -> BRN2PrintWifi("Phyerror",TIMESTAMP true)
-//-> PrintWifi("Phyerror",TIMESTAMP true)
   -> Discard;
 
 status_clf[3]
@@ -42,7 +39,6 @@ status_clf[4]
 filter_tx[1]
   -> Strip(11)
   -> BRN2PrintWifi("TXFeedback",TIMESTAMP true)
-//-> PrintWifi("TXFeedback",TIMESTAMP true)
   -> Discard;
   
 Script(
