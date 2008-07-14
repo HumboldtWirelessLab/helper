@@ -206,7 +206,7 @@ for i in `ls $DATADIR`; do
 ################   P A C K E T S T U F F   F O R   E A C H   B I T R A T E / S I Z E    #########################
 ################################################################################
 
-	       if [ "x$REMOTEMATLAB_AVAILABLE" = "x1" ] && ["x$MATLAB_AVAILABLE" != "x1" ]; then
+	       if [ "x$REMOTEMATLAB_AVAILABLE" = "x1" ] && [ "x$MATLAB_AVAILABLE" != "x1" ]; then
 		ssh sombrutz@gruenau.informatik.hu-berlin.de "mkdir ~/tmp" > /dev/null 2>&1
 	       fi
 
@@ -248,21 +248,25 @@ for i in `ls $DATADIR`; do
                                   ( cd $AC_EVALUATIONDIR; rm -f  packet_stat_print_call.m packet_stat_call.m packet_stat.m packet_stat_print.m packet_stat_paint.m packet_stat_paint_call.m)
                               else
                                   echo "function packet_stat_call()" > $AC_EVALUATIONDIR/packet_stat_call.m
-                                  echo "packet_stat($SIZEWIFI, $BITRATE, $INTERVAL, '$NODE.$DEVICE.packets.all.all.matlab', 100, '$NODE\_$DEVICE_$SIZE\_$BITRATE');"   >> $AC_EVALUATIONDIR/packet_stat_call.m
+                                  echo "packet_stat($SIZEWIFI, $BITRATE, $INTERVAL, '$NODE.$DEVICE.packets.all.all.matlab', 100, 'packets_stat');"   >> $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "end" >> $AC_EVALUATIONDIR/packet_stat_call.m
   
                                   echo "function packet_stat_print_call()" > $AC_EVALUATIONDIR/packet_stat_print_call.m
-                                  echo "packet_stat_print('$AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat.matlab');" >> $AC_EVALUATIONDIR/packet_stat_print_call.m
+                                  echo "packet_stat_print('packets_stat');" >> $AC_EVALUATIONDIR/packet_stat_print_call.m
                                   echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_print_call.m
                                   echo "end" >> $AC_EVALUATIONDIR/packet_stat_print_call.m
 
                                   echo "function packet_stat_paint_call()" > $AC_EVALUATIONDIR/packet_stat_paint_call.m
-                                  echo "packet_stat_paint('$NODE\_$DEVICE_$SIZE\_$BITRATE','$NODE.$DEVICE.packets.all.all.matlab');" >> $AC_EVALUATIONDIR/packet_stat_paint_call.m
+                                  echo "packet_stat_paint('packets_stat','$NODE.$DEVICE.packets.all.all.matlab');" >> $AC_EVALUATIONDIR/packet_stat_paint_call.m
                                   echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_paint_call.m
                                   echo "end" >> $AC_EVALUATIONDIR/packet_stat_paint_call.m
 
                                   if [ "x$MATLAB_AVAILABLE" = "x1" ]; then
+                                      cp $DIR/packet_stat.m $AC_EVALUATIONDIR/
+                                      cp $DIR/packet_stat_print.m $AC_EVALUATIONDIR/
+                                      cp $DIR/packet_stat_paint.m $AC_EVALUATIONDIR/
+
                                       ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -nodesktop -nojvm -nosplash -r "packet_stat_call;exit" )
                                       ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -nodesktop -nojvm -nosplash -r "packet_stat_print_call;exit" > $NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab )
                                       ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -nodesktop -nojvm -nosplash -r "packet_stat_paint_call;exit" )
