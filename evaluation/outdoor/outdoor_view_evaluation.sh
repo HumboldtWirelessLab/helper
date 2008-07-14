@@ -48,6 +48,8 @@ while  read line; do
 	LONG=`echo "$line" | sed "s#;# #g" | awk '{print $3}'`
 	LAT=`echo "$line" | sed "s#;# #g" | awk '{print $4}'`
 	HOG=`echo "$line" | sed "s#;# #g" | awk '{print $5}'`
+	CHANNEL=`echo "$line" | sed "s#;# #g" | awk '{print $6}'`
+
 cat >> $KMLFILE << EOF
 	<Placemark>
 		<name>$NAME</name>
@@ -56,10 +58,10 @@ cat >> $KMLFILE << EOF
 			<h3>$NAME</h3>
 			<table>
 				<tr>
-					<th>Name</th><th>Device</th><th>Longitude</th><th>Latitude</th><th>HOG</th>
+					<th>Name</th><th>Device</th><th>Longitude</th><th>Latitude</th><th>HOG</th><th>Channel</th>
 				</tr>
 				<tr>
-					<td>$NAME</td><td>$DEVICE</td><td>$LONG</td><td>$LAT</td><td>$HOG</td>
+					<td>$NAME</td><td>$DEVICE</td><td>$LONG</td><td>$LAT</td><td>$HOG</td><td>$CHANNEL</td>
 				</tr>
 			</table>
 		]]>
@@ -72,135 +74,153 @@ EOF
 	
 done < $SENDERFILE
 
-RESULTLINES=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print ";"$2";"$3";"$4";"}' | sort -u`
+POINTS=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2}' | sort -u`
 
-for rline in $RESULTLINES; do
-	line=`cat $RECEIVERFILE | grep $rline | tail -n 1`
-	NUMBER=`echo "$line" | sed "s#;# #g" | awk '{print $1}'`
-	POINT=`echo "$line" | sed "s#;# #g" | awk '{print $2}'`
-	NAME=`echo "$line" | sed "s#;# #g" | awk '{print $3}'`
-	DEVICE=`echo "$line" | sed "s#;# #g" | awk '{print $4}'`
-	LONG=`echo "$line" | sed "s#;# #g" | awk '{print $5}'`
-	LAT=`echo "$line" | sed "s#;# #g" | awk '{print $6}'`
-	HOG=`echo "$line" | sed "s#;# #g" | awk '{print $7}'`
-	SENDERNAME=`echo "$line" | sed "s#;# #g" | awk '{print $8}'`
-	SENDERDEVICE=`echo "$line" | sed "s#;# #g" | awk '{print $9}'`
-	SENDERLONG=`echo "$line" | sed "s#;# #g" | awk '{print $10}'`
-	SENDERLAT=`echo "$line" | sed "s#;# #g" | awk '{print $11}'`
-	SENDERHOG=`echo "$line" | sed "s#;# #g" | awk '{print $12}'`
-	DISTANCE=`echo "$line" | sed "s#;# #g" | awk '{print $13}'`
-	DURATION=`echo "$line" | sed "s#;# #g" | awk '{print $14}'`
+for POINT in $POINTS; do
 
-	PACKETS_ALL_ALL=`echo "$line" | sed "s#;# #g" | awk '{print $15}'`
-	PACKETS_ALL_OK=`echo "$line" | sed "s#;# #g" | awk '{print $16}'`
-	PACKETS_ALL_CRC=`echo "$line" | sed "s#;# #g" | awk '{print $17}'`
-	PACKETS_ALL_PHY=`echo "$line" | sed "s#;# #g" | awk '{print $18}'`
+  NUMBER=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$1}' | grep "^$POINT " | awk '{print $2}' | tail -n 1`
+  INFODIR=`cat $INFOFILE | egrep "^$NUMBER;" | sed "s#;# #g" | awk '{print $2}' | sed "s#\"##g"`
 
-	INFODIR=`cat $INFOFILE | egrep "^$NUMBER;" | sed "s#;# #g" | awk '{print $2}' | sed "s#\"##g"`
+  if [ -e $INFODIR/info ]; then	
+    DAY=`cat $INFODIR/info | grep "DATE:" | awk '{print $2}' | sed "s#:#/#g"`
+    TIME=`cat $INFODIR/info | grep "DATE:" | awk '{print $3}'`
+  else
+     DAY="-"
+     TIME="-"
+  fi
 
-if [ ! "x$LONG" = "x0" ] && [ ! "x$LAT" = "x0" ]; then 
+  NODES=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3}' | grep "^$POINT " | awk '{print $2}' | sort -u`
 
+  for NODE in $NODES; do
+
+    DEVICES=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4}' | grep "^$POINT $NODE " | awk '{print $3}' | sort -u`
+
+    for DEVICE in $DEVICES; do
+      NUMBER=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$1}' | grep "^$POINT $NODE $DEVICE " | awk '{print $4}' | sort -u`
+      CHANNEL=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$5}' | grep "^$POINT $NODE $DEVICE " | awk '{print $4}' | sort -u`
+      LONG=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$6}' | grep "^$POINT $NODE $DEVICE " | awk '{print $4}' | sort -u`
+      LAT=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$7}' | grep "^$POINT $NODE $DEVICE " | awk '{print $4}' | sort -u`
+      HOG=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$8}' | grep "^$POINT $NODE $DEVICE " | awk '{print $4}' | sort -u`
+
+      PACKETS_ALL_ALL=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$16}' | grep "^$POINT $NODE $DEVICE " | awk '{print $4}' | tail -n 1`
+      PACKETS_ALL_OK=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$17}' | grep "^$POINT $NODE $DEVICE " | awk '{print $4}' | tail -n 1`
+      PACKETS_ALL_CRC=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$18}' | grep "^$POINT $NODE $DEVICE " | awk '{print $4}' | tail -n 1`
+      PACKETS_ALL_PHY=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$19}' | grep "^$POINT $NODE $DEVICE " | awk '{print $4}' | tail -n 1`
+      DURATION=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$15}' | grep "^$POINT $NODE $DEVICE " | awk '{print $4}' | tail -n 1`
+
+      if [ ! "x$LONG" = "x0" ] && [ ! "x$LAT" = "x0" ]; then 
+ 
 cat >> $KMLFILE << EOF
 	<Placemark>
-		<name>POINT $POINT ($NAME)</name>
+		<name>POINT $POINT ($NODE:$DEVICE)</name>
 		<description>
 		<![CDATA[
-EOF
-			if [ -e $INFODIR/info ]; then	
-				DAY=`cat $INFODIR/info | grep "DATE:" | awk '{print $2}' | sed "s#:#/#g"`
-				TIME=`cat $INFODIR/info | grep "DATE:" | awk '{print $3}'`
-				echo "Date: $DAY $TIME" >> $KMLFILE
-			else
-				echo "Date: -" >> $KMLFILE
-			fi
-cat >> $KMLFILE << EOF
-			<h3>Nodes</h3>
+			<h3>Node</h3>
+			Date: $DAY $TIME
 			<table>
 				<tr>
-					<th></th><th>Name</th><th>Device</th><th>Longitude</th><th>Latitude</th><th>HOG</th><th>Distance</th>
+					<th>Name</th><th>Device</th><th>Longitude</th><th>Latitude</th><th>HOG</th><th>Channel</th><th>Duration</th>
 				</tr>
 				<tr>
-					<td>Receiver</td><td>$NAME</td><td>$DEVICE</td><td>$LONG</td><td>$LAT</td><td>$HOG</td><td>$DISTANCE</td>
-				</tr>
-				<tr>
-					<td>Sender</td><td>$SENDERNAME</td><td>$SENDERDEVICE</td><td>$SENDERLONG</td><td>$SENDERLAT</td><td>$SENDERHOG</td><td>0</td>
+					<td>$NODE</td><td>$DEVICE</td><td>$LONG</td><td>$LAT</td><td>$HOG</td><td>$CHANNEL</td><td>$DURATION</td>
 				</tr>
 			</table>
-			<h3>Packetstats</h3>
-			<h4>All</h4>
+			<h3>General Packetstats</h3>
 			<table>
 				<tr>
-					<th>Sum</th><th>OK</th><th>CRC-Error</th><th>Phy-Error</th><th>PER</th><th>Mean-RSSI</th><th>Std. Dev. RSSI</th>
+					<th>Sum</th><th>OK</th><th>CRC-Error</th><th>Phy-Error</th>
 				</tr>
 				<tr>
-					<td>$PACKETS_ALL_ALL</td><td>$PACKETS_ALL_OK</td><td>$PACKETS_ALL_CRC</td><td>$PACKETS_ALL_PHY</td><td>-</td><td>-</td><td>-</td>
+					<td>$PACKETS_ALL_ALL</td><td>$PACKETS_ALL_OK</td><td>$PACKETS_ALL_CRC</td><td>$PACKETS_ALL_PHY</td>
 				</tr>
 			</table>
-			<h4>Own</h4>
+
+EOF
+
+        SENDERS=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9}' | grep "^$POINT $NODE $DEVICE " | awk '{print $4}' | sort -u`
+
+        for SENDERNAME in $SENDERS; do
+
+          SENDERDEVICES=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10}' | grep "^$POINT $NODE $DEVICE $SENDERNAME " | awk '{print $5}' | sort -u`
+
+          for SENDERDEVICE in $SENDERDEVICES; do
+
+            SENDERLONG=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$11}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE " | awk '{print $6}' | sort -u`
+            SENDERLAT=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$12}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE " | awk '{print $6}' | sort -u` 
+            SENDERHOG=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$13}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE " | awk '{print $6}' | sort -u`
+            DISTANCE=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$14}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE " | awk '{print $6}' | sort -u`
+
+cat >> $KMLFILE << EOF
+			<h3>Sender</h3>
 			<table>
 				<tr>
-					<th>Duration</th><th>Size</th><th>Bitrate</th><th>Interval</th><th>Sum</th><th>OK</th><th>CRC-Error</th><th>Phy-Error</th><th>PER (OK) </th><th>Mean-RSSI</th><th>Std. Dev. RSSI</th>
+					<th>Name</th><th>Device</th><th>Longitude</th><th>Latitude</th><th>HOG</th><th>Channel</th><th>Distance</th>
 				</tr>
-EOF
-
-while  read line; do
-	INC_LINE=`echo "$line" | grep $rline | wc -l | awk '{print $1}'`
-	if [ $INC_LINE -eq 1 ]; then
-          	PACKETS_OWN_SIZE=`echo "$line" | sed "s#;# #g" | awk '{print $19}'`
-		PACKETS_OWN_BITRATE=`echo "$line" | sed "s#;# #g" | awk '{print $20}'`
-          	PACKETS_OWN_INTERVAL=`echo "$line" | sed "s#;# #g" | awk '{print $21}'`
-		PACKETS_OWN_ALL=`echo "$line" | sed "s#;# #g" | awk '{print $22}'`
-		PACKETS_OWN_OK=`echo "$line" | sed "s#;# #g" | awk '{print $23}'`
-          	PACKETS_OWN_CRC=`echo "$line" | sed "s#;# #g" | awk '{print $24}'`
-		PACKETS_OWN_PHY=`echo "$line" | sed "s#;# #g" | awk '{print $25}'`
-		PER=`echo "$line" | sed "s#;# #g" | awk '{print $26}'`
-		MEANRSSI=`echo "$line" | sed "s#;# #g" | awk '{print $27}'`
-		STDRSSI=`echo "$line" | sed "s#;# #g" | awk '{print $28}'`
-
-cat >> $KMLFILE << EOF
 				<tr>
-					<td>$DURATION</td><td>$PACKETS_OWN_SIZE</td><td>$PACKETS_OWN_BITRATE</td><td>$PACKETS_OWN_INTERVAL</td><td>$PACKETS_OWN_ALL</td><td>$PACKETS_OWN_OK</td><td>$PACKETS_OWN_CRC</td><td>$PACKETS_OWN_PHY</td><td>$PER</td><td>$MEANRSSI</td><td>$STDRSSI</td>
+					<td>$SENDERNAME</td><td>$SENDERDEVICE</td><td>$SENDERLONG</td><td>$SENDERLAT</td><td>$SENDERHOG</td><td>$CHANNEL</td><th>$DISTANCE</th>
 				</tr>
-EOF
-	fi
-done < $RECEIVERFILE
-
-cat >> $KMLFILE << EOF
 			</table>
-			<h3>	Graphs</h3>
 EOF
 
-#echo "$POINT $NAME $DEVICE"
+            BITRATES=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE " | awk '{print $6}' | sort -u`
 
-DIFFSIZES=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$19" "$20}' | grep "^$POINT $NAME $DEVICE " | awk '{print $4}' | sort -u`
-for dsize in $DIFFSIZES; do
-	DIFFBR=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$19" "$20}' | grep "^$POINT $NAME $DEVICE $dsize " | awk '{print $5}' | sort -u`
-	for dbr in $DIFFBR; do
-#		echo "$dsize $dbr $POINT"
-		if [ -e $1/$POINT/$NAME.$DEVICE.packets.all.all.matlab.$dsize.$dbr.png ]; then
-			if [ ! -e $GOOGLEDIR/$POINT ]; then
-				mkdir $GOOGLEDIR/$POINT
-			fi
+            for BITRATE in $BITRATES; do
 
-			cp $1/$POINT/$NAME.$DEVICE.packets.all.all.matlab.$dsize.$dbr.png $GOOGLEDIR/$POINT/ 
+              SIZES=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE " | awk '{print $7}' | sort -u`
+
+              for SIZE in $SIZES; do
+
+                PACKETS_OWN_INTERVAL=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$22}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                PACKETS_OWN_ALL=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$23}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                PACKETS_OWN_OK=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$24}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                PACKETS_OWN_CRC=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$25}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                PACKETS_OWN_PHY=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$26}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                PER=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$27}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                STDPER=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$28}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                MEANRSSI=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$29}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                STDRSSI=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$30}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+
 cat >> $KMLFILE << EOF
-			        <h4>Node: $NAME Device: $DEVICE Packetsize: $dsize Bitrate: $dbr</h4>
-				<img src="$POINT/$NAME.$DEVICE.packets.all.all.matlab.$dsize.$dbr.png" alt="graph">
+			<h4>Packets</h4>
+			<table>
+				<tr>
+					<th>Duration</th><th>Size</th><th>Bitrate</th><th>Interval</th><th>Sum</th><th>OK</th><th>CRC-Error</th><th>Phy-Error</th><th>PER (OK)</th><th>STDPER (OK)</th><th>Mean-RSSI</th><th>Std. Dev. RSSI</th>
+				</tr>
+				<tr>
+					<td>$DURATION</td><td>$SIZE</td><td>$BITRATE</td><td>$PACKETS_OWN_INTERVAL</td><td>$PACKETS_OWN_ALL</td><td>$PACKETS_OWN_OK</td><td>$PACKETS_OWN_CRC</td><td>$PACKETS_OWN_PHY</td><td>$PER</td><td>$STDPER</td><td>$MEANRSSI</td><td>$STDRSSI</td>
+				</tr>
+			</table>
+EOF
+
+                if [ -e $1/$POINT/$NODE.$DEVICE.packets.all.all.matlab.$SIZE.$BITRATE.png ]; then
+                  if [ ! -e $GOOGLEDIR/$POINT ]; then
+                    mkdir $GOOGLEDIR/$POINT
+                  fi
+
+                  cp $1/$POINT/$NAME.$DEVICE.packets.all.all.matlab.$SIZE.$BITRATE.png $GOOGLEDIR/$POINT/ 
+cat >> $KMLFILE << EOF
+			        <h3>Graphs</h3>
+			        <h4>Node: $NAME Device: $DEVICE Packetsize: $SIZE Bitrate: $BITRATE</h4>
+				<img src="$POINT/$NAME.$DEVICE.packets.all.all.matlab.$SIZE.$BITRATE.png" alt="graph">
 				<p>
 EOF
-			if [ -e $1/$POINT/$NAME.$DEVICE.$dsize.$dbr.crc.error.png ]; then
-			    cp $1/$POINT/$NAME.$DEVICE.$dsize.$dbr.crc.error.png $GOOGLEDIR/$POINT/
+                  if [ -e $1/$POINT/$NAME.$DEVICE.$SIZE.$BITRATE.crc.error.png ]; then
+                     cp $1/$POINT/$NAME.$DEVICE.$SIZE.$BITRATE.crc.error.png $GOOGLEDIR/$POINT/
 cat >> $KMLFILE << EOF
 			        CRC
-				<img src="$POINT/$NAME.$DEVICE.$dsize.$dbr.crc.error.png" alt="crc">
+				<img src="$POINT/$NAME.$DEVICE.$SIZE.$BITRATE.crc.error.png" alt="crc">
 				<p>
 EOF
-			fi			    
-		fi
-	done
-done
-
-			
+                  fi			    
+                fi
+#size
+              done
+#bitrate
+            done
+#senderdevice
+          done
+#sendername
+        done
 
 cat >> $KMLFILE << EOF
 			<h3>Info</h3>
@@ -222,8 +242,13 @@ cat >> $KMLFILE << EOF
 		</Point>
 	</Placemark>
 EOF
+      fi #END of valid coord
 
-fi #END of valid coord
+#device
+    done
+#node
+  done
+#point
 done 
 
 cat >> $KMLFILE << EOF
@@ -232,7 +257,7 @@ cat >> $KMLFILE << EOF
 EOF
 
 cp az.png $GOOGLEDIR/
-rm $GOOGLEDIR/../network.kmz
+rm -f $GOOGLEDIR/../network.kmz
 (cd $GOOGLEDIR/; zip -r ../network.kmz *)
 rm -rf $GOOGLEDIR
 

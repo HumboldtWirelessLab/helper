@@ -1,4 +1,4 @@
-function rssi_per(packet_stat_file,fname)
+function packet_stat_paint(packet_stat_file,fname)
 
   load(packet_stat_file);
 
@@ -7,6 +7,8 @@ function rssi_per(packet_stat_file,fname)
   set(gcf,'paperpositionmode','auto');
   set(gca,'fontsize',16);
 
+  title(strcat('TX: ', num2str(bin_own_packet_count), ', Bins: ', num2str(numbins), ', mean\_per: ', num2str(per),', std\_per: ', num2str(std_bin_per) ,', mean\_own\_rssi: ', num2str(mean_rssi),', std\_rssi: ', num2str(std_rssi) , ', mean\_fg\_rssi: ', num2str(mean_forrssi),', std\_fg\_rssi: ', num2str(std_forrssi)));
+
   subplot(5,1,1);
   scatter(bin_own_rssi, bin_own_per);
   ylim([0 1.0])
@@ -14,7 +16,7 @@ function rssi_per(packet_stat_file,fname)
   xlabel('RSSI');
   ylabel('PER');
     
-  title(strcat('TX: ', num2str(bin_own_packet_count_ac), ', Bins: ', num2str(numbins), ', mean\_per: ', num2str(per),', std\_per: ', num2str(std_bin_per) ,', mean\_own\_rssi: ', num2str(mean_rssi),', std\_rssi: ', num2str(std_rssi) , ', mean\_fg\_rssi: ', num2str(mean_forrssi),', std\_fg\_rssi: ', num2str(std_forrssi)));
+  title(strcat('TX: ', num2str(bin_own_packet_count), ', Bins: ', num2str(numbins), ', mean\_per: ', num2str(per),', std\_per: ', num2str(std_bin_per) ,', mean\_own\_rssi: ', num2str(mean_rssi),', std\_rssi: ', num2str(std_rssi) , ', mean\_fg\_rssi: ', num2str(mean_forrssi),', std\_fg\_rssi: ', num2str(std_forrssi)));
     
   subplot(5,1,2);
   scatter(bin_for_packet_count, bin_own_packet_count)
@@ -42,7 +44,8 @@ function rssi_per(packet_stat_file,fname)
   ylabel('FG RSSI');
     
 %exportfig(gcf, strcat(sname, '.eps'),'LineStyleMap',[],'Color','rgb');
-  fname = strcat(rname,'.', num2str(psize - 32),'.',num2str(bitrate),'.png');
+
+  fname = strcat(fname,'.', num2str(psize - 32),'.',num2str(bitrate),'.png');
   print('-dpng', fname);
 
   clear;
