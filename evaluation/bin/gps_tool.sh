@@ -41,7 +41,8 @@ gps_calc() {
 	PO=`echo $1 | sed "s#\.# #g" | awk '{print $2}'`
 	PR1=`echo $PR | cut -b 1,2`
 	PR2=`echo $PR | cut -b 3,4`
-	POC=`calc $PR2$PO / 6  | sed -e "s#~##g" | awk '{print $1}' | sed "s#\.##g"`
+#	POC=`calc $PR2$PO / 6  | sed -e "s#~##g" | awk '{print $1}' | sed "s#\.##g"`
+	POC=`$DIR/perl_calc.pl $PR2$PO  6  | sed -e "s#~##g" | awk '{print $1}' | sed "s#\.##g"`
 	echo "$PR1.$POC"
 }
 
