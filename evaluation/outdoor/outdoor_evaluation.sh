@@ -182,7 +182,7 @@ for i in `ls $DATADIR`; do
              else
                   SENDERLAT=0
                   SENDERLONG=0
-                  SENDERHOG=0
+                  SENDERHOG=0 
              fi
 
              if [ ! "$LONG" = "0" ] && [ ! "$LAT" = "0" ] && [ ! "$SENDERLONG" = "0" ] && [ ! "$SENDERLAT" = "0" ]; then
@@ -222,31 +222,6 @@ for i in `ls $DATADIR`; do
 
                           if [ -e $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab ] && [ $MATLABFILESIZE -gt 0 ]; then
 
-                              if [ "x$MATLAB_AVAILABLE" != "x1" ] && [ "x$REMOTEMATLAB_AVAILABLE" != "x1" ]; then
-                                  echo "function packet_stat_call()" > $AC_EVALUATIONDIR/packet_stat_call.m
-                                  echo "packet_stat($SIZEWIFI, $BITRATE, $INTERVAL, \"$AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab\", 100, \"$AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat.matlab\");"   >> $AC_EVALUATIONDIR/packet_stat_call.m
-                                  echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_call.m
-                                  echo "end" >> $AC_EVALUATIONDIR/packet_stat_call.m
-
-                                  echo "function packet_stat_print_call()" > $AC_EVALUATIONDIR/packet_stat_print_call.m
-                                  echo "packet_stat_print(\"$AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat.matlab\");" >> $AC_EVALUATIONDIR/packet_stat_print_call.m
-                                  echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_print_call.m
-                                  echo "end" >> $AC_EVALUATIONDIR/packet_stat_print_call.m
-
-                                  #echo "function packet_stat_paint_call()" > $AC_EVALUATIONDIR/packet_stat_paint_call.m
-                                  #echo "packet_stat_paint(\"$NODE\_$DEVICE_$SIZE\_$BITRATE\",\"$NODE.$DEVICE.packets.all.all.matlab\");" >> $AC_EVALUATIONDIR/packet_stat_paint_call.m
-                                  #echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_paint_call.m
-                                  #echo "end" >> $AC_EVALUATIONDIR/packet_stat_paint_call.m
-
-                                  cp $DIR/packet_stat.m $AC_EVALUATIONDIR/
-                                  cp $DIR/packet_stat_print.m $AC_EVALUATIONDIR/
-                                  #cp $DIR/packet_stat_paint.m $AC_EVALUATIONDIR/
-
-                                  ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -q --funcall packet_stat_call )
-                                  ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -q --funcall packet_stat_print_call > $NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab )
-                                  #( cd $AC_EVALUATIONDIR; $LOCALMATLAB -q --funcall packet_stat_paint_call )
-                                  ( cd $AC_EVALUATIONDIR; rm -f  packet_stat_print_call.m packet_stat_call.m packet_stat.m packet_stat_print.m packet_stat_paint.m packet_stat_paint_call.m)
-                              else
                                   echo "function packet_stat_call()" > $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "packet_stat($SIZEWIFI, $BITRATE, $INTERVAL, '$NODE.$DEVICE.packets.all.all.matlab', 100, 'packets_stat');"   >> $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_call.m
@@ -262,36 +237,46 @@ for i in `ls $DATADIR`; do
                                   echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_paint_call.m
                                   echo "end" >> $AC_EVALUATIONDIR/packet_stat_paint_call.m
 
+                                  cp $DIR/packet_stat.m $AC_EVALUATIONDIR/
+                                  cp $DIR/packet_stat_print.m $AC_EVALUATIONDIR/
+                                  cp $DIR/packet_stat_paint.m $AC_EVALUATIONDIR/
+
+                              if [ "x$MATLAB_AVAILABLE" != "x1" ] && [ "x$REMOTEMATLAB_AVAILABLE" != "x1" ]; then
+                                  MATEXT=""
+
+                                  ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -q --funcall packet_stat_call ) > /dev/null 2>&1
+                                  ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -q --funcall packet_stat_print_call > $NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab ) > /dev/null 2>&1
+                                  #( cd $AC_EVALUATIONDIR; $LOCALMATLAB -q --funcall packet_stat_paint_call ) > /dev/null 2>&1
+                              else
+                                  MATEXT=".mat"
+
                                   if [ "x$MATLAB_AVAILABLE" = "x1" ]; then
-                                      cp $DIR/packet_stat.m $AC_EVALUATIONDIR/
-                                      cp $DIR/packet_stat_print.m $AC_EVALUATIONDIR/
-                                      cp $DIR/packet_stat_paint.m $AC_EVALUATIONDIR/
-
-                                      ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -nodesktop -nojvm -nosplash -r "packet_stat_call;exit" )
-                                      ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -nodesktop -nojvm -nosplash -r "packet_stat_print_call;exit" > $NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab )
-                                      ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -nodesktop -nojvm -nosplash -r "packet_stat_paint_call;exit" )
-                                      ( cd $AC_EVALUATIONDIR; rm -f  packet_stat_print_call.m packet_stat_call.m packet_stat.m packet_stat_print.m packet_stat_paint.m packet_stat_paint_call.m)
-
-                                      cp $DIR/packet_stat.m $AC_EVALUATIONDIR/
-                                      cp $DIR/packet_stat_print.m $AC_EVALUATIONDIR/
-                                      cp $DIR/packet_stat_paint.m $AC_EVALUATIONDIR/
-                                      ( cd $AC_EVALUATIONDIR; rm -f  packet_stat_print_call.m packet_stat_call.m packet_stat.m packet_stat_print.m packet_stat_paint.m packet_stat_paint_call.m)
+                                      ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -nodesktop -nojvm -nosplash -r "packet_stat_call;exit" ) > /dev/null 2>&1
+                                      ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -nodesktop -nojvm -nosplash -r "packet_stat_print_call;exit" > $NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab ) > /dev/null 2>&1
+                                      ( cd $AC_EVALUATIONDIR; $LOCALMATLAB -nodesktop -nojvm -nosplash -r "packet_stat_paint_call;exit" ) > /dev/null 2>&1
                                   else
-                                      scp $DIR/packet_stat.m sombrutz@gruenau.informatik.hu-berlin.de:~/tmp
-                                      scp $DIR/packet_stat_paint.m sombrutz@gruenau.informatik.hu-berlin.de:~/tmp > /dev/null
-                                      scp $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab sombrutz@gruenau.informatik.hu-berlin.de:~/tmp
-                                      scp $AC_EVALUATIONDIR/packet_stat_call.m sombrutz@gruenau.informatik.hu-berlin.de:~/tmp
-                                      scp $AC_EVALUATIONDIR/packet_stat_paint_call.m sombrutz@gruenau.informatik.hu-berlin.de:~/tmp
-                                      ssh sombrutz@gruenau.informatik.hu-berlin.de "cd ~/tmp;/usr/local/bin/matlab -nodesktop -nojvm -nosplash -r \"packet_stat_call;\""
-                                      ssh sombrutz@gruenau.informatik.hu-berlin.de "cd ~/tmp;/usr/local/bin/matlab -nodesktop -nojvm -nosplash -r \"packet_stat_paint_call;exit\""
-                                      rm -f $AC_EVALUATIONDIR/packet_stat_paint_call.m $AC_EVALUATIONDIR/packet_stat_call.m
+                                      scp $DIR/packet_stat.m sombrutz@gruenau.informatik.hu-berlin.de:~/tmp > /dev/null 2>&1
+                                      scp $DIR/packet_stat_print.m sombrutz@gruenau.informatik.hu-berlin.de:~/tmp > /dev/null 2>&1
+                                      scp $DIR/packet_stat_paint.m sombrutz@gruenau.informatik.hu-berlin.de:~/tmp > /dev/null 2>&1
+                                      scp $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab sombrutz@gruenau.informatik.hu-berlin.de:~/tmp > /dev/null 2>&1
+                                      scp $AC_EVALUATIONDIR/packet_stat_call.m sombrutz@gruenau.informatik.hu-berlin.de:~/tmp > /dev/null 2>&1
+                                      scp $AC_EVALUATIONDIR/packet_stat_print_call.m sombrutz@gruenau.informatik.hu-berlin.de:~/tmp > /dev/null 2>&1
+                                      scp $AC_EVALUATIONDIR/packet_stat_paint_call.m sombrutz@gruenau.informatik.hu-berlin.de:~/tmp > /dev/null 2>&1
 
-                                      scp sombrutz@gruenau.informatik.hu-berlin.de:~/tmp/*.png  $AC_EVALUATIONDIR/
-                                      scp sombrutz@gruenau.informatik.hu-berlin.de:~/tmp/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab  $AC_EVALUATIONDIR/
+                                      ssh sombrutz@gruenau.informatik.hu-berlin.de "cd ~/tmp;/usr/local/bin/matlab -nodesktop -nojvm -nosplash -r \"packet_stat_call;\"" > /dev/null 2>&1
+                                      ssh sombrutz@gruenau.informatik.hu-berlin.de "cd ~/tmp;/usr/local/bin/matlab -nodesktop -nojvm -nosplash -r \"packet_stat_print_call;exit\" > $NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab" > /dev/null 2>&1
+                                      ssh sombrutz@gruenau.informatik.hu-berlin.de "cd ~/tmp;/usr/local/bin/matlab -nodesktop -nojvm -nosplash -r \"packet_stat_paint_call;exit\"" > /dev/null 2>&1
 
-                                      ssh sombrutz@gruenau.informatik.hu-berlin.de "cd ~/tmp;rm *"
+                                      scp sombrutz@gruenau.informatik.hu-berlin.de:~/tmp/*.png  $AC_EVALUATIONDIR/ > /dev/null 2>&1
+                                      scp sombrutz@gruenau.informatik.hu-berlin.de:~/tmp/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab  $AC_EVALUATIONDIR/ > /dev/null 2>&1
+                                      scp sombrutz@gruenau.informatik.hu-berlin.de:~/tmp/packets_stat$MATEXT  $AC_EVALUATIONDIR/ > /dev/null 2>&1
+
+                                      ssh sombrutz@gruenau.informatik.hu-berlin.de "cd ~/tmp;rm *" > /dev/null 2>&1
                                   fi
                               fi
+
+                              ( cd $AC_EVALUATIONDIR; rm -f  packet_stat_print_call.m packet_stat_call.m packet_stat.m packet_stat_print.m packet_stat_paint.m packet_stat_paint_call.m)
+			mv $AC_EVALUATIONDIR/packets_stat$MATEXT $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat.matlab
 
                               PACKETS_OWN_ALL=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "all_rec_packets" | awk '{print $2}'`
                               PACKETS_OWN_OK=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "ok_packets" | awk '{print $2}'`
