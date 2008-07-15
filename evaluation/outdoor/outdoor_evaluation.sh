@@ -360,8 +360,8 @@ done
 
 cat $RESULTDIR/sender.csv.tmp | sort -u > $RESULTDIR/sender.csv
 rm -f $RESULTDIR/sender.csv.tmp
-cat $RESULTDIR/result.csv | grep -v "NUMBER" | sed -e "s#;# #g" | awk '{print $3"_"$2" "$5" "$6" "$7}' | grep -v "0 0 0" | sort -u > $RESULTDIR/positions.csv
-cat $RESULTDIR/sender.csv | sed -e "s#;# #g" | awk '{print $1"_0 "$3" "$4" "$5}' | sort -u >> $RESULTDIR/positions.csv 
+cat $RESULTDIR/result.csv | grep -v "NUMBER" | sed -e "s#;# #g" | awk '{print $3"_"$2" "$6" "$7" "$8}' | grep -v "0 0 0" | sort -u > $RESULTDIR/positions.csv
+cat $RESULTDIR/sender.csv | sed -e "s#;# #g" | awk '{print $1"_"$2" "$3" "$4" "$5}' | sed -e "s#ath##g" | sort -u >> $RESULTDIR/positions.csv 
 
 cat $RESULTDIR/info.log.tmp | egrep -v "^[[:space:]]*$" > $RESULTDIR/info.log
 rm -f $RESULTDIR/info.log.tmp
