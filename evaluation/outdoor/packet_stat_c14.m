@@ -90,7 +90,7 @@ if ~isempty(allpackets)
 
     per = 1 - ( size(own_packets_ok,1) / count_send_packets );
   else
-    count_send_packets = 0;
+    count_send_packets = (end_time - start_time) / ( mean_packet_interval / 1000 );
     per = 1;
   end
 
