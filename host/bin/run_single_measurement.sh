@@ -1,1 +1,0 @@
-../../measurement/bin/run_single_measurement.sh

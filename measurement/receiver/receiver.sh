@@ -36,7 +36,7 @@ echo "" >> $DIR/info
 echo "DATE: $DATE" > $DIR/measurement.info
 
 echo "prepare everything"
-$DIR/../../host/bin/prepare_measurement.sh prepare receiver.dis
+$DIR/../bin/prepare_measurement.sh prepare receiver.dis
 
 . $DIR/receiver.dis.real
 
@@ -107,7 +107,7 @@ if [ "x$RUNMODE" = "x" ]; then
     RUNMODE=CLICK
 fi
 
-RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/../../host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
+RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/../bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
 
 mv *.dump $DIR/$1/
 mv *.log $DIR/$1/
@@ -115,7 +115,7 @@ mv *info $DIR/$1/
 cp *.click* $DIR/$1/
 cp *.real $DIR/$1/
 
-$DIR/../../host/bin/prepare_measurement.sh cleanup receiver.dis
+$DIR/../bin/prepare_measurement.sh cleanup receiver.dis
 
 echo "$RESULT"
 
