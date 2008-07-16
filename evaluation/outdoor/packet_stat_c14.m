@@ -162,8 +162,8 @@ if ~isempty(allpackets)
   mean_bin_per = mean(bin_own_per);
   std_bin_per = std(bin_own_per);
 
-  count_ghost_packets=size(find( allpackets(:,3) == GHOST ) , 1 )
-  count_for_packets=size(find( (allpackets(:,3) == FOREIGN ) , 1 )
+  count_ghost_packets=size(find( allpackets(:,3) == GHOST ) , 1 );
+  count_for_packets=size(find( allpackets(:,3) == FOREIGN ) , 1 );
 
 end
 
