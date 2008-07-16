@@ -23,46 +23,6 @@ if [ -e $DIR/$1 ]; then
     exit 0
 fi
 
-mkdir $DIR/$1
-
-rm -f $DIR/info
-
-vi $DIR/info
-
-DATE=`date +%Y:%m:%d" "%H:%M:%S`
-
-echo "" >> $DIR/info
-
-echo "DATE: $DATE" > $DIR/measurement.info
-
-echo "prepare everything"
-$DIR/../bin/prepare_measurement.sh prepare receiver.dis
-
-. $DIR/receiver.dis.real
-
-echo "DISFILE: receiver.dis.real" > $DIR/measurement.info
-
-NODELIST=`cat $DIR/receiver.mes.real | grep -v "^#" | awk '{print $1}' | sort -u`
-
-for node in $NODELIST; do
-	NODEDEVICELIST=`cat $DIR/receiver.mes.real | egrep "^$node[[:space:]]" | awk '{print $2}'`
-
-	for nodedevice in $NODEDEVICELIST; do
-		WIFICONFIG=`cat $DIR/receiver.mes.real | awk '{print $1" "$2" "$4}' | grep "^$node $nodedevice" | awk '{print $3}' | sort -u`
-		for wificonfig_ac in $WIFICONFIG; do
-			if [ -e $wificonfig_ac ]; then
-				cp $wificonfig_ac $DIR/$1/
-			fi
-			if [ -e $DIR/$wificonfig_ac ]; then
-				cp $DIR/$wificonfig_ac $DIR/$1/
-			fi
-			if [ -e $DIR/../../nodes/etc/wifi/$wificonfig_ac ]; then
-				cp $DIR/../../nodes/etc/wifi/$wificonfig_ac $DIR/$1/
-			fi
-		done
-	done
-done
-
 GPSD=`ps -le | grep gpsd | wc -l | awk '{print $1}'`
 
 if [ $GPSD -eq 0 ]; then
@@ -74,6 +34,7 @@ if [ $GPSD -eq 0 ]; then
     fi
 fi
 
+NODELIST=`cat $DIR/receiver.mes | grep -v "^#" | awk '{print $1}' | sort -u`
 
 for n in $NODELIST; do
 
@@ -103,9 +64,44 @@ echo "NODE: $n"
         
 done
 
+mkdir $DIR/$1
+
+rm -f $DIR/info
+vi $DIR/info
+echo "" >> $DIR/info
+
+DATE=`date +%Y:%m:%d" "%H:%M:%S`
+echo "DATE: $DATE" > $DIR/measurement.info
+
+echo "prepare everything"
+$DIR/../bin/prepare_measurement.sh prepare receiver.dis
+
+. $DIR/receiver.dis.real
+
+echo "DISFILE: receiver.dis.real" > $DIR/measurement.info
+
 if [ "x$RUNMODE" = "x" ]; then
     RUNMODE=CLICK
 fi
+
+for node in $NODELIST; do
+	NODEDEVICELIST=`cat $DIR/receiver.mes.real | egrep "^$node[[:space:]]" | awk '{print $2}'`
+
+	for nodedevice in $NODEDEVICELIST; do
+		WIFICONFIG=`cat $DIR/receiver.mes.real | awk '{print $1" "$2" "$4}' | grep "^$node $nodedevice" | awk '{print $3}' | sort -u`
+		for wificonfig_ac in $WIFICONFIG; do
+			if [ -e $wificonfig_ac ]; then
+				cp $wificonfig_ac $DIR/$1/
+			fi
+			if [ -e $DIR/$wificonfig_ac ]; then
+				cp $DIR/$wificonfig_ac $DIR/$1/
+			fi
+			if [ -e $DIR/../../nodes/etc/wifi/$wificonfig_ac ]; then
+				cp $DIR/../../nodes/etc/wifi/$wificonfig_ac $DIR/$1/
+			fi
+		done
+	done
+done
 
 RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/../bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
 
