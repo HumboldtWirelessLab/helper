@@ -1,3 +1,4 @@
+RECOMMENDMODOPTIONS=modoptions.ubi
 MODE=monitor
 CHANNEL=5
 POWER=28
