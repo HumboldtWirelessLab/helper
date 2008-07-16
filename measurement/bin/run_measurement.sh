@@ -18,11 +18,15 @@ case "$SIGN" in
       ;;
 esac
 
-$DIR/prepare_measurement.sh prepare todump.dis
+DISCRIPTIONFILE=$1
 
-. $DIR/todump.dis.real
+$DIR/prepare_measurement.sh prepare $DISCRIPTIONFILE
+
+. $DISCRIPTIONFILE.real
 
 RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME $DIR/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
+
+$DIR/prepare_measurement.sh cleanup $DISCRIPTIONFILE
 
 echo $RESULT
 
