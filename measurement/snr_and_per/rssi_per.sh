@@ -45,7 +45,7 @@ for chan in 1 2 3 4 5 6 7 8 9 10 11 12 13 36 40 44 48 52 56 60 64; do
 	    cat /home/sombrutz/lab/helper/nodes/etc/wifi/monitor.default | sed -e "s\POWER=15\POWER=$receiverpower\g" -e "s\CHANNEL=11\CHANNEL=$chan\g" > $LOGDIR/monitor_receiver
 	    
 
-	    RESULT=`CONFIGFILE=$DIR/rssi_per.mes MARKER=22 STATUSFD=5 TIME=140 ID=RSSI_PER $DIR/../../host/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
+	    RESULT=`CONFIGFILE=$DIR/rssi_per.mes MARKER=22 STATUSFD=5 TIME=140 ID=RSSI_PER $DIR/../bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
 
 	    mv $LOGDIR/monitor_sender $LOGDIR/$senderpower\_monitor_sender
 	    mv $LOGDIR/monitor_receiver $LOGDIR/$senderpower\_monitor_receiver
