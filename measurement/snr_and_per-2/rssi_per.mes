@@ -1,3 +1,3 @@
-#NODE		DEVICE		MODULSDIR						WIFICONFIG					CLICKSCRIPT								LOGFILE
-sk111		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	/home/sombrutz/lab/measurement/monitor_receiver	/home/sombrutz/lab/helper/measurement/snr_and_per-2/receiver.click	/home/sombrutz/lab/measurement/receiver.log
-sk110		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	/home/sombrutz/lab/measurement/monitor_sender	/home/sombrutz/lab/helper/measurement/snr_and_per-2/sender.tmp.click		/home/sombrutz/lab/measurement/sender.log
+#NODE		DEVICE		MODULSDIR						MODOPTIONS	WIFICONFIG					CLICKSCRIPT								LOGFILE						APP	APPLOGFILE
+sk111		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	-		/home/sombrutz/lab/measurement/monitor_receiver	/home/sombrutz/lab/helper/measurement/snr_and_per-2/receiver.click	/home/sombrutz/lab/measurement/receiver.log	-	-
+sk110		ath0		/home/sombrutz/lab/helper/nodes/lib/modules/i586	-		/home/sombrutz/lab/measurement/monitor_sender	/home/sombrutz/lab/helper/measurement/snr_and_per-2/sender.tmp.click	/home/sombrutz/lab/measurement/sender.log	-	-

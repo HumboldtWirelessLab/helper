@@ -24,12 +24,12 @@ if [ "x$1" = "x" ]; then
     exit 0
 fi
 
-cat $1/result.csv | grep "NUMBER" | awk -F\; '{print $5" "$14" "$43" "$20" "$21" "$17" "$24"  "$44" "$45" "$27" "$29" "$36}' > $1/result.mat
+cat $1/result.csv | grep -v "NUMBER" | awk -F\; '{print $5" "$14" "$43" "$20" "$21" "$17" "$24"  "$44" "$45" "$27" "$29" "$36}' > $1/result.mat
 
 echo "function packet_stat_call()" > $1/outdoor_result_evaluation_call.m
 echo "outdoor_result_evaluation('result.mat');"   >> $1/outdoor_result_evaluation_call.m
 echo "exit;" >> $1/outdoor_result_evaluation_call.m
 echo "end" >> $1/outdoor_result_evaluation_call.m
-        
 
+exit 0
 
