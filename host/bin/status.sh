@@ -38,7 +38,7 @@ case "$1" in
 		;;
 	"statusmarker")	
 		for node in $NODELIST; do
-		    RESULT=`run_on_node $node "ls $MARKER" "/" $DIR/../etc/keys/id_dsa`
+		    RESULT=`run_on_node $node "ls $MARKER" "/" $DIR/../etc/keys/id_dsa 2>&1`
 		    if [ ! "x$RESULT" = "x$MARKER" ]; then
 			echo "failed"
 			exit 0
