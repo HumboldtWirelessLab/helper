@@ -94,7 +94,6 @@ case "$1" in
 		SIMDIS=$2
 		. $SIMDIS
 		cat $NODETABLE.$POSTFIX |  grep -v "#" | awk '{print $6}' | xargs rm -f
-		cat $NODETABLE.$POSTFIX |  grep -v "#" | awk '{print $8}' | xargs rm -f
 		rm -f $SIMDIS.$POSTFIX
 		rm -f $NODETABLE.$POSTFIX
 		;;
