@@ -1,1 +1,0 @@
-../../measurement/bin/prepare_measurement.sh

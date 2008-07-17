@@ -162,23 +162,23 @@ cat >> $KMLFILE << EOF
 			</table>
 EOF
 
-            BITRATES=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE " | awk '{print $6}' | sort -u`
+            BITRATES=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$21}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE " | awk '{print $6}' | sort -u`
 
             for BITRATE in $BITRATES; do
 
-              SIZES=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE " | awk '{print $7}' | sort -u`
+              SIZES=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$21" "$20}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE " | awk '{print $7}' | sort -u`
 
               for SIZE in $SIZES; do
 
-                PACKETS_OWN_INTERVAL=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$22}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
-                PACKETS_OWN_ALL=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$23}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
-                PACKETS_OWN_OK=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$24}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
-                PACKETS_OWN_CRC=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$25}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
-                PACKETS_OWN_PHY=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$26}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
-                PER=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$27}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
-                STDPER=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$28}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
-                MEANRSSI=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$29}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
-                STDRSSI=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$20" "$21" "$30}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                PACKETS_OWN_INTERVAL=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$21" "$20" "$22}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                PACKETS_OWN_ALL=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$21" "$20" "$23}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                PACKETS_OWN_OK=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$21" "$20" "$24}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                PACKETS_OWN_CRC=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$21" "$20" "$25}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                PACKETS_OWN_PHY=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$21" "$20" "$26}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                PER=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$21" "$20" "$27}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                STDPER=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$21" "$20" "$28}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                MEANRSSI=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$21" "$20" "$29}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
+                STDRSSI=`cat $RECEIVERFILE | grep -v "NUMBER" | sed "s#;# #g" | awk '{print $2" "$3" "$4" "$9" "$10" "$21" "$20" "$30}' | grep "^$POINT $NODE $DEVICE $SENDERNAME $SENDERDEVICE $BITRATE $SIZE " | awk '{print $8}'`
 
 cat >> $KMLFILE << EOF
 			<h4>Packets</h4>
@@ -197,18 +197,18 @@ EOF
                     mkdir $GOOGLEDIR/$POINT
                   fi
 
-                  cp $1/$POINT/$NAME.$DEVICE.packets.all.all.matlab.$SIZE.$BITRATE.png $GOOGLEDIR/$POINT/ 
+                  cp $1/$POINT/$NODE.$DEVICE.packets.all.all.matlab.$SIZE.$BITRATE.png $GOOGLEDIR/$POINT/ 
 cat >> $KMLFILE << EOF
 			        <h3>Graphs</h3>
-			        <h4>Node: $NAME Device: $DEVICE Packetsize: $SIZE Bitrate: $BITRATE</h4>
-				<img src="$POINT/$NAME.$DEVICE.packets.all.all.matlab.$SIZE.$BITRATE.png" alt="graph">
+			        <h4>Node: $NODE Device: $DEVICE Packetsize: $SIZE Bitrate: $BITRATE</h4>
+				<img src="$POINT/$NODE.$DEVICE.packets.all.all.matlab.$SIZE.$BITRATE.png" alt="graph">
 				<p>
 EOF
-                  if [ -e $1/$POINT/$NAME.$DEVICE.$SIZE.$BITRATE.crc.error.png ]; then
-                     cp $1/$POINT/$NAME.$DEVICE.$SIZE.$BITRATE.crc.error.png $GOOGLEDIR/$POINT/
+                  if [ -e $1/$POINT/$NODE.$DEVICE.$SIZE.$BITRATE.crc.error.png ]; then
+                     cp $1/$POINT/$NODE.$DEVICE.$SIZE.$BITRATE.crc.error.png $GOOGLEDIR/$POINT/
 cat >> $KMLFILE << EOF
 			        CRC
-				<img src="$POINT/$NAME.$DEVICE.$SIZE.$BITRATE.crc.error.png" alt="crc">
+				<img src="$POINT/$NODE.$DEVICE.$SIZE.$BITRATE.crc.error.png" alt="crc">
 				<p>
 EOF
                   fi			    

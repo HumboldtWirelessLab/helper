@@ -1,3 +1,4 @@
+RECOMMENDMODOPTIONS=modoptions.default
 MODE=monitor
 CHANNEL=11
 POWER=16

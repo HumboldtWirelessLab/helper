@@ -90,7 +90,7 @@ if ~isempty(allpackets)
 
     per = 1 - ( size(own_packets_ok,1) / count_send_packets );
   else
-    count_send_packets = 0;
+    count_send_packets = floor( (end_time - start_time) / mean_packet_interval );
     per = 1;
   end
 
@@ -161,6 +161,9 @@ if ~isempty(allpackets)
 
   mean_bin_per = mean(bin_own_per);
   std_bin_per = std(bin_own_per);
+
+  count_ghost_packets=size(find( allpackets(:,3) == GHOST ) , 1 );
+  count_for_packets=size(find( allpackets(:,3) == FOREIGN ) , 1 );
 
 end
 
