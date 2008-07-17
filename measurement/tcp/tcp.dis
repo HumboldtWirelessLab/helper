@@ -1,0 +1,16 @@
+NAME=tcp
+SIMULATOR=ns2
+RADIO=shadowing11b
+FORGEINNODES=no
+
+TIME=10
+
+NODETABLE=tcp.mes
+NODEPLACEMENT=placement.default
+
+LOGDIR=WORKDIR
+LOGFILE=measurement.log
+
+RESULTDIR=WORKDIR
+
+GPS=yes
