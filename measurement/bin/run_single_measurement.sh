@@ -44,9 +44,11 @@ get_node_status()  {
     echo "$NODESTATUS"
 }
 
-if [ "x$RUNMODE" = "x" ]; then
-    RUNMODE=DRIVER
+CHECKNODESTATUS=`get_node_status`
+if [ ! "x$NODESTATUS" = "xok" ]; then
+    RUNMODENUM=2
 fi
+
 
 case "$RUNMODE" in
 	"REBOOT")
@@ -69,7 +71,7 @@ case "$RUNMODE" in
 			if [ ! "x$NODESTATUS" = "xok" ]; then
 				RUNMODENUM=1
 			else
-				RUNMODENUM=5
+				RUNMODENUM=2
 			fi
 			;;
 esac				
@@ -99,7 +101,16 @@ if [ $RUNMODENUM -le 3 ]; then
 
     for node in $NODELIST; do
 	MODULSDIR=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $3}' | tail -n 1`
-	NODELIST="$node" MODULSDIR=$MODULSDIR $DIR/wlanmodules.sh insmod
+	
+	CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $4}' | tail -n 1`
+	RECOMMENDMODOPTIONS=`cat $CONFIGFILE | grep RECOMMENDMODOPTIONS | awk -F= '{print $2}'`
+	if [ "x$RECOMMENDMODOPTIONS" != "x" ]; then
+	    MODOPTIONS=$RECOMMENDMODOPTIONS
+	else
+	    MODOPTIONS=modoptions.default
+	fi	
+
+	NODELIST="$node" MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/wlanmodules.sh insmod
     done
 
     check_nodes

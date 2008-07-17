@@ -24,8 +24,8 @@ if [ "x$NODELIST" = "x" ]; then
     ls  $DIR/../etc/nodegroups/
 fi
 
-if [ "x$OPTIONSCONF" = "x" ]; then
-    MODOPTIONS=""
+if [ "x$MODOPTIONS" = "x" ]; then
+    MODOPTIONS=modoptions.default
 fi
 
 case "$1" in
