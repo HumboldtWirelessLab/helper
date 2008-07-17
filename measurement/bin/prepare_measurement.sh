@@ -42,6 +42,7 @@ case "$1" in
 		    for nodedevice in $NODEDEVICELIST; do		    
 			CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $6}'`
 			WIFICONFIG=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
+
 			if [ -f  $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then                                                                                                                                                   
 			    . $DIR/../../nodes/etc/wifi/$WIFICONFIG
 			else
@@ -75,14 +76,18 @@ case "$1" in
 				;;
 			esac
 			
-			CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g"`
+			if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
+			    CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g"`
+			    
+			    if [ -e $CLICK ]; then
+				cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAP#g" -e "s#TODEVICE#WIFIENCAP -> TORAWDEVICE#g" | sed -e "s#WIFIDECAP#$WIFIDECAP#g" -e "s#WIFIENCAP#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(DEVICE)#g" -e "s#TORAWDEVICE#ToDevice(DEVICE)#g" | sed -e "s#DEVICE#$nodedevice#g" -e "s#NODE#$node#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" > $CLICK.$node.$nodedevice
+			    fi
+			fi
 			
-			cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAP#g" -e "s#TODEVICE#WIFIENCAP -> TORAWDEVICE#g" | sed -e "s#WIFIDECAP#$WIFIDECAP#g" -e "s#WIFIENCAP#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(DEVICE)#g" -e "s#TORAWDEVICE#ToDevice(DEVICE)#g" | sed -e "s#DEVICE#$nodedevice#g" -e "s#NODE#$node#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" > $CLICK.$node.$nodedevice
-
 		    done
 		done
 		
-		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5" "$6"."$1"."$2" "$7" "$8"."$1"."$2" "$9}' | sed -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$WORKDIR#g" > $NODETABLE.$POSTFIX
+		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5" "$6"."$1"."$2" "$7" "$8" "$9}' | sed -e "s#[[:space:]]*-\.*[[:alnum:]\.]*# -#g" -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$WORKDIR#g" > $NODETABLE.$POSTFIX
 		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" > $SIMDIS.$POSTFIX
 		;;
 	"cleanup")

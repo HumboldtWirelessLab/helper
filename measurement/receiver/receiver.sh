@@ -73,22 +73,21 @@ echo "" >> $DIR/info
 DATE=`date +%Y:%m:%d" "%H:%M:%S`
 echo "DATE: $DATE" > $DIR/measurement.info
 
-echo "prepare everything"
+echo "Prepare the Scripts !"
+
 $DIR/../bin/prepare_measurement.sh prepare receiver.dis
 
 . $DIR/receiver.dis.real
 
-echo "DISFILE: receiver.dis.real" > $DIR/measurement.info
+echo "DISFILE: receiver.dis.real" >> $DIR/measurement.info
 
-if [ "x$RUNMODE" = "x" ]; then
-    RUNMODE=CLICK
-fi
+echo "Copy Configs !"
 
 for node in $NODELIST; do
 	NODEDEVICELIST=`cat $DIR/receiver.mes.real | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
 	for nodedevice in $NODEDEVICELIST; do
-		WIFICONFIG=`cat $DIR/receiver.mes.real | awk '{print $1" "$2" "$4}' | grep "^$node $nodedevice" | awk '{print $3}' | sort -u`
+		WIFICONFIG=`cat $DIR/receiver.mes.real | awk '{print $1" "$2" "$5}' | grep "^$node $nodedevice" | awk '{print $3}' | sort -u`
 		for wificonfig_ac in $WIFICONFIG; do
 			if [ -e $wificonfig_ac ]; then
 				cp $wificonfig_ac $DIR/$1/
@@ -102,6 +101,8 @@ for node in $NODELIST; do
 		done
 	done
 done
+
+echo "Start measurement !"
 
 RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/../bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
 
