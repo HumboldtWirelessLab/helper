@@ -1,25 +1,25 @@
-#NODE		DEVICE		MODULSDIR				WIFICONFIG		CLICKSCRIPT		LOGFILE
-sk110_1		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_1.log
-sk111_1		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_2.log
-sk112_1		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_3.log
-sk110_2		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_4.log
-sk111_2		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_5.log
-sk112_2		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_6.log
-sk110_3		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_7.log
-sk111_3		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_8.log
-sk112_3		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_9.log
-sk110_4		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_10.log
-sk111_4		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_11.log
-sk112_4		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_12.log
-sk110_5		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_13.log
-sk111_5		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_14.log
-sk112_5		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_15.log
-sk110_6		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_16.log
-sk111_6		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_17.log
-sk112_6		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_18.log
-sk110_7		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_19.log
-sk111_7		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_20.log
-sk112_7		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_21.log
-sk110_8		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_22.log
-sk111_8		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_23.log
-sk112_8		ath0		WORKDIR/../../nodes/lib/modules/i586	monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_24.log
+#NODE		DEVICE		MODULSDIR				MODOPTIONS	WIFICONFIG		CLICKSCRIPT		LOGFILE			APP	APPLOGFILE
+sk110_1		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_1.log	-	-
+sk111_1		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_2.log	-	-
+sk112_1		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_3.log	-	-
+sk110_2		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_4.log	-	-
+sk111_2		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_5.log	-	-
+sk112_2		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_6.log	-	-
+sk110_3		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_7.log	-	-
+sk111_3		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_8.log	-	-
+sk112_3		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_9.log	-	-
+sk110_4		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_10.log	-	-
+sk111_4		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_11.log	-	-
+sk112_4		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_12.log	-	-
+sk110_5		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_13.log	-	-
+sk111_5		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_14.log	-	-
+sk112_5		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_15.log	-	-
+sk110_6		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_16.log	-	-
+sk111_6		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_17.log	-	-
+sk112_6		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_18.log	-	-
+sk110_7		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_19.log	-	-
+sk111_7		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_20.log	-	-
+sk112_7		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_21.log	-	-
+sk110_8		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_22.log	-	-
+sk111_8		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_23.log	-	-
+sk112_8		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_24.log	-	-

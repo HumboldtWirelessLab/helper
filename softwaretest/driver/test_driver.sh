@@ -24,7 +24,7 @@ TIME=100
 chmod 777 $LOGDIR
 
 SEDARG="s#MODULSDIR#$MODULSDIR#g"
-cat $DIR/drivertest.mes | grep -v "#" | grep -e "." | awk '{print  $1" "$2" MODULSDIR "$4" "$5" "$6}' | sed -e $SEDARG > $DIR/drivertest.mes.tmp 
+cat $DIR/drivertest.mes | grep -v "#" | grep -e "." | awk '{print  $1" "$2" MODULSDIR "$4" "$5" "$6" "$7" "$8" "$9}' | sed -e $SEDARG > $DIR/drivertest.mes.tmp 
 
 RESULT=`CONFIGFILE=$DIR/drivertest.mes.tmp MARKER=$REVISION STATUSFD=5 ID=driver TIME=$TIME $DIR/../../measurement/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
 
