@@ -52,7 +52,7 @@ echo -n "PACKETS_ALL_ALL;PACKETS_ALL_OK;PACKETS_ALL_CRC;PACKETS_ALL_PHY;" >> $RE
 echo -n "PACKETS_OWN_SIZE;PACKETS_OWN_BITRATE;PACKETS_OWN_INTERVAL;PACKETS_OWN_ALL;PACKETS_OWN_OK;PACKETS_OWN_CRC;PACKETS_OWN_PHY;" >> $RESULTDIR/result.csv
 echo -n "MEANPER;STDPER;" >> $RESULTDIR/result.csv
 echo -n "MEANRSSI;STDRSSI;RSSI_P5;RSSI_P25;RSSI_P50;RSSI_P75;RSSI_P95;" >> $RESULTDIR/result.csv
-echo "FORMEANRSSI;FORSTDRSSI;FORRSSI_P5;FORRSSI_P25;FORRSSI_P50;FORRSSI_P75;FORRSSI_P95;LOS;" >> $RESULTDIR/result.csv
+echo "FORMEANRSSI;FORSTDRSSI;FORRSSI_P5;FORRSSI_P25;FORRSSI_P50;FORRSSI_P75;FORRSSI_P95;LOS;PACKETS_OWN_FOR_ALL;PACKETS_FOR_ALL;" >> $RESULTDIR/result.csv
 
 for i in `ls $DATADIR`; do
 
@@ -222,11 +222,18 @@ for i in `ls $DATADIR`; do
 
                           if [ -e $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab ] && [ $MATLABFILESIZE -gt 0 ]; then
 
+                              if [ $CHANNEL -eq 14 ] && [ "$BITRATE" = "1" ] && [ -e $DATADIR/$SENDERNUM/c14.bug ]; then
+                    	          echo "$SENDERNODE $SENDERDEVICE $NODE $DEVICE $CHANNEL $BITRATE $SIZE" >> $AC_EVALUATIONDIR/../0/c14.bug.log
+			          echo "function packet_stat_call()" > $AC_EVALUATIONDIR/packet_stat_call.m
+                                  echo "packet_stat_c14($SIZEWIFI, $BITRATE, $INTERVAL, '$NODE.$DEVICE.packets.all.all.matlab', 100, 'packets_stat');"   >> $AC_EVALUATIONDIR/packet_stat_call.m
+                                  echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_call.m
+                                  echo "end" >> $AC_EVALUATIONDIR/packet_stat_call.m
+                              else
                                   echo "function packet_stat_call()" > $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "packet_stat($SIZEWIFI, $BITRATE, $INTERVAL, '$NODE.$DEVICE.packets.all.all.matlab', 100, 'packets_stat');"   >> $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "end" >> $AC_EVALUATIONDIR/packet_stat_call.m
-  
+                              fi
                                   echo "function packet_stat_print_call()" > $AC_EVALUATIONDIR/packet_stat_print_call.m
                                   echo "packet_stat_print('packets_stat');" >> $AC_EVALUATIONDIR/packet_stat_print_call.m
                                   echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_print_call.m
@@ -238,6 +245,7 @@ for i in `ls $DATADIR`; do
                                   echo "end" >> $AC_EVALUATIONDIR/packet_stat_paint_call.m
 
                                   cp $DIR/packet_stat.m $AC_EVALUATIONDIR/
+                                  cp $DIR/packet_stat_c14.m $AC_EVALUATIONDIR/
                                   cp $DIR/packet_stat_print.m $AC_EVALUATIONDIR/
                                   cp $DIR/packet_stat_paint.m $AC_EVALUATIONDIR/
 
@@ -275,19 +283,19 @@ for i in `ls $DATADIR`; do
                                   fi
                               fi
 
-                              ( cd $AC_EVALUATIONDIR; rm -f  packet_stat_print_call.m packet_stat_call.m packet_stat.m packet_stat_print.m packet_stat_paint.m packet_stat_paint_call.m)
-			mv $AC_EVALUATIONDIR/packets_stat$MATEXT $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat.matlab
+                              ( cd $AC_EVALUATIONDIR; rm -f packet_stat_print_call.m packet_stat_call.m packet_stat.m packet_stat_c14.m packet_stat_print.m packet_stat_paint.m packet_stat_paint_call.m)
+			      mv $AC_EVALUATIONDIR/packets_stat$MATEXT $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat.matlab
 
-                              PACKETS_OWN_ALL=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "all_rec_packets" | awk '{print $2}'`
-                              PACKETS_OWN_OK=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "ok_packets" | awk '{print $2}'`
-                              PACKETS_OWN_CRC=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "crc_packets" | awk '{print $2}'`
-		          PACKETS_OWN_PHY=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "phy_packets" | awk '{print $2}'`
-		          MEANPER=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "^per:" | awk '{print $2}'`
-		          STDPER=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "std_bin_per" | awk '{print $2}'`
-		          MEANRSSI=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "mean_rssi" | awk '{print $2}'`
-		          STDRSSI=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "std_rssi" | awk '{print $2}'`
-		          FORMEANRSSI=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "mean_forrssi" | awk '{print $2}'`
-		          FORSTDRSSI=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "std_forrssi" | awk '{print $2}'`
+                              PACKETS_OWN_ALL=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "own_rec_packets_all:" | awk '{print $2}'`
+                              PACKETS_OWN_OK=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "own_rec_packets_ok:" | awk '{print $2}'`
+                              PACKETS_OWN_CRC=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "own_rec_packets_crc:" | awk '{print $2}'`
+		    	      PACKETS_OWN_PHY=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "own_rec_packets_phy:" | awk '{print $2}'`
+		          MEANPER=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "own_per_mean:" | awk '{print $2}'`
+		          STDPER=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "own_per_bin_std:" | awk '{print $2}'`
+		          MEANRSSI=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "own_rssi_mean:" | awk '{print $2}'`
+		          STDRSSI=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "own_rssi_std:" | awk '{print $2}'`
+		          FORMEANRSSI=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "for_rssi_mean:" | awk '{print $2}'`
+		          FORSTDRSSI=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "for_rssi_std:" | awk '{print $2}'`
                               FORRSSI_P5=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "percentile_forrssi_5:" | awk '{print $2}'`
                               FORRSSI_P25=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "percentile_forrssi_25:" | awk '{print $2}'`
                               FORRSSI_P50=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "percentile_forrssi_50:" | awk '{print $2}'`
@@ -298,6 +306,8 @@ for i in `ls $DATADIR`; do
                               RSSI_P50=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "percentile_rssi_50:" | awk '{print $2}'`
                               RSSI_P75=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "percentile_rssi_75:" | awk '{print $2}'`
                               RSSI_P95=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "percentile_rssi_95:" | awk '{print $2}'`
+			      PACKETS_OWN_FOR_ALL=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "ghost_rec_packets_all:" | awk '{print $2}'`
+			      PACKETS_FOR_ALL=`cat $AC_EVALUATIONDIR/$NODE.$DEVICE.$SIZE.$BITRATE.packets_stat_print.matlab | grep "for_rec_packets_all:" | awk '{print $2}'`
                           else
 		          PACKETS_OWN_ALL=0
 		          PACKETS_OWN_OK=0
@@ -319,6 +329,8 @@ for i in `ls $DATADIR`; do
                               RSSI_P50=0
                               RSSI_P75=0
                               RSSI_P95=0
+			      PACKETS_OWN_FOR_ALL=0
+			      PACKETS_FOR_ALL=0
 		      fi
 		
 		      if [ -e $DATADIR/$i/$NODE.info ]; then
@@ -335,6 +347,8 @@ for i in `ls $DATADIR`; do
 		      echo "PACKETS_OWN_OK=$PACKETS_OWN_OK" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
 	    	      echo "PACKETS_OWN_CRC=$PACKETS_OWN_CRC" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
 	    	      echo "PACKETS_OWN_PHY=$PACKETS_OWN_PHY" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
+		      echo "PACKETS_OWN_FOR_ALL=$PACKETS_OWN_FOR_ALL" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
+		      echo "PACKETS_FOR_ALL=$PACKETS_FOR_ALL" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
 	   	      echo "MEANPER=$MEANPER" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
 	   	      echo "STDPER=$STDPER" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
 	    	      echo "MEANRSSI=$MEANRSSI" >> $AC_EVALUATIONDIR/$NODE.$DEVICE.result.view
@@ -346,7 +360,7 @@ for i in `ls $DATADIR`; do
 	    	      echo -n "$PACKETS_ALL_ALL;$PACKETS_ALL_OK;$PACKETS_ALL_CRC;$PACKETS_ALL_PHY;"  >> $RESULTDIR/result.csv
 		      echo -n "$SIZE;$BITRATE;$INTERVAL;$PACKETS_OWN_ALL;$PACKETS_OWN_OK;$PACKETS_OWN_CRC;$PACKETS_OWN_PHY;$MEANPER;$STDPER;" >> $RESULTDIR/result.csv
                           echo -n "$MEANRSSI;$STDRSSI;$RSSI_P5;$RSSI_P25;$RSSI_P50;$RSSI_P75;$RSSI_P95;" >> $RESULTDIR/result.csv
-                          echo "$FORMEANRSSI;$FORSTDRSSI;$FORRSSI_P5;$FORRSSI_P25;$FORRSSI_P50;$FORRSSI_P75;$FORRSSI_P95;$LOS;" >> $RESULTDIR/result.csv
+                          echo "$FORMEANRSSI;$FORSTDRSSI;$FORRSSI_P5;$FORRSSI_P25;$FORRSSI_P50;$FORRSSI_P75;$FORRSSI_P95;$LOS;$PACKETS_OWN_FOR_ALL;$PACKETS_FOR_ALL;" >> $RESULTDIR/result.csv
 	        
 	                echo "$EVALUATIONNUMBER;\"$DATADIR/$i\";" >> $RESULTDIR/info.csv
 	
@@ -360,8 +374,8 @@ done
 
 cat $RESULTDIR/sender.csv.tmp | sort -u > $RESULTDIR/sender.csv
 rm -f $RESULTDIR/sender.csv.tmp
-cat $RESULTDIR/result.csv | grep -v "NUMBER" | sed -e "s#;# #g" | awk '{print $3"_"$2" "$5" "$6" "$7}' | grep -v "0 0 0" | sort -u > $RESULTDIR/positions.csv
-cat $RESULTDIR/sender.csv | sed -e "s#;# #g" | awk '{print $1"_0 "$3" "$4" "$5}' | sort -u >> $RESULTDIR/positions.csv 
+cat $RESULTDIR/result.csv | grep -v "NUMBER" | sed -e "s#;# #g" | awk '{print $3"_"$2" "$6" "$7" "$8}' | grep -v "0 0 0" | sort -u > $RESULTDIR/positions.csv
+cat $RESULTDIR/sender.csv | sed -e "s#;# #g" | awk '{print $1"_"$2" "$3" "$4" "$5}' | sed -e "s#ath##g" | sort -u >> $RESULTDIR/positions.csv 
 
 cat $RESULTDIR/info.log.tmp | egrep -v "^[[:space:]]*$" > $RESULTDIR/info.log
 rm -f $RESULTDIR/info.log.tmp
