@@ -5,7 +5,16 @@ case "$1" in
 	if [ "x$MODOPTIONS" = "x" ]; then
 	    . ../etc/madwifi/modoptions.default
 	else
+	    if [ -e $MODOPTIONS ]; then
 	    . $MODOPTIONS
+	    else
+		if [ -e ../etc/madwifi/$MODOPTIONS ]; then
+		  . ../etc/madwifi/$MODOPTIONS
+		else
+		    echo "Modoptionsfile $MODOPTIONS doesn't exist ! Use default"
+		    . ../etc/madwifi/modoptions.default
+		fi
+	    fi
 	fi
 	
 	echo insmod ath_hal
