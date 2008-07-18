@@ -63,15 +63,28 @@ for node in $NODELIST; do
 	done
 done
 
+echo "Start local process"
+gcc -o $DIR/controller $DIR/controller.c > /dev/null 2>&1
+screen -d -m -S localrun
+screen -S localrun -X screen -t controller
+sleep 0.1
+screen -S localrun -p controller -X stuff "( cd $pwd; ./controller > controller.log 2>&1 )"
+sleep 0.1
+screen -S localrun -p controller -X stuff $'\n'
+
 echo "Start measurement !"
 
 RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/../bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
 
-mv *.dump $DIR/$1/
+killall -s TERM controller
+screen -S localrun -X quit
+
+#mv *.dump $DIR/$1/
 mv *.log $DIR/$1/
 mv *info $DIR/$1/
 cp *.click* $DIR/$1/
 cp *.real $DIR/$1/
+rm $DIR/controller
 
 $DIR/../bin/prepare_measurement.sh cleanup tcp.dis
 
