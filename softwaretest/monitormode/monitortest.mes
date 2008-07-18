@@ -1,4 +1,4 @@
-#NODE		DEVICE		MODULSDIR	WIFICONFIG		CLICKSCRIPT		LOGFILE
-sk110		ath0		-		monitor.default		WORKDIR/sender.click	LOGDIR/sender.log
-sk111		ath0		-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver.log
+#NODE		DEVICE		MODULSDIR	MODOPTIONS	WIFICONFIG		CLICKSCRIPT		LOGFILE			APP	APPLOGFILE
+sk110		ath0		-		-		monitor.default		WORKDIR/sender.click	LOGDIR/sender.log	-	-
+sk111		ath0		-		-		Mmonitor.default	WORKDIR/receiver.click	LOGDIR/receiver.log	-	-
 
