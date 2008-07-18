@@ -94,7 +94,7 @@ mgm_clf[1]
     -> wlan_out_queue;
 
     apclassifier[1]
-    -> Etherdecap()
+    -> EtherDecap()
     -> Print("Up to Backend")
     -> packet_encap :: UDPIPEncap( 1.0.0.2 , 10000 , 192.168.4.102 , 12345, true )
     -> ipqueue :: NotifierQueue(50)

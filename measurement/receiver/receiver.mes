@@ -1,10 +1,10 @@
 #NODE		DEVICE		MODULSDIR				MODOPTIONS	WIFICONFIG		CLICKSCRIPT		CLICKLOGFILE		APPLICATION	APPLICATIONLOGFILE
-sk110		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/receiver.click	LOGDIR/sk110.ath0.log	date		sk0.0.log
-sk111		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel14	WORKDIR/receiver.click	LOGDIR/sk111.ath0.log	date		sk1.0.log
-sk112		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.a.channel183	WORKDIR/receiver.click	LOGDIR/sk112.ath0.log	date		sk2.0.log
-sk110		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel14	WORKDIR/receiver.click	LOGDIR/sk110.ath1.log	date		sk0.1.log
-sk111		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.a.channel183	WORKDIR/receiver.click	LOGDIR/sk111.ath1.log	date		sk1.1.log
-sk112		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/receiver.click	LOGDIR/sk112.ath1.log	date		sk2.1.log
+sk110		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/receiver.click	LOGDIR/sk110.ath0.log	date		WORKDIR/sk0.0.log
+sk111		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel14	WORKDIR/receiver.click	LOGDIR/sk111.ath0.log	date		WORKDIR/sk1.0.log
+sk112		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.a.channel183	WORKDIR/receiver.click	LOGDIR/sk112.ath0.log	date		WORKDIR/sk2.0.log
+sk110		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel14	WORKDIR/receiver.click	LOGDIR/sk110.ath1.log	date		WORKDIR/sk0.1.log
+sk111		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.a.channel183	WORKDIR/receiver.click	LOGDIR/sk111.ath1.log	date		WORKDIR/sk1.1.log
+sk112		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/receiver.click	LOGDIR/sk112.ath1.log	date		WORKDIR/sk2.1.log
 #wgt73		ath0		WORKDIR/../../nodes/lib/modules/mips	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_7.log	-		-
 #sk111		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel14	WORKDIR/receiver.click	LOGDIR/sk111.ath0.log	-		-
 #sk111		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.a.channel183	WORKDIR/receiver.click	LOGDIR/sk111.ath1.log	-		-

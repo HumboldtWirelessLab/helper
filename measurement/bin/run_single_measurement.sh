@@ -174,8 +174,6 @@ if [ $RUNMODENUM -le 5 ]; then
     SCREENNAME="measurement_$ID"
     
     screen -d -m -S $SCREENNAME
-# runs with 0.2
-#    sleep 0.1
 
     NODEBINDIR="$DIR/../../nodes/bin"
 
@@ -189,28 +187,26 @@ if [ $RUNMODENUM -le 5 ]; then
 	NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
 	
 	for nodedevice in $NODEDEVICELIST; do
-		CLICKSCRIPT=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $6}'`
-		LOGFILE=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
-		APPLICATION=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $8}'`
-		APPLOGFILE=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $9}'`
+		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
+
+		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $6}'`
+		LOGFILE=`echo "$CONFIGLINE" | awk '{print $7}'`
 
 		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_click"	
 			screen -S $SCREENNAME -X screen -t $SCREENT
-# runs with 0.2
    			sleep 0.1
 			screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
-#			sleep 0.2
 		fi
+
+		APPLICATION=`echo "$CONFIGLINE" | awk '{print $8}'`
+		APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $9}'`
 		
 		if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_app"	
-
 			screen -S $SCREENNAME -X screen -t $SCREENT
-# runs with 0.2
    			sleep 0.1
 			screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$APPLICATION  > $APPLOGFILE 2>&1\""
-#			sleep 0.2
 		fi
 	done
     done
@@ -222,20 +218,22 @@ if [ $RUNMODENUM -le 5 ]; then
     for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	for nodedevice in $NODEDEVICELIST; do
-		CLICKSCRIPT=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $6}'`
-		LOGFILE=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
-		APPLICATION=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $8}'`
-		APPLOGFILE=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $9}'`
+		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
+
+		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $6}'`
+		LOGFILE=`echo "$CONFIGLINE" | awk '{print $7}'`
 
 		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_click"	
     			screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
-#			sleep 1
 		fi
+
+		APPLICATION=`echo "$CONFIGLINE" | awk '{print $8}'`
+		APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $9}'`
+
 		if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_app"	
     			screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
-#			sleep 1
 		fi
 	done
     done
@@ -244,8 +242,9 @@ if [ $RUNMODENUM -le 5 ]; then
 ################# Wait and Stop ###################
 ###################################################
 
-    echo "Wait for $TIME sec"
-    sleep $TIME
+    WAITTIME=`expr $TIME + 5`
+    echo "Wait for $WAITTIME sec"
+    sleep $WAITTIME
 
     screen -S $SCREENNAME -X quit
 
