@@ -33,7 +33,7 @@ check_nodes() {
 	NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
 
 	echo "wait for all nodes"
-	sleep 60
+	sleep 20
 	echo "error" 1>&$STATUSFD
 	exit 0
     fi
@@ -123,7 +123,7 @@ if [ $RUNMODENUM -le 3 ]; then
     done
 
     check_nodes
-    sleep 2
+    sleep 1
 fi
 
 if [ $RUNMODENUM -le 4 ]; then
@@ -136,7 +136,7 @@ if [ $RUNMODENUM -le 4 ]; then
     done
 
     check_nodes
-    sleep 2
+    sleep 1
 
     for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
@@ -147,7 +147,7 @@ if [ $RUNMODENUM -le 4 ]; then
     done
 
     check_nodes
-    sleep 2
+    sleep 1
 
     for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
@@ -174,7 +174,8 @@ if [ $RUNMODENUM -le 5 ]; then
     SCREENNAME="measurement_$ID"
     
     screen -d -m -S $SCREENNAME
-    sleep 0.2
+# runs with 0.2
+#    sleep 0.1
 
     NODEBINDIR="$DIR/../../nodes/bin"
 
@@ -196,18 +197,20 @@ if [ $RUNMODENUM -le 5 ]; then
 		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_click"	
 			screen -S $SCREENNAME -X screen -t $SCREENT
-   			sleep 0.2
+# runs with 0.2
+   			sleep 0.1
 			screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
-			sleep 0.2
+#			sleep 0.2
 		fi
 		
 		if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_app"	
 
 			screen -S $SCREENNAME -X screen -t $SCREENT
-   			sleep 0.2
+# runs with 0.2
+   			sleep 0.1
 			screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$APPLICATION  > $APPLOGFILE 2>&1\""
-			sleep 0.2
+#			sleep 0.2
 		fi
 	done
     done
@@ -227,12 +230,12 @@ if [ $RUNMODENUM -le 5 ]; then
 		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_click"	
     			screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
-			sleep 1
+#			sleep 1
 		fi
 		if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_app"	
     			screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
-			sleep 1
+#			sleep 1
 		fi
 	done
     done
@@ -254,3 +257,4 @@ fi
 echo "Finished measurement. Status: ok."
 
 exit 0
+
