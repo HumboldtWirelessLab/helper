@@ -60,33 +60,45 @@ filter[0]
   -> WifiDupeFilter()
   -> mgm_clf :: Classifier(0/00%0f, -);				// management frames
 
-mgm_clf[0] 								//handle mgmt frames
+mgm_clf[0] 							//handle mgmt frames
   -> ap
   -> beacon_rates :: SetTXRate(RATE 22,TRIES 1)		// ap beacons send at constant bitrate
   -> beacon_power :: SetTXPower( POWER 16)
   -> wlan_out_queue;
 
 mgm_clf[1]
-  -> PrintWifi(">", TIMESTAMP true)
   -> WifiDecap()
   -> clf_bcast :: Classifier(0/ffffffffffff, -)
-  -> arp_clf :: Classifier (12/0806, 12/8086, -)
-  -> ARPResponder( 192.168.1.1/24 mywlan)
+  -> arp_clf :: Classifier (12/0806, - )
+  -> ARPResponder( 192.168.1.1/24 06:0C:42:0C:74:0E )
   -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
   -> SetTXRate(RATE 22,TRIES 9)
-  -> SetTXPower( POWER 16)
+  -> SetTXPower( POWER 16 )
   -> wlan_out_queue;
 
   arp_clf[1] -> Discard;
 
+  arp :: ARPTable();
+
   clf_bcast[1]
     -> Classifier(12/0800)
-    -> Print("IP:")
-//  -> packet_encap :: UDPIPEncap( 1.0.0.2 , 10000 , 1.0.0.1 , 12345, true )
-//  -> ipqueue :: NotifierQueue(50)
-  -> Discard;
-  Idle()
-  -> tun;
+    -> apclassifier :: Classifier(30/c0a80101,-)
+    -> StoreIPEthernet(arp)
+    -> EtherDecap()
+    -> CheckIPHeader
+    -> icp :: ICMPPingResponder
+    -> ResolveEthernet( 06:0C:42:0C:74:0E, arp)
+    -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
+    -> SetTXRate(RATE 22,TRIES 9)
+    -> SetTXPower( POWER 16 )
+    -> wlan_out_queue;
+
+    apclassifier[1]
+    -> Etherdecap()
+    -> Print("Up to Backend")
+    -> packet_encap :: UDPIPEncap( 1.0.0.2 , 10000 , 192.168.4.102 , 12345, true )
+    -> ipqueue :: NotifierQueue(50)
+    -> tun;
 
 wlan_out_queue
   -> AthdescEncap()

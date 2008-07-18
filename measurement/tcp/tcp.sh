@@ -27,9 +27,9 @@ NODELIST=`cat $DIR/tcp.mes | grep -v "^#" | awk '{print $1}' | sort -u`
 
 mkdir $DIR/$1
 
-rm -f $DIR/info
-vi $DIR/info
-echo "" >> $DIR/info
+#rm -f $DIR/info
+#vi $DIR/info
+#echo "" >> $DIR/info
 
 DATE=`date +%Y:%m:%d" "%H:%M:%S`
 echo "DATE: $DATE" > $DIR/measurement.info
