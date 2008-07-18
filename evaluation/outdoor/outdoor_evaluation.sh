@@ -104,7 +104,7 @@ for i in `ls $DATADIR`; do
          fi
 
          if [ -e $DATADIR/$i/$MESFILE ]; then
-		WIFICONFIG=`cat $DATADIR/$i/$MESFILE | egrep "$NODE[[:space:]]*$DEVICE" | awk '{print $4}' | sed -e "s#/# #g" | awk '{print $NF}'`
+		WIFICONFIG=`cat $DATADIR/$i/$MESFILE | egrep "$NODE[[:space:]]*$DEVICE" | awk '{print $5}' | sed -e "s#/# #g" | awk '{print $NF}'`
 		CHANNEL=`cat $DATADIR/$i/$WIFICONFIG | grep "CHANNEL" | sed -e "s#=# #g" | awk '{print $2}'`;
 		WIFITYPE=`cat $DATADIR/$i/$WIFICONFIG | grep "WIFITYPE" | sed -e "s#=# #g" | awk '{print $2}'`;
          else
