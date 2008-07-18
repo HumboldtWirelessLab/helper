@@ -104,7 +104,7 @@ for i in `ls $DATADIR`; do
          fi
 
          if [ -e $DATADIR/$i/$MESFILE ]; then
-		WIFICONFIG=`cat $DATADIR/$i/$MESFILE | egrep "$NODE[[:space:]]*$DEVICE" | awk '{print $4}' | sed -e "s#/# #g" | awk '{print $NF}'`
+		WIFICONFIG=`cat $DATADIR/$i/$MESFILE | egrep "$NODE[[:space:]]*$DEVICE" | awk '{print $5}' | sed -e "s#/# #g" | awk '{print $NF}'`
 		CHANNEL=`cat $DATADIR/$i/$WIFICONFIG | grep "CHANNEL" | sed -e "s#=# #g" | awk '{print $2}'`;
 		WIFITYPE=`cat $DATADIR/$i/$WIFICONFIG | grep "WIFITYPE" | sed -e "s#=# #g" | awk '{print $2}'`;
          else
@@ -230,7 +230,7 @@ for i in `ls $DATADIR`; do
                                   echo "end" >> $AC_EVALUATIONDIR/packet_stat_call.m
                               else
                                   echo "function packet_stat_call()" > $AC_EVALUATIONDIR/packet_stat_call.m
-                                  echo "packet_stat($SIZEWIFI, $BITRATE, $INTERVAL, '$NODE.$DEVICE.packets.all.all.matlab', 100, 'packets_stat');"   >> $AC_EVALUATIONDIR/packet_stat_call.m
+                                  echo "packet_stat($SIZEWIFI, $BITRATE, $INTERVAL, '$NODE.$DEVICE.packets.all.all.matlab', 200, 'packets_stat');"   >> $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "end" >> $AC_EVALUATIONDIR/packet_stat_call.m
                               fi
