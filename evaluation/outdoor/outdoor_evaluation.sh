@@ -230,7 +230,7 @@ for i in `ls $DATADIR`; do
                                   echo "end" >> $AC_EVALUATIONDIR/packet_stat_call.m
                               else
                                   echo "function packet_stat_call()" > $AC_EVALUATIONDIR/packet_stat_call.m
-                                  echo "packet_stat($SIZEWIFI, $BITRATE, $INTERVAL, '$NODE.$DEVICE.packets.all.all.matlab', 100, 'packets_stat');"   >> $AC_EVALUATIONDIR/packet_stat_call.m
+                                  echo "packet_stat($SIZEWIFI, $BITRATE, $INTERVAL, '$NODE.$DEVICE.packets.all.all.matlab', 400, 'packets_stat');"   >> $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "end" >> $AC_EVALUATIONDIR/packet_stat_call.m
                               fi
