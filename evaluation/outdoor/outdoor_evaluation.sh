@@ -223,8 +223,8 @@ for i in `ls $DATADIR`; do
                           if [ -e $AC_EVALUATIONDIR/$NODE.$DEVICE.packets.all.all.matlab ] && [ $MATLABFILESIZE -gt 0 ]; then
 
                               if [ $CHANNEL -eq 14 ] && [ "$BITRATE" = "1" ] && [ -e $DATADIR/$SENDERNUM/c14.bug ]; then
-                    	          echo "$SENDERNODE $SENDERDEVICE $NODE $DEVICE $CHANNEL $BITRATE $SIZE" >> $AC_EVALUATIONDIR/../0/c14.bug.log
-			          echo "function packet_stat_call()" > $AC_EVALUATIONDIR/packet_stat_call.m
+                    	    echo "$SENDERNODE $SENDERDEVICE $NODE $DEVICE $CHANNEL $BITRATE $SIZE" >> $AC_EVALUATIONDIR/../0/c14.bug.log
+			    echo "function packet_stat_call()" > $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "packet_stat_c14($SIZEWIFI, $BITRATE, $INTERVAL, '$NODE.$DEVICE.packets.all.all.matlab', 100, 'packets_stat');"   >> $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "exit;" >> $AC_EVALUATIONDIR/packet_stat_call.m
                                   echo "end" >> $AC_EVALUATIONDIR/packet_stat_call.m
