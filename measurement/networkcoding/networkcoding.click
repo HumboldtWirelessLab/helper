@@ -5,7 +5,6 @@ FROMDEVICE
  -> Discard;  
 
 BRN2PacketSource(1000, 1000, 0)
- -> SetTimestamp()
  -> EtherEncap(0x8086, my_wlan, ff:ff:ff:ff:ff:ff)
  -> BRN2Networkcoding()
  -> WifiEncap(0x00, 0:0:0:0:0:0)

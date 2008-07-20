@@ -13,7 +13,6 @@ filter[1]
   -> Discard;
 
 BRN2PacketSource(1000, 20, my_wlan, ff:ff:ff:ff:ff:ff)
-  -> SetTimestamp()
   -> EtherEncap(0x8087, my_wlan, ff:ff:ff:ff:ff:ff)
   -> WifiEncap(0x00, 0:0:0:0:0:0)
   -> SetTXRate(24)                                                                                                                                                     

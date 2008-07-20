@@ -70,13 +70,13 @@ screen -S localrun -X screen -t controller
 sleep 0.1
 screen -S localrun -p controller -X stuff "( cd $pwd; ./controller > controller.log 2>&1 )"
 sleep 0.1
-screen -S localrun -p controller -X stuff $'\n'
+#screen -S localrun -p controller -X stuff $'\n'
 
 echo "Start measurement !"
 
 RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/../bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
 
-killall -s TERM controller
+#killall -s TERM controller
 screen -S localrun -X quit
 
 #mv *.dump $DIR/$1/
