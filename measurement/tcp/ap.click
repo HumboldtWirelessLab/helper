@@ -97,8 +97,12 @@ mgm_clf[1]
     -> EtherDecap()
     -> Print("Up to Backend")
     -> packet_encap :: UDPIPEncap( 1.0.0.2 , 10000 , 192.168.4.3 , 12345, true )
-    -> ipqueue :: NotifierQueue(50)
+    -> ipqueue :: NotifierQueue(500)
     -> tun;
+
+BRN2PacketSource(1000, 2000, 1000)
+-> packet_encap2 :: UDPIPEncap( 1.0.0.2 , 10000 , 192.168.4.3 , 12000, true )
+-> ipqueue;
 
 wlan_out_queue
   -> AthdescEncap()
