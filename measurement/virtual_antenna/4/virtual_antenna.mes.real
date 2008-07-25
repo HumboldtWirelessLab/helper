@@ -1,0 +1,3 @@
+sk110 ath0 /home/sombrutz/lab/helper/measurement/virtual_antenna/../../nodes/lib/modules/i586 - station.brn - - /home/sombrutz/lab/helper/measurement/virtual_antenna/tcp_stream.sh /home/sombrutz/lab/helper/measurement/virtual_antenna/sk110.app.log
+sk111 ath0 /home/sombrutz/lab/helper/measurement/virtual_antenna/../../nodes/lib/modules/i586 - monitor.b.channel11 /home/sombrutz/lab/helper/measurement/virtual_antenna/ap.click.sk111.ath0 /home/sombrutz/lab/helper/measurement/virtual_antenna/sk111.ath0.log - -
+sk112 ath0 /home/sombrutz/lab/helper/measurement/virtual_antenna/../../nodes/lib/modules/i586 - monitor.b.channel11 /home/sombrutz/lab/helper/measurement/virtual_antenna/ap2.click.sk112.ath0 /home/sombrutz/lab/helper/measurement/virtual_antenna/sk112.ath0.log - -

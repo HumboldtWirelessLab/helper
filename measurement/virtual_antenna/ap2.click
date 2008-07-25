@@ -101,7 +101,7 @@ mgm_clf[1]
     -> tun;
 
 BRN2PacketSource(1000, 2000, 1000)
--> packet_encap2 :: UDPIPEncap( 1.0.0.3 , 10000 , 192.168.4.3 , 12000, true )
+-> packet_encap2 :: UDPIPEncap( 1.0.0.3 , 10000 , 192.168.4.3 , 12100, true )
 -> ipqueue;
 
 wlan_out_queue
