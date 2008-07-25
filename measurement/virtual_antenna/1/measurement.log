@@ -1,0 +1,124 @@
+check all nodes
+Set marker for reboot-detection
+sk110
+sk111
+sk112
+sk110
+bash: line 0: cd: /home/sombrutz/lab/helper/measurement/virtual_antenna/./../bin/../../host/bin/../../nodes/bin/: No such file or directory
+bash: ./wlanmodules.sh: No such file or directory
+sk111
+rmmod wlan_xauth
+rmmod wlan_wep
+rmmod wlan_tkip
+rmmod wlan_scan_sta
+rmmod wlan_ccmp
+rmmod wlan_acl
+rmmod wlan_scan_ap
+rmmod ath_pci
+rmmod ath_rate_sample
+rmmod wlan
+rmmod ath_hal
+sk112
+rmmod wlan_xauth
+rmmod wlan_wep
+rmmod wlan_tkip
+rmmod wlan_scan_sta
+rmmod wlan_ccmp
+rmmod wlan_acl
+rmmod wlan_scan_ap
+rmmod ath_pci
+rmmod ath_rate_sample
+rmmod wlan
+rmmod ath_hal
+sk110
+bash: line 0: cd: /home/sombrutz/lab/helper/measurement/virtual_antenna/./../bin/../../host/bin/../../nodes/bin/: No such file or directory
+bash: ./wlanmodules.sh: No such file or directory
+sk111
+insmod ath_hal
+insmod wlan
+insmod ath_rate_sample
+insmod ath_pci autocreate=none outdoor=1 xchanmode=1 countrycode=395
+sk112
+insmod ath_hal
+insmod wlan
+insmod ath_rate_sample
+insmod ath_pci autocreate=none outdoor=1 xchanmode=1 countrycode=395
+create sk110 ath0 with station.brn
+bash: line 0: cd: /home/sombrutz/lab/helper/measurement/virtual_antenna/./../bin/../../host/bin/../../nodes/bin/: No such file or directory
+bash: ./wlandevice.sh: No such file or directory
+create sk111 ath0 with monitor.b.channel11
+/usr/sbin/wlanconfig ath0 create wlandev wifi0 wlanmode monitor
+ath0
+create sk112 ath0 with monitor.b.channel11
+/usr/sbin/wlanconfig ath0 create wlandev wifi0 wlanmode monitor
+ath0
+config sk110 ath0
+bash: line 0: cd: /home/sombrutz/lab/helper/measurement/virtual_antenna/./../bin/../../host/bin/../../nodes/bin/: No such file or directory
+bash: ./wlandevice.sh: No such file or directory
+config sk111 ath0
+/sbin/ifconfig ath0 up
+config sk112 ath0
+/sbin/ifconfig ath0 up
+config sk110 ath0
+bash: line 0: cd: /home/sombrutz/lab/helper/measurement/virtual_antenna/./../bin/../../host/bin/../../nodes/bin/: No such file or directory
+bash: ./wlandevice.sh: No such file or directory
+config sk111 ath0
+/usr/sbin/iwconfig ath0 channel 11
+/usr/sbin/iwconfig ath0 txpower 16
+echo "0" > /proc/sys/dev/wifi0/diversity
+sysctl -w dev.wifi0.txantenna=1
+dev.wifi0.txantenna = 1
+sysctl -w dev.wifi0.rxantenna=1
+dev.wifi0.rxantenna = 1
+echo 804 > /proc/sys/net/ath0/dev_type
+sysctl -w dev.wifi0.intmit=0
+dev.wifi0.intmit = 0
+config sk112 ath0
+/usr/sbin/iwconfig ath0 channel 11
+/usr/sbin/iwconfig ath0 txpower 16
+echo "0" > /proc/sys/dev/wifi0/diversity
+sysctl -w dev.wifi0.txantenna=1
+dev.wifi0.txantenna = 1
+sysctl -w dev.wifi0.rxantenna=1
+dev.wifi0.rxantenna = 1
+echo 804 > /proc/sys/net/ath0/dev_type
+sysctl -w dev.wifi0.intmit=0
+dev.wifi0.intmit = 0
+Deviceconfig for sk110:ath0
+config sk110 ath0
+ath0      IEEE 802.11g  ESSID:""  Nickname:""
+          Mode:Ad-Hoc  Frequency:2.412 GHz  Cell: 06:0C:42:0C:85:F4   
+          Bit Rate=11 Mb/s   Tx-Power:18 dBm   Sensitivity=1/1  
+          Retry:off   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+          Link Quality=0/70  Signal level=-96 dBm  Noise level=-96 dBm
+          Rx invalid nwid:26  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+
+Deviceconfig for sk111:ath0
+config sk111 ath0
+ath0      IEEE 802.11g  ESSID:""  Nickname:""
+          Mode:Monitor  Frequency:2.462 GHz  Access Point: 06:0C:42:0C:74:0E   
+          Bit Rate:0 kb/s   Tx-Power=16 dBm   Sensitivity=1/1  
+          Retry:off   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+          Link Quality=0/70  Signal level=-99 dBm  Noise level=-99 dBm
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+
+Deviceconfig for sk112:ath0
+config sk112 ath0
+ath0      IEEE 802.11g  ESSID:""  Nickname:""
+          Mode:Monitor  Frequency:2.462 GHz  Access Point: 06:0C:42:0C:74:0D   
+          Bit Rate:0 kb/s   Tx-Power=16 dBm   Sensitivity=1/1  
+          Retry:off   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+          Link Quality=0/70  Signal level=-97 dBm  Noise level=-97 dBm
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+
+Wait for 25 sec
+Finished measurement. Status: ok.
