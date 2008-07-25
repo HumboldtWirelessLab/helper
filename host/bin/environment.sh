@@ -27,7 +27,7 @@ fi
 case "$1" in
 	"help")
 		echo "Use $0 mount | watchdogstart | status"
-		echo "Use NODELIS"
+		echo "Use NODELIST"
 		;;
 	"mount")
 		for node in $NODELIST; do

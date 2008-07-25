@@ -1,0 +1,24 @@
+AddressInfo(my_wlan ath1:eth);
+
+BRN2PacketSource(100, 5, 0, 14, 2, SETPOWER)
+ -> SetTimestamp()
+ -> EtherEncap(0x8087, my_wlan, ff:ff:ff:ff:ff:ff)
+ -> WifiEncap(0x00, 0:0:0:0:0:0)
+ -> SetTXRate(2)
+ -> wlan_out_queue :: NotifierQueue(1000);
+
+BRN2PacketSource(100, 5, 0, 14, 22, SETPOWER)
+ -> SetTimestamp()
+ -> EtherEncap(0x8087, my_wlan, ff:ff:ff:ff:ff:ff)
+ -> WifiEncap(0x00, 0:0:0:0:0:0)
+ -> SetTXRate(22)
+ -> wlan_out_queue;
+
+wlan_out_queue
+-> AthdescEncap()
+-> ToDevice(ath1);
+
+Script(
+	wait 30,
+	stop
+);
