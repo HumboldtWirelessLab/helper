@@ -1,0 +1,43 @@
+check all nodes
+Set marker for reboot-detection
+sk110
+sk111
+sk112
+Deviceconfig for sk110:ath0
+config sk110 ath0
+ath0      IEEE 802.11g  ESSID:""  Nickname:""
+          Mode:Ad-Hoc  Frequency:2.412 GHz  Cell: 06:0C:42:0C:85:F4   
+          Bit Rate=11 Mb/s   Tx-Power:18 dBm   Sensitivity=1/1  
+          Retry:off   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+          Link Quality=0/70  Signal level=-96 dBm  Noise level=-96 dBm
+          Rx invalid nwid:310  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+
+Deviceconfig for sk111:ath0
+config sk111 ath0
+ath0      IEEE 802.11g  ESSID:""  Nickname:""
+          Mode:Monitor  Frequency:2.462 GHz  Access Point: 06:0C:42:0C:74:0E   
+          Bit Rate:0 kb/s   Tx-Power=16 dBm   Sensitivity=1/1  
+          Retry:off   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+          Link Quality=0/70  Signal level=-99 dBm  Noise level=-99 dBm
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+
+Deviceconfig for sk112:ath0
+config sk112 ath0
+ath0      IEEE 802.11g  ESSID:""  Nickname:""
+          Mode:Monitor  Frequency:2.462 GHz  Access Point: 06:0C:42:0C:74:0D   
+          Bit Rate:0 kb/s   Tx-Power=16 dBm   Sensitivity=1/1  
+          Retry:off   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+          Link Quality=0/70  Signal level=-98 dBm  Noise level=-98 dBm
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+
+Wait for 25 sec
+Finished measurement. Status: ok.
