@@ -1,11 +1,11 @@
-NAME=tcp
+NAME=virtualantenna
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=50
+TIME=20
 
-NODETABLE=tcp.mes
+NODETABLE=virtual_antenna.mes
 NODEPLACEMENT=placement.default
 
 LOGDIR=WORKDIR
