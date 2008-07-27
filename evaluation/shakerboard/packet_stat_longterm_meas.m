@@ -1,6 +1,9 @@
-function packet_stat(packetfile,numbins,node,device,bitrate,channel,point)
+function packet_stat_longterm_meas(packetfile,numbins,node,device,bitrate,channel,point)
 % psize - Packetsize
 % bitrate - Bitrate of own packets
+
+global allpackets;
+
 
 POINT=1;NODE=2;DEVICE=3;TIMESTAMP=4;SIZE=5;BITRATE=6;RSSI=7;SEQ=8;
 FOROWN=9;PID=10;INTERVAL=11;CHANNEL=12;SENDBITRATE=13;TXPOWER=14;
@@ -10,7 +13,7 @@ OWN=1;
 
 MIN_RSSI=0;
 
-allpackets=load(packetfile);
+%allpackets=load(packetfile);
 
 allpackets( find( allpackets(:,RSSI) > 100 ),RSSI) = 0;                                                                  % remove wrong rssi
 
@@ -60,11 +63,12 @@ own_packets = allpackets( find( ( allpackets(:,FOROWN) == OWN ) & ( allpackets(:
 
     per = 1 - ( size(own_packets,1) / count_send_packets ); 
   else
+    count_send_packets = 0;
     per = 1;
   end
 
 %divide into bins (time) and calc
-  bin_packetsize = ( count_send_packets / numbins );
+  bin_packetsize = ( count_send_packets / numbins )
 
   bin_own_per = [];
   bin_own_rssi = [];
@@ -115,20 +119,21 @@ own_packets = allpackets( find( ( allpackets(:,FOROWN) == OWN ) & ( allpackets(:
   %c=colormap;
   subplot(4,1,1);
   scatter( 1:numbins, bin_own_rssi );
+  xlabel('Bin');ylabel('RSSI');
   subplot(4,1,2);
   scatter( 1:numbins, bin_own_per );
+  xlabel('Bin');ylabel('PER');
   subplot(4,1,3);
   scatter( 1:numbins, bin_own_int_mean );
+  xlabel('Bin');ylabel('Int(Mean)');
   subplot(4,1,4);
   scatter( 1:numbins, bin_own_int_std );
+  xlabel('Bin');ylabel('Int(Std)');
 
   mean_bin_per = mean(bin_own_per);
   std_bin_per = std(bin_own_per);
 
-end
-
 clear bin_own_per_ac bin_own_rssi_ac bin_for_rssi_ac bin_own_packet_count_ac bin_for_packet_count_ac bin_own_rssi_ac bin_for_own_rate_ac bin_for_medium_time_ac
-
 
 end
 
