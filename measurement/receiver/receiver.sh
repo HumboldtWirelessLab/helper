@@ -41,12 +41,16 @@ for n in $NODELIST; do
 echo "NODE: $n"
 
     if [ $GPSD -ge 1 ]; then
-	echo "Get GPS -Data"
+        if [ "$n" = "sk110" ]; then
+	  echo "Get GPS -Data"
     
-        echo -n "Get Position for $n ! Press any key !"
-        read key
+          echo -n "Get Position for $n ! Press any key !"
+          read key
 	
-        $DIR/../../host/bin/gps.sh getdata > $n\_gps.info
+          $DIR/../../host/bin/gps.sh getdata > $n\_gps.info
+	else
+	  cat sk110_gps.info > $n\_gps.info
+	fi
     fi
 
     key=0
