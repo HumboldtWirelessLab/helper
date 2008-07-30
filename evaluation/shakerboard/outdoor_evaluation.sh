@@ -32,6 +32,11 @@ fi
 
 mkdir -p $RESULTDIR
 
+if [ "x$DISPLAY" != "x" ]; then
+  SAVEDISPLAY=$DISPLAY
+  unset DISPLAY
+fi
+
 for i in `ls $DATADIR`; do
 
     echo "POINT $i "    
@@ -58,6 +63,11 @@ for i in `ls $DATADIR`; do
 
     done
 done
+
+if [ "x$SAVEDISPLAY" != "x" ]; then
+  DISPLAY=$SAVEDISPLAY
+  unset SAVEDISPLAY
+fi
 
 exit 0
 
