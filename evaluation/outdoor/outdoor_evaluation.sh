@@ -36,6 +36,11 @@ rm -f $RESULTDIR/info.csv
 SENDERNUM=0
 EVALUATIONNUMBER=1
 
+if [ "x$DISPLAY" != "x" ]; then
+  SAVEDISPLAY=$DISPLAY
+  unset DISPLAY
+fi
+
 REMOTEMATLAB_AVAILABLE=`ping -c 1 gruenau.informatik.hu-berlin.de 2>&1 | grep trans | awk '{print $4}'`
 LOCALMATLAB=`which matlab`
 if [ "x$LOCALMATLAB" = "x" ]; then
@@ -169,7 +174,7 @@ for i in `ls $DATADIR`; do
 	fi
 
 	for SENDERNODE in $SENDERNODES; do
-		
+
 ################################################################
 #####################    S E N D E R   G P S  S T U F F   #######################
 ################################################################
@@ -381,6 +386,11 @@ cat $RESULTDIR/info.log.tmp | egrep -v "^[[:space:]]*$" > $RESULTDIR/info.log
 rm -f $RESULTDIR/info.log.tmp
 
 echo ""
+
+if [ "x$SAVEDISPLAY" != "x" ]; then
+  DISPLAY=$SAVEDISPLAY
+  unset SAVEDISPLAY
+fi
 
 exit 0
 
