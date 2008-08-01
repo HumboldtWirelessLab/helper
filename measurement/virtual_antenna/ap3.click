@@ -49,12 +49,6 @@ mywlan :: AddressInfo(ether_address DEVICE:eth);
 
 tun :: KernelTun(1.0.0.1/8);
 
-BRN2HotSpotsConnector(STARTOFFSET 1, UPDATEINTERVAL 200000,CLICKIP 192.168.4.123, CLICKPORT 7777, PACKETIP 192.168.4.123, PACKETPORT 7776 )
--> Print("Reg")
--> UDPIPEncap( 1.0.0.2 , 10002 , 192.168.4.3 , 12000, true )
--> ipqueue :: NotifierQueue(500)
--> tun;
-
 ap :: AccessPoint( INTERFACE DEVICE, SSID "brn", CHANNEL 11, BEACON_INTERVAL 100);
 
 FromDevice(DEVICE)
@@ -92,7 +86,6 @@ mgm_clf[1]
     -> StoreIPEthernet(arp)
     -> EtherDecap()
     -> CheckIPHeader
-    -> Print("localPing")
     -> icp :: ICMPPingResponder
     -> ResolveEthernet( 06:0C:42:0C:74:0D, arp)
     -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
@@ -103,28 +96,24 @@ mgm_clf[1]
     apclassifier[1]
     -> EtherDecap()
     -> Print("Up to Backend")
-    -> packet_encap :: UDPIPEncap( 1.0.0.3 , 10002 , 192.168.4.3 , 12100, true )
-    -> ipqueue
+    -> packet_encap :: UDPIPEncap( 1.0.0.3 , 10000 , 192.168.4.3 , 12345, true )
+    -> ipqueue :: NotifierQueue(50)
     -> tun;
 
+BRN2PacketSource(1000, 2000, 1000)
+-> packet_encap2 :: UDPIPEncap( 1.0.0.3 , 10000 , 192.168.4.3 , 12100, true )
+-> ipqueue;
 
 wlan_out_queue
   -> AthdescEncap()
-  -> Print("E")
   -> ToDevice(DEVICE);
 
 tun
   -> StripIPHeader()
   -> Strip(8)			                                                    //Strip udp
-  -> Print("zurueck zum Client")
-  -> ResolveEthernet( 06:0C:42:0C:74:0D, arp)
-  -> Print("A")
-  -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
-  -> Print("B")
-  -> SetTXRate(RATE 22,TRIES 9)
-  -> Print("C")
-  -> SetTXPower( POWER 16 )
-  -> Print("D")
+  -> WifiEncap(0x00, 0:0:0:0:0:0)
+  -> data_rates :: SetTXRate(RATE 22,TRIES 9)
+  -> data_power :: SetTXPower( POWER 16)
   -> wlan_out_queue;
 
 ControlSocket("TCP", 7777);
