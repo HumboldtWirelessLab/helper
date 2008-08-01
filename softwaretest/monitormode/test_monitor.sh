@@ -18,7 +18,7 @@ case "$SIGN" in
       ;;
 esac
 
-TIME=100
+TIME=10
 
 chmod 777 $LOGDIR
 
@@ -27,14 +27,20 @@ SEDARG2="s#LOGDIR#$LOGDIR#g"
 SEDARG3="s#WORKDIR#$DIR#g"
 cat $DIR/monitortest.mes | grep -v "#" | grep -e "." | awk '{print  $1" "$2" MODULSDIR "$4" "$5" "$6" "$7" "$8" "$9}' | sed -e $SEDARG -e $SEDARG2 -e $SEDARG3 > $DIR/monitortest.mes.tmp 
 
-RESULT=`CONFIGFILE=$DIR/monitortest.mes.tmp MARKER=$REVISION STATUSFD=5 ID=monitormode TIME=$TIME $DIR/../../measurement/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
+RESULT=`RUNMODE=REBOOT CONFIGFILE=$DIR/monitortest.mes.tmp MARKER=$REVISION STATUSFD=5 ID=monitormode TIME=$TIME $DIR/../../measurement/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
 
 rm -f $DIR/monitortest.mes.tmp
 
 if [ "$RESULT" = "error" ]; then
 	echo "error" 1>&$STATUSFD
 else
-	PACKETCOUNT=`cat $LOGDIR/receiver.log | grep "^1032" | wc -l`
+	PACKETCOUNT=`cat $LOGDIR/receiver.log | grep "^1032" | grep "8088" | wc -l`
+	ls -lisa $LOGDIR/receiver.log
+	echo "1"
+	cp $LOGDIR/receiver.log $LOGDIR/receiver.log_bla
+	cat $LOGDIR/receiver.log
+	echo "2"
+	cat $LOGDIR/receiver.log | grep "^1032"
 	echo "Packetcount is $PACKETCOUNT"
 
 	if [ $PACKETCOUNT -gt 0 ]; then
