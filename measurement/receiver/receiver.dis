@@ -13,4 +13,7 @@ LOGFILE=measurement.log
 
 RESULTDIR=WORKDIR
 
-GPS=yes
+GPS=no
+NOTICE=yes
+LOS=yes
+
