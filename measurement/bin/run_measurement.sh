@@ -128,7 +128,7 @@ done
 
 echo "Start measurement !"
 
-RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
+RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/run_single_measurement.sh 5>&1 6>&2 1>> $LOGDIR/$LOGFILE 2>&1`
 
 mv *.dump $pwd/$2/
 mv *.log $pwd/$2/

@@ -6,7 +6,7 @@
 #sk111		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.a.channel183	WORKDIR/receiver.click	LOGDIR/sk111.ath1.log	-		-
 #sk112		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/receiver.click	LOGDIR/sk112.ath1.log	-		-
 #wgt73		ath0		WORKDIR/../../nodes/lib/modules/mips	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_7.log	-		-
-sk110		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel14	WORKDIR/receiver.click	LOGDIR/sk111.ath0.log	-		-
-sk110		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.a.channel184	WORKDIR/receiver.click	LOGDIR/sk111.ath1.log	-		-
-sk112		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel14	WORKDIR/receiver.click	LOGDIR/sk112.ath0.log	-		-
-sk112		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.a.channel184	WORKDIR/receiver.click	LOGDIR/sk112.ath1.log	-		-
+#sk110		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel14	WORKDIR/receiver.click	LOGDIR/sk111.ath0.log	-		-
+#sk110		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.a.channel184	WORKDIR/receiver.click	LOGDIR/sk111.ath1.log	-		-
+sk112		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel14	WORKDIR/receiver2.click	LOGDIR/sk112.ath0.log	-		-
+#sk112		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.a.channel184	WORKDIR/receiver.click	LOGDIR/sk112.ath1.log	-		-
