@@ -244,7 +244,11 @@ if [ $RUNMODENUM -le 5 ]; then
 
     WAITTIME=`expr $TIME + 5`
     echo "Wait for $WAITTIME sec"
-    sleep $WAITTIME
+
+    echo -n "Wait...." >&6
+    for ((i = $WAITTIME; i > 0; i--)); do echo -e "$i \033[1A \033[2K" >&6 ; sleep 1; done
+
+#   sleep $WAITTIME
 
     screen -S $SCREENNAME -X quit
 
