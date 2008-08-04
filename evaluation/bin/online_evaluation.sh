@@ -18,5 +18,16 @@ case "$SIGN" in
 	;;
 esac
 
+DISFILE=$1
 
-find -maxdepth 1 -type d | grep -v "^.$" | sed -e "s#\./##g"
+. $DISFILE
+
+while [ ! -e $STOPMARKER ]; do
+    DIRS=`( cd $RESULTDIR; find -maxdepth 1 -type d | grep -v "^.$" | sed -e "s#\./##g" )`
+    for d in $DIRS; do
+	if [ -e $RESULTSIR/$d/measurement_fin ]; then
+	fi
+    done
+done
+
+exit 0
