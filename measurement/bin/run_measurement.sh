@@ -18,7 +18,7 @@ case "$SIGN" in
       ;;
 esac
 
-if [ -e $DIR/$2 ]; then
+if [ -e $pwd/$2 ]; then
     echo "Measurement already exits"
     exit 0
 fi
@@ -127,8 +127,6 @@ for node in $NODELIST; do
 done
 
 echo "Start measurement !"
-
-exit 0
 
 RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
 
