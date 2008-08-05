@@ -13,4 +13,8 @@ LOGFILE=measurement.log
 
 RESULTDIR=WORKDIR
 
-GPS=yes
+LOCALPROCESS=WORKDIR/virtualantenna.sh
+
+GPS=no
+NOTICE=no
+LOS=no

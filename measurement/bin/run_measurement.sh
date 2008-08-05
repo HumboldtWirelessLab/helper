@@ -126,9 +126,19 @@ for node in $NODELIST; do
 	done
 done
 
+if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
+  echo "Start local process"
+  $LOCALPROCESS start
+fi
+
 echo "Start measurement !"
 
 RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/run_single_measurement.sh 5>&1 6>&2 1>> $LOGDIR/$LOGFILE 2>&1`
+
+if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
+  echo "Stop local process"
+  $LOCALPROCESS stop
+fi
 
 mv *.dump $pwd/$2/
 mv *.log $pwd/$2/
