@@ -3,3 +3,4 @@ sk110		ath0		WORKDIR/../../nodes/lib/modules/i586	-		station.brn		-			-			WORKDI
 #sk111		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel11	WORKDIR/ap.click	LOGDIR/sk111.ath0.log	-			-
 sk112		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel11	WORKDIR/ap2.click	LOGDIR/sk112.ath0.log	WORKDIR/setup_portforwarding.sh	LOGDIR/sk112.app.log
 #sk112		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel11	WORKDIR/ap3.click	LOGDIR/sk112.ath1.log	-			-
+#host		-		-					-		-			-			-			bla			bla
