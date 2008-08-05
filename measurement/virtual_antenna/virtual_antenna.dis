@@ -3,7 +3,7 @@ SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=40
+TIME=10
 
 NODETABLE=virtual_antenna.mes
 NODEPLACEMENT=placement.default
