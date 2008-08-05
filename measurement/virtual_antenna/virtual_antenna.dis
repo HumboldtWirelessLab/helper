@@ -3,7 +3,7 @@ SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=40
+TIME=10
 
 NODETABLE=virtual_antenna.mes
 NODEPLACEMENT=placement.default
@@ -15,7 +15,8 @@ RESULTDIR=WORKDIR
 EVALUATIONSDIR=WORKDIR
 EVALUATIONSDIRPOSTFIX=_evaluation
 
-GPS=no
-NOTICE=yes
-LOS=yes
+LOCALPROCESS=WORKDIR/virtualantenna.sh
 
+GPS=no
+NOTICE=no
+LOS=no
