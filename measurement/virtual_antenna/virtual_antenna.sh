@@ -61,19 +61,19 @@ done
 
 echo "Start local process"
 
-#screen -d -m -S localrun
-#screen -S localrun -X screen -t controller
-#sleep 0.1
-#screen -S localrun -p controller -X stuff "( cd $pwd; ./controller > controller.log 2>&1 )"
-#sleep 0.1
-#screen -S localrun -p controller -X stuff $'\n'
+screen -d -m -S localrun
+screen -S localrun -X screen -t controller
+sleep 0.1
+screen -S localrun -p controller -X stuff "( cd $pwd; java -jar VirtualAntenna.jar > controller.log 2>&1 )"
+sleep 0.1
+screen -S localrun -p controller -X stuff $'\n'
 
 echo "Start measurement !"
 
-RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/../bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/$LOGFILE 2>&1`
+RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/../bin/run_single_measurement.sh 5>&1 6>&2 1>> $LOGDIR/$LOGFILE 2>&1`
 
-#killall -s TERM controller
-#screen -S localrun -X quit
+killall -s TERM java
+screen -S localrun -X quit
 
 #mv *.dump $DIR/$1/
 mv *.log $DIR/$1/
