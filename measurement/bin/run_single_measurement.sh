@@ -244,12 +244,17 @@ if [ $RUNMODENUM -le 5 ]; then
 
     WAITTIME=`expr $TIME + 5`
     echo "Wait for $WAITTIME sec"
-    sleep $WAITTIME
+
+    echo -n -e "Wait... \033[1G" >&6
+    for ((i = $WAITTIME; i > 0; i--)); do echo -n -e "Wait... $i \033[1G" >&6 ; sleep 1; done
+    echo -n -e "                 \033[1G" >&6
+
+#   sleep $WAITTIME
 
     screen -S $SCREENNAME -X quit
 
     check_nodes
-
+    
     echo "ok" 1>&$STATUSFD
 fi
 
