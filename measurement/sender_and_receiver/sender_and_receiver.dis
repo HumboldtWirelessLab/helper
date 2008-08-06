@@ -5,7 +5,7 @@ FORGEINNODES=no
 
 TIME=60
 
-NODETABLE=receiver.mes
+NODETABLE=sender_and_receiver.mes
 NODEPLACEMENT=placement.default
 
 LOGDIR=WORKDIR
@@ -18,4 +18,3 @@ EVALUATIONSDIRPOSTFIX=_evaluation
 GPS=no
 NOTICE=yes
 LOS=yes
-
