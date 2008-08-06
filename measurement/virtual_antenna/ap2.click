@@ -6,6 +6,10 @@ elementclass AccessPoint {
     rates :: AvailableRates(DEFAULT 2 4 11 12 18 22);
     bs :: BeaconScanner(RT rates);
 
+    Idle() ->
+    sc :: BRN2SetChannel($device,false)
+    -> Discard;
+ 
     input[0]
     -> mgt_cl :: Classifier(  0/00%f0, //assoc req
                                         0/10%f0, //assoc resp
@@ -24,7 +28,7 @@ elementclass AccessPoint {
     -> Discard;
 
     mgt_cl[2]
-    -> BeaconSource(WIRELESS_INFO winfo, RT rates)
+    -> bsrc :: BRN2BeaconSource(WIRELESS_INFO winfo, RT rates, SWITCHCHANNEL sc)
     -> [0]output;
 
     mgt_cl[3]
@@ -127,9 +131,12 @@ tun
   -> Print("D")
   -> wlan_out_queue;
 
+
 ControlSocket("TCP", 7777);
 
 Script(
+    wait 25,
+    write ap/bsrc.channel 3,
     wait RUNTIME,
     stop
 );
