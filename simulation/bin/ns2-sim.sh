@@ -115,7 +115,7 @@ case "$1" in
 
 		POSTFIX=$POSTFIX $DIR/prepare-sim.sh cleanup $2
 
-#		rm $TCLFILE
+		rm $TCLFILE
 		;;
 	*)
 		$0 help

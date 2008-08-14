@@ -23,7 +23,7 @@ Antenna/OmniAntenna set Gr_ 1.0
 Phy/WirelessPhy set CPThresh_ 10.0
 Phy/WirelessPhy set CSThresh_ 1.559e-11
 Phy/WirelessPhy set RXThresh_ 3.28984e-09
-#Phy/WirelessPhy set Rb_ 2*1e6
+Phy/WirelessPhy set Rb_ 2*1e6
 Phy/WirelessPhy set Pt_ 0.281838
 Phy/WirelessPhy set freq_ 2.472e9
 Phy/WirelessPhy set L_ 1.0
@@ -40,3 +40,14 @@ Mac/802_11 set basicRate_         11.0e6           ;# 11Mbps
 Mac/802_11 set RTSThreshold_ 3000
 Mac/802_11 set ShortRetryLimit_ 7               ;# retransmittions
 Mac/802_11 set LongRetryLimit_  4               ;# retransmissions
+
+#
+# The network channel, physical layer, MAC, propagation model,
+# and antenna model are all standard ns-2.
+#  
+set netchan	Channel/WirelessChannel
+set netphy	Phy/WirelessPhy
+set netmac	Mac/802_11
+set netprop     Propagation/TwoRayGround
+set antenna     Antenna/OmniAntenna
+

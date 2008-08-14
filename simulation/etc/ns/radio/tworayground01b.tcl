@@ -27,6 +27,7 @@ Phy/WirelessPhy set Rb_ 2*1e6
 Phy/WirelessPhy set Pt_ 0.2818
 Phy/WirelessPhy set freq_ 914e+6 
 Phy/WirelessPhy set L_ 1.0
+Phy/WirelessPhy set bandwidth_ 1Mb
 
 Mac/802_11 set SlotTime_          0.000050        ;# 50us
 Mac/802_11 set SIFS_              0.000028        ;# 28us
@@ -36,7 +37,17 @@ Mac/802_11 set PLCPDataRate_      1.0e6           ;# 1Mbps
 Mac/802_11 set dataRate_          1.0e6           ;# 11Mbps
 Mac/802_11 set basicRate_         1.0e6           ;# 1Mbps
 
-
 Mac/802_11 set RTSThreshold_ 3000
 Mac/802_11 set ShortRetryLimit_ 7               ;# retransmittions
 Mac/802_11 set LongRetryLimit_  4               ;# retransmissions
+
+#
+# The network channel, physical layer, MAC, propagation model,
+# and antenna model are all standard ns-2.
+#  
+set netchan	Channel/WirelessChannel
+set netphy	Phy/WirelessPhy
+set netmac	Mac/802_11
+set netprop     Propagation/TwoRayGround
+set antenna     Antenna/OmniAntenna
+
