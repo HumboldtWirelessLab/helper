@@ -1,0 +1,17 @@
+#NODE		DEVICE		MODULSDIR				MODOPTIONS	WIFICONFIG		CLICKSCRIPT		CLICKLOGFILE		APPLICATION	APPLICATIONLOGFILE
+sk110		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk110.ath0.log	-		-
+sk111		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk111.ath0.log	-		-
+sk112		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk112.ath0.log	-		-
+sk113		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht_arp.click	LOGDIR/sk113.ath0.log	-		-
+#sk114		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk114.ath0.log	-		-
+#sk115		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk115.ath0.log	-		-
+#sk116		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk116.ath0.log	-		-
+#sk117		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk117.ath0.log	-		-
+#sk118		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk118.ath0.log	-		-
+#sk119		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk119.ath0.log	-		-
+#sk120		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk120.ath0.log	-		-
+#sk121		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk121.ath0.log	-		-
+#sk122		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk122.ath0.log	-		-
+#sk123		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk123.ath0.log	-		-
+#sk124		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht.click	LOGDIR/sk124.ath0.log	-		-
+#sk125		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.b.channel6	WORKDIR/dht_arp.click	LOGDIR/sk125.ath0.log	-		-

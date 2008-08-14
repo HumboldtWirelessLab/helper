@@ -2,16 +2,6 @@ set wtopo	[new Topography]
 $wtopo load_flatgrid $xsize $ysize
 
 #
-# The network channel, physical layer, MAC, propagation model,
-# and antenna model are all standard ns-2.
-#  
-set netchan	Channel/WirelessChannel
-set netphy	Phy/WirelessPhy
-set netmac	Mac/802_11
-set netprop     Propagation/Shadowing
-set antenna     Antenna/OmniAntenna
-
-#
 # We have to use a special queue and link layer. This is so that
 # Click can have control over the network interface packet queue,
 # which is vital if we want to play with, e.g. QoS algorithms.
