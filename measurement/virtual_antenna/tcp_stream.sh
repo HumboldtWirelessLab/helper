@@ -11,10 +11,10 @@ iwconfig ath0
 ping -c 5 -i 1 192.168.1.1
 
 iwconfig ath0
-ping -c 50 -i 0.2 192.168.1.1
+ping -c 50 -i 0.2 192.168.1.2
 
-iwconfig ath0
-ping -c 50 -i 0.2 192.168.1.1
+#iwconfig ath0
+#ping -c 50 -i 0.2 192.168.1.1
 
 #ping -c 10 -s 990 192.168.1.2
 #ping -c 100 -s 1000 -i 0.2 192.168.1.2

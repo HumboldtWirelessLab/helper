@@ -1,7 +1,5 @@
 tun :: KernelTun(192.168.1.1/24);
 
-ap :: AccessPoint( INTERFACE DEVICE, SSID "brn", CHANNEL 11, BEACON_INTERVAL 100);
-
 tun
   -> fromVA :: IPClassifier( dst udp port 10000, - )
   -> Print("From VA")

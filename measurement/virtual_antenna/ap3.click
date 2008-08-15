@@ -42,16 +42,16 @@ elementclass AccessPoint {
     -> [0]output;
 }
 
-AddressInfo(my_wlan DEVICE:eth);
+AddressInfo(my_wlan NODEDEVICE:eth);
 wlan_out_queue :: NotifierQueue(50);
 
-mywlan :: AddressInfo(ether_address DEVICE:eth);
+mywlan :: AddressInfo(ether_address NODEDEVICE:eth);
 
 tun :: KernelTun(1.0.0.1/8);
 
-ap :: AccessPoint( INTERFACE DEVICE, SSID "brn", CHANNEL 11, BEACON_INTERVAL 100);
+ap :: AccessPoint( INTERFACE NODEDEVICE, SSID "brn", CHANNEL 11, BEACON_INTERVAL 100);
 
-FromDevice(DEVICE)
+FromDevice(NODEDEVICE)
   -> AthdescDecap()
   -> FilterPhyErr()
   -> filter :: FilterTX();
@@ -106,7 +106,7 @@ BRN2PacketSource(1000, 2000, 1000)
 
 wlan_out_queue
   -> AthdescEncap()
-  -> ToDevice(DEVICE);
+  -> ToDevice(NODEDEVICE);
 
 tun
   -> StripIPHeader()
