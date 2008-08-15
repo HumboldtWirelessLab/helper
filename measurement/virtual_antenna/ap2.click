@@ -46,10 +46,10 @@ elementclass AccessPoint {
     -> [0]output;
 }
 
-AddressInfo(my_wlan DEVICE:eth);
+AddressInfo(my_wlan NODEDEVICE:eth);
 wlan_out_queue :: NotifierQueue(50);
 
-mywlan :: AddressInfo(ether_address DEVICE:eth);
+mywlan :: AddressInfo(ether_address NODEDEVICE:eth);
 
 tun :: KernelTun(1.0.0.1/8);
 
@@ -59,9 +59,9 @@ BRN2HotSpotsConnector(STARTOFFSET 1, UPDATEINTERVAL 200000,CLICKIP 192.168.4.123
 -> ipqueue :: NotifierQueue(500)
 -> tun;
 
-ap :: AccessPoint( INTERFACE DEVICE, SSID "brn", CHANNEL 11, BEACON_INTERVAL 100);
+ap :: AccessPoint( INTERFACE NODEDEVICE, SSID "brn", CHANNEL 11, BEACON_INTERVAL 100);
 
-FromDevice(DEVICE)
+FromDevice(NODEDEVICE)
   -> AthdescDecap()
   -> FilterPhyErr()
   -> filter :: FilterTX();
@@ -115,7 +115,7 @@ mgm_clf[1]
 wlan_out_queue
   -> AthdescEncap()
   -> Print("E")
-  -> ToDevice(DEVICE);
+  -> ToDevice(NODEDEVICE);
 
 tun
   -> StripIPHeader()
@@ -135,8 +135,8 @@ tun
 ControlSocket("TCP", 7777);
 
 Script(
-    wait 25,
-    write ap/bsrc.channel 3,
+//    wait 25,
+//    write ap/bsrc.channel 3,
     wait RUNTIME,
     stop
 );
