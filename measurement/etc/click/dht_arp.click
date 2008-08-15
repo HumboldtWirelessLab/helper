@@ -125,11 +125,11 @@ elementclass DHCP_ARP {
 //input:       0: von DHT-Nodes           1: von services         2: DSR (BRN-Takeout)
 //output:    0: zu DHT-Nodes             1: Services                2: zum DSR
 
-  dhcp_server :: DHCPServer(my_wlan, 10.9.0.0/24, 10.9.0.1, 10.9.0.1, 192.168.2.3 ,"dhcp.brn.net","brn.net", DEBUG 5);
+  dhcp_server :: DHCPServer(my_wlan, 10.9.0.0/24, 10.9.0.1, 10.9.0.1, 192.168.2.3 ,"dhcp.brn.net","brn.net");
   arp :: Arp( 10.8.0.1, my_wlan );
   dht :: FalconDHT(my_wlan, link_stat, 10.9.0.0/24, 30000 , 10 , 50 , 25, FAKE_ARP 1 );
-  dhcp_client :: DHCPRequester(10:10:10:10:01:00 , 10.9.0.2, 10 , 40100 , 400, DEBUG 5);
-//  arpclient :: ARPClient( 10.9.20.1 , 10:10:10:10:00:f0 , 10.9.0.0, 256 , 60000 , 450 , 100 , 1 ,  5000, DEBUG 5 );
+//dhcp_client :: DHCPRequester(10:10:10:10:01:00 , 10.9.0.2, 1 , 40100 , 400 );
+  arpclient :: ARPClient( 10.9.20.1 , 10:10:10:10:00:f0 , 10.9.0.0, 256 , 40000 , 450 , 100 , 1 ,  5000, DEBUG 5 );
 
 //Lines gen by script 
 
@@ -159,9 +159,7 @@ elementclass DHCP_ARP {
   ->[0] output; 
 
   arp[0]
-  -> Discard;
-//  -> arpclient
-  Idle()
+  -> arpclient
   -> [0]arp;
     
   dhcp_arp_clf[1]
@@ -173,10 +171,10 @@ elementclass DHCP_ARP {
     -> [0] dhcp_server;
 
  Idle()
-  -> dhcp_client
+//  -> dhcp_client
   -> dhcp_server
-  -> dhcp_client;
-  //-> Discard;
+//  -> dhcp_client;
+  -> Discard;
   
   dhcp_arp_clf[2]
     -> Strip(6)
@@ -205,8 +203,8 @@ elementclass DHCP_ARP {
   dhcp_arp_clf[3]
   -> Discard;
 
- dhcp_client[1]
- -> dhcp_server
+// dhcp_client[1]
+// -> Discard;
 
 }
 
@@ -233,10 +231,8 @@ etx_metric :: BRNETXMetric(LT dsr/lt);
 // ----------------------------------------------------------------------------
 // Handling ath0-device
 // ----------------------------------------------------------------------------
-FromSimDevice(eth0,4096) //, PROMISC true
-  -> SetTXRate(22)
+  FROMDEVICE
   -> Print("0_FromDevice",60,TIMESTAMP true)
-  -> Strip(14)
   -> FilterPhyErr()
 //-> Print("FromDevice")
   -> filter :: FilterTX();
@@ -452,10 +448,9 @@ out_q_0
   -> WifiEncap(0x00, 0:0:0:0:0:0)                     // sollte das WDS Packet erzeugen mit Hilfe eines Parameters
   -> wlan_out_queue
   -> SetTXRate(22)
-  -> AddEtherNsclick()
   -> SetTimestamp()
   -> Print("ToSim_0 ----- :",TIMESTAMP true)
-  -> ToSimDevice(eth0);
+  -> TODEVICE;
 
 
 filter[1]                                              //take a closer look at tx-annotated packets
@@ -476,16 +471,6 @@ mgm_clf2[1]                     //other frames
   -> Classifier(12/8086)   //handle only brn protocol
   -> EtherDecap()
   -> [2]dsr;
-
-//BRN2PacketSource(800, 1000)
-//  -> SetTimestamp()
-//  -> Print("Send Pre encap: ",60)
-//  -> EtherEncap(0x8086, my_wlan, 00:03:47:70:89:01)
-//  -> Print("Send Pre Wifi: ",60)
-//  -> WifiEncap(0x00, 0:0:0:0:0:0)
-//  -> Print("Send: ",60)
-//  -> SetTXRate(22)                                                                                                                                                     
-//  -> wlan_out_queue;
 
 
 Script(

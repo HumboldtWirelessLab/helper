@@ -18,6 +18,12 @@ case "$SIGN" in
 	;;
 esac
 
+if [ "x$1" = "xhelp" ] || [ "x$1" = "x" ]; then
+  echo "Skript to run measurements as much as you want. After each measurement you'll be ask whether you want one more."
+  echo "Use $0 disfile to start"
+  exit 0
+fi 
+
 DISFILE=$1
 RUNMODE=REBOOT
 

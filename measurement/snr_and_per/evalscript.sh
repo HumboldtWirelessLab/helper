@@ -1,5 +1,4 @@
 #!/bin/bash
-
 (cd $1; ~/lab/helper/evaluation/rssi_per-003/evaluation.sh )
 ssh brn-suse093-7 "mkdir tmp"
 (cd ~/lab/helper/evaluation/rssi_per-003/;cp *.m $1 )

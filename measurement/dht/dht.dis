@@ -1,7 +1,7 @@
 NAME=dhtarp
 SIMULATOR=ns2
-RADIO=shadowing11b
-#RADIO=tworayground11b
+#RADIO=shadowing11b
+RADIO=tworayground11b
 FORGEINNODES=no
 
 TIME=45
