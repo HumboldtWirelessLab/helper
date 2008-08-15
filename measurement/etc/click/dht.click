@@ -233,10 +233,8 @@ etx_metric :: BRNETXMetric(LT dsr/lt);
 // ----------------------------------------------------------------------------
 // Handling ath0-device
 // ----------------------------------------------------------------------------
-FromSimDevice(eth0,4096) //, PROMISC true
-  -> SetTXRate(22)
+  FROMDEVICE
   -> Print("1_FromDevice",60,TIMESTAMP true)
-  -> Strip(14)
   -> FilterPhyErr()
 //-> Print("FromDevice")
   -> filter :: FilterTX();
@@ -452,11 +450,9 @@ out_q_0
   -> WifiEncap(0x00, 0:0:0:0:0:0)                     // sollte das WDS Packet erzeugen mit Hilfe eines Parameters
   -> wlan_out_queue
   -> SetTXRate(22)
-  -> AddEtherNsclick()
   -> SetTimestamp()
   -> Print("ToSim_1 ------ :",TIMESTAMP true)
-  -> ToSimDevice(eth0);
-
+  -> TODEVICE;
 
 filter[1]                                              //take a closer look at tx-annotated packets
   -> failures :: FilterFailures();
@@ -476,16 +472,6 @@ mgm_clf2[1]                     //other frames
   -> Classifier(12/8086)   //handle only brn protocol
   -> EtherDecap()
   -> [2]dsr;
-
-//BRN2PacketSource(800, 1000)
-//  -> SetTimestamp()
-//  -> Print("Send Pre encap: ",60)
-//  -> EtherEncap(0x8086, my_wlan, 00:03:47:70:89:00)
-//  -> Print("Send Pre Wifi: ",60)
-//  -> WifiEncap(0x00, 0:0:0:0:0:0)
-//  -> Print("Send: ",60)
-//  -> SetTXRate(22)                                                                                                                                               
-//  -> wlan_out_queue;
 
 Script(
   wait 20,

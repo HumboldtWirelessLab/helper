@@ -28,7 +28,8 @@ fi
 
 case "$1" in
 	"help")
-		echo "Use $0 run"
+		echo "Use $0 prepare | cleanup"
+		echo "Tool wich prepares the final skripts for a measurement (run_single_measurement). Replaces Variables ind the skript (like NODENAME, NODEDEVICE, ...)"
 		;;
 	"prepare")
 		SIMDIS=$2
