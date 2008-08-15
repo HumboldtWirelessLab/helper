@@ -50,14 +50,14 @@ BRN2HotSpotsConnector(STARTOFFSET 2, UPDATEINTERVAL 2000,CLICKIP 192.168.4.148, 
 -> ipqueue :: NotifierQueue(500)
 -> tun;
 
-AddressInfo(my_wlan DEVICE:eth);
+AddressInfo(my_wlan NODEDEVICE:eth);
 wlan_out_queue :: NotifierQueue(50);
 
 mywlan :: AddressInfo(ether_address DEVICE:eth);
 
-ap :: AccessPoint( INTERFACE DEVICE, SSID "brn", CHANNEL 11, BEACON_INTERVAL 100);
+ap :: AccessPoint( INTERFACE NODEDEVICE, SSID "brn", CHANNEL 11, BEACON_INTERVAL 100);
 
-FromDevice(DEVICE)
+FromDevice(NODEDEVICE)
   -> AthdescDecap()
   -> FilterPhyErr()
   -> filter :: FilterTX();
@@ -111,7 +111,7 @@ BRN2PacketSource(1000, 2000, 1000)
 
 wlan_out_queue
   -> AthdescEncap()
-  -> ToDevice(DEVICE);
+  -> ToDevice(NODEDEVICE);
 
 tun
   -> StripIPHeader()
