@@ -38,9 +38,9 @@ case "$1" in
 		POS_Y_MAX=0
 		POS_Z_MAX=0
 		for node in $NODELIST; do
-		    POS_X=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENT | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
-		    POS_Y=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENT | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
-		    POS_Z=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENT | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
+		    POS_X=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
+		    POS_Y=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
+		    POS_Z=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
 		    if [ $POS_X -gt $POS_X_MAX ]; then
 			POS_X_MAX=$POS_X;
 		    fi
@@ -82,9 +82,9 @@ case "$1" in
 		
 		i=0
 		for node in $NODELIST; do
-		    POS_X=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENT | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
-		    POS_Y=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENT | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
-		    POS_Z=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENT | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
+		    POS_X=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
+		    POS_Y=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
+		    POS_Z=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
 		    
 		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		

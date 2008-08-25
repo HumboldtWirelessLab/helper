@@ -6,7 +6,7 @@ FORGEINNODES=no
 TIME=60
 
 NODETABLE=sender_and_receiver.mes
-NODEPLACEMENT=placement.default
+NODEPLACEMENTFILE=placement.default
 
 LOGDIR=WORKDIR
 LOGFILE=measurement.log
