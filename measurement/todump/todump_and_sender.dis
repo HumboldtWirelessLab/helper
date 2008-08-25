@@ -6,7 +6,7 @@ FORGEINNODES=no
 TIME=20
 
 NODETABLE=todump_and_sender.mes
-NODEPLACEMENT=placement.default
+NODEPLACEMENTFILE=placement.default
 
 LOGDIR=WORKDIR/result
 LOGFILE=todump_and_sender.log
