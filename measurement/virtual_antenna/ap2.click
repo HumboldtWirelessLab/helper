@@ -114,7 +114,7 @@ mgm_clf[1]
 
 wlan_out_queue
   -> AthdescEncap()
-  -> Print("E")
+//  -> Print("E")
   -> ToDevice(NODEDEVICE);
 
 tun
@@ -122,13 +122,13 @@ tun
   -> Strip(8)			                                                    //Strip udp
   -> Print("zurueck zum Client")
   -> ResolveEthernet( 06:0C:42:0C:74:0D, arp)
-  -> Print("A")
+//  -> Print("A")
   -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
-  -> Print("B")
+//  -> Print("B")
   -> SetTXRate(RATE 22,TRIES 9)
-  -> Print("C")
+//  -> Print("C")
   -> SetTXPower( POWER 16 )
-  -> Print("D")
+//  -> Print("D")
   -> wlan_out_queue;
 
 
