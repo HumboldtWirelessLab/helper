@@ -3,7 +3,7 @@ SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=60
+TIME=30
 
 NODETABLE=simple_infrastructure.mes
 NODEPLACEMENT=placement.default
@@ -14,6 +14,8 @@ LOGFILE=measurement.log
 RESULTDIR=WORKDIR
 EVALUATIONSDIR=WORKDIR
 EVALUATIONSDIRPOSTFIX=_evaluation
+
+LOCALPROCESS=WORKDIR/simple_iperf.sh
 
 GPS=no
 NOTICE=no

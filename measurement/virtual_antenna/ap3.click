@@ -3,9 +3,13 @@ elementclass AccessPoint {
 
     AddressInfo(ether_address $device:eth);
     winfo :: WirelessInfo(SSID $ssid, BSSID ether_address, CHANNEL $channel, INTERVAL $beacon_interval);
-    rates :: AvailableRates(DEFAULT 2 4 11 12 18 22);
+    rates :: AvailableRates(DEFAULT 2 4 11 12 18 22 108);
     bs :: BeaconScanner(RT rates);
 
+    Idle() ->
+    sc :: BRN2SetChannel($device,false)
+    -> Discard;
+ 
     input[0]
     -> mgt_cl :: Classifier(  0/00%f0, //assoc req
                                         0/10%f0, //assoc resp
@@ -24,7 +28,7 @@ elementclass AccessPoint {
     -> Discard;
 
     mgt_cl[2]
-    -> BeaconSource(WIRELESS_INFO winfo, RT rates)
+    -> bsrc :: BRN2BeaconSource(WIRELESS_INFO winfo, RT rates, SWITCHCHANNEL sc)
     -> [0]output;
 
     mgt_cl[3]
@@ -47,7 +51,13 @@ wlan_out_queue :: NotifierQueue(50);
 
 mywlan :: AddressInfo(ether_address NODEDEVICE:eth);
 
-tun :: KernelTun(1.0.0.1/8);
+tun :: KernelTun(2.0.0.1/8);
+
+BRN2HotSpotsConnector(STARTOFFSET 1, UPDATEINTERVAL 200000,CLICKIP 192.168.4.123, CLICKPORT 7779, PACKETIP 192.168.4.123, PACKETPORT 7778 )
+-> Print("Reg")
+-> UDPIPEncap( 2.0.0.2 , 10003 , 192.168.4.3 , 12000, true )
+-> ipqueue :: NotifierQueue(500)
+-> tun;
 
 ap :: AccessPoint( INTERFACE NODEDEVICE, SSID "brn", CHANNEL 11, BEACON_INTERVAL 100);
 
@@ -70,9 +80,9 @@ mgm_clf[1]
   -> WifiDecap()
   -> clf_bcast :: Classifier(0/ffffffffffff, -)
   -> arp_clf :: Classifier (12/0806, - )
-  -> ARPResponder( 192.168.1.1/24 06:0C:42:0C:74:0D )
+  -> ARPResponder( 192.168.1.1/24 06:0B:6B:09:EF:18 )
   -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
-  -> SetTXRate(RATE 22,TRIES 9)
+  -> SetTXRate(RATE 108,TRIES 9)
   -> SetTXPower( POWER 16 )
   -> wlan_out_queue;
 
@@ -86,39 +96,47 @@ mgm_clf[1]
     -> StoreIPEthernet(arp)
     -> EtherDecap()
     -> CheckIPHeader
+    -> Print("localPing")
     -> icp :: ICMPPingResponder
-    -> ResolveEthernet( 06:0C:42:0C:74:0D, arp)
+    -> ResolveEthernet( 06:0B:6B:09:EF:18, arp)
     -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
-    -> SetTXRate(RATE 22,TRIES 9)
+    -> SetTXRate(RATE 108,TRIES 9)
     -> SetTXPower( POWER 16 )
     -> wlan_out_queue;
 
     apclassifier[1]
     -> EtherDecap()
     -> Print("Up to Backend")
-    -> packet_encap :: UDPIPEncap( 1.0.0.3 , 10000 , 192.168.4.3 , 12345, true )
-    -> ipqueue :: NotifierQueue(50)
+    -> packet_encap :: UDPIPEncap( 2.0.0.3 , 10003 , 192.168.4.3 , 12100, true )
+    -> ipqueue
     -> tun;
 
-BRN2PacketSource(1000, 2000, 1000)
--> packet_encap2 :: UDPIPEncap( 1.0.0.3 , 10000 , 192.168.4.3 , 12100, true )
--> ipqueue;
 
 wlan_out_queue
   -> AthdescEncap()
+//  -> Print("E")
   -> ToDevice(NODEDEVICE);
 
 tun
   -> StripIPHeader()
   -> Strip(8)			                                                    //Strip udp
-  -> WifiEncap(0x00, 0:0:0:0:0:0)
-  -> data_rates :: SetTXRate(RATE 22,TRIES 9)
-  -> data_power :: SetTXPower( POWER 16)
+  -> Print("zurueck zum Client")
+  -> ResolveEthernet( 06:0B:6B:09:EF:18, arp)
+//  -> Print("A")
+  -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
+//  -> Print("B")
+  -> SetTXRate(RATE 108,TRIES 9)
+//  -> Print("C")
+  -> SetTXPower( POWER 16 )
+//  -> Print("D")
   -> wlan_out_queue;
 
-ControlSocket("TCP", 7777);
+
+ControlSocket("TCP", 7779);
 
 Script(
+//    wait 25,
+//    write ap/bsrc.channel 3,
     wait RUNTIME,
     stop
 );
