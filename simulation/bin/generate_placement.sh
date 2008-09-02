@@ -2,7 +2,7 @@
 
 V=1
 NODE=110
-DISTANCE=55
+DISTANCE=60
 
 while [ $V -le 10 ]; do
 

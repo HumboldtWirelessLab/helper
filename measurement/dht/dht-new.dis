@@ -1,18 +1,18 @@
-NAME=dhtarp
+NAME=dht2
 SIMULATOR=ns2
-RADIO=shadowing11b
-#RADIO=tworayground11b
+#RADIO=shadowing11b
+RADIO=tworayground11b
 FORGEINNODES=no
 
 TIME=45
 
-NODETABLE=dht.mes
+NODETABLE=dht-new.mes
 NODEPLACEMENT=file
 NODEPLACEMENTFILE=placement.grid
 
 
 LOGDIR=WORKDIR
-LOGFILE=dhtarp.log
+LOGFILE=dht-new.log
 
 RESULTDIR=WORKDIR
 EVALUATIONSDIR=WORKDIR
