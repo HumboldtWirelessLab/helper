@@ -22,12 +22,8 @@ case "$1" in
     start)
         echo "Start iperf"
 	(ssh gruenau2.informatik.hu-berlin.de iperf -s -p 20000 -D) &
-	echo "Start java"
-	(java -jar VirtualAntenna.jar > virtualantenna.log) &
 	;;
     stop)
-	echo "Stop java"
-	killall -s TERM java
 	echo "stop iperf"
 	(ssh gruenau2.informatik.hu-berlin.de killall -9 iperf ) &
 	;;
