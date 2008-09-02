@@ -232,7 +232,7 @@ etx_metric :: BRNETXMetric(LT dsr/lt);
 // Handling ath0-device
 // ----------------------------------------------------------------------------
   FROMDEVICE
-  -> Print("0_FromDevice",60,TIMESTAMP true)
+  -> Print("FromDevice NODENAME",60,TIMESTAMP true)
   -> FilterPhyErr()
 //-> Print("FromDevice")
   -> filter :: FilterTX();
@@ -302,7 +302,7 @@ dhcp_arp_classifier[3]
 //
 
 clf_bcast[1]                                      //Unicast
-//-> Print("Unicast (in): ",256)
+//-> Print("Unicast (in) NODENAME",256)
   -> protoclf;
     
 //NO BRN
@@ -332,7 +332,7 @@ brnclf[1] // tftp
 -> Discard;
 
 brnclf[2] //dsr
-  -> Print("0_BRN-clf: DSR: ",60)
+  -> Print("BRN-clf: DSR NODENAME",60)
   -> dht_take_out ::  Classifier( 0/0303 6/04 163/02 , - );                                        //0: brn src und dst (dsr)   6: dsr-type (src_route)    163: dsr payload (dht)  163 = 16 (HOP_COUNT) * 8 + 35 
   
   dht_take_out[0]
@@ -449,7 +449,7 @@ out_q_0
   -> wlan_out_queue
   -> SetTXRate(22)
   -> SetTimestamp()
-  -> Print("ToSim_0 ----- :",TIMESTAMP true)
+  -> Print("ToSim NODENAME",TIMESTAMP true)
   -> TODEVICE;
 
 
