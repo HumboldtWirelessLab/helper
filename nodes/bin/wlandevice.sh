@@ -94,7 +94,7 @@ case "$1" in
 	    echo "sysctl -w dev.wifi0.intmit=$INTMIT"
 	    sysctl -w dev.wifi0.intmit=$INTMIT
 	    
-	    if [ "$MODE" = "sta" ]; then
+	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ]; then
 		if [ ! "x$SSID" = "x" ]; then
 		    sleep 1
 		    iwconfig $DEVICE essid $SSID 
