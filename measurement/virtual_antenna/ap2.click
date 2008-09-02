@@ -3,7 +3,7 @@ elementclass AccessPoint {
 
     AddressInfo(ether_address $device:eth);
     winfo :: WirelessInfo(SSID $ssid, BSSID ether_address, CHANNEL $channel, INTERVAL $beacon_interval);
-    rates :: AvailableRates(DEFAULT 2 4 11 12 18 22);
+    rates :: AvailableRates(DEFAULT 2 4 11 12 18 22 108);
     bs :: BeaconScanner(RT rates);
 
     Idle() ->
@@ -82,7 +82,7 @@ mgm_clf[1]
   -> arp_clf :: Classifier (12/0806, - )
   -> ARPResponder( 192.168.1.1/24 06:0C:42:0C:74:0D )
   -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
-  -> SetTXRate(RATE 22,TRIES 9)
+  -> SetTXRate(RATE 108,TRIES 9)
   -> SetTXPower( POWER 16 )
   -> wlan_out_queue;
 
@@ -100,7 +100,7 @@ mgm_clf[1]
     -> icp :: ICMPPingResponder
     -> ResolveEthernet( 06:0C:42:0C:74:0D, arp)
     -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
-    -> SetTXRate(RATE 22,TRIES 9)
+    -> SetTXRate(RATE 108,TRIES 9)
     -> SetTXPower( POWER 16 )
     -> wlan_out_queue;
 
@@ -125,7 +125,7 @@ tun
 //  -> Print("A")
   -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
 //  -> Print("B")
-  -> SetTXRate(RATE 22,TRIES 9)
+  -> SetTXRate(RATE 108,TRIES 9)
 //  -> Print("C")
   -> SetTXPower( POWER 16 )
 //  -> Print("D")

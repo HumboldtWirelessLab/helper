@@ -1,0 +1,3 @@
+#NODE		DEVICE		MODULSDIR				MODOPTIONS	WIFICONFIG		CLICKSCRIPT		CLICKLOGFILE		APPLICATION			APPLICATIONLOGFILE
+sk110		ath0		WORKDIR/../../nodes/lib/modules/i586	-		station.brn		-			-			WORKDIR/simple_station.sh	LOGDIR/sk110.app.log
+sk111		ath0		WORKDIR/../../nodes/lib/modules/i586	-		ap.brn			-			-			WORKDIR/simple_master.sh	LOGDIR/sk111.app.log
