@@ -1,12 +1,12 @@
-NAME=virtualantenna
+NAME=infrastructure
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=120
+TIME=30
 
-NODETABLE=virtual_antenna.mes
-NODEPLACEMENTFILE=placement.default
+NODETABLE=simple_infrastructure.mes
+NODEPLACEMENT=placement.default
 
 LOGDIR=WORKDIR
 LOGFILE=measurement.log
@@ -15,7 +15,7 @@ RESULTDIR=WORKDIR
 EVALUATIONSDIR=WORKDIR
 EVALUATIONSDIRPOSTFIX=_evaluation
 
-LOCALPROCESS=WORKDIR/virtualantenna.sh
+LOCALPROCESS=WORKDIR/simple_iperf.sh
 
 GPS=no
 NOTICE=no

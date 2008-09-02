@@ -8,6 +8,7 @@ iptables --table nat --delete-chain
 echo "1" > /proc/sys/net/ipv4/ip_forward
 
 iptables -A PREROUTING -t nat -p udp --dport 7776 -j DNAT --to 1.0.0.3:12100
+iptables -A PREROUTING -t nat -p udp --dport 7778 -j DNAT --to 2.0.0.3:12100
 
 iwconfig ath0
 
