@@ -302,4 +302,6 @@ exit 0
 #svnversion mad-0.9.2.1	madwifi-0.9.2.1
 #svnversion k-07	kamikaze-7.07
 #svnversion k-trunk	kamikaze-trunk
+#svnversion b105	madwifi-branch/madwifi-hal-0.10.5.6
+#svnversion t094	madwifi-tags/release-0.9.4
 #arch mips mipsel-linux-
