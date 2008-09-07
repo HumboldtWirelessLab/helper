@@ -1,14 +1,30 @@
 #!/bin/sh
 
-sleep 10
+sleep 2
 
 ifconfig ath0 192.168.1.2 up
 route del default
 route add default gw 192.168.1.1
+echo ""
+iwconfig ath0
 
+echo ""
 ping -c 5 192.168.1.1
 
-wget ftp://ftp.gnu.org/pub/gnu/gperf/gperf-2.7.2.tar.gz
-rm -f gperf-2.7.2.tar.gz
+echo ""
+iwconfig ath0
+
+echo ""
+ping -c 5 141.20.21.165
+
+echo ""
+#iperf -M 1400 -c 141.20.21.165 -p 20000 -t 2
+iperf -c 141.20.21.165 -p 20000 -t 2
+
+echo ""
+arp -a
+
+echo ""
+iwconfig ath0
 
 exit 0
