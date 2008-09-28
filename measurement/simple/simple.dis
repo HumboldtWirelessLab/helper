@@ -1,0 +1,24 @@
+NAME=simple
+SIMULATOR=ns2
+RADIO=shadowing11b
+FORGEINNODES=no
+
+TIME=20
+
+#CLICKMODE=kernel | userlevel | both
+CLICKMODE=kernel
+
+NODETABLE=simple.mes
+NODEPLACEMENTFILE=placement.default
+
+LOGDIR=WORKDIR
+LOGFILE=measurement.log
+
+RESULTDIR=WORKDIR
+EVALUATIONSDIR=WORKDIR
+EVALUATIONSDIRPOSTFIX=_evaluation
+
+GPS=no
+NOTICE=yes
+LOS=yes
+

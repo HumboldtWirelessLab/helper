@@ -41,7 +41,7 @@ case "$1" in
 		for node in $NODELIST; do
 		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		    for nodedevice in $NODEDEVICELIST; do		    
-			CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $6}'`
+			CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
 			WIFICONFIG=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
 
 			if [ -f  $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then                                                                                                                                                   
@@ -88,13 +88,13 @@ case "$1" in
 		    done
 		done
 		
-		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5" "$6"."$1"."$2" "$7" "$8" "$9}' | sed -e "s#[[:space:]]*-\.*[[:alnum:]\.]*# -#g" -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$WORKDIR#g" > $NODETABLE.$POSTFIX
+		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5" "$6" "$7"."$1"."$2" "$8" "$8" "$10}' | sed -e "s#[[:space:]]*-\.*[[:alnum:]\.]*# -#g" -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$WORKDIR#g" > $NODETABLE.$POSTFIX
 		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" > $SIMDIS.$POSTFIX
 		;;
 	"cleanup")
 		SIMDIS=$2
 		. $SIMDIS
-		cat $NODETABLE.$POSTFIX |  grep -v "#" | awk '{print $6}' | xargs rm -f
+		cat $NODETABLE.$POSTFIX |  grep -v "#" | awk '{print $7}' | xargs rm -f
 		rm -f $SIMDIS.$POSTFIX
 		rm -f $NODETABLE.$POSTFIX
 		;;

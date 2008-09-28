@@ -5,6 +5,8 @@ id :: BRN2NodeIdentity( d1, d2 );
 
 Script(
  wait 1,
+ read d1.deviceinfo,
+ read d2.deviceinfo,
  stop
 );
  

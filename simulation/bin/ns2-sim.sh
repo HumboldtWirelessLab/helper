@@ -20,7 +20,7 @@ esac
 
 case "$1" in
 	"help")
-		echo "Use $0 run"
+		echo "Use $0 run dis-file"
 		;;
 	"run")
 		POSTFIX=ns2
@@ -70,7 +70,7 @@ case "$1" in
 		for node in $NODELIST; do
 		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		    for nodedevice in $NODEDEVICELIST; do		    
-			CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $6}'`
+			CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
 			echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
 			i=`expr $i + 1`
 		    done
