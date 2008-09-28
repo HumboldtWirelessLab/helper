@@ -32,7 +32,11 @@ case "$1" in
 	"mount")
 		for node in $NODELIST; do
 		    echo "$node"
-		    run_on_node $node "mount -o nolock 192.168.4.3:/home /home" "/" $DIR/../etc/keys/id_dsa
+		    
+		    ENVIRONMENTFILE=`cat $DIR/../../nodes/etc/environment/nodesenvironment.conf | grep "^$node " | awk '{print $2}'`
+		    . $DIR/../../nodes/etc/environment/$ENVIRONMENTFILE
+		    
+		    run_on_node $node "mount -o nolock $NFSSERVER:$HOME $HOME" "/" $DIR/../etc/keys/id_dsa
 		done
 		;;
 	"watchdogstart")
