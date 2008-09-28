@@ -189,8 +189,8 @@ if [ $RUNMODENUM -le 5 ]; then
 	for nodedevice in $NODEDEVICELIST; do
 		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
 
-		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $6}'`
-		LOGFILE=`echo "$CONFIGLINE" | awk '{print $7}'`
+		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
+		LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
 
 		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_click"	
@@ -199,8 +199,8 @@ if [ $RUNMODENUM -le 5 ]; then
 			screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
 		fi
 
-		APPLICATION=`echo "$CONFIGLINE" | awk '{print $8}'`
-		APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $9}'`
+		APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
+		APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $10}'`
 		
 		if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_app"	
@@ -220,16 +220,16 @@ if [ $RUNMODENUM -le 5 ]; then
 	for nodedevice in $NODEDEVICELIST; do
 		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
 
-		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $6}'`
-		LOGFILE=`echo "$CONFIGLINE" | awk '{print $7}'`
+		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
+		LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
 
 		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_click"	
     			screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
 		fi
 
-		APPLICATION=`echo "$CONFIGLINE" | awk '{print $8}'`
-		APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $9}'`
+		APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
+		APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $10}'`
 
 		if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_app"	

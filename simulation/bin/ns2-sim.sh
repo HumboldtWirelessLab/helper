@@ -20,7 +20,7 @@ esac
 
 case "$1" in
 	"help")
-		echo "Use $0 run"
+		echo "Use $0 run dis-file"
 		;;
 	"run")
 		POSTFIX=ns2
@@ -38,9 +38,9 @@ case "$1" in
 		POS_Y_MAX=0
 		POS_Z_MAX=0
 		for node in $NODELIST; do
-		    POS_X=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
-		    POS_Y=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
-		    POS_Z=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
+		    POS_X=`cat $DIR/../etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
+		    POS_Y=`cat $DIR/../etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
+		    POS_Z=`cat $DIR/../etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
 		    if [ $POS_X -gt $POS_X_MAX ]; then
 			POS_X_MAX=$POS_X;
 		    fi
@@ -70,7 +70,7 @@ case "$1" in
 		for node in $NODELIST; do
 		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		    for nodedevice in $NODEDEVICELIST; do		    
-			CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $6}'`
+			CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
 			echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
 			i=`expr $i + 1`
 		    done
@@ -82,9 +82,9 @@ case "$1" in
 		
 		i=0
 		for node in $NODELIST; do
-		    POS_X=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
-		    POS_Y=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
-		    POS_Z=`cat $DIR/../../host/etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
+		    POS_X=`cat $DIR/../etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
+		    POS_Y=`cat $DIR/../etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
+		    POS_Z=`cat $DIR/../etc/nodeplacement/$NODEPLACEMENTFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
 		    
 		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		
