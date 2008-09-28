@@ -88,7 +88,7 @@ fi
 
 mkdir $pwd/$2
 
-if [ "xNOTICE" = "xyes" ]; then
+if [ "x$NOTICE" = "xyes" ]; then
   rm -f $pwd/info
   vi $pwd/info
   echo "" >> $pwd/info

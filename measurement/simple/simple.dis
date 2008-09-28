@@ -3,7 +3,7 @@ SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=20
+TIME=60
 
 #CLICKMODE=kernel | userlevel | both
 CLICKMODE=kernel
@@ -19,6 +19,6 @@ EVALUATIONSDIR=WORKDIR
 EVALUATIONSDIRPOSTFIX=_evaluation
 
 GPS=no
-NOTICE=yes
-LOS=yes
+NOTICE=no
+LOS=no
 
