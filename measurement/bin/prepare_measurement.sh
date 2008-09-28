@@ -44,38 +44,40 @@ case "$1" in
 			CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
 			WIFICONFIG=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
 
-			if [ -f  $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then                                                                                                                                                   
-			    . $DIR/../../nodes/etc/wifi/$WIFICONFIG
-			else
-			    . $WIFICONFIG
+			if [ ! "x$WIFICONFIG" = "x" ] && [ ! "x$WIFICONFIG" = "x-" ]; then
+			    if [ -f  $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then                                                                                                                                                   
+				. $DIR/../../nodes/etc/wifi/$WIFICONFIG
+			    else
+				. $WIFICONFIG
+			    fi
+						
+			    case "$WIFITYPE" in
+				"801")
+				    WIFIENCAP="Null()"
+				    WIFIDECAP="Null()"
+				    ;;
+				"802")
+				    WIFIENCAP="RadiotapEncap()"
+				    WIFIDECAP="RadiotapDecap()"
+				    ;;
+				"803")
+				    WIFIENCAP="Prism2Encap()"
+				    WIFIDECAP="Prism2Decap()"
+				    ;;
+				"804")
+				    WIFIENCAP="AthdescEncap()"
+				    WIFIDECAP="AthdescDecap()"
+				    ;;
+				"805")
+				    WIFIENCAP="AthdescEncap()"
+				    WIFIDECAP="AthdescDecap()"
+				    ;;
+			        *)
+				    WIFIENCAP="Null()"
+				    WIFIDECAP="Null()"
+				    ;;
+			    esac
 			fi
-
-			case "$WIFITYPE" in
-			    "801")
-				WIFIENCAP="Null()"
-				WIFIDECAP="Null()"
-				;;
-			    "802")
-				WIFIENCAP="RadiotapEncap()"
-				WIFIDECAP="RadiotapDecap()"
-				;;
-			    "803")
-				WIFIENCAP="Prism2Encap()"
-				WIFIDECAP="Prism2Decap()"
-				;;
-			    "804")
-				WIFIENCAP="AthdescEncap()"
-				WIFIDECAP="AthdescDecap()"
-				;;
-			    "805")
-				WIFIENCAP="AthdescEncap()"
-				WIFIDECAP="AthdescDecap()"
-				;;
-			     *)
-				WIFIENCAP="Null()"
-				WIFIDECAP="Null()"
-				;;
-			esac
 			
 			if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
 			    CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g"`
