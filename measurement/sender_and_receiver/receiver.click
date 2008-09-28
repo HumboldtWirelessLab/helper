@@ -1,4 +1,4 @@
-AddressInfo(my_wlan DEVICE:eth);
+AddressInfo(my_wlan NODEDEVICE:eth);
 
 FROMRAWDEVICE
   -> rawtee :: Tee()
@@ -10,7 +10,7 @@ FROMRAWDEVICE
   -> Discard();
   
   rawtee[1]
-  -> td :: ToDump("RESULTDIR/NODE.DEVICE.dump");
+  -> td :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump");
   
 Script(
   wait RUNTIME,

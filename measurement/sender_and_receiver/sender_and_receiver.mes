@@ -10,5 +10,5 @@
 #sk111		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_5.log	-	-
 #sk112		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_6.log	-	-
 #wgt73		ath0		WORKDIR/../../nodes/lib/modules/mips	-		monitor.default		WORKDIR/receiver.click	LOGDIR/receiver_7.log	-	-
-sk110		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default.804	WORKDIR/sender.click	LOGDIR/1_sen.log	-	-
-sk112		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default.804 	WORKDIR/receiver.click  LOGDIR/1_rec.log	-	-
+sk110		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.a.channel36	WORKDIR/sender.click	LOGDIR/1_sen.log	-	-
+sk112		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.a.channel36 	WORKDIR/receiver.click  LOGDIR/1_rec.log	-	-

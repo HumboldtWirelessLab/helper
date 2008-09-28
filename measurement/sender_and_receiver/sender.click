@@ -1,4 +1,4 @@
-AddressInfo(my_wlan DEVICE:eth);
+AddressInfo(my_wlan NODEDEVICE:eth);
 
 BRN2PacketSource(1000, 100, 1000)
  -> EtherEncap(0x8088, my_wlan, ff:ff:ff:ff:ff:ff)
@@ -25,7 +25,7 @@ BRN2PacketSource(1000, 100, 1000)
  -> wlan_out_queue;
 	  
 wlan_out_queue
--> SetTXPower(14)
+-> SetTXPower(10)
 -> TODEVICE;
 
 Script(
