@@ -36,7 +36,11 @@ case "$1" in
 		    ENVIRONMENTFILE=`cat $DIR/../../nodes/etc/environment/nodesenvironment.conf | grep "^$node" | awk '{print $2}'`
 		    . $DIR/../../nodes/etc/environment/$ENVIRONMENTFILE
 		    
-		    run_on_node $node "mount -o nolock $NFSSERVER:$NFSHOME $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+		    if [ ! "x$NFSHOME" = "x" ]; then
+			run_on_node $node "mount -o nolock $NFSSERVER:$NFSHOME $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+		    else
+			echo "NFSHOME not set, so no mount."
+		    fi
 		done
 		;;
 	"watchdogstart")
