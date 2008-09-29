@@ -133,7 +133,7 @@ fi
 
 echo "Start measurement !"
 
-RESULT=`CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/run_single_measurement.sh 5>&1 6>&2 1>> $LOGDIR/$LOGFILE 2>&1`
+RESULT=`CLICKMODE=$CLICKMODE CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/run_single_measurement.sh 5>&1 6>&2 1>> $LOGDIR/$LOGFILE 2>&1`
 
 if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
   echo "Stop local process"

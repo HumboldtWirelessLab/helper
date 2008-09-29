@@ -3,10 +3,10 @@ SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=5
+TIME=40
 
 #CLICKMODE=kernel | userlevel | both
-CLICKMODE=kernel
+CLICKMODE=userlevel
 
 NODETABLE=simple.mes
 NODEPLACEMENTFILE=placement.default
