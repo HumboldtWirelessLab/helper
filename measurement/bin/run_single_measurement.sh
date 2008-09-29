@@ -118,10 +118,9 @@ echo "Set marker for reboot-detection"
 
 NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmarker
 
-############################
-###### Setup Wifi ##########
-############################
-
+##################################
+###### Load Wifi-Moduls ##########
+##################################
 
 if [ $RUNMODENUM -le 3 ]; then
     NODELIST="$NODELIST" $DIR/../../host/bin/wlanmodules.sh rmmod
@@ -149,6 +148,10 @@ if [ $RUNMODENUM -le 3 ]; then
     check_nodes
     sleep 1
 fi
+
+############################
+###### Setup Wifi ##########
+############################
 
 if [ $RUNMODENUM -le 4 ]; then
     for node in $NODELIST; do
@@ -191,6 +194,10 @@ if [ $RUNMODENUM -le 4 ]; then
 
 fi
 
+######################################################
+###### Get Wifiinfo and Start Screensession ##########
+######################################################
+
 if [ $RUNMODENUM -le 5 ]; then
 
     for node in $NODELIST; do
@@ -218,16 +225,16 @@ if [ $RUNMODENUM -le 5 ]; then
 
 	CLICKMODDIR=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $6}' | tail -n 1`
 
-	if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ]; then
-	    NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh insmod
+	if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
+	    NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh reloadmod
 	fi
     done
 
     check_nodes
 
-##################################################
-###### Setup Click- & Application-Stuff ##########
-##################################################
+########################################################
+###### Setup Click-, Log- & Application-Stuff ##########
+########################################################
 
     for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
@@ -246,8 +253,15 @@ if [ $RUNMODENUM -le 5 ]; then
 			screen -S $SCREENNAME -X screen -t $SCREENT
    			sleep 0.1
 			
-			if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ]; then
-			    screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT > /tmp/click/config; wait $TIME; echo "" > /tmp/click/config\""
+			if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
+			    CLICKWAITTIME=`expr $TIME + 2`
+			    screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT > /tmp/click/config; sleep $CLICKWAITTIME; echo -n > /tmp/click/config\""
+
+ 			    sleep 0.1
+			    SCREENT="$node\_$nodedevice\_kcm"	
+			    screen -S $SCREENNAME -X screen -t $SCREENT
+  			    sleep 0.1
+			    screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"rm -f $LOGFILE ; cat /proc/kmsg >> $LOGFILE \""
 			else
 			    screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
 			fi
@@ -275,15 +289,19 @@ if [ $RUNMODENUM -le 5 ]; then
 		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
 
 		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
-		LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
 
 		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-			SCREENT="$node\_$nodedevice\_click"	
+			SCREENT="$node\_$nodedevice\_click"
     			screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
+
+			CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
+			if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
+			    SCREENT="$node\_$nodedevice\_kcm"
+			    screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
+			fi
 		fi
 
 		APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
-		APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $10}'`
 
 		if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
 			SCREENT="$node\_$nodedevice\_app"	
@@ -299,11 +317,30 @@ if [ $RUNMODENUM -le 5 ]; then
     WAITTIME=`expr $TIME + 5`
     echo "Wait for $WAITTIME sec"
 
+# Countdown
     echo -n -e "Wait... \033[1G" >&6
     for ((i = $WAITTIME; i > 0; i--)); do echo -n -e "Wait... $i \033[1G" >&6 ; sleep 1; done
     echo -n -e "                 \033[1G" >&6
 
+#Normal wait
 #   sleep $WAITTIME
+
+###################################################
+##### Kill progs for logfile for kclick  ##########
+###################################################
+    for node in $NODELIST; do
+	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+	
+	for nodedevice in $NODEDEVICELIST; do
+		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
+		CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
+		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
+		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
+			    TAILPID=`ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "pidof cat"`
+			    ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill $TAILPID"
+		fi
+	done
+    done
 
     screen -S $SCREENNAME -X quit
 
@@ -315,4 +352,3 @@ fi
 echo "Finished measurement. Status: ok."
 
 exit 0
-
