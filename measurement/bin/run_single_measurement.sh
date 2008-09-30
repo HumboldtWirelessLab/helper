@@ -123,6 +123,9 @@ NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmark
 ##################################
 
 if [ $RUNMODENUM -le 3 ]; then
+
+    echo "Load Moduls"
+
     NODELIST="$NODELIST" $DIR/../../host/bin/wlanmodules.sh rmmod
 
     for node in $NODELIST; do
@@ -154,6 +157,9 @@ fi
 ############################
 
 if [ $RUNMODENUM -le 4 ]; then
+
+    echo "Setup Wifi"
+
     for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	for nodedevice in $NODEDEVICELIST; do
@@ -199,6 +205,8 @@ fi
 ######################################################
 
 if [ $RUNMODENUM -le 5 ]; then
+
+    echo "Get Wifiinfo"
 
     for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
