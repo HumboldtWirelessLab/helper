@@ -10,7 +10,7 @@ node_available() {
 }
 
 run_on_node() {
-    ssh -i $4 root@$1 "(cd $3;$2)"
+    echo -n "" | ssh -i $4 root@$1 "(cd $3;$2)"
 }
 
 get_arch() {
