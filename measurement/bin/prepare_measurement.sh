@@ -26,6 +26,8 @@ if [ "x$WORKDIR" = "x" ]; then
     WORKDIR=$pwd
 fi
 
+BASEDIR=$DIR/../../
+
 case "$1" in
 	"help")
 		echo "Use $0 prepare | cleanup"
@@ -80,18 +82,18 @@ case "$1" in
 			fi
 			
 			if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
-			    CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g"`
+			    CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g"`
 			    
 			    if [ -e $CLICK ]; then
-				cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAP#g" -e "s#TODEVICE#WIFIENCAP -> TORAWDEVICE#g" | sed -e "s#WIFIDECAP#$WIFIDECAP#g" -e "s#WIFIENCAP#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(NODEDEVICE)#g" -e "s#TORAWDEVICE#ToDevice(NODEDEVICE)#g" | sed -e "s#NODEDEVICE#$nodedevice#g" -e "s#NODENAME#$node#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" > $CLICK.$node.$nodedevice
+				cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAP#g" -e "s#TODEVICE#WIFIENCAP -> TORAWDEVICE#g" | sed -e "s#WIFIDECAP#$WIFIDECAP#g" -e "s#WIFIENCAP#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(NODEDEVICE)#g" -e "s#TORAWDEVICE#ToDevice(NODEDEVICE)#g" | sed -e "s#NODEDEVICE#$nodedevice#g" -e "s#NODENAME#$node#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $CLICK.$node.$nodedevice
 			    fi
 			fi
 			
 		    done
 		done
 		
-		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5" "$6" "$7"."$1"."$2" "$8" "$9" "$10}' | sed -e "s#[[:space:]]*-\.*[[:alnum:]\.]*# -#g" -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$WORKDIR#g" > $NODETABLE.$POSTFIX
-		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" > $SIMDIS.$POSTFIX
+		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5" "$6" "$7"."$1"."$2" "$8" "$9" "$10}' | sed -e "s#[[:space:]]*-\.*[[:alnum:]\.]*# -#g" -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $NODETABLE.$POSTFIX
+		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $SIMDIS.$POSTFIX
 		;;
 	"cleanup")
 		SIMDIS=$2
