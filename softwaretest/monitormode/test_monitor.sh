@@ -25,7 +25,7 @@ chmod 777 $LOGDIR
 SEDARG="s#MODULSDIR#$MODULSDIR#g"
 SEDARG2="s#LOGDIR#$LOGDIR#g"
 SEDARG3="s#WORKDIR#$DIR#g"
-cat $DIR/monitortest.mes | grep -v "#" | grep -e "." | awk '{print  $1" "$2" MODULSDIR "$4" "$5" "$6" "$7" "$8" "$9}' | sed -e $SEDARG -e $SEDARG2 -e $SEDARG3 > $DIR/monitortest.mes.tmp 
+cat $DIR/monitortest.mes | grep -v "#" | grep -e "." | awk '{print  $1" "$2" MODULSDIR "$4" "$5" "$6" "$7" "$8" "$9" "$10}' | sed -e $SEDARG -e $SEDARG2 -e $SEDARG3 > $DIR/monitortest.mes.tmp 
 
 RESULT=`RUNMODE=REBOOT CONFIGFILE=$DIR/monitortest.mes.tmp MARKER=$REVISION STATUSFD=5 ID=monitormode TIME=$TIME $DIR/../../measurement/bin/run_single_measurement.sh 5>&1 1>> $LOGDIR/measurement.log 2>&1`
 
