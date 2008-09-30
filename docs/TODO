@@ -1,3 +1,4 @@
-directory for marker, which should be clear before setting a new one. Problem with different measurement (e.g tcp -> receiver -> tcp)
-outdoorevalution: change in mes-file needs update for evaluation
-ns2: radiomodell (update, correct value, etc.)
+- directory for marker, which should be clear before setting a new one. Problem with different measurement (e.g tcp -> receiver -> tcp)
+- outdoorevalution: change in mes-file needs update for evaluation
+- ns2: radiomodell (update, correct value, etc.)
+- measurement: better log-support for kclick (seems to me, that now there are some lines missing)
