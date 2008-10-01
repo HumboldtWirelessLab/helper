@@ -1,8 +1,9 @@
 #NODE		DEVICE	MODULSDIR			MODOPTIONS	WIFICONFIG		CLICKMODDIR				CLICKSCRIPT		LOGFILE			APP	APPLOGFILE
-sk110		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.default		BASEDIR/nodes/lib/modules/i586		WORKDIR/simple.click	LOGDIR/simple.log	-	-
+#sk110		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.default		BASEDIR/nodes/lib/modules/i586		WORKDIR/simple.click	LOGDIR/simple.log	-	-
 #clickdev	eth0	-				-		-			BASEDIR/nodes/lib/modules/i586		WORKDIR/simple.click	LOGDIR/simple.log	-	-
 #wgt39		eth0	-				-		-			BASEDIR/nodes/lib/modules/mips		WORKDIR/simple.click	LOGDIR/simple.log	-	-
 #wgt25		eth0	-				-		-			-					WORKDIR/simple.click	LOGDIR/simple25.log	-	-
 #wgt31		eth0	-				-		-			-					WORKDIR/simple.click	LOGDIR/simple31.log	-	-
 #wgt32		eth0	-				-		-			-					WORKDIR/simple.click	LOGDIR/simple32.log	-	-
 #wgt33		eth0	-				-		-			-					WORKDIR/simple.click	LOGDIR/simple33.log	-	-
+wgt33		ath0	BASEDIR/nodes/lib/modules/mips	-		monitor.default		-					WORKDIR/simple.click	LOGDIR/simple33.log	-	-

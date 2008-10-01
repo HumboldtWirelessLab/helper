@@ -172,6 +172,8 @@ if [ $RUNMODENUM -le 4 ]; then
 
     check_nodes
     sleep 1
+    #extra sleep for WGTs
+    sleep 2
 
     for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
