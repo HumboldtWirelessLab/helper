@@ -22,6 +22,12 @@ esac
 
 NODELIST=`cat $CONFIGFILE | grep -v "#" | awk '{print $1}' | sort -u`
 
+##############################################
+###### Functions to check the nodes ##########
+##############################################
+
+CURRENTMODE="START"
+
 check_nodes() {
 
     NODESTATUS=`NODELIST=$NODELIST MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh statusmarker`
@@ -29,6 +35,8 @@ check_nodes() {
     if [ ! "x$NODESTATUS" = "xok" ]; then
 	echo "Nodestatus: $NODESTATUS"
 	echo "WHHHHOOOOO: LOOKS LIKE RESTART! GOD SAVE THE WATCHDOG"
+	echo "Current Mode: $CURRENTMODE"
+	echo "Nodes: $NODELIST"
 	echo "reboot all nodes"
 	NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
 
@@ -43,6 +51,10 @@ get_node_status()  {
     NODESTATUS=`NODELIST=$NODELIST MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh statusmarker`
     echo "$NODESTATUS"
 }
+
+#########################################################
+###### Check RUNMODE. What do you want to do ? ##########
+#########################################################
 
 if [ "x$RUNMODE" = "x" ]; then
     RUNMODE=UNKNOWN
@@ -90,9 +102,9 @@ if [ $RUNMODENUM -eq 0 ]; then
     fi
 fi
 
-##################################
-###### Reboot all nodes ##########
-##################################
+####################################################
+###### Reboot all nodes and wait for them ##########
+####################################################
 
 if [ $RUNMODENUM -le 1 ]; then
     echo "reboot all nodes"
@@ -107,7 +119,6 @@ fi
 ###################################
 ###### Setup Environment ##########
 ###################################
-
 
 if [ $RUNMODENUM -le 2 ]; then
     echo "Setup environment"
@@ -124,7 +135,9 @@ NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmark
 
 if [ $RUNMODENUM -le 3 ]; then
 
-    echo "Load Moduls"
+    echo "Load Modules"
+    CURRENTMODE="LOAD MODULES"
+    LOADMODULES=0
 
     NODELIST="$NODELIST" $DIR/../../host/bin/wlanmodules.sh rmmod
 
@@ -145,11 +158,15 @@ if [ $RUNMODENUM -le 3 ]; then
 	    fi	
 
 	    NODELIST="$node" MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../host/bin/wlanmodules.sh insmod
+	    LOADMODULES=1
 	fi
     done
 
-    check_nodes
-    sleep 1
+    if [ $LOADMODULES -eq 1 ]; then
+	#check nodes and sleep, only if modules are need to load
+	check_nodes
+	sleep 1
+    fi
 fi
 
 ############################
@@ -159,21 +176,30 @@ fi
 if [ $RUNMODENUM -le 4 ]; then
 
     echo "Setup Wifi"
-
+    CURRENTMODE="CREATE WIFI"
+    CREATEWIFI=0
+    
     for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	for nodedevice in $NODEDEVICELIST; do
 	    CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
 	    if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
 		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/../../host/bin/wlandevices.sh create
+		CREATEWIFI=1
 	    fi
 	done
     done
 
-    check_nodes
-    sleep 1
-    #extra sleep for WGTs
-    sleep 2
+    if [ $CREATEWIFI -eq 1 ]; then
+	#check nodes and sleep if device should be created
+	check_nodes
+	sleep 1
+	#extra sleep for WGTs
+	sleep 2
+    fi
+
+    CURRENTMODE="START WIFI"
+    STARTWIFI=0
 
     for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
@@ -181,12 +207,18 @@ if [ $RUNMODENUM -le 4 ]; then
 	    CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
 	    if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
     		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/../../host/bin/wlandevices.sh start
+	        STARTWIFI=1
 	    fi
 	done
     done
 
-    check_nodes
-    sleep 1
+    if [ $STARTWIFI -eq 1 ]; then
+        check_nodes
+	sleep 1
+    fi
+    
+    CURRENTMODE="CONFIG WIFI"
+    CONFIGWIFI=0
 
     for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
@@ -194,12 +226,15 @@ if [ $RUNMODENUM -le 4 ]; then
 	    CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
 	    if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
 		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/../../host/bin/wlandevices.sh config
+		CONFIGWIFI=1
 	    fi
 	done
     done
 
-    check_nodes
-
+    if [ $CONFIGWIFI -eq 1 ]; then
+        check_nodes
+    fi
+    
 fi
 
 ######################################################
@@ -231,20 +266,29 @@ if [ $RUNMODENUM -le 5 ]; then
 ###### Setup Clickmodule ##########
 ###################################
 
+    CURRENTMODE="LOAD CLICKMOD"
+    LOADCLICKMOD=0
+
     for node in $NODELIST; do
 
 	CLICKMODDIR=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $6}' | tail -n 1`
 
 	if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
 	    NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh reloadmod
+	    LOADCLICKMOD=1
 	fi
     done
 
-    check_nodes
-
+    if [ $LOADCLICKMOD -eq 1 ]; then
+	check_nodes
+    fi
+    
 ########################################################
 ###### Setup Click-, Log- & Application-Stuff ##########
 ########################################################
+
+    CURRENTMODE="RUN CLICK AND APPLICATION"
+    RUN_CLICK_APPLICATION=0
 
     for node in $NODELIST; do
 	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
@@ -259,6 +303,9 @@ if [ $RUNMODENUM -le 5 ]; then
 		LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
 
 		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
+			
+			RUN_CLICK_APPLICATION=1
+			
 			SCREENT="$node\_$nodedevice\_click"	
 			screen -S $SCREENNAME -X screen -t $SCREENT
    			sleep 0.1
@@ -281,6 +328,9 @@ if [ $RUNMODENUM -le 5 ]; then
 		APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $10}'`
 		
 		if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
+
+			RUN_CLICK_APPLICATION=1
+
 			SCREENT="$node\_$nodedevice\_app"	
 			screen -S $SCREENNAME -X screen -t $SCREENT
    			sleep 0.1
@@ -293,55 +343,67 @@ if [ $RUNMODENUM -le 5 ]; then
 ####### Start Click- & Application-Stuff ##########
 ###################################################
 
-    for node in $NODELIST; do
-	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-	for nodedevice in $NODEDEVICELIST; do
+    if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
+
+        for node in $NODELIST; do
+	    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+	    for nodedevice in $NODEDEVICELIST; do
 		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
 
 		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
 
 		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-			SCREENT="$node\_$nodedevice\_click"
-    			screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
+		    SCREENT="$node\_$nodedevice\_click"
+    		    screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
 
-			CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
-			if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
-			    SCREENT="$node\_$nodedevice\_kcm"
-			    screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
-			fi
+		    CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
+		    if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
+			SCREENT="$node\_$nodedevice\_kcm"
+			screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
+		    fi
 		fi
 
 		APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
 
 		if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-			SCREENT="$node\_$nodedevice\_app"	
-    			screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
+		    SCREENT="$node\_$nodedevice\_app"	
+    		    screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
 		fi
+	    done
 	done
-    done
+	
+    fi
 
 ###################################################
 ################# Wait and Stop ###################
 ###################################################
 
-    WAITTIME=`expr $TIME + 5`
-    echo "Wait for $WAITTIME sec"
+    if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
-# Countdown
-    echo -n -e "Wait... \033[1G" >&6
-    for ((i = $WAITTIME; i > 0; i--)); do echo -n -e "Wait... $i \033[1G" >&6 ; sleep 1; done
-    echo -n -e "                 \033[1G" >&6
+	#add 5 second extra to make sure that we are not faster than the devices (click,application)
+	WAITTIME=`expr $TIME + 5`
+	echo "Wait for $WAITTIME sec"
 
-#Normal wait
-#   sleep $WAITTIME
+	# Countdown
+	echo -n -e "Wait... \033[1G" >&6
+	for ((i = $WAITTIME; i > 0; i--)); do echo -n -e "Wait... $i \033[1G" >&6 ; sleep 1; done
+	echo -n -e "                 \033[1G" >&6
+
+	#Normal wait
+	#sleep $WAITTIME
+
+    fi
 
 ###################################################
 ##### Kill progs for logfile for kclick  ##########
 ###################################################
-    for node in $NODELIST; do
-	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+
+    if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
+
+	for node in $NODELIST; do
+	    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	
-	for nodedevice in $NODEDEVICELIST; do
+	    for nodedevice in $NODEDEVICELIST; do
 		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
 		CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
 		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
@@ -349,14 +411,26 @@ if [ $RUNMODENUM -le 5 ]; then
 			    TAILPID=`ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "pidof cat"`
 			    ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill $TAILPID"
 		fi
+	    done
 	done
-    done
+    fi
+
+#####################################
+##### Close Screen-Session ##########
+#####################################
 
     screen -S $SCREENNAME -X quit
 
-    check_nodes
+#######################################
+##### Check Nodes and finish ##########
+#######################################
+
+    if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
+        check_nodes
+    fi
     
     echo "ok" 1>&$STATUSFD
+
 fi
 
 echo "Finished measurement. Status: ok."
