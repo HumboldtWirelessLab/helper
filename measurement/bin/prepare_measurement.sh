@@ -44,21 +44,36 @@ case "$1" in
 	"prepare")
 		SIMDIS=$2
 		. $SIMDIS
-		NODELIST=`cat $CONFIGDIR/$NODETABLE | grep -v "#" | awk '{print $1}' | sort -u`
-		NODECOUNT=`cat $CONFIGDIR/$NODETABLE | grep -v "#" | wc -l`
+
+		SIMDISBASENAME=`basename $SIMDIS`
+		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $RESULTDIR/$SIMDISBASENAME.$POSTFIX
 
 		#Prepare click
-		for node in $NODELIST; do
-		    NODEDEVICELIST=`cat $CONFIGDIR/$NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-		    for nodedevice in $NODEDEVICELIST; do		    
-			CLICK=`cat $CONFIGDIR/$NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
-			WIFICONFIG=`cat $CONFIGDIR/$NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
+		echo -n "" > $RESULTDIR/$NODETABLE.$POSTFIX
+		while read line; do
+		    ISCOMMENT=`echo $line | grep "#" | wc -l`
+		    if [ $ISCOMMENT -eq 0 ]; then
+			read CNODE CDEV CMODDIR CMODOPT WIFICONFIG CCMODDIR CLICK CCLOG CAPP CAPPL <<< $line
+			
+			WIFICONFIG=`echo "$WIFICONFIG" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 
 			if [ ! "x$WIFICONFIG" = "x" ] && [ ! "x$WIFICONFIG" = "x-" ]; then
 			    if [ -f  $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then                                                                                                                                                   
 				. $DIR/../../nodes/etc/wifi/$WIFICONFIG
+				WIFICONFIGFINALNAME="$DIR/../../nodes/etc/wifi/$WIFICONFIG"
 			    else
-				. $WIFICONFIG
+				if [ -f  $CONFIG/$WIFICONFIG ]; then                                                                                                                                                   
+				    . $CONFIG/$WIFICONFIG
+				    WIFICONFIGFINALNAME=$CONFIG/$WIFICONFIG
+				else
+				    if [ -f $WIFICONFIG ]; then
+					. $WIFICONFIG
+					WIFICONFIGFINALNAME="$WIFICONFIG"
+				    else
+					echo "Error: WIFICONFIG does'nt exist"
+					WIFICONFIGFINALNAME="-"
+				    fi
+				fi
 			    fi
 						
 			    case "$WIFITYPE" in
@@ -87,6 +102,8 @@ case "$1" in
 				    WIFIDECAP="Null()"
 				    ;;
 			    esac
+			else
+			    WIFICONFIGFINALNAME="-"
 			fi
 			
 			if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
@@ -95,27 +112,17 @@ case "$1" in
 			    if [ -e $CLICK ] || [ -e $CONFIGDIR/$CLICK ]; then
 				CLICKBASENAME=`basename $CLICK`
 				( cd $CONFIGDIR; cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAP#g" -e "s#TODEVICE#WIFIENCAP -> TORAWDEVICE#g" | sed -e "s#WIFIDECAP#$WIFIDECAP#g" -e "s#WIFIENCAP#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(NODEDEVICE)#g" -e "s#TORAWDEVICE#ToDevice(NODEDEVICE)#g" | sed -e "s#NODEDEVICE#$nodedevice#g" -e "s#NODENAME#$node#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $RESULTDIR/$CLICKBASENAME.$node.$nodedevice )
+				CLICKFINALNAME="$CLICKBASENAME.$CNODE.$CDEV"
+			    else
+				CLICKFINALNAME="-"
 			    fi
 			fi
 			
-		    done
-		done
+			echo "$CNODE $CDEV $CMODDIR $CMODOPT $WIFICONFIG $CCMODDIR $CLICKFINALNAME $CCLOG $CAPP $CAPPL" | sed -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" >> $RESULTDIR/$NODETABLE.$POSTFIX
 
-		SIMDISBASENAME=`basename $SIMDIS`
-		
-		#cat $CONFIGDIR/$NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5" "$6" "$7"."$1"."$2" "$8" "$9" "$10}' | sed -e "s#[[:space:]]*-\.*[[:alnum:]\.]*# -#g" -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $RESULTDIR/$NODETABLE.$POSTFIX
-
-		echo -n "" > $RESULTDIR/$NODETABLE.$POSTFIX
-		while read line; do
-		    ISCOMMENT=`echo $line | grep -v "#" | wc -l`
-		    if [ $ISCOMMENT -eq 0 ]; then
-			read CNODE CDEV CMODDIR CMODOPT CWIFI CCMODDIR CCSCRIPT CCLOG CAPP CAPPL <<< $line
-			echo "$CNODE $CDEV $CMODDIR $CMODOPT $CWIFI $CCMODDIR $CCSCRIPT.$CNODE.$CDEV $CCLOG $CAPP $CAPPL" | sed -e "s#[[:space:]]*-\.*[[:alnum:]\.]*# -#g" -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $RESULTDIR/$NODETABLE.$POSTFIX
 		    fi
 		done < $CONFIGDIR/$NODETABLE
-		
-		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $RESULTDIR/$SIMDISBASENAME.$POSTFIX
-		
+				
 		;;
 	*)
 		$0 help
