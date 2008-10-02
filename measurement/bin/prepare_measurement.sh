@@ -102,7 +102,18 @@ case "$1" in
 		done
 
 		SIMDISBASENAME=`basename $SIMDIS`
-		cat $CONFIGDIR/$NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5" "$6" WORKDIR/"$7"."$1"."$2" "$8" "$9" "$10}' | sed -e "s#[[:space:]]*-\.*[[:alnum:]\.]*# -#g" -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $RESULTDIR/$NODETABLE.$POSTFIX
+		
+		#cat $CONFIGDIR/$NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5" "$6" "$7"."$1"."$2" "$8" "$9" "$10}' | sed -e "s#[[:space:]]*-\.*[[:alnum:]\.]*# -#g" -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $RESULTDIR/$NODETABLE.$POSTFIX
+
+		echo -n "" > $RESULTDIR/$NODETABLE.$POSTFIX
+		while read line; do
+		    ISCOMMENT=`echo $line | grep -v "#" | wc -l`
+		    if [ $ISCOMMENT -eq 0 ]; then
+			read CNODE CDEV CMODDIR CMODOPT CWIFI CCMODDIR CCSCRIPT CCLOG CAPP CAPPL <<< $line
+			echo "$CNODE $CDEV $CMODDIR $CMODOPT $CWIFI $CCMODDIR $CCSCRIPT.$CNODE.$CDEV $CCLOG $CAPP $CAPPL" | sed -e "s#[[:space:]]*-\.*[[:alnum:]\.]*# -#g" -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $RESULTDIR/$NODETABLE.$POSTFIX
+		    fi
+		done < $CONFIGDIR/$NODETABLE
+		
 		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $RESULTDIR/$SIMDISBASENAME.$POSTFIX
 		
 		;;
