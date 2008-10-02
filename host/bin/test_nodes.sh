@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ "x$1" = "x" ]; then
+    echo "Use $0 outputfile"
+    exit 0
+fi
+
 echo "Node Ping SSH" > $1
 N=1
 while [ $N -lt 110 ]; do
@@ -16,7 +21,7 @@ while [ $N -lt 110 ]; do
 	echo "wgt$N no no" >> $1
     else
 	echo -n "yes"
-	DIR=`ssh -i ../etc/keys/id_dsa root@wgt$N pwd 2>&1`
+	DIR=`echo -n | ssh -i ../etc/keys/id_dsa root@wgt$N pwd 2>&1`
 	if [ "x$DIR" = "x" ]; then
 	  echo " SSH not(!!) available"
 	  echo "wgt$N yes no" >> $1

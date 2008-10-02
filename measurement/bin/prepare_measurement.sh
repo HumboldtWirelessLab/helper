@@ -89,8 +89,6 @@ case "$1" in
 			    esac
 			fi
 			
-			echo "$CLICK"
-			
 			if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
 			    CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 			    

@@ -54,10 +54,7 @@ else
 fi
 
 mkdir $FINALRESULTDIR
-
-#echo "RESULTDIR: $FINALRESULTDIR"
-#echo "WORKDIR: $WORKDIR"
-#echo "CONFIGDIR: $CONFIGDIR"
+chmod 777 $FINALRESULTDIR
 
 NODELIST=`cat $CONFIGDIR/$NODETABLE | grep -v "^#" | awk '{print $1}' | sort -u`
 
@@ -128,7 +125,6 @@ fi
 DATE=`date +%Y:%m:%d" "%H:%M:%S`
 echo "DATE: $DATE" > $FINALRESULTDIR/measurement.info
 
-
 echo "Prepare the Scripts !"
 
 DISCRIPTIONFILENAME=`basename $DISCRIPTIONFILE`
@@ -144,17 +140,22 @@ echo "DISFILE: $DISCRIPTIONFILENAME.real" >> $FINALRESULTDIR/measurement.info
 echo "Copy Configs !"
 
 for node in $NODELIST; do
-	NODEDEVICELIST=`cat $FINALRESULTDIR/$DISCRIPTIONFILENAME.real | egrep "^$node[[:space:]]" | awk '{print $2}'`
+
+	NODEDEVICELIST=`cat $FINALRESULTDIR/$NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
 	for nodedevice in $NODEDEVICELIST; do
+
 		WIFICONFIG=`cat $FINALRESULTDIR/$NODETABLE | awk '{print $1" "$2" "$5}' | grep "^$node $nodedevice" | awk '{print $3}' | sort -u`
+
 		for wificonfig_ac in $WIFICONFIG; do
+
 			if [ -e $CONFIGDIR/$wificonfig_ac ]; then
 				cp $CONFIGDIR/$wificonfig_ac $FINALRESULTDIR
 			fi
 			if [ -e $DIR/../../nodes/etc/wifi/$wificonfig_ac ]; then
 				cp $DIR/../../nodes/etc/wifi/$wificonfig_ac $FINALRESULTDIR
 			fi
+
 		done
 	done
 done
@@ -166,7 +167,7 @@ fi
 
 echo "Start measurement !"
 
-RESULT=`CLICKMODE=$CLICKMODE CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/run_single_measurement.sh 5>&1 6>&2 1>> $LOGDIR/$LOGFILE 2>&1`
+RESULT=`(cd $FINALRESULTDIR; CLICKMODE=$CLICKMODE CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/run_single_measurement.sh 5>&1 6>&2 1>> $LOGDIR/$LOGFILE 2>&1)`
 
 if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
   echo "Stop local process"
