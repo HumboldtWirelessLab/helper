@@ -13,20 +13,53 @@ case "$SIGN" in
       DIR=$pwd/$dir
       ;;
    *)
-      echo "Error while getting directory"
-      exit -1
+      DIR=$pwd/$dir
       ;;
 esac
 
-if [ -e $pwd/$2 ]; then
-    echo "Measurement already exits"
-    exit 0
+WORKDIR=$pwd
+CONFIGDIR=$(dirname "$1")
+SIGN=`echo $CONFIGDIR | cut -b 1`
+
+case "$SIGN" in
+  "/")
+      ;;
+  ".")
+      CONFIGDIR=$WORKDIR/$CONFIGDIR
+      ;;
+   *)
+      CONFIGDIR=$WORKDIR/$CONFIGDIR
+      ;;
+esac
+
+if [ -f $1 ]; then
+    DISCRIPTIONFILE=$1
+    .  $DISCRIPTIONFILE
+else
+    echo "$1 : No such file !"
+    exit 0;
 fi
 
-DISCRIPTIONFILE=$1
-.  $DISCRIPTIONFILE
+FINALRESULTDIR=`echo $RESULTDIR | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 
-NODELIST=`cat $pwd/$NODETABLE | grep -v "^#" | awk '{print $1}' | sort -u`
+if [ "x$2" = "x" ]; then
+    echo "RESULTDIR is target. no Subdir."
+else
+    if [ -e $FINALRESULTDIR/$2 ]; then
+	echo "Measurement already exits"
+	exit 0
+    else
+	FINALRESULTDIR=$FINALRESULTDIR/$2
+    fi
+fi
+
+mkdir $FINALRESULTDIR
+
+#echo "RESULTDIR: $FINALRESULTDIR"
+#echo "WORKDIR: $WORKDIR"
+#echo "CONFIGDIR: $CONFIGDIR"
+
+NODELIST=`cat $CONFIGDIR/$NODETABLE | grep -v "^#" | awk '{print $1}' | sort -u`
 
 if [ "x$GPS" = "xyes" ] || [ "x$GPS" = "xsingle" ] || [ "x$LOS" = "xyes" ]; then
   if [ "x$GPS" = "xyes" ] || [ "x$GPS" = "xsingle" ]; then
@@ -46,7 +79,6 @@ if [ "x$GPS" = "xyes" ] || [ "x$GPS" = "xsingle" ] || [ "x$LOS" = "xyes" ]; then
     WANTGPS="no"
   fi
 
-
   for n in $NODELIST; do
     echo "NODE: $n"
 
@@ -57,14 +89,14 @@ if [ "x$GPS" = "xyes" ] || [ "x$GPS" = "xsingle" ] || [ "x$LOS" = "xyes" ]; then
 
       if [ $GPSD -ge 1 ]; then
         if [ "$GPS" = "single" ] && [ "x$nx" != "x$FIRSTNODEx"; then
-          cat $pwd/$FIRSTNODE\_gps.info > $pwd/$n\_gps.info
+          cat $pwd/$FIRSTNODE\_gps.info > $FINALRESULTDIR/$n\_gps.info
         else
           echo "Get GPS -Data"
     
           echo -n "Get Position for $n ! Press any key !"
           read key
 	
-          $DIR/../../host/bin/gps.sh getdata > $pwd/$n\_gps.info
+          $DIR/../../host/bin/gps.sh getdata > $FINALRESULTDIR/$n\_gps.info
         fi
       fi
     fi
@@ -81,46 +113,47 @@ if [ "x$GPS" = "xyes" ] || [ "x$GPS" = "xsingle" ] || [ "x$LOS" = "xyes" ]; then
 	fi
       done
     
-      echo "LOS=$key" > $pwd/$n.info
+      echo "LOS=$key" > $FINALRESULTDIR/$n.info
     fi  
   done
 fi
 
-mkdir $pwd/$2
 
 if [ "x$NOTICE" = "xyes" ]; then
-  rm -f $pwd/info
-  vi $pwd/info
-  echo "" >> $pwd/info
+  rm -f $FINALRESULTDIR/info
+  vi $FINALRESULTDIR/info
+  echo "" >> $FINALRESULTDIR/info
 fi
 
 DATE=`date +%Y:%m:%d" "%H:%M:%S`
-echo "DATE: $DATE" > $pwd/measurement.info
+echo "DATE: $DATE" > $FINALRESULTDIR/measurement.info
+
 
 echo "Prepare the Scripts !"
 
-$DIR/prepare_measurement.sh prepare $DISCRIPTIONFILE
+DISCRIPTIONFILENAME=`basename $DISCRIPTIONFILE`
+cat $DISCRIPTIONFILE | sed -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp
 
-. $DISCRIPTIONFILE.real
+CONFIGDIR=$CONFIGDIR $DIR/prepare_measurement.sh prepare $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp
+mv $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp.real $FINALRESULTDIR/$DISCRIPTIONFILENAME.real
 
-echo "DISFILE: $DISCRIPTIONFILE.real" >> $pwd/measurement.info
+. $FINALRESULTDIR/$DISCRIPTIONFILENAME.real
+
+echo "DISFILE: $DISCRIPTIONFILENAME.real" >> $FINALRESULTDIR/measurement.info
 
 echo "Copy Configs !"
 
 for node in $NODELIST; do
-	NODEDEVICELIST=`cat $pwd/$DISCRIPTIONFILE.real | egrep "^$node[[:space:]]" | awk '{print $2}'`
+	NODEDEVICELIST=`cat $FINALRESULTDIR/$DISCRIPTIONFILENAME.real | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
 	for nodedevice in $NODEDEVICELIST; do
-		WIFICONFIG=`cat $pwd/$NODETABLE | awk '{print $1" "$2" "$5}' | grep "^$node $nodedevice" | awk '{print $3}' | sort -u`
+		WIFICONFIG=`cat $FINALRESULTDIR/$NODETABLE | awk '{print $1" "$2" "$5}' | grep "^$node $nodedevice" | awk '{print $3}' | sort -u`
 		for wificonfig_ac in $WIFICONFIG; do
-			if [ -e $wificonfig_ac ]; then
-				cp $wificonfig_ac $pwd/$2/
-			fi
-			if [ -e $pwd/$wificonfig_ac ]; then
-				cp $pwd/$wificonfig_ac $pwd/$2/
+			if [ -e $CONFIGDIR/$wificonfig_ac ]; then
+				cp $CONFIGDIR/$wificonfig_ac $FINALRESULTDIR
 			fi
 			if [ -e $DIR/../../nodes/etc/wifi/$wificonfig_ac ]; then
-				cp $DIR/../../nodes/etc/wifi/$wificonfig_ac $pwd/$2/
+				cp $DIR/../../nodes/etc/wifi/$wificonfig_ac $FINALRESULTDIR
 			fi
 		done
 	done
@@ -139,14 +172,6 @@ if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
   echo "Stop local process"
   $LOCALPROCESS stop
 fi
-
-mv *.dump $pwd/$2/
-mv *.log $pwd/$2/
-mv *info $pwd/$2/
-cp *.click* $pwd/$2/
-cp *.real $pwd/$2/
-
-$DIR/prepare_measurement.sh cleanup $DISCRIPTIONFILE
 
 echo $RESULT
 
