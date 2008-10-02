@@ -1,5 +1,5 @@
-#NODE		DEVICE		MODULSDIR				MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT		LOGFILE			APP	APPLOGFILE
-sk110		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		-		WORKDIR/sender.click	LOGDIR/receiver.log	-	-
-sk110		ath1		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		-		WORKDIR/sender.click	LOGDIR/receiver.log	-	-
-sk111		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		-		WORKDIR/sender.click	LOGDIR/receiver.log	-	-
-sk112		ath0		WORKDIR/../../nodes/lib/modules/i586	-		monitor.default		-		WORKDIR/sender.click	LOGDIR/receiver.log	-	-
+#NODE		DEVICE		MODULSDIR			MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	LOGFILE			APP	APPLOGFILE
+sk110		ath0		BASEDIR/nodes/lib/modules/i586	-		monitor.default		-		sender.click	LOGDIR/receiver.log	-	-
+sk110		ath1		BASEDIR/nodes/lib/modules/i586	-		monitor.default		-		sender.click	LOGDIR/receiver.log	-	-
+sk111		ath0		BASEDIR/nodes/lib/modules/i586	-		monitor.default		-		sender.click	LOGDIR/receiver.log	-	-
+sk112		ath0		BASEDIR/nodes/lib/modules/i586	-		monitor.default		-		sender.click	LOGDIR/receiver.log	-	-
