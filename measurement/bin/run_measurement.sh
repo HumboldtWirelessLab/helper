@@ -160,8 +160,6 @@ for node in $NODELIST; do
 	done
 done
 
-exit 0
-
 if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
   echo "Start local process"
   $LOCALPROCESS start
