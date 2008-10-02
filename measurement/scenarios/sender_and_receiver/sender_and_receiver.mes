@@ -10,5 +10,5 @@
 #sk111	ath1		BASEDIR/nodes/lib/modules/i586	-		monitor.default		-		receiver.click	LOGDIR/receiver_5.log	-	-
 #sk112	ath1		BASEDIR/nodes/lib/modules/i586	-		monitor.default		-		receiver.click	LOGDIR/receiver_6.log	-	-
 #wgt73	ath0		BASEDIR/nodes/lib/modules/mips	-		monitor.default		-		receiver.click	LOGDIR/receiver_7.log	-	-
-sk110	ath0		BASEDIR/nodes/lib/modules/i586	-		monitor.a.channel36	-		sender.click	LOGDIR/1_sen.log	-	-
-sk112	ath0		BASEDIR/nodes/lib/modules/i586	-		monitor.a.channel36 	-		receiver.click  LOGDIR/1_rec.log	-	-
+sk110	ath0		BASEDIR/nodes/lib/modules/i586	-		monitor.a.channel183	-		sender.click	LOGDIR/1_sen.log	-	-
+sk112	ath0		BASEDIR/nodes/lib/modules/i586	-		monitor.a.channel183 	-		receiver.click  LOGDIR/1_rec.log	-	-
