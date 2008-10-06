@@ -18,16 +18,62 @@ case "$SIGN" in
 	;;
 esac
 
+if [ ! "x$1" = "xrun" ]; then
+	echo "Use $0 run dis-file"
+	exit 0
+fi
+
+WORKDIR=$pwd
+CONFIGDIR=$(dirname "$2")
+SIGN=`echo $CONFIGDIR | cut -b 1`
+
+case "$SIGN" in
+  "/")
+      ;;
+  ".")
+      CONFIGDIR=$WORKDIR/$CONFIGDIR
+      ;;
+   *)
+      CONFIGDIR=$WORKDIR/$CONFIGDIR
+      ;;
+esac
+
+if [ -f $2 ]; then
+    DISCRIPTIONFILE=$2
+    .  $DISCRIPTIONFILE
+else
+    echo "$2 : No such file !"
+    exit 0;
+fi
+
+FINALRESULTDIR=`echo $RESULTDIR | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
+
+if [ "x$3" = "x" ]; then
+    echo "RESULTDIR is target. No Subdir."
+else
+    if [ -e $FINALRESULTDIR/$3 ]; then
+	echo "Measurement already exits"
+	exit 0
+    else
+	FINALRESULTDIR=$FINALRESULTDIR/$3
+    fi
+fi
+
+mkdir $FINALRESULTDIR
+chmod 777 $FINALRESULTDIR
+
 case "$1" in
-	"help")
-		echo "Use $0 run dis-file"
-		;;
 	"run")
+		DISCRIPTIONFILENAME=`basename $DISCRIPTIONFILE`
+		cat $DISCRIPTIONFILE | sed -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp
+		
+
 		POSTFIX=ns2
 	    
-		POSTFIX=$POSTFIX $DIR/prepare-sim.sh prepare $2
-	
-		SIMDIS=$2.$POSTFIX
+		CONFIGDIR=$CONFIGDIR POSTFIX=$POSTFIX $DIR/prepare-sim.sh prepare $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp
+		mv $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp.ns2 $FINALRESULTDIR/$DISCRIPTIONFILENAME.ns2
+
+		SIMDIS=$FINALRESULTDIR/$DISCRIPTIONFILENAME.ns2
 		. $SIMDIS
 		TCLFILE="$NAME.tcl"
 		NODELIST=`cat $NODETABLE | grep -v "#" | awk '{print $1}' | sort -u`
