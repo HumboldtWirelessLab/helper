@@ -22,10 +22,6 @@ if [ "x$POSTFIX" = "x" ]; then
     POSTFIX="simulation"
 fi
 
-if [ "x$WORKDIR" = "x" ]; then
-    WORKDIR=$pwd
-fi
-
 BASEDIR=$DIR/../../
 
 case "$1" in
@@ -35,27 +31,42 @@ case "$1" in
 	"prepare")
 		SIMDIS=$2
 		. $SIMDIS
-		NODELIST=`cat $NODETABLE | grep -v "#" | awk '{print $1}' | sort -u`
-		NODECOUNT=`cat $NODETABLE | grep -v "#" | wc -l`
-
-		#Prepare click
-		for node in $NODELIST; do
-		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-		    for nodedevice in $NODEDEVICELIST; do
-			CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}' | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g"`
-			cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAP#g" -e "s#TODEVICE#WIFIENCAP -> TORAWDEVICE#g" -e "s#FROMRAWDEVICE#FromSimDevice(NODEDEVICE,4096)#g" -e "s#WIFIDECAP#Strip(14)#g" -e "s#TORAWDEVICE#ToSimDevice(NODEDEVICE)#g" -e "s#WIFIENCAP#AddEtherNsclick()#g" | sed -e "s#NODEDEVICE#eth0#g" -e"s#NODENAME#$node#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $CLICK.$node.$nodedevice
-		    done
-		done
 		
-		cat $NODETABLE | grep -v "#" | awk '{ print $1" "$2" "$3" "$4" "$5" "$6" "$7"."$1"."$2" "$8" "$9" "$10}' | sed -e "s#LOGDIR#$LOGDIR#g"  -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $NODETABLE.$POSTFIX
-		cat $SIMDIS | sed -e "s#$NODETABLE#$NODETABLE.$POSTFIX#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $SIMDIS.$POSTFIX
+		if [ "x$WORKDIR" = "x" ]; then
+		    WORKDIR=$RESULTDIR
+		fi
+		
+		echo -n "" > $RESULTDIR/$NODETABLE.$POSTFIX
+		while read line; do
+		    ISCOMMENT=`echo $line | grep "#" | wc -l`
+		    if [ $ISCOMMENT -eq 0 ]; then
+			read CNODE CDEV CMODDIR CMODOPT WIFICONFIG CCMODDIR CLICK CCLOG CAPP CAPPL <<< $line
+			
+			if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
+			    CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
+			    
+			    if [ -e $CLICK ] || [ -e $CONFIGDIR/$CLICK ]; then
+				CLICKBASENAME=`basename $CLICK`
+				CLICKFINALNAME="$RESULTDIR/$CLICKBASENAME.$CNODE.$CDEV"
+				( cd $CONFIGDIR; cat $CLICK | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAP#g" -e "s#TODEVICE#WIFIENCAP -> TORAWDEVICE#g" -e "s#FROMRAWDEVICE#FromSimDevice(NODEDEVICE,4096)#g" -e "s#WIFIDECAP#Strip(14)#g" -e "s#TORAWDEVICE#ToSimDevice(NODEDEVICE)#g" -e "s#WIFIENCAP#AddEtherNsclick()#g" | sed -e "s#NODEDEVICE#eth0#g" -e"s#NODENAME#$node#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $CLICKFINALNAME )
+			    else
+				CLICKFINALNAME="-"
+			    fi
+			else
+			    CLICKFINALNAME="-"
+			fi
+			
+			echo "$CNODE $CDEV $CMODDIR $CMODOPT $WIFICONFIG $CCMODDIR $CLICKFINALNAME $CCLOG $CAPP $CAPPL" | sed -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" >> $RESULTDIR/$NODETABLE.$POSTFIX
+
+		    fi
+		done < $CONFIGDIR/$NODETABLE
 		;;
 	"cleanup")
-		SIMDIS=$2
-		. $SIMDIS
-		cat $NODETABLE.$POSTFIX |  grep -v "#" | awk '{print $7}' | xargs rm -f
-		rm -f $SIMDIS.$POSTFIX
-		rm -f $NODETABLE.$POSTFIX
+#		SIMDIS=$2
+#		. $SIMDIS
+#		cat $NODETABLE.$POSTFIX |  grep -v "#" | awk '{print $7}' | xargs rm -f
+#		rm -f $SIMDIS.$POSTFIX
+#		rm -f $NODETABLE.$POSTFIX
 		;;
 	*)
 		$0 help
