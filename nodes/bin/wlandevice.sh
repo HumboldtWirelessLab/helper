@@ -91,8 +91,8 @@ case "$1" in
 	    echo "echo $WIFITYPE > /proc/sys/net/$DEVICE/dev_type"
 	    echo $WIFITYPE > /proc/sys/net/$DEVICE/dev_type
 
-	    echo "sysctl -w dev.wifi0.intmit=$INTMIT"
-	    sysctl -w dev.wifi0.intmit=$INTMIT
+	    echo "sysctl -w dev.$PHYDEV.intmit=$INTMIT"
+	    sysctl -w dev.$PHYDEV.intmit=$INTMIT
 	    
 	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ]; then
 		if [ ! "x$SSID" = "x" ]; then
