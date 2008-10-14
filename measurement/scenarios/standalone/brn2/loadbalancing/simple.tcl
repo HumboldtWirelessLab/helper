@@ -1,3 +1,26 @@
+# Propagation model
+# first set values of shadowing model
+Propagation/Shadowing set pathlossExp_ 2.0  ;# path loss exponent
+Propagation/Shadowing set std_db_ 4.0       ;# shadowing deviation (dB)
+Propagation/Shadowing set dist0_ 1.0        ;# reference distance (m)
+Propagation/Shadowing set seed_ 0           ;# seed for RNG
+
+# Mac Layer
+Mac/802_11 set dataRate_ 11Mb
+Mac/802_11 set basicRate_ 1Mb 
+Mac/802_11 set RTSThreshold_ 3000
+
+# Physical Layer
+# transmission power
+Phy/WirelessPhy set Pt_ 0.281838
+
+# for broadcast packets
+# channel-13.2.472GHz
+Phy/WirelessPhy set freq_ 2.472e9 
+
+# communication radius
+Phy/WirelessPhy set RXThresh_ 3.28984e-09
+
 #
 # Set some general simulation parameters
 #
@@ -12,51 +35,11 @@ Antenna/OmniAntenna set Z_ 1.5
 Antenna/OmniAntenna set Gt_ 1.0
 Antenna/OmniAntenna set Gr_ 1.0
 
-#
-# Initialize the SharedMedia interface with parameters to make
-# it work like the 914MHz Lucent WaveLAN DSSS radio interface
-# These are taken directly from the ns-2 sample files.
-#
-
-#DSSS (IEEE802.11b)
-
-Phy/WirelessPhy set CPThresh_ 10.0
-#Phy/WirelessPhy set CSThresh_ 5.011872e-12
-Phy/WirelessPhy set CSThresh_ 1.559e-11
-Phy/WirelessPhy set RXThresh_ 3.28984e-09
-#Phy/WirelessPhy set RXThresh_ 3.652e-10
-#Phy/WirelessPhy set RXThresh_ 5.82587e-09
-#Phy/WirelessPhy set Rb_ 2*1e6
-Phy/WirelessPhy set Pt_ 0.281838
-#Phy/WirelessPhy set Pt_ 0.031622777
-
-
-Phy/WirelessPhy set freq_ 2.472e9
-Phy/WirelessPhy set L_ 1.0
-Phy/WirelessPhy set bandwidth_ 11Mb
-
-
-Mac/802_11 set SlotTime_          0.000020        ;# 20us
-Mac/802_11 set SIFS_              0.000010        ;# 10us
-Mac/802_11 set PreambleLength_    144             ;# 144 bit
-Mac/802_11 set PLCPHeaderLength_  48              ;# 48 bits
-Mac/802_11 set PLCPDataRate_      11.0e6           ;# 1Mbps
-Mac/802_11 set dataRate_          54.0e6          ;# 11Mbps
-Mac/802_11 set basicRate_         11.0e6           ;# 1Mbps
-
-Mac/802_11 set RTSThreshold_ 3000
-Mac/802_11 set ShortRetryLimit_ 7               ;# retransmittions
-Mac/802_11 set LongRetryLimit_  4               ;# retransmissions
-
-
-#COLLISIONWINDOWS MIN 31
-#MAX 1023
-
 # 
 # Set the size of the playing field and the topography.
 #
-set xsize  1000
-set ysize  1000
+set xsize  400
+set ysize  400
 set wtopo	[new Topography]
 $wtopo load_flatgrid $xsize $ysize
 
@@ -67,7 +50,7 @@ $wtopo load_flatgrid $xsize $ysize
 set netchan	Channel/WirelessChannel
 set netphy	Phy/WirelessPhy
 set netmac	Mac/802_11
-set netprop     Propagation/TwoRayGround
+set netprop     Propagation/Shadowing
 set antenna     Antenna/OmniAntenna
 
 #
@@ -84,9 +67,9 @@ LL set delay_			1ms
 # and when we'll stop.
 #
 
-set node_dist   55
-set nodecount   2
-set stoptime    40.0
+set node_dist   80
+set nodecount   3
+set stoptime    16.0
 
 #
 # With nsclick, we have to worry about details like which network
@@ -189,7 +172,8 @@ for {set i 0} {$i < $nodecount } {incr i} {
     # which node is doing the printing.
     #
     [$node_($i) set classifier_] setnodename "node$i"
-    
+}
+for {set i 0} {$i < ( $nodecount - 1 ) } {incr i} {
     #
     # Load the appropriate Click router script for the node.
     # All nodes in this simulation are using the same script,
@@ -198,6 +182,8 @@ for {set i 0} {$i < $nodecount } {incr i} {
     #
 [$node_($i) entry] loadclick "brn.click"
 }
+
+[$node_(2) entry] loadclick "client.click"
 
 for {set i 0} {$i < $nodecount} {incr i} {
    $ns_ at 0.0 "[$node_($i) entry] runclick"
@@ -222,8 +208,8 @@ set packetsize 64
 
 
 for {set i 0} {$i < $nodecount} {incr i} {
-    $node_($i) set X_ [expr ($i) % 4 * ($node_dist) ]
-    $node_($i) set Y_ [expr ($i) / 4 * ($node_dist) ]
+    $node_($i) set X_ [expr $i % 2 * $node_dist ]
+    $node_($i) set Y_ [expr $i / 2 * $node_dist ]
     $node_($i) set Z_ 0
     $node_($i) label $node_mac($i).brn
 }

@@ -1,5 +1,5 @@
 wlan_out_queue :: NotifierQueue(50);
-AddressInfo(my_wlan eth0:eth);
+BRNAddressInfo(my_wlan eth0:eth);
 
 elementclass AdHocOrInfraStructureClient {
     ETH $eth, SSID $ssid, CHANNEL $channel , WIFIENCAP $clientwifiencap, 
@@ -11,7 +11,7 @@ elementclass AdHocOrInfraStructureClient {
     auth_req :: OpenAuthRequester(ETH $eth, WIRELESS_INFO $auth_info);
     assoc_req :: BRNAssocRequester(ETH $eth, WIRELESS_INFO $auth_info, RT auth_rates);
 
-    bs :: BeaconScanner(RT auth_rates);
+    bs :: BRNBeaconScanner(RT auth_rates);
     // TODO set to 5, 5 in real deployment
 //    st_hnd :: StationHandover(assoc_req, $auth_info, 2, 5)
 
