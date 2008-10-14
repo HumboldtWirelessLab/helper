@@ -180,10 +180,10 @@ for {set i 0} {$i < ( $nodecount - 1 ) } {incr i} {
     # but there's no reason why each node couldn't use a different
     # script.
     #
-[$node_($i) entry] loadclick "brn.click"
+[$node_($i) entry] loadclick "brn2.click"
 }
 
-[$node_(2) entry] loadclick "client.click"
+[$node_(2) entry] loadclick "client2.click"
 
 for {set i 0} {$i < $nodecount} {incr i} {
    $ns_ at 0.0 "[$node_($i) entry] runclick"

@@ -10,10 +10,10 @@ wlan_out_queue :: NotifierQueue(50);
 elementclass AccessPoint {
     INTERFACE $device, SSID $ssid, CHANNEL $channel, BEACON_INTERVAL $beacon_interval |
 
-    AddressInfo(ether_address $device:eth);
+    BRNAddressInfo(ether_address $device:eth);
     winfo :: WirelessInfo(SSID $ssid, BSSID ether_address, CHANNEL $channel, INTERVAL $beacon_interval);
     rates :: AvailableRates(DEFAULT 2 4 11 12 18 22);
-    bs :: BeaconScanner(RT rates);
+    bs :: BRNBeaconScanner(RT rates);
 
     input[0]
     -> mgt_cl :: Classifier(
@@ -68,13 +68,13 @@ link_stat :: BRNLinkStat(ETHTYPE 0x0a04,
         RT rates);
 
 
-AddressInfo(my_wlan eth0:eth);
+BRNAddressInfo(my_wlan eth0:eth);
 
 nb_lst :: NeighborList(); // collect information about neighbors
 
 //out_q_0 :: Null();          //wifi_out_queue does the job
 
-AddressInfo(my_vlan eth0:eth);
+BRNAddressInfo(my_vlan eth0:eth);
 
 //ds :: BRNDS(id, nb_lst);
 
