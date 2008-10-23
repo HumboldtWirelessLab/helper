@@ -2,7 +2,8 @@ AddressInfo(my_wlan NODEDEVICE:eth);
 
 FROMRAWDEVICE
   -> rawtee :: Tee()
-  -> AthdescDecap()
+  -> WIFIDECAP
+  -> ethertee :: Tee()
   -> ftx :: FilterTX()
   -> ff :: FilterFailures()
   -> fphy :: FilterPhyErr()
@@ -10,8 +11,11 @@ FROMRAWDEVICE
   -> Discard();
   
   rawtee[1]
-  -> td :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump");
+  -> tdraw :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.raw.dump");
   
+  ethertee[1]
+  -> td :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump")
+
 Script(
   wait RUNTIME,
   stop
