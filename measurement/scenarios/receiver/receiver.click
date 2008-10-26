@@ -1,4 +1,4 @@
-AddressInfo(my_wlan NODEDEVICE:eth);
+BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
 FROMRAWDEVICE
   -> rawtee :: Tee()
@@ -6,6 +6,7 @@ FROMRAWDEVICE
   -> ftx :: FilterTX()
   -> ff :: FilterFailures()
   -> fphy :: FilterPhyErr()
+  -> Strip(11)
   -> pw :: PrintWifi(TIMESTAMP true)
   -> Discard();
   
