@@ -3,6 +3,7 @@ BRNAddressInfo(my_wlan NODEDEVICE:eth);
 FROMRAWDEVICE
   -> rawtee :: Tee()
   -> AthdescDecap()
+  -> Strip(11)
   -> ftx :: FilterTX()
   -> ff :: FilterFailures()
   -> fphy :: FilterPhyErr()
@@ -16,7 +17,7 @@ FROMRAWDEVICE
   -> Print("TXFeedback")
   -> Discard;
 
-BRN2PacketSource(800, 100, 1000, 14, 22, 16)
+BRN2PacketSource(1000, 100, 1000, 14, 22, 16)
   -> SetTimestamp()
   -> EtherEncap(0x8086, my_wlan, 00:01:0e:03:05:02)
   -> WifiEncap(0x00, 0:0:0:0:0:0)

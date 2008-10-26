@@ -93,6 +93,12 @@ case "$1" in
 
 	    echo "sysctl -w dev.$PHYDEV.intmit=$INTMIT"
 	    sysctl -w dev.$PHYDEV.intmit=$INTMIT
+
+	    echo "echo  \"1\" > /proc/sys/net/$DEVICE/monitor_crc_errors"
+	    echo "1" > /proc/sys/net/$DEVICE/monitor_crc_errors
+
+	    echo "echo \"1\" > /proc/sys/net/$DEVICE/monitor_phy_errors"
+	    echo "1" > /proc/sys/net/$DEVICE/monitor_phy_errors
 	    
 	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ]; then
 		if [ ! "x$SSID" = "x" ]; then
