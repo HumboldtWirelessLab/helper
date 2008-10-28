@@ -25,7 +25,7 @@ BRN2PacketSource(1000, 100, 1000, 14, 22, 16)
   -> wlan_out_queue :: NotifierQueue(50);
 	  
 wlan_out_queue
- -> SetTXPower(2)
+ -> SetTXPower(6)
  -> TODEVICE;
     
 Script(
