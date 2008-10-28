@@ -14,5 +14,5 @@
 #sk110		ath1	BASEDIR/nodes/lib/modules/i586	-		monitor.a.channel184	-		receiver.click	LOGDIR/sk111.ath1.log	-		-
 #sk112		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel14	-		receiver.click	LOGDIR/sk112.ath0.log	-		-
 #sk112		ath1	BASEDIR/nodes/lib/modules/i586	-		monitor.a.channel184	-		receiver.click	LOGDIR/sk112.ath1.log	-		-
-sk110		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.805		-		sender_and_receiver.click	LOGDIR/sk110.ath0.log	-		-
-sk111		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.805		-		receiver.click	LOGDIR/sk111.ath0.log	-		-
+sk110		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel14	-		sender_and_receiver.click	LOGDIR/sk110.ath0.log	-		-
+sk111		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel14	-		receiver.click	LOGDIR/sk111.ath0.log	-		-
