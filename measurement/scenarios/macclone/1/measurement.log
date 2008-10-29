@@ -1,0 +1,31 @@
+check all nodes
+Set marker for reboot-detection
+sk110
+sk111
+Get Wifiinfo
+Deviceconfig for sk110:ath0
+config sk110 ath0
+ath0      IEEE 802.11b  ESSID:""  Nickname:""
+          Mode:Monitor  Frequency:2.484 GHz  Access Point: 06:0C:42:0C:85:F4   
+          Bit Rate:0 kb/s   Tx-Power=7 dBm   Sensitivity=1/1  
+          Retry:off   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+          Link Quality=0/70  Signal level=-98 dBm  Noise level=-98 dBm
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+
+Deviceconfig for sk111:ath0
+config sk111 ath0
+ath0      IEEE 802.11b  ESSID:""  Nickname:""
+          Mode:Monitor  Frequency:2.484 GHz  Access Point: 06:0C:42:0C:74:0E   
+          Bit Rate:0 kb/s   Tx-Power=7 dBm   Sensitivity=1/1  
+          Retry:off   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+          Link Quality=0/70  Signal level=-98 dBm  Noise level=-98 dBm
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+
+Wait for 15 sec
+Finished measurement. Status: ok.

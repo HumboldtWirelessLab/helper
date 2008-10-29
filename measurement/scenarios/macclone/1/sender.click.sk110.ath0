@@ -1,0 +1,19 @@
+BRNAddressInfo(my_wlan ath0:eth);
+
+FromDevice(ath0)
+-> ToDump("/home/sombrutz/lab/helper/measurement/scenarios/macclone/1/sender.sk110.ath0.dump");
+
+BRN2PacketSource(1000, 100, 1000, 14, 2, 16)
+ -> EtherEncap(0x8088, my_wlan, ff:ff:ff:ff:ff:ff)
+ -> WifiEncap(0x00, 0:0:0:0:0:0)
+ -> SetTXRate(2)
+ -> wlan_out_queue :: NotifierQueue(50);
+	  
+wlan_out_queue
+-> SetTXPower(7)
+-> AthdescEncap() -> ToDevice(ath0);
+
+Script(
+  wait 10,
+  stop
+);
