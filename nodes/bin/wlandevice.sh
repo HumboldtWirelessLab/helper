@@ -100,12 +100,17 @@ case "$1" in
 	    echo "echo \"1\" > /proc/sys/net/$DEVICE/monitor_phy_errors"
 	    echo "1" > /proc/sys/net/$DEVICE/monitor_phy_errors
 	    
-	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ]; then
+	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ]; then
 		if [ ! "x$SSID" = "x" ]; then
 		    sleep 1
 		    iwconfig $DEVICE essid $SSID 
 		fi
 	    fi
+	    
+#	    sleep 1
+	    
+#	    echo "iwpriv ath0 macclone 1"
+#	    iwpriv $DEVICE macclone 1
 	;;
     "start")
 	    if [ "x$CONFIG" = "x" ]; then

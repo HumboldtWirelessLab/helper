@@ -3,10 +3,10 @@ FromDump("sk110.ath0.dump")
   -> Ath2Print(COMPLATH 1)
   -> AthdescDecap()
   -> filter_tx :: FilterTX()
-  -> status_clf :: Classifier(2/00%ff, // 0 => recv ok
-                              2/01%ff, // CRC error on frame
-                              2/02%ff, // PHY error, rs_phyerr is valid
-                              2/04%ff, // fifo overrun
+  -> status_clf :: Classifier(6/00%ff, // 0 => recv ok
+                              6/01%ff, // CRC error on frame
+                              6/02%ff, // PHY error, rs_phyerr is valid
+                              6/04%ff, // fifo overrun
                               -        // decrypt stuff
                               );
 			      
