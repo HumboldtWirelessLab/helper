@@ -1,0 +1,9 @@
+BRNAddressInfo(my_wlan ath0:eth);
+
+FromDevice(ath0)
+  -> ToDump("/home/sombrutz/lab/helper/measurement/scenarios/macclone/7/sk111.ath0.dump");
+
+Script(
+  wait 10,
+  stop
+);
