@@ -1,0 +1,4 @@
+#NODE	DEVICE	MODULSDIR				MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	CLICKLOGFILE		APPLICATION		APPLICATIONLOGFILE
+sk110	ath0	BASEDIR/nodes/lib/modules/i586		-		adhoc.default		-		-		-			CONFIGDIR/sk110.sh	LOGDIR/sk110.log
+sk111	ath0	BASEDIR/nodes/lib/modules/i586		-		adhoc.default		-		-		-			CONFIGDIR/sk111.sh	LOGDIR/sk111.log
+sk112	ath0	BASEDIR/nodes/lib/modules/i586		-		adhoc.default		-		-		-			CONFIGDIR/sk112.sh	LOGDIR/sk112.log
