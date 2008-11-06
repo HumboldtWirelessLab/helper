@@ -172,16 +172,17 @@ mysrc :: RatedSource("ABCDEFGHIJKLMNOPQRSTUWVXYZ", 5, 10 , false)
 -> infra_wifiencap
 -> wlan_out_queue;
 
-//mysrc2 :: RatedSource("1234ABCDEFGHIJKLMNOPQRSTUWVXYZ", 5, 10 , false)
-//-> Print("--------------- Start: Sending new Packet")
-//-> UDPIPEncap( 192.168.0.2 , 1001 , 192.168.0.1 , 80 )
-//-> tst;
+mysrc2 :: RatedSource("1234ABCDEFGHIJKLMNOPQRSTUWVXYZ", 5, 10 , false)
+-> Print("--------------- Start: Sending new Packetflow2")
+-> UDPIPEncap( 192.168.0.2 , 1001 , 192.168.0.1 , 80 )
+-> tst;
 
 Script(
   wait 8,
   read infra_client/isc.wireless_info,
   read infra_client/isc.assoc,
   write mysrc.active true,
+  wait 1,
   write mysrc2.active true
 );
 
