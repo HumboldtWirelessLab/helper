@@ -23,6 +23,37 @@ get_phy_dev() {
     echo "wifi$NUMBER"
 }
 
+if [ -e /usr/sbin/iwconfig ]; then
+    IWCONFIG=/usr/sbin/iwconfig
+else
+    if [ -e /sbin/iwconfig ]; then
+	IWCONFIG=/sbin/iwconfig
+    fi
+fi
+
+if [ -e /usr/sbin/iwpriv ]; then
+    IWPRIV=/usr/sbin/iwpriv
+else
+    if [ -e /sbin/iwpriv ]; then
+	IWPRIV=/sbin/iwpiv
+    fi
+fi
+
+if [ -e /usr/sbin/ifconfig ]; then
+    IFCONFIG=/usr/sbin/ifconfig
+else
+    if [ -e /sbin/ifconfig ]; then
+	IFCONFIG=/sbin/ifconfig
+    fi
+fi
+
+if [ -e /usr/sbin/wlanconfig ]; then
+    WLANCONFIG=/usr/sbin/wlanconfig
+else
+    if [ -e /sbin/wlanconfig ]; then
+	WLANCONFIG=/sbin/wlanconfig
+    fi
+fi
 
 case "$1" in
     "help")
@@ -43,14 +74,14 @@ case "$1" in
 		. $CONFIG
 	    fi
 	    
-	    echo "/usr/sbin/wlanconfig $DEVICE create wlandev $PHYDEV wlanmode $MODE"
-	    /usr/sbin/wlanconfig $DEVICE create wlandev $PHYDEV wlanmode $MODE
+	    echo "$WLANCONFIG $DEVICE create wlandev $PHYDEV wlanmode $MODE"
+	    ${WLANCONFIG} $DEVICE create wlandev $PHYDEV wlanmode $MODE
 	;;
     "delete")
-	    echo "ifconfig $DEVICE down"
-	    ifconfig $DEVICE down
-	    echo "wlanconfig $DEVICE destroy"
-	    wlanconfig $DEVICE destroy
+	    echo "$IFCONFIG $DEVICE down"
+	    ${IFCONFIG} $DEVICE down
+	    echo "$WLANCONFIG $DEVICE destroy"
+	    ${WLANCONFIG} $DEVICE destroy
 	;;
     "config")
 	    if [ "x$CONFIG" = "x" ]; then
@@ -66,16 +97,16 @@ case "$1" in
 		. $CONFIG
 	    fi
 
-	    echo "/usr/sbin/iwconfig $DEVICE channel $CHANNEL"
-	    /usr/sbin/iwconfig $DEVICE channel $CHANNEL
+	    echo "$IWCONFIG $DEVICE channel $CHANNEL"
+	    ${IWCONFIG} $DEVICE channel $CHANNEL
 
-	    echo "/usr/sbin/iwconfig $DEVICE txpower $POWER"
-	    /usr/sbin/iwconfig $DEVICE txpower $POWER
+	    echo "$IWCONFIG $DEVICE txpower $POWER"
+	    ${IWCONFIG} $DEVICE txpower $POWER
 
 	    if [ ! "x$RATE" = "x" ]; then
 		if [ $RATE -gt 0 ]; then
-		    echo "/usr/sbin/iwconfig $DEVICE rate $RATE"
-		    /usr/sbin/iwconfig $DEVICE rate $RATE
+		    echo "$IWCONFIG $DEVICE rate $RATE"
+		    ${IWCONFIG} $DEVICE rate $RATE
 		fi
 	    fi
 
@@ -93,13 +124,24 @@ case "$1" in
 
 	    echo "sysctl -w dev.$PHYDEV.intmit=$INTMIT"
 	    sysctl -w dev.$PHYDEV.intmit=$INTMIT
+
+	    echo "echo  \"1\" > /proc/sys/net/$DEVICE/monitor_crc_errors"
+	    echo "1" > /proc/sys/net/$DEVICE/monitor_crc_errors
+
+	    echo "echo \"1\" > /proc/sys/net/$DEVICE/monitor_phy_errors"
+	    echo "1" > /proc/sys/net/$DEVICE/monitor_phy_errors
 	    
-	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ]; then
+	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ]; then
 		if [ ! "x$SSID" = "x" ]; then
 		    sleep 1
-		    iwconfig $DEVICE essid $SSID 
+		    ${IWCONFIG} $DEVICE essid $SSID 
 		fi
 	    fi
+	    
+	    sleep 1
+	    
+	    echo "$IWPRIV ath0 macclone 1"
+	    ${IWPRIV} $DEVICE macclone 1
 	;;
     "start")
 	    if [ "x$CONFIG" = "x" ]; then
@@ -107,8 +149,8 @@ case "$1" in
 		exit 0
 	    fi
 	    
-	    echo "/sbin/ifconfig $DEVICE up"
-	    /sbin/ifconfig $DEVICE up
+	    echo "$IFCONFIG $DEVICE up"
+	    ${IFCONFIG} $DEVICE up
 	;;	    
     *)
 	;;

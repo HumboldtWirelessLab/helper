@@ -1,11 +1,11 @@
-NAME=receiver
+NAME=loadbalancing
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=60
+TIME=30
 
-NODETABLE=receiver.mes
+NODETABLE=loadbalancing.mes
 NODEPLACEMENTFILE=placement.default
 
 LOGDIR=WORKDIR
@@ -18,4 +18,3 @@ EVALUATIONSDIRPOSTFIX=_evaluation
 GPS=no
 NOTICE=no
 LOS=no
-
