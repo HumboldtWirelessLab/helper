@@ -97,8 +97,8 @@ case "$1" in
 					WIFIDECAP="AthdescDecap()"
 					;;
 				    "805")
-					WIFIENCAP="AthdescEncap()"
-					WIFIDECAP="AthdescDecap()"
+					WIFIENCAP="Ath2Encap(ATHENCAP true)"
+					WIFIDECAP="Ath2Decap(ATHDECAP true)"
 					;;
 			    	    *)
 					WIFIENCAP="Null()"
