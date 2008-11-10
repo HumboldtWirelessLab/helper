@@ -187,9 +187,7 @@ protoclf[0]                              //brn packets
 
 brnclf[0] //linkprobe
   -> SetTimestamp()
-  -> Print("jsjjjs")
   -> link_stat
-  -> Print("Bla")
   -> SetTimestamp()
   -> EtherEncap(0x8086, my_wlan, ff:ff:ff:ff:ff:ff)
   -> WifiEncap(0x00, 0:0:0:0:0:0) // packet to brn peer node
