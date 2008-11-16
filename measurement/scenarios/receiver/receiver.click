@@ -2,12 +2,11 @@ BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
 FROMRAWDEVICE
   -> rawtee :: Tee()
-  -> AthdescDecap()
+  -> Ath2Decap( ATHDECAP true )
   -> ftx :: FilterTX()
   -> ff :: FilterFailures()
   -> fphy :: FilterPhyErr()
-  -> Strip(11)
-  -> pw :: PrintWifi(TIMESTAMP true)
+//  -> pw :: PrintWifi(TIMESTAMP true)
   -> Discard();
   
   rawtee[1]

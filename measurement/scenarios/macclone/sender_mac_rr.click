@@ -14,10 +14,10 @@ BRN2PacketSource(1000, 100, 30000, 14, 2, 16)
  -> SetTXPower(16)
  -> TODEVICE;
 
-// rrs[1]
+ rrs[1]
 // -> Print("Bar")
-// -> EtherEncap(0x8088, 00:0c:52:1d:95:f2 , 06:0c:42:0c:74:0e )
-// -> wifienc;
+ -> EtherEncap(0x8088, 00:0c:52:1d:95:f2 , 06:0c:42:0c:74:0e )
+ -> wifienc;
 
 Script(
   wait RUNTIME,
