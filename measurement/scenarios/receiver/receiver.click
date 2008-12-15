@@ -6,7 +6,7 @@ FROMRAWDEVICE
   -> ftx :: FilterTX()
   -> ff :: FilterFailures()
   -> fphy :: FilterPhyErr()
-//  -> pw :: PrintWifi(TIMESTAMP true)
+  -> pw :: PrintWifi(TIMESTAMP true)
   -> Discard();
   
   rawtee[1]

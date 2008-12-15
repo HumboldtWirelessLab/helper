@@ -1,4 +1,4 @@
-AddressInfo(my_wlan eth0:eth);
+BRNAddressInfo(my_wlan eth0:eth);
 
 FromDevice(eth0)
   -> rawtee :: Tee()
