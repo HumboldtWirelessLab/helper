@@ -140,8 +140,16 @@ case "$1" in
 	    
 	    sleep 1
 	    
-	    echo "$IWPRIV ath0 macclone 1"
+	    echo "$IWPRIV $DEVICE macclone 1"
 	    ${IWPRIV} $DEVICE macclone 1
+	    
+	    echo "$IWPRIV $DEVICE channelswitch 1"
+	    ${IWPRIV} $DEVICE channelswitch 1
+	    
+#	    echo "sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA"
+#	    sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA
+			
+	    
 	;;
     "start")
 	    if [ "x$CONFIG" = "x" ]; then
