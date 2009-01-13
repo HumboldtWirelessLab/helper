@@ -57,21 +57,21 @@ fi
 
 case "$1" in
     "help")
-	echo "Use $0 create | delete | config"
-	exit 0;
+		echo "Use $0 create | delete | config"
+		exit 0;
 	;;
     "create")
 	    if [ "x$CONFIG" = "x" ]; then
-		echo "Use CONFIG to set the config"
-		exit 0
+			echo "Use CONFIG to set the config"
+			exit 0
 	    fi
 	    
 	    PHYDEV=`get_phy_dev $DEVICE`
 	    
 	    if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
-		. $DIR/../../nodes/etc/wifi/$CONFIG
+			. $DIR/../../nodes/etc/wifi/$CONFIG
 	    else
-		. $CONFIG
+			. $CONFIG
 	    fi
 	    
 	    echo "$WLANCONFIG $DEVICE create wlandev $PHYDEV wlanmode $MODE"
@@ -92,11 +92,13 @@ case "$1" in
 	    PHYDEV=`get_phy_dev $DEVICE`
 	    
 	    if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
-		. $DIR/../../nodes/etc/wifi/$CONFIG
+			. $DIR/../../nodes/etc/wifi/$CONFIG
 	    else
-		. $CONFIG
+			. $CONFIG
 	    fi
 
+		. $DIR/../../nodes/etc/wifi/default
+		
 	    echo "$IWCONFIG $DEVICE channel $CHANNEL"
 	    ${IWCONFIG} $DEVICE channel $CHANNEL
 
@@ -104,10 +106,10 @@ case "$1" in
 	    ${IWCONFIG} $DEVICE txpower $POWER
 
 	    if [ ! "x$RATE" = "x" ]; then
-		if [ $RATE -gt 0 ]; then
-		    echo "$IWCONFIG $DEVICE rate $RATE"
-		    ${IWCONFIG} $DEVICE rate $RATE
-		fi
+			if [ $RATE -gt 0 ]; then
+		    	echo "$IWCONFIG $DEVICE rate $RATE"
+		    	${IWCONFIG} $DEVICE rate $RATE
+			fi
 	    fi
 
 	    echo "echo \"$DIVERSITY\" > /proc/sys/dev/$PHYDEV/diversity"
@@ -132,24 +134,31 @@ case "$1" in
 	    echo "1" > /proc/sys/net/$DEVICE/monitor_phy_errors
 	    
 	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ]; then
-		if [ ! "x$SSID" = "x" ]; then
-		    sleep 1
-		    ${IWCONFIG} $DEVICE essid $SSID 
-		fi
+			if [ ! "x$SSID" = "x" ]; then
+		    	sleep 1
+		    	${IWCONFIG} $DEVICE essid $SSID 
+			fi
 	    fi
 	    
 	    sleep 1
 	    
-	    echo "$IWPRIV $DEVICE macclone 1"
-	    ${IWPRIV} $DEVICE macclone 1
-	    
-	    echo "$IWPRIV $DEVICE channelswitch 1"
-	    ${IWPRIV} $DEVICE channelswitch 1
-	    
-#	    echo "sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA"
-#	    sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA
-			
-	    
+	    if [ "x$MACCLONE" = "x" ]; then
+			MACCLONE=$DEFAULT_MACCLONE
+	    fi
+	    echo "$IWPRIV $DEVICE macclone $MACCLONE"
+	    ${IWPRIV} $DEVICE macclone $MACCLONE
+
+	    if [ "x$CHANNELSWITCH" = "x" ]; then
+			CHANNELSWITCH=$DEFAULT_CHANNELSWITCH
+	    fi
+	    echo "$IWPRIV $DEVICE channelswitch $CHANNELSWITCH"
+	    ${IWPRIV} $DEVICE channelswitch $CHANNELSWITCH
+
+	    if [ "x$DISABLECCA" = "x" ]; then
+			DISABLECCA=$DEFAULT_DISABLECCA
+	    fi	    
+	    echo "sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA"
+	    sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA
 	;;
     "start")
 	    if [ "x$CONFIG" = "x" ]; then
