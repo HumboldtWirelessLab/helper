@@ -1,0 +1,4 @@
+#NODE		DEVICE	MODULSDIR				MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	LOGFILE			APP	APPLOGFILE
+sk110		ath0	BASEDIR/nodes/lib/modules/i586-094	-		monitor.b.channel6	-		-		LOGDIR/reset_0.log	-	-
+#sk111		ath0	BASEDIR/nodes/lib/modules/i586-094	-		monitor.b.channel6	-		-		LOGDIR/reset_1.log	-	-
+#sk112		ath0	BASEDIR/nodes/lib/modules/i586-094	-		monitor.b.channel6	-		-		LOGDIR/reset_2.log	-	-

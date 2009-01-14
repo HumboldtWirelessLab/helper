@@ -255,6 +255,10 @@ case "$1" in
     		( cd $DIR/$REVISIONDIR; make KERNELPATH=$KERNELDIR  CROSS_COMPILE=$CROSS_COMPILE; )
 	    fi
 	    
+	    if [ ! -e $MODULSDIR ]; then
+		mkdir $MODULSDIR
+	    fi
+	    
 	    ( cd $DIR/$REVISIONDIR; find . -name "*.ko" -print0 | xargs -0 cp --target=$MODULSDIR );
 	    
 	else
@@ -295,13 +299,14 @@ exit 0
 #help 
 #MODULSDIR=/home/sombrutz/lab/helper/nodes/lib/modules/i586 REVISION=0.9.1 KERNELDIR=/home/sombrutz/develop/software/linux-2.6.19.2/linux/ ./madwifi_svn.sh installrev
 
-
 #svnversion ubi		madwifi-dfs-r3319-20080201
 #svnversion 0.9.1	release-0.9.1
 #svnversion brn-0.9.1	brn-madwifi-0.9.1
 #svnversion brn-0.9.3	brn-madwifi-0.9.3
 #svnversion mad-0.9.1	madwifi-0.9.1
 #svnversion mad-0.9.2.1	madwifi-0.9.2.1
+#svnversion mad-0.9.3	madwifi-0.9.3
+#svnversion mad-0.9.4	madwifi-0.9.4
 #svnversion k-07	kamikaze-7.07
 #svnversion k-trunk	kamikaze-trunk
 #svnversion b105	madwifi-branch/madwifi-hal-0.10.5.6
