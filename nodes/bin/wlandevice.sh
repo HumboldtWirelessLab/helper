@@ -73,7 +73,12 @@ case "$1" in
 	    else
 			. $CONFIG
 	    fi
+
+		. $DIR/../../nodes/etc/wifi/default
 	    
+	    if [ "x$MODE" = "x" ]; then
+			MODE=$DEFAULT_MODE
+	    fi
 	    echo "$WLANCONFIG $DEVICE create wlandev $PHYDEV wlanmode $MODE"
 	    ${WLANCONFIG} $DEVICE create wlandev $PHYDEV wlanmode $MODE
 	;;
@@ -99,9 +104,15 @@ case "$1" in
 
 		. $DIR/../../nodes/etc/wifi/default
 		
+	    if [ "x$CHANNEL" = "x" ]; then
+			CHANNEL=$DEFAULT_CHANNEL
+	    fi
 	    echo "$IWCONFIG $DEVICE channel $CHANNEL"
 	    ${IWCONFIG} $DEVICE channel $CHANNEL
 
+	    if [ "x$POWER" = "x" ]; then
+			POWER=$DEFAULT_POWER
+	    fi
 	    echo "$IWCONFIG $DEVICE txpower $POWER"
 	    ${IWCONFIG} $DEVICE txpower $POWER
 
@@ -112,27 +123,51 @@ case "$1" in
 			fi
 	    fi
 
+	    if [ "x$DIVERSITY" = "x" ]; then
+			DIVERSITY=$DEFAULT_DIVERSITY
+	    fi
 	    echo "echo \"$DIVERSITY\" > /proc/sys/dev/$PHYDEV/diversity"
 	    echo "$DIVERSITY" > /proc/sys/dev/$PHYDEV/diversity
 
+	    if [ "x$TXANTENNA" = "x" ]; then
+			TXANTENNA=$DEFAULT_TXANTENNA
+	    fi
 	    echo "sysctl -w dev.$PHYDEV.txantenna=$TXANTENNA"
 	    sysctl -w dev.$PHYDEV.txantenna=$TXANTENNA
 
+	    if [ "x$RXANTENNA" = "x" ]; then
+			RXANTENNA=$DEFAULT_RXANTENNA
+	    fi
 	    echo "sysctl -w dev.$PHYDEV.rxantenna=$RXANTENNA"
 	    sysctl -w dev.$PHYDEV.rxantenna=$RXANTENNA
 
+	    if [ "x$WIFITYPE" = "x" ]; then
+			WIFITYPE=$DEFAULT_WIFITYPE
+	    fi
 	    echo "echo $WIFITYPE > /proc/sys/net/$DEVICE/dev_type"
 	    echo $WIFITYPE > /proc/sys/net/$DEVICE/dev_type
 
+	    if [ "x$INTMIT" = "x" ]; then
+			INTMIT=$DEFAULT_INTMIT
+	    fi
 	    echo "sysctl -w dev.$PHYDEV.intmit=$INTMIT"
 	    sysctl -w dev.$PHYDEV.intmit=$INTMIT
 
-	    echo "echo  \"1\" > /proc/sys/net/$DEVICE/monitor_crc_errors"
-	    echo "1" > /proc/sys/net/$DEVICE/monitor_crc_errors
+	    if [ "x$CRCERROR" = "x" ]; then
+			CRCERROR=$DEFAULT_CRCERROR
+	    fi
+	    echo "echo  \"$CRCERROR\" > /proc/sys/net/$DEVICE/monitor_crc_errors"
+	    echo "$CRCERROR" > /proc/sys/net/$DEVICE/monitor_crc_errors
 
-	    echo "echo \"1\" > /proc/sys/net/$DEVICE/monitor_phy_errors"
-	    echo "1" > /proc/sys/net/$DEVICE/monitor_phy_errors
-	    
+	    if [ "x$PHYERROR" = "x" ]; then
+			PHYERROR=$DEFAULT_PHYERROR
+	    fi
+	    echo "echo \"$PHYERROR\" > /proc/sys/net/$DEVICE/monitor_phy_errors"
+	    echo "$PHYERROR" > /proc/sys/net/$DEVICE/monitor_phy_errors
+
+		if [ "x$MODE" = "x" ]; then
+			MODE=$DEFAULT_MODE
+		fi
 	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ]; then
 			if [ ! "x$SSID" = "x" ]; then
 		    	sleep 1
