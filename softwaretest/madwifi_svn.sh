@@ -250,9 +250,9 @@ case "$1" in
 	    ( cd $DIR/$REVISIONDIR; make clean )
 	    
     	    if [ "x$CROSS_COMPILE" = "x" ]; then
-		( cd $DIR/$REVISIONDIR; make KERNELPATH=$KERNELDIR )
+		( cd $DIR/$REVISIONDIR; make KERNELPATH=$KERNELDIR $EXTRAOPTION)
 	    else
-    		( cd $DIR/$REVISIONDIR; make KERNELPATH=$KERNELDIR  CROSS_COMPILE=$CROSS_COMPILE; )
+    		( cd $DIR/$REVISIONDIR; make KERNELPATH=$KERNELDIR  CROSS_COMPILE=$CROSS_COMPILE $EXTRAOPTION; )
 	    fi
 	    
 	    if [ ! -e $MODULSDIR ]; then
@@ -315,4 +315,5 @@ exit 0
 #svnversion t092	madwifi-tags/release-0.9.2
 #svnversion t091	madwifi-tags/release-0.9.1
 #svnversion mad-brn	madwifi-brn
+#svnversion brn-test	madwifi-brn-test
 #arch mips mipsel-linux-
