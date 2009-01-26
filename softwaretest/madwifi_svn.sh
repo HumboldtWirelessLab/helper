@@ -315,5 +315,7 @@ exit 0
 #svnversion t092	madwifi-tags/release-0.9.2
 #svnversion t091	madwifi-tags/release-0.9.1
 #svnversion mad-brn	madwifi-brn
+#svnversion free-brn	madwifi-free-brn
 #svnversion brn-test	madwifi-brn-test
+#svnversion mad-free	madwifi-free
 #arch mips mipsel-linux-
