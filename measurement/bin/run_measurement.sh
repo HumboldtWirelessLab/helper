@@ -42,6 +42,15 @@ fi
 
 FINALRESULTDIR=`echo $RESULTDIR | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 
+trap abort_measurement 1 2 3 6
+
+abort_measurement() {
+	
+	killall run_single_measurement.sh
+	
+	exit 0;
+}
+
 if [ "x$2" = "x" ]; then
     echo "RESULTDIR is target. no Subdir."
 else
