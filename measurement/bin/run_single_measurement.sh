@@ -76,16 +76,21 @@ abort_measurement() {
 			    ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill $TAILPID"
 		else
 		    if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-			NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
-			ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill click-$NODEARCH"
+				NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
+				CLICKPID=`ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "pidof click-$NODEARCH"`
+				if [ "x$CLICKPID" != "x" ]; then
+					for cpid in $CLICKPID; do
+						ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill $cpid"
+					done
+				fi
 		    fi
 		fi
 		
 		APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
 		
-                if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
+        if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
 			ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "$APPLICATION  stop"
-                fi
+        fi
 
 	    done
 	done
