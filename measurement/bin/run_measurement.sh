@@ -46,6 +46,8 @@ trap abort_measurement 1 2 3 6
 
 abort_measurement() {
 	
+	echo "Master abort"
+	
 	killall run_single_measurement.sh
 	
 	exit 0;
