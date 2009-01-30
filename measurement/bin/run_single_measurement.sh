@@ -53,6 +53,58 @@ get_node_status()  {
 }
 
 #########################################################
+############ Clean up after abort #######################
+#########################################################
+
+trap abort_measurement 1 2 3 6
+
+abort_measurement() {
+	
+	echo "Abort Measurement"
+	
+    if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
+
+	for node in $NODELIST; do
+	    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+	
+	    for nodedevice in $NODEDEVICELIST; do
+		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
+		CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
+		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
+		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
+			    TAILPID=`ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "pidof cat"`
+			    ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill $TAILPID"
+		else
+		    if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
+			NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
+			ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill click-$NODEARCH"
+		    fi
+		fi
+		
+		APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
+		
+                if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
+			ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "$APPLICATION  stop"
+                fi
+
+	    done
+	done
+    fi
+
+    screen -S $SCREENNAME -X quit
+
+    if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
+        check_nodes
+    fi
+    
+    echo "abort" 1>&$STATUSFD
+
+    echo "Finished measurement. Status: abort."
+
+    exit 0
+}
+
+#########################################################
 ###### Check RUNMODE. What do you want to do ? ##########
 #########################################################
 
@@ -334,7 +386,7 @@ if [ $RUNMODENUM -le 5 ]; then
 			SCREENT="$node\_$nodedevice\_app"	
 			screen -S $SCREENNAME -X screen -t $SCREENT
    			sleep 0.1
-			screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$APPLICATION  > $APPLOGFILE 2>&1\""
+			screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$APPLICATION  start > $APPLOGFILE 2>&1\""
 		fi
 	done
     done
@@ -410,7 +462,19 @@ if [ $RUNMODENUM -le 5 ]; then
 		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
 			    TAILPID=`ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "pidof cat"`
 			    ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill $TAILPID"
+		else
+		    if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
+			NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
+			ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill click-$NODEARCH"
+		    fi
 		fi
+		
+		APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
+		
+                if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
+			ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "$APPLICATION  stop"
+                fi
+
 	    done
 	done
     fi
