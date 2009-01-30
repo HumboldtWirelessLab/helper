@@ -60,7 +60,7 @@ trap abort_measurement 1 2 3 6
 
 abort_measurement() {
 	
-	echo "Abort Measurement"
+    echo "Abort Measurement" >&6
 	
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
