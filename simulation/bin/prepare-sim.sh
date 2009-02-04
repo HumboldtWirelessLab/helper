@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 dir=$(dirname "$0")
 pwd=$(pwd)
@@ -26,7 +26,7 @@ BASEDIR=$DIR/../../
 
 case "$1" in
 	"help")
-		echo "Use $0 run"
+		echo "Use $0 prepare dis-file"
 		;;
 	"prepare")
 		SIMDIS=$2
@@ -40,6 +40,7 @@ case "$1" in
 		while read line; do
 		    ISCOMMENT=`echo $line | grep "#" | wc -l`
 		    if [ $ISCOMMENT -eq 0 ]; then
+		    
 			read CNODE CDEV CMODDIR CMODOPT WIFICONFIG CCMODDIR CLICK CCLOG CAPP CAPPL <<< $line
 			
 			if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
