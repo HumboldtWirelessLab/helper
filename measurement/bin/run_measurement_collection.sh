@@ -100,7 +100,7 @@ case "$1" in
 	for acdir in $ALLDIRS; do
 	  echo $acdir
 	  NOW=`pwd`
-	  ( cd $ACDIR; RUNMODE=REBOOT $DIR/run_measurement.sh $4 1; cd $NOW)
+	  ( cd $acdir; RUNMODE=REBOOT $DIR/run_measurement.sh $4 1; cd $NOW)
 	done
 	
 	
