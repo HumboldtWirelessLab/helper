@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 dir=$(dirname "$0")
 pwd=$(pwd)
@@ -25,11 +25,35 @@ if [ "x$1" = "xhelp" ] || [ "x$1" = "x" ]; then
 fi 
 
 DISFILE=$1
-RUNMODE=REBOOT
 
+if [ "x$FIRSTRUNMODE" = "x" ]; then
+  RUNMODE=REBOOT
+else
+  RUNMODE=$FIRSTRUNMODE
+fi
+
+if [ "x$MULTIMODE" = "x" ]; then
+  MULTIMODE="ASK"
+fi
+
+if [ "x$SIMULATION" = "x" ]; then
+  SIMULATION="0"
+fi
+
+RUNNUMBER=0
 key=y
 
+#echo "RUNS $RUNS"
+#echo "$PWD"
+#echo "$DISFILE"
+
 while [ "x$key" = "xy" ]; do
+      RUNNUMBER=`expr $RUNNUMBER + 1`
+
+      if [ "x$MULTIWAIT" = "x1" ]; then
+        echo "Press Key to run $RUNNUMBER measurement"
+        read -n 1 trash
+      fi
 
       HIGHESTDIR=`ls | sort -un | egrep "^[0-9]*$" | tail -n 1`
       if [ "x$HIGHESTDIR" = "x" ]; then
@@ -38,14 +62,27 @@ while [ "x$key" = "xy" ]; do
 
       NEXT=`expr $HIGHESTDIR + 1`
       
-      RUNMODE=$RUNMODE $DIR/run_measurement $DISFILE $NEXT
-      
-      if [ "$RUNMODE" = "REBOOT" ]; then
-           RUNMODE=CLICK
+      if [ $SIMULATION -eq 0 ]; then
+        RUNMODE=$RUNMODE $DIR/run_measurement $DISFILE $NEXT
+      else
+      	$DIR/../../simulation/bin/ns2-sim.sh run $DISFILE $NEXT
       fi
-
-      echo -n "Another Measurement (y/n) ? "
-      read key
+      
+     
+      if [ "x$MULTIRUNMODE" = "x" ]; then
+        RUNMODE=CLICK
+      else
+        RUNMODE=$MULTIRUNMODE
+      fi
+      
+      if [ "$MULTIMODE" = "LOOP" ]; then
+        if [ $RUNNUMBER -eq $RUNS ]; then
+          key=n
+        fi
+      else   
+        echo -n "Another Measurement (y/n) ? "
+        read key
+      fi
 
 done
 

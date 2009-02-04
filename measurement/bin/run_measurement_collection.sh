@@ -53,7 +53,11 @@ recursive() {
       done
       
       for acfile in  `ls $MDIR`; do
-        cat $MDIR/$acfile | sed $SEDARG > $MDIR.$CONFIGS/$acfile
+        if [ "$acfile" = "$PARAMSFILE" ]; then
+          cp $MDIR/$acfile $MDIR.$CONFIGS/
+        else
+          cat $MDIR/$acfile | sed $SEDARG > $MDIR.$CONFIGS/$acfile
+        fi
       done
       
       SEDARG=""
@@ -74,34 +78,67 @@ case "$1" in
 	echo "Use $0 collectionfile"
 	echo "Skript to run measurement with different parameters (e.g. TXPOWER, CHANNEL,...). The collectionfile include the parameter and the name of the templatefiles (configfile with Vars as parameters)."
 	;;
-    "run")
-	echo "Start Collection"
-	MDIR=$3
-	VARS=`cat $2 | sed -e "s#=# #g" | awk '{print $1}'`
-	
-	VARFIELD=($VARS)
-	
-	. $2
-	
-	i=0
-	for v in $VARS; do
-	    VALUEFIELD[$i]=${!v}
-#	    echo "${VALUEFIELD[$i]}"
-	    let "i=$i + 1"
-	done
-	
-	ALLDIRS=""
-	
-	INDEX=`expr ${#VARFIELD[@]} - 1`
-	recursive $INDEX
-	
-	echo "$CONFIGS configs created"
-	
-	for acdir in $ALLDIRS; do
-	  echo $acdir
-	  NOW=`pwd`
-	  ( cd $acdir; RUNMODE=REBOOT $DIR/run_measurement.sh $4 1; cd $NOW)
-	done
+    "run"|"sim")
+    
+        if [ "$1" = "sim" ]; then
+          SIMULATION=1
+        else
+          SIMULATION=0
+        fi
+        
+        if [ "x$FIRSTRUNMODE" = "x" ]; then
+          FIRSTRUNMODE="REBOOT"
+        fi
+         
+		MDIR=`dirname $2`
+		. $2
+		
+		if [ "x$MDIR" = "x." ]; then
+		  MDIR=$(pwd)
+		fi
+		
+		if [ "x$PARAMSFILE" = "x" ]; then
+		  echo "Missing PARAMSFILE in $2"
+		  exit 0
+		fi
+		
+		if [ ! -f $MDIR/$PARAMSFILE ]; then
+		  echo "PARAMSFILE $PARAMSFILE doesn't exists"
+		  exit 0
+		fi
+					
+		VARS=`cat $MDIR/$PARAMSFILE | sed -e "s#=# #g" | awk '{print $1}'`
+		
+		VARFIELD=($VARS)
+		
+		. $MDIR/$PARAMSFILE
+		
+		i=0
+		for v in $VARS; do
+			VALUEFIELD[$i]=${!v}
+			let "i=$i + 1"
+		done
+		
+		ALLDIRS=""
+		
+		INDEX=`expr ${#VARFIELD[@]} - 1`
+		recursive $INDEX
+		
+		echo "Create $CONFIGS configs !"
+		
+		CURRUN=1
+		
+     	for acdir in $ALLDIRS; do
+     	
+     	  if [ "x$PARAMSWAIT" = "x1" ]; then
+     	    echo "Press any key to run $CURRUN. params"
+     	    read -n 1 trash
+     	  fi
+     	  echo "Run $CURRUN. params"
+		  NOW=`pwd`
+		  ( cd $acdir; SIMULATION=$SIMULATION FIRSTRUNMODE=$FIRSTRUNMODE MULTIRUNMODE=$MULTIRUNMODE MULTIMODE="LOOP" RUNS=$MULTIREPEAT MULTIWAIT=$MULTIWAIT $DIR/run_multiple_measurments.sh $2; cd $NOW)
+		  let "CURRUN=$CURRUN + 1"
+		done
 	
 	
 	;;

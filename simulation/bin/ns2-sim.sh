@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 dir=$(dirname "$0")
 pwd=$(pwd)
@@ -40,7 +40,7 @@ esac
 
 if [ -f $2 ]; then
     DISCRIPTIONFILE=$2
-    .  $DISCRIPTIONFILE
+    . $DISCRIPTIONFILE
 else
     echo "$2 : No such file !"
     exit 0;
