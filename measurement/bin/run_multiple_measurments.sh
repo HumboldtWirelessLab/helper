@@ -63,7 +63,7 @@ while [ "x$key" = "xy" ]; do
       NEXT=`expr $HIGHESTDIR + 1`
       
       if [ $SIMULATION -eq 0 ]; then
-        RUNMODE=$RUNMODE $DIR/run_measurement $DISFILE $NEXT
+        RUNMODE=$RUNMODE $DIR/run_measurement.sh $DISFILE $NEXT
       else
       	$DIR/../../simulation/bin/ns2-sim.sh run $DISFILE $NEXT
       fi
