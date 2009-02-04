@@ -26,7 +26,8 @@ fi
 CONFIGS=0
 
 recursive() {
-  local VALUES=(${VALUEFIELD[$1]})
+  local VALUES=""
+  VALUES=(${VALUEFIELD[$1]})
   local CURINDEX=0;
   local NEXT=`expr $1 - 1`
   local SEDARG=""
@@ -52,7 +53,6 @@ recursive() {
       done
       
       for acfile in  `ls $MDIR`; do
-        local i=0;
         cat $MDIR/$acfile | sed $SEDARG > $MDIR.$CONFIGS/$acfile
       done
       
@@ -87,7 +87,7 @@ case "$1" in
 	for v in $VARS; do
 	    VALUEFIELD[$i]=${!v}
 #	    echo "${VALUEFIELD[$i]}"
-		let "i=$i + 1"
+	    let "i=$i + 1"
 	done
 	
 	ALLDIRS=""
