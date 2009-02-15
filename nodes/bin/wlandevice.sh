@@ -23,6 +23,10 @@ get_phy_dev() {
     echo "wifi$NUMBER"
 }
 
+get_arch() {
+    uname -m
+}
+
 if [ -e /usr/sbin/iwconfig ]; then
     IWCONFIG=/usr/sbin/iwconfig
 else
@@ -89,12 +93,14 @@ case "$1" in
 	    ${WLANCONFIG} $DEVICE destroy
 	;;
     "config")
+	    echo "Start device config"
 	    if [ "x$CONFIG" = "x" ]; then
 		echo "Use CONFIG to set the config"
 		exit 0
 	    fi
 	    
 	    PHYDEV=`get_phy_dev $DEVICE`
+	    ARCH=`get_arch`
 	    
 	    if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
 			. $DIR/../../nodes/etc/wifi/$CONFIG
@@ -102,8 +108,17 @@ case "$1" in
 			. $CONFIG
 	    fi
 
-		. $DIR/../../nodes/etc/wifi/default
+	    . $DIR/../../nodes/etc/wifi/default
 		
+	    if [ "x$ARCH" = "xmips" ]; then
+		sleep 5
+		${IWCONFIG} $DEVICE txpower $POWER
+	        sleep 5
+		echo "$IFCONFIG $DEVICE up"
+        	${IFCONFIG} $DEVICE up
+		sleep 5
+	    fi
+
 	    if [ "x$CHANNEL" = "x" ]; then
 			CHANNEL=$DEFAULT_CHANNEL
 	    fi
