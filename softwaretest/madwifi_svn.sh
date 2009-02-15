@@ -318,4 +318,5 @@ exit 0
 #svnversion free-brn	madwifi-free-brn
 #svnversion brn-test	madwifi-brn-test
 #svnversion mad-free	madwifi-free
+#svnversion mad-mips	madwifi-mips
 #arch mips mipsel-linux-
