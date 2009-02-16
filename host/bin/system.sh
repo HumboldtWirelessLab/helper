@@ -50,6 +50,23 @@ case "$1" in
 		    done
 		done
 		;;	    
+	"waitfornodesandssh")
+		for node in $NODELIST; do
+		
+		    AVAILABLE=`node_available $node`
+		    while [ $AVAILABLE = "n" ]; do
+			sleep 5;
+			AVAILABLE=`node_available $node`
+		    done
+
+		    ARCH=`run_on_node $node "uname -m" "/" $DIR/../etc/keys/id_dsa 2> /dev/null`
+		    while [ "x$ARCH" = "x" ]; do
+ 			sleep 10;
+			ARCH=`run_on_node $node "uname -m" "/" $DIR/../etc/keys/id_dsa 2> /dev/null`
+		    done
+
+		done
+		;;	    
 	*)
 		$0 help
 		;;

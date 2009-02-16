@@ -109,14 +109,18 @@ case "$1" in
 	    fi
 
 	    . $DIR/../../nodes/etc/wifi/default
-		
-	    if [ "x$ARCH" = "xmips" ]; then
-		sleep 5
-		${IWCONFIG} $DEVICE txpower $POWER
-	        sleep 5
-		echo "$IFCONFIG $DEVICE up"
-        	${IFCONFIG} $DEVICE up
-		sleep 5
+
+
+	    if [ "x$MODE" = "x" ]; then
+	    		MODE=$DEFAULT_MODE
+	    fi
+	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ]; then
+			if [ ! "x$SSID" = "x" ]; then
+		    	    sleep 1
+		    	    echo "$IWCONFIG $DEVICE essid $SSID" 
+		    	    ${IWCONFIG} $DEVICE essid $SSID 
+			    sleep 1
+			fi
 	    fi
 
 	    if [ "x$CHANNEL" = "x" ]; then
@@ -179,18 +183,6 @@ case "$1" in
 	    fi
 	    echo "echo \"$PHYERROR\" > /proc/sys/net/$DEVICE/monitor_phy_errors"
 	    echo "$PHYERROR" > /proc/sys/net/$DEVICE/monitor_phy_errors
-
-		if [ "x$MODE" = "x" ]; then
-			MODE=$DEFAULT_MODE
-		fi
-	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ]; then
-			if [ ! "x$SSID" = "x" ]; then
-		    	sleep 1
-		    	${IWCONFIG} $DEVICE essid $SSID 
-			fi
-	    fi
-	    
-	    sleep 1
 	    
 	    if [ "x$MACCLONE" = "x" ]; then
 			MACCLONE=$DEFAULT_MACCLONE
@@ -209,13 +201,15 @@ case "$1" in
 	    fi	    
 	    echo "sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA"
 	    sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA
+
+	    echo "Finished device config"
 	;;
     "start")
 	    if [ "x$CONFIG" = "x" ]; then
 		echo "Use CONFIG to set the config"
 		exit 0
 	    fi
-	    
+
 	    echo "$IFCONFIG $DEVICE up"
 	    ${IFCONFIG} $DEVICE up
 	;;	    
