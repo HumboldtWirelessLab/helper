@@ -21,6 +21,7 @@ esac
 . $DIR/../../host/bin/functions.sh
 
 NODELIST=`cat $CONFIGFILE | grep -v "#" | awk '{print $1}' | sort -u`
+RUN_CLICK_APPLICATION=0
 
 ##############################################
 ###### Functions to check the nodes ##########
