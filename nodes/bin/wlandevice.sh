@@ -114,13 +114,21 @@ case "$1" in
 	    if [ "x$MODE" = "x" ]; then
 	    		MODE=$DEFAULT_MODE
 	    fi
-	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ]; then
+	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ] || [ "$MODE" = "ahdemo" ]; then
 			if [ ! "x$SSID" = "x" ]; then
 		    	    sleep 1
 		    	    echo "$IWCONFIG $DEVICE essid $SSID" 
 		    	    ${IWCONFIG} $DEVICE essid $SSID 
 			    sleep 1
 			fi
+	    fi
+	    
+	    if [ "$MODE" = "ahdemo" ]; then
+		if [ "x$BSSID" = "x" ]; then
+			BSSID=$DEFAULT_BSSID
+		fi
+		echo "$IWCONFIG $DEVICE ap $BSSID"
+		${IWCONFIG} $DEVICE ap $BSSID
 	    fi
 
 	    if [ "x$CHANNEL" = "x" ]; then
@@ -160,48 +168,54 @@ case "$1" in
 	    echo "sysctl -w dev.$PHYDEV.rxantenna=$RXANTENNA"
 	    sysctl -w dev.$PHYDEV.rxantenna=$RXANTENNA
 
-	    if [ "x$WIFITYPE" = "x" ]; then
-			WIFITYPE=$DEFAULT_WIFITYPE
-	    fi
-	    echo "echo $WIFITYPE > /proc/sys/net/$DEVICE/dev_type"
-	    echo $WIFITYPE > /proc/sys/net/$DEVICE/dev_type
-
-	    if [ "x$INTMIT" = "x" ]; then
+		if [ "x$INTMIT" = "x" ]; then
 			INTMIT=$DEFAULT_INTMIT
-	    fi
-	    echo "sysctl -w dev.$PHYDEV.intmit=$INTMIT"
-	    sysctl -w dev.$PHYDEV.intmit=$INTMIT
+		fi
+		echo "sysctl -w dev.$PHYDEV.intmit=$INTMIT"
+		sysctl -w dev.$PHYDEV.intmit=$INTMIT
 
-	    if [ "x$CRCERROR" = "x" ]; then
-			CRCERROR=$DEFAULT_CRCERROR
-	    fi
-	    echo "echo  \"$CRCERROR\" > /proc/sys/net/$DEVICE/monitor_crc_errors"
-	    echo "$CRCERROR" > /proc/sys/net/$DEVICE/monitor_crc_errors
 
-	    if [ "x$PHYERROR" = "x" ]; then
-			PHYERROR=$DEFAULT_PHYERROR
-	    fi
-	    echo "echo \"$PHYERROR\" > /proc/sys/net/$DEVICE/monitor_phy_errors"
-	    echo "$PHYERROR" > /proc/sys/net/$DEVICE/monitor_phy_errors
-	    
-	    if [ "x$MACCLONE" = "x" ]; then
-			MACCLONE=$DEFAULT_MACCLONE
-	    fi
-	    echo "$IWPRIV $DEVICE macclone $MACCLONE"
-	    ${IWPRIV} $DEVICE macclone $MACCLONE
+		if [ "$MODE" = "monitor" ]; then
+			
+			if [ "x$WIFITYPE" = "x" ]; then
+				WIFITYPE=$DEFAULT_WIFITYPE
+			fi
+			echo "echo $WIFITYPE > /proc/sys/net/$DEVICE/dev_type"
+			echo $WIFITYPE > /proc/sys/net/$DEVICE/dev_type
 
-	    if [ "x$CHANNELSWITCH" = "x" ]; then
-			CHANNELSWITCH=$DEFAULT_CHANNELSWITCH
-	    fi
-	    echo "$IWPRIV $DEVICE channelswitch $CHANNELSWITCH"
-	    ${IWPRIV} $DEVICE channelswitch $CHANNELSWITCH
+			if [ "x$CRCERROR" = "x" ]; then
+				CRCERROR=$DEFAULT_CRCERROR
+			fi
+			echo "echo  \"$CRCERROR\" > /proc/sys/net/$DEVICE/monitor_crc_errors"
+			echo "$CRCERROR" > /proc/sys/net/$DEVICE/monitor_crc_errors
 
-	    if [ "x$DISABLECCA" = "x" ]; then
+			if [ "x$PHYERROR" = "x" ]; then
+				PHYERROR=$DEFAULT_PHYERROR
+			fi
+			echo "echo \"$PHYERROR\" > /proc/sys/net/$DEVICE/monitor_phy_errors"
+			echo "$PHYERROR" > /proc/sys/net/$DEVICE/monitor_phy_errors
+			
+			if [ "x$MACCLONE" = "x" ]; then
+				MACCLONE=$DEFAULT_MACCLONE
+			fi
+			echo "$IWPRIV $DEVICE macclone $MACCLONE"
+			${IWPRIV} $DEVICE macclone $MACCLONE
+
+			if [ "x$CHANNELSWITCH" = "x" ]; then
+				CHANNELSWITCH=$DEFAULT_CHANNELSWITCH
+			fi
+			echo "$IWPRIV $DEVICE channelswitch $CHANNELSWITCH"
+			${IWPRIV} $DEVICE channelswitch $CHANNELSWITCH
+
+		fi
+		
+		if [ "x$DISABLECCA" = "x" ]; then
 			DISABLECCA=$DEFAULT_DISABLECCA
-	    fi	    
-	    echo "sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA"
-	    sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA
+		fi	    
+		echo "sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA"
+		sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA
 
+		
 	    echo "Finished device config"
 	;;
     "start")
