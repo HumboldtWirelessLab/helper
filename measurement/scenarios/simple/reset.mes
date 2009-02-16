@@ -7,4 +7,4 @@ sk110		ath0	BASEDIR/nodes/lib/modules/i586  		-		adhoc.default		-		-		LOGDIR/res
 sk111		ath0	BASEDIR/nodes/lib/modules/i586  		-		adhoc.default		-		-		LOGDIR/reset_111.log	-	-
 sk112		ath0	BASEDIR/nodes/lib/modules/i586  		-		adhoc.default		-		-		LOGDIR/reset_112.log	-	-
 wgt54		ath0	BASEDIR/nodes/lib/modules/mips-test  		-		adhoc.default		-		-		LOGDIR/reset_54.log	-	-
-wgt55		ath0	BASEDIR/nodes/lib/modules/mips-test  		-		adhoc.deafult		-		-		LOGDIR/reset_55.log	-	-
+wgt55		ath0	BASEDIR/nodes/lib/modules/mips-test  		-		adhoc.default		-		-		LOGDIR/reset_55.log	-	-
