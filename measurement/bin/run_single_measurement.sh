@@ -168,9 +168,8 @@ if [ $RUNMODENUM -le 1 ]; then
     NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
      
     echo "wait for all nodes"
-    sleep 20
-    NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodes
-    sleep 20
+    sleep 30
+    NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodesandssh
 fi
 
 ###################################
