@@ -18,6 +18,7 @@ elementclass AccessPoint {
           );
 
     mgt_cl[0]
+    -> Print("Assoc Request")
     -> BRN2AssocResponder(DEBUG 0, DEVICE $wdev, ASSOCLIST assoclist, WIRELESS_INFO winfo, RT rates )
     -> Print("assoc")
     -> [0]output;
@@ -26,6 +27,7 @@ elementclass AccessPoint {
     -> Discard;
 
     mgt_cl[2]
+    -> Print("Probe request")
     -> bsrc :: BRN2BeaconSource(WIRELESS_INFO winfo, RT rates)
     -> Print("Beacon")
     -> [0]output;
@@ -61,13 +63,13 @@ lt::Brn2LinkTable(NODEIDENTITIY id, ROUTECACHE rc, STALE 500,  SIMULATE false,
 
 ap :: AccessPoint( INTERFACE NODEDEVICE, WDEV wireless, SSID "brn", CHANNEL 11, BEACON_INTERVAL 100, LT lt);
 
-FromDevice(NODEDEVICE)
-  -> WIFIDECAP
+FROMDEVICE
   -> FilterPhyErr()
   -> filter :: FilterTX();
 
 filter[0]
   -> WifiDupeFilter()
+  -> Print("in")
   -> mgm_clf :: Classifier(0/00%0f, -);				// management frames
 
 mgm_clf[0] 							//handle mgmt frames
@@ -78,7 +80,7 @@ mgm_clf[0] 							//handle mgmt frames
 
 mgm_clf[1]
 -> Discard;
- Idle();
+ Idle()
   -> WifiDecap()
   -> clf_bcast :: Classifier(0/ffffffffffff, -)
   -> arp_clf :: Classifier (12/0806, - )
@@ -94,8 +96,8 @@ mgm_clf[1]
   arp :: ARPTable();
 
   clf_bcast[1]
-  -> Idle;
-  Discard
+  -> Discard;
+  Idle
     -> Classifier(12/0800)
     -> StoreIPEthernet(arp)
     -> EtherDecap()
@@ -110,8 +112,7 @@ mgm_clf[1]
 //    -> wlan_out_queue;
 
 wlan_out_queue
-  -> WIFIENCAP
-  -> ToDevice(NODEDEVICE);
+  -> TODEVICE;
 
 Script(
 //    wait 25,
