@@ -3,11 +3,12 @@ elementclass AccessPoint {
 
     BRNAddressInfo(ether_address $device:eth);
     winfo :: WirelessInfo(SSID $ssid, BSSID ether_address, CHANNEL $channel, INTERVAL $beacon_interval);
-    rates :: AvailableRates(DEFAULT 2 4 11 12 18 22 108);
+    rates :: AvailableRates(DEFAULT 2 4 11 22);
     bs :: BeaconScanner(RT rates);
     assoclist :: BRN2AssocList(LINKTABLE $lt);
 
     input[0]
+    -> Print("mgt")
     -> mgt_cl :: Classifier(  0/00%f0, //assoc req
                                         0/10%f0, //assoc resp
                                         0/40%f0, //probe req
@@ -43,6 +44,7 @@ elementclass AccessPoint {
     -> Discard;
 
     mgt_cl[6]
+    -> Print("OpenAuth req")
     -> OpenAuthResponder(WIRELESS_INFO winfo)
     -> Print("Auth")
     -> [0]output;
@@ -74,23 +76,20 @@ filter[0]
 
 mgm_clf[0] 							//handle mgmt frames
   -> ap
-  -> beacon_rates :: SetTXRate(RATE 22,TRIES 3)		// ap beacons send at constant bitrate
+  -> beacon_rates :: SetTXRate(RATE 2,TRIES 1)		// ap beacons send at constant bitrate
   -> beacon_power :: SetTXPower( POWER 16)
   -> wlan_out_queue;
 
 mgm_clf[1]
--> Discard;
- Idle()
   -> WifiDecap()
   -> clf_bcast :: Classifier(0/ffffffffffff, -)
   -> arp_clf :: Classifier (12/0806, - )
   -> ARPResponder( 192.168.1.1/24 06:0c:42:0c:74:0e )
   -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
-  -> SetTXRate(RATE 108,TRIES 9)
+  -> SetTXRate(RATE 22,TRIES 9)
   -> SetTXPower( POWER 16 )
-//  -> wlan_out_queue;
--> Discard;
-  
+ -> wlan_out_queue;
+ 
   arp_clf[1] -> Discard;
 
   arp :: ARPTable();
