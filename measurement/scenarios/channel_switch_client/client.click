@@ -163,8 +163,8 @@ Idle
 -> Discard;
  
 Script(
-  wait 5,
+  wait 20,
   read infra_client/isc.wireless_info,
   read infra_client/isc.assoc,
-  wait 10
+  wait 40
 );
