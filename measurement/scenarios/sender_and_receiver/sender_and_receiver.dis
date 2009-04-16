@@ -3,7 +3,7 @@ SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=10
+TIME=30
 
 NODETABLE=sender_and_receiver.mes
 NODEPLACEMENTFILE=placement.default
@@ -16,5 +16,5 @@ EVALUATIONSDIR=WORKDIR
 EVALUATIONSDIRPOSTFIX=_evaluation
 
 GPS=no
-NOTICE=yes
+NOTICE=no
 LOS=no

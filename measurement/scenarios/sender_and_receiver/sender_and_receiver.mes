@@ -15,7 +15,8 @@
 #sk112	ath0		BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel6 	-		receiver.click  LOGDIR/1_rec.log	-	-
 #sk110	ath0		BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel6	-		sender_and_receiver.click  LOGDIR/1_sen.log	-	-
 #sk111	ath0		BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel6 	-		sender_and_receiver.click  LOGDIR/2_sen.log	-	-
-#sk112   ath0            BASEDIR/nodes/lib/modules/i586-ubi      -       monitor.ubi.channel5    -               sender.click     LOGDIR/1_sen.log       -	-
-#sk110   ath0            BASEDIR/nodes/lib/modules/i586-ubi      -       monitor.ubi.channel5    -               receiver.click     LOGDIR/1_rec.log       -	-
-sk111   ath0            BASEDIR/nodes/lib/modules/i586      -       monitor.b.channel5    -               sender.click     LOGDIR/1_sen.log       -	-
-sk110   ath0            BASEDIR/nodes/lib/modules/i586      -       monitor.b.channel5    -               receiver.click     LOGDIR/1_rec.log       -	-
+#sk112  ath0            BASEDIR/nodes/lib/modules/i586-ubi      -       monitor.ubi.channel5    -               sender.click     LOGDIR/1_sen.log       -	-
+#sk110  ath0            BASEDIR/nodes/lib/modules/i586-ubi      -       monitor.ubi.channel5    -               receiver.click   LOGDIR/1_rec.log       -	-
+#sk112  ath0            BASEDIR/nodes/lib/modules/i586      -           monitor.ubi.channel5    -              	sender.click     LOGDIR/1_sen.log       -	-
+#192.168.3.112   ath0            BASEDIR/nodes/lib/modules/i586-test      -       monitor.b.channel6    -        receiver.click   LOGDIR/1_sec.log       -	-
+#sk110   ath0            BASEDIR/nodes/lib/modules/i586-test    -       monitor.b.channel6    	-               sender.click     LOGDIR/1_sen.log       -	-
