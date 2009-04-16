@@ -300,6 +300,7 @@ exit 0
 #MODULSDIR=/home/sombrutz/lab/helper/nodes/lib/modules/i586 REVISION=0.9.1 KERNELDIR=/home/sombrutz/develop/software/linux-2.6.19.2/linux/ ./madwifi_svn.sh installrev
 
 #svnversion ubi		madwifi-dfs-r3319-20080201
+#svnversion ubi-0.7	madwifi-dfs-r3319-20080201-0.7
 #svnversion 0.9.1	release-0.9.1
 #svnversion brn-0.9.1	brn-madwifi-0.9.1
 #svnversion brn-0.9.3	brn-madwifi-0.9.3
