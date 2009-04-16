@@ -18,18 +18,18 @@ elementclass AccessPoint {
           );
 
     mgt_cl[0]
-    -> Print("Assoc Request")
+//    -> Print("Assoc Request")
     -> BRN2AssocResponder(DEBUG 0, DEVICE $wdev, ASSOCLIST assoclist, WIRELESS_INFO winfo, RT rates )
-    -> Print("assoc")
+//    -> Print("assoc")
     -> [0]output;
 
     mgt_cl[1]
     -> Discard;
 
     mgt_cl[2]
-    -> Print("Probe request")
+//    -> Print("Probe request")
     -> bsrc :: BRN2BeaconSource(WIRELESS_INFO winfo, RT rates)
-    -> Print("Beacon")
+//    -> Print("Beacon")
     -> [0]output;
 
     mgt_cl[3]
@@ -44,7 +44,7 @@ elementclass AccessPoint {
 
     mgt_cl[6]
     -> OpenAuthResponder(WIRELESS_INFO winfo)
-    -> Print("Auth")
+//    -> Print("Auth")
     -> [0]output;
 }
 
@@ -69,7 +69,7 @@ FROMDEVICE
 
 filter[0]
   -> WifiDupeFilter()
-  -> Print("in")
+  -> Print("AP:in")
   -> mgm_clf :: Classifier(0/00%0f, -);				// management frames
 
 mgm_clf[0] 							//handle mgmt frames
@@ -79,11 +79,11 @@ mgm_clf[0] 							//handle mgmt frames
   -> wlan_out_queue;
 
 mgm_clf[1]
--> Discard;
- Idle()
   -> WifiDecap()
+  -> Print("AP: Data")
   -> clf_bcast :: Classifier(0/ffffffffffff, -)
-  -> arp_clf :: Classifier (12/0806, - )
+  -> Print("AP: bc")
+  -> arp_clf :: Classifier (12/0806,12/0800, - )
   -> ARPResponder( 192.168.1.1/24 06:0c:42:0c:74:0e )
   -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
   -> SetTXRate(RATE 108,TRIES 9)
@@ -91,13 +91,11 @@ mgm_clf[1]
 //  -> wlan_out_queue;
 -> Discard;
   
-  arp_clf[1] -> Discard;
+  arp_clf[2] -> Discard;
 
   arp :: ARPTable();
 
   clf_bcast[1]
-  -> Discard;
-  Idle
     -> Classifier(12/0800)
     -> StoreIPEthernet(arp)
     -> EtherDecap()
@@ -110,6 +108,15 @@ mgm_clf[1]
     -> SetTXPower( POWER 16 )
     -> Discard;
 //    -> wlan_out_queue;
+
+arp_clf[1]
+-> Print("ip")
+-> EtherDecap()
+-> Print("ip2")
+-> CheckIPHeader
+-> StripIPHeader()
+-> Print()
+-> Discard;
 
 wlan_out_queue
   -> TODEVICE;
