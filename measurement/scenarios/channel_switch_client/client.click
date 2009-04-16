@@ -158,13 +158,22 @@ failures[1]
   -> WifiDupeFilter()
   -> Discard();
 
-Idle
+mysrc :: RatedSource("ABCDEFGHIJKLMNOPQRSTUWVXYZ", 5, 10 , false)
+-> Print("--------------- Start: Sending new Packet")
+-> UDPIPEncap( 192.168.0.2 , 1000 , 192.168.0.1 , 80 )
+-> tst::SetTimestamp()
+-> CheckIPHeader()
+-> IPPrint("Client")
+-> EtherEncap(0x0800, my_wlan, ff:ff:ff:ff:ff:ff)
+-> Print("Client: Send Packet to AP")
 -> infra_wifiencap
--> Discard;
+-> wlan_out_queue;
+
  
 Script(
   wait 20,
   read infra_client/isc.wireless_info,
   read infra_client/isc.assoc,
-  wait 40
+  wait 5,
+  write mysrc.active true,
 );
