@@ -8,7 +8,7 @@ elementclass AccessPoint {
     assoclist :: BRN2AssocList(LINKTABLE $lt);
 
     input[0]
-    -> Print("mgt")
+//    -> Print("mgt")
     -> mgt_cl :: Classifier(  0/00%f0, //assoc req
                                         0/10%f0, //assoc resp
                                         0/40%f0, //probe req
@@ -19,18 +19,18 @@ elementclass AccessPoint {
           );
 
     mgt_cl[0]
-    -> Print("Assoc Request")
+//    -> Print("Assoc Request")
     -> BRN2AssocResponder(DEBUG 0, DEVICE $wdev, ASSOCLIST assoclist, WIRELESS_INFO winfo, RT rates )
-    -> Print("assoc")
+//    -> Print("assoc")
     -> [0]output;
 
     mgt_cl[1]
     -> Discard;
 
     mgt_cl[2]
-    -> Print("Probe request")
+//    -> Print("Probe request")
     -> bsrc :: BRN2BeaconSource(WIRELESS_INFO winfo, RT rates)
-    -> Print("Beacon")
+//    -> Print("Beacon")
     -> [0]output;
 
     mgt_cl[3]
@@ -44,9 +44,9 @@ elementclass AccessPoint {
     -> Discard;
 
     mgt_cl[6]
-    -> Print("OpenAuth req")
+//    -> Print("OpenAuth req")
     -> OpenAuthResponder(WIRELESS_INFO winfo)
-    -> Print("Auth")
+//    -> Print("Auth")
     -> [0]output;
 }
 
@@ -71,7 +71,7 @@ FROMDEVICE
 
 filter[0]
   -> WifiDupeFilter()
-  -> Print("in")
+//  -> Print("in")
   -> mgm_clf :: Classifier(0/00%0f, -);				// management frames
 
 mgm_clf[0] 							//handle mgmt frames
@@ -93,8 +93,15 @@ mgm_clf[1]
   arp_clf[1] -> Discard;
 
   arp :: ARPTable();
-
+  
   clf_bcast[1]
+  -> EtherDecap()
+  -> CheckIPHeader
+  -> servip::IPClassifier(192.168.1.0/24 and dst udp port 12001,-)
+  -> Print("udp",1)
+  -> Discard;
+  
+  servip[1]  
   -> Discard;
   Idle
     -> Classifier(12/0800)
