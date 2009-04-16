@@ -71,7 +71,7 @@ FROMDEVICE
 
 filter[0]
   -> WifiDupeFilter()
-//  -> Print("in")
+  -> Print("AP:in")
   -> mgm_clf :: Classifier(0/00%0f, -);				// management frames
 
 mgm_clf[0] 							//handle mgmt frames
@@ -82,15 +82,18 @@ mgm_clf[0] 							//handle mgmt frames
 
 mgm_clf[1]
   -> WifiDecap()
+  -> Print("AP: Data")
   -> clf_bcast :: Classifier(0/ffffffffffff, -)
-  -> arp_clf :: Classifier (12/0806, - )
+  -> Print("AP: bc")
+  -> arp_clf :: Classifier (12/0806,12/0800, - )
   -> ARPResponder( 192.168.1.1/24 06:0c:42:0c:74:0e )
   -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
   -> SetTXRate(RATE 22,TRIES 9)
   -> SetTXPower( POWER 16 )
- -> wlan_out_queue;
- 
-  arp_clf[1] -> Discard;
+//  -> wlan_out_queue;
+-> Discard;
+  
+  arp_clf[2] -> Discard;
 
   arp :: ARPTable();
   
@@ -116,6 +119,15 @@ mgm_clf[1]
     -> SetTXPower( POWER 16 )
     -> Discard;
 //    -> wlan_out_queue;
+
+arp_clf[1]
+-> Print("ip")
+-> EtherDecap()
+-> Print("ip2")
+-> CheckIPHeader
+-> StripIPHeader()
+-> Print()
+-> Discard;
 
 wlan_out_queue
   -> TODEVICE;
