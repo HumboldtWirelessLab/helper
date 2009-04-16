@@ -1,6 +1,6 @@
 #NODE	DEVICE	MODULSDIR			MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	CLICKLOGFILE		APPLICATION		APPLICATIONLOGFILE
-sk110	ath0	BASEDIR/nodes/lib/modules/i586	-		station.brn		-		-		-			CONFIGDIR/udp_fire.sh	LOGDIR/sk110.app.log
+#sk110	ath0	BASEDIR/nodes/lib/modules/i586	-		station.brn		-		-		-			CONFIGDIR/udp_fire.sh	LOGDIR/sk110.app.log
 sk111	ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel11	-		ap.click	LOGDIR/sk111.ath0.log	-			-
-sk112	ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel11	-		receiver.click	LOGDIR/sk112.ath0.log	-			-
+#sk112	ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel11	-		receiver.click	LOGDIR/sk112.ath0.log	-			-
 #sk111	ath0	BASEDIR/nodes/lib/modules/i586	-		ap.brn			-		-		-			CONFIGDIR/ap.sh		LOGDIR/sk111.app.log
-#sk110	ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel11	-		client.click	LOGDIR/sk110.ath0.log	-			-
+sk110	ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel11	-		client.click	LOGDIR/sk110.ath0.log	-			-
