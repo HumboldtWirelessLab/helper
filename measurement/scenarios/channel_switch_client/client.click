@@ -153,7 +153,7 @@ filter[1]
 
  
 Script(
-  wait 20,
+  wait 5,
   read infra_client/isc.wireless_info,
   read infra_client/isc.assoc,
   wait 5,
