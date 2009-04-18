@@ -59,11 +59,11 @@ int main( int argc, char **argv) {
   
   int i;
   
-  con =  setupConnection(12000, "127.0.0.1", 12001);
+  con =  setupConnection(12000, "192.168.1.1", 12001);
   
-  for(i = 0; i < 10; i++) {
+  for(i = 0; i < 10000; i++) {
  	c = (int*)p;
- 	*c = i; 
+ 	*c = htonl(i); 
  	
  	sendTo(con,p,1500);
  	

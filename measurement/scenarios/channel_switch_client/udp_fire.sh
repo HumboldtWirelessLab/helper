@@ -22,12 +22,14 @@ echo "call script"
 
 case "$1" in
     start)
+        sleep 5
         $DIR/ping.sh
         echo "Start udp fire"
+	$DIR/udp_fire
 	;;
     stop)
 	echo "Stop udp"
-#	killall udp_fire
+	killall udp_fire
 	;;
     *)
 	echo "Use $0 start|stop"

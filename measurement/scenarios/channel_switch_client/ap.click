@@ -71,7 +71,6 @@ FROMDEVICE
 
 filter[0]
   -> WifiDupeFilter()
-  -> Print("AP:in")
   -> mgm_clf :: Classifier(0/00%0f, -);				// management frames
 
 mgm_clf[0] 							//handle mgmt frames
@@ -82,52 +81,47 @@ mgm_clf[0] 							//handle mgmt frames
 
 mgm_clf[1]
   -> WifiDecap()
-  -> Print("AP: Data")
   -> clf_bcast :: Classifier(0/ffffffffffff, -)
-  -> Print("AP: bc")
-  -> arp_clf :: Classifier (12/0806,12/0800, - )
-  -> ARPResponder( 192.168.1.1/24 06:0c:42:0c:74:0e )
+  -> arp_clf :: Classifier (12/0806, 12/0800, - )
+  -> ARPResponder( 192.168.1.1/24 my_wlan )
   -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
-  -> SetTXRate(RATE 22,TRIES 9)
+  -> SetTXRate(RATE 2,TRIES 9)
   -> SetTXPower( POWER 16 )
-//  -> wlan_out_queue;
--> Discard;
+  -> wlan_out_queue;
   
   arp_clf[2] -> Discard;
 
   arp :: ARPTable();
   
   clf_bcast[1]
-  -> EtherDecap()
-  -> CheckIPHeader
-  -> servip::IPClassifier(192.168.1.0/24 and dst udp port 12001,-)
-  -> Print("udp",1)
-  -> Discard;
-  
-  servip[1]  
-  -> Discard;
-  Idle
     -> Classifier(12/0800)
     -> StoreIPEthernet(arp)
     -> EtherDecap()
     -> CheckIPHeader
+    -> IPClassifier(dst host 192.168.1.1)
+    -> servip::IPClassifier(dst udp port 12001, icmp type 8, -)
+    -> StripIPHeader()
+    -> Strip(8)
+    -> Print("Data",4,TIMESTAMP true)
+    -> Discard;
+  
+  servip[1] 
     -> Print("localPing")
     -> icp :: ICMPPingResponder
-    -> ResolveEthernet( 06:0c:42:0c:74:0e, arp)
+    -> ResolveEthernet( my_wlan, arp)
     -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
-    -> SetTXRate(RATE 108,TRIES 9)
+    -> SetTXRate(RATE 2,TRIES 9)
     -> SetTXPower( POWER 16 )
-    -> Discard;
-//    -> wlan_out_queue;
+    -> wlan_out_queue;
 
-arp_clf[1]
--> Print("ip")
--> EtherDecap()
--> Print("ip2")
--> CheckIPHeader
--> StripIPHeader()
--> Print()
--> Discard;
+  servip[2] -> Discard;
+
+  arp_clf[1]
+    -> Classifier(12/0800)
+    -> StoreIPEthernet(arp)
+    -> EtherDecap()
+    -> CheckIPHeader
+    -> servip;
 
 wlan_out_queue
   -> TODEVICE;
@@ -135,6 +129,7 @@ wlan_out_queue
 Script(
 //    wait 25,
 //    write ap/bsrc.channel 3,
+//    wait 10,
     wait RUNTIME,
     stop
 );
