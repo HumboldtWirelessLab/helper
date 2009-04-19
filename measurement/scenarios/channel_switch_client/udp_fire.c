@@ -50,23 +50,73 @@ int sendTo(struct udp_connection *udpc, char* data, int len) {
   return 0;
 }
 
+static int receiveFrom(struct udp_connection *udpc,char* data) {
+	struct timeval timer;
+	fd_set fds;
+	int timeouts = 0;
+	int retval;
+    int len;
+
+	FD_ZERO(&fds);
+	FD_SET(udpc->udpsd,&fds);
+
+	timer.tv_sec = 5;
+	timer.tv_usec = 0;
+
+	do {
+		timeouts++;
+		retval = select(udpc->udpsd + 1,&fds,NULL,NULL,&timer);
+	} while((retval <= 0) && (timeouts < 4));
+
+	if ( retval > 0 ) {
+		len = read(udpc->udpsd,data,2048);
+		if ( len < 0 ) {
+			return -1;
+		}
+	} else {
+		return -1;
+	}
+
+	return len;
+}
+
+
+#define SOURCE 1
+#define DESTINATION 2
+
 
 int main( int argc, char **argv) {
   struct udp_connection	*con;
   
-  char *p = (char*)malloc(sizeof(char) * 1500);
+  char *p = (char*)malloc(sizeof(char) * 2000);
   int *c;
   
   int i;
+  int mode = SOURCE;
   
   con =  setupConnection(12000, "192.168.1.1", 12001);
-  
-  for(i = 0; i < 10000; i++) {
- 	c = (int*)p;
+
+  if ( argc > 1 ) {
+    if ( strncmp(argv[1],"d",1) == 0 )
+      mode = DESTINATION;
+  }
+    
+  if ( mode == SOURCE ) {
+    for(i = 0; i < 10000; i++) {
+	c = (int*)p;
  	*c = htonl(i); 
  	
  	sendTo(con,p,1500);
  	
+    }
+  } else {
+  	while ( 1 ) {
+      if ( receiveFrom(con,p) >= 0 ) {
+        c = (int*)p[2];
+        i = ntohl(*c);
+        printf("Data: %d\n",i);
+      }
+    }
   }
 
   close_udp_connection(con);
