@@ -112,7 +112,7 @@ int main( int argc, char **argv) {
   } else {
   	while ( 1 ) {
       if ( receiveFrom(con,p) >= 0 ) {
-        c = (int*)p[2];
+        c = (int*)&p[2];
         i = ntohl(*c);
         printf("Data: %d\n",i);
       }
