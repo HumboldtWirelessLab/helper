@@ -99,13 +99,18 @@ mgm_clf[1]
     -> EtherDecap()
     -> CheckIPHeader
     -> IPClassifier(dst host 192.168.1.1)
-    -> servip::IPClassifier(dst udp port 12001, icmp type 8, -)
+    -> servip::IPClassifier(dst udp port 12001, dst udp port 12002, icmp type 8, -)
     -> StripIPHeader()
     -> Strip(8)
-    -> Print("Data",4,TIMESTAMP true)
+    -> pr::Print("Data",4,TIMESTAMP true)
     -> Discard;
-  
-  servip[1] 
+
+  servip[1]
+    -> StripIPHeader()
+    -> Strip(10)
+    -> pr;
+
+  servip[2] 
     -> Print("localPing")
     -> icp :: ICMPPingResponder
     -> ResolveEthernet( my_wlan, arp)
@@ -114,7 +119,7 @@ mgm_clf[1]
     -> SetTXPower( POWER 16 )
     -> wlan_out_queue;
 
-  servip[2] -> Discard;
+  servip[3] -> Discard;
 
   arp_clf[1]
     -> Classifier(12/0800)
@@ -125,7 +130,17 @@ mgm_clf[1]
 
 wlan_out_queue
   -> TODEVICE;
-
+  
+BRN2PacketSource(1500, 15, 10000, 0, 0, 0)
+-> UDPIPEncap( 192.168.1.1 , 12002 , 192.168.1.2 , 12000 )
+-> CheckIPHeader()
+-> EtherEncap(0x0800, my_wlan, ff:ff:ff:ff:ff:ff)
+-> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
+-> SetTXRate(RATE 2,TRIES 1)
+-> SetTXPower( POWER 16 )
+-> wlan_out_queue;
+  
+  
 Script(
 //    wait 25,
 //    write ap/bsrc.channel 3,

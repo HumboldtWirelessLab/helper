@@ -42,32 +42,32 @@ elementclass AdHocOrInfraStructureClient {
     -> Discard;    
 
     mgt_cl[1]  //Association Response
-    -> Print("Bekomme Association Response")
+//    -> Print("Bekomme Association Response")
     -> assoc_req
-    -> Print("Sende Association Request")
+//    -> Print("Sende Association Request")
     -> [0]output;
 
     mgt_cl[2]  //Reassociation Request
     -> Discard;
 
     mgt_cl[3]  //Reassociation Response
-    -> Print("Bekomme Reassociation Response")
+//    -> Print("Bekomme Reassociation Response")
     -> assoc_req;
 
     mgt_cl[4]  //Probe Request
     -> Discard;
 
     mgt_cl[5]  //Probe Response
-    -> PrintWifi("Bekomme Probe Response in den Beaconscanner")
+//    -> PrintWifi("Bekomme Probe Response in den Beaconscanner")
     -> bs
     -> Discard;
     
     probe_req
-    -> Print("Send Probe",64)
+//    -> Print("Send Probe",64)
     -> [0]output;
 
     mgt_cl[6]  //Beacon
-    -> PrintWifi("Bekomme Beacon: ")
+//    -> PrintWifi("Bekomme Beacon: ")
     -> bs;
 
     mgt_cl[7]  //ATIM (Power Save)
@@ -78,9 +78,9 @@ elementclass AdHocOrInfraStructureClient {
     -> assoc_req;
 
     mgt_cl[9]  //Authentification
-    -> Print("bekomme AUTH")
+//    -> Print("bekomme AUTH")
     -> auth_req    
-    -> Print("Send AUTH ",128)
+//    -> Print("Send AUTH ",128)
     -> [0]output;
 
     mgt_cl[10]  //De-Authentification
@@ -90,9 +90,7 @@ elementclass AdHocOrInfraStructureClient {
 
 auth_info :: WirelessInfo(SSID brn, BSSID 00:00:00:00:00:00 , CHANNEL 11);
 
-Idle()
--> infra_wifiencap ::  WifiEncap(0x01, WIRELESS_INFO auth_info)
--> Discard;
+infra_wifiencap ::  WifiEncap(0x01, WIRELESS_INFO auth_info);
 
 infra_client :: AdHocOrInfraStructureClient( ETH my_wlan, SSID brn, CHANNEL 11, WIFIENCAP infra_wifiencap, WIRELESS_INFO auth_info );
 
@@ -118,40 +116,44 @@ mgm_clf[1]           //handle other frames (data)
   -> WifiDecap()
   -> clf_bcast :: Classifier(0/ffffffffffff, -); // broadcast & unicast packets
 
-clf_bcast[0]
-  -> Discard();
-
 //
 // handle Unicast
 //
-clf_bcast[1]                                      //Unicast
-//  -> Print("Client: Unicast (in): ",256)           //simple packets (no brn) (only IP)
-//  -> Classifier(12/0800)                    // ip packet (don't handle IP-Packets in simulation -> Discard
-// -> EtherDecap()
-//  -> CheckIPHeader()
-//  -> IPPrint("Client")
-  -> Discard();
+clf_bcast[0]                              //Unicast
+-> Print("uni")
+-> cl::Classifier(12/0800)                    // ip packet (don't handle IP-Packets in simulation -> Discard
+-> Print("ip")
+-> EtherDecap()
+-> CheckIPHeader()
+-> IPClassifier(dst host 192.168.1.2)
+-> servip::IPClassifier(dst udp port 12000, -)
+-> StripIPHeader()
+-> Strip(10)
+-> pr::Print("ClientData",4,TIMESTAMP true)
+-> Discard;
+
+clf_bcast[1]
+  -> cl;
+
+servip[1]
+-> Discard;
 
 //BRN intern and other Clients
 
-  wlan_out_queue
+wlan_out_queue
   -> TODEVICE;
   
 filter[1]
   -> Discard;                                              //take a closer look at tx-annotated packets
 
-//mysrc :: RatedSource("ABCDEFGHIJKLMNOPQRSTUWVXYZ", 5, 10 , false)
-//-> Print("--------------- Start: Sending new Packet")
-//-> UDPIPEncap( 192.168.0.2 , 1000 , 192.168.0.1 , 80 )
-//-> tst::SetTimestamp()
-//-> CheckIPHeader()
-//-> IPPrint("Client")
-//-> EtherEncap(0x0800, my_wlan, ff:ff:ff:ff:ff:ff)
-//-> Print("Client: Send Packet to AP")
-//-> infra_wifiencap
-//-> wlan_out_queue;
+//BRN2PacketSource(1500, 100, 10000, 0, 0, 0)
+Idle()
+-> UDPIPEncap( 192.168.1.2 , 12000 , 192.168.1.1 , 12002 )
+-> CheckIPHeader()
+-> EtherEncap(0x0800, my_wlan, ff:ff:ff:ff:ff:ff)
+-> infra_wifiencap
+-> wlan_out_queue;
 
- 
 Script(
   wait 5,
   read infra_client/isc.wireless_info,
