@@ -73,6 +73,10 @@ filter[0]
   -> WifiDupeFilter()
   -> mgm_clf :: Classifier(0/00%0f, -);				// management frames
 
+filter[1]
+-> PrintWifi(TIMESTAMP true)
+-> Discard;
+
 mgm_clf[0] 							//handle mgmt frames
   -> ap
   -> beacon_rates :: SetTXRate(RATE 2,TRIES 1)		// ap beacons send at constant bitrate
@@ -115,7 +119,7 @@ mgm_clf[1]
     -> icp :: ICMPPingResponder
     -> ResolveEthernet( my_wlan, arp)
     -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
-    -> SetTXRate(RATE 2,TRIES 9)
+    -> SetTXRate(RATE 2,TRIES 2)
     -> SetTXPower( POWER 16 )
     -> wlan_out_queue;
 
@@ -131,20 +135,24 @@ mgm_clf[1]
 wlan_out_queue
   -> TODEVICE;
   
-BRN2PacketSource(1500, 15, 10000, 0, 0, 0)
--> UDPIPEncap( 192.168.1.1 , 12002 , 192.168.1.2 , 12000 )
+//mysrc :: RatedSource("ABCDEFGHIJKLMNOPQRSTUWVXYZ", 15, -1 , false, LENGTH 1200)  
+BRN2PacketSource(1300, 5, 10000, 0, 0, 0)
+-> UDPIPEncap( 192.168.1.1 , 12001 , 192.168.1.2 , 12000 )
+-> SetIPChecksum()
 -> CheckIPHeader()
--> EtherEncap(0x0800, my_wlan, ff:ff:ff:ff:ff:ff)
+-> EtherEncap(0x0800, my_wlan, 06:0C:42:0C:74:0E)
 -> WifiEncap(0x02, WIRELESS_INFO ap/winfo)
--> SetTXRate(RATE 2,TRIES 1)
+-> SetTXRate(RATE 11,TRIES 3)
 -> SetTXPower( POWER 16 )
 -> wlan_out_queue;
   
   
 Script(
-//    wait 25,
-//    write ap/bsrc.channel 3,
+    wait 25,
+    write ap/bsrc.channel 3,
 //    wait 10,
+//    wait 17,
+//    write mysrc.active true,
     wait RUNTIME,
     stop
 );

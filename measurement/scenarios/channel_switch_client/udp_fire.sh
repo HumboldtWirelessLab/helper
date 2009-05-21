@@ -25,7 +25,7 @@ case "$1" in
         sleep 5
         $DIR/ping.sh
         echo "Start udp fire"
-	$DIR/udp_fire
+#	$DIR/udp_fire d > $DIR/bla/out.log
 	;;
     stop)
 	echo "Stop udp"

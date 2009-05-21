@@ -9,7 +9,7 @@
 #include <sys/time.h>
 #include <stdlib.h>
 #include <syslog.h>
-
+#include <sys/time.h>
 
 struct udp_connection {
   int udpsd;
@@ -93,6 +93,8 @@ int main( int argc, char **argv) {
   
   int i;
   int mode = SOURCE;
+
+  struct timeval it_interval;
   
   con =  setupConnection(12000, "192.168.1.1", 12001);
 
@@ -114,7 +116,8 @@ int main( int argc, char **argv) {
       if ( receiveFrom(con,p) >= 0 ) {
         c = (int*)&p[2];
         i = ntohl(*c);
-        printf("Data: %d\n",i);
+        gettimeofday(&it_interval, NULL); 
+        printf("Data: %d %d\n", ((it_interval.tv_sec%100) * 1000000 + ( it_interval.tv_usec)),i);
       }
     }
   }
