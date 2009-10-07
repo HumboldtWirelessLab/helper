@@ -320,4 +320,5 @@ exit 0
 #svnversion brn-test	madwifi-brn-test
 #svnversion mad-free	madwifi-free
 #svnversion mad-mips	madwifi-mips
+#svnversion trunk	trunk
 #arch mips mipsel-linux-
