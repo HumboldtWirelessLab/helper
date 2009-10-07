@@ -39,7 +39,7 @@ if [ -e /usr/sbin/iwpriv ]; then
     IWPRIV=/usr/sbin/iwpriv
 else
     if [ -e /sbin/iwpriv ]; then
-	IWPRIV=/sbin/iwpiv
+	IWPRIV=/sbin/iwpriv
     fi
 fi
 
