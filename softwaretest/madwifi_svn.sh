@@ -252,7 +252,13 @@ case "$1" in
     	    if [ "x$CROSS_COMPILE" = "x" ]; then
 		( cd $DIR/$REVISIONDIR; make KERNELPATH=$KERNELDIR $EXTRAOPTION)
 	    else
-    		( cd $DIR/$REVISIONDIR; make KERNELPATH=$KERNELDIR  CROSS_COMPILE=$CROSS_COMPILE $EXTRAOPTION; )
+	        if [ "x$FIX" = "xmips" ]; then
+		    echo "LDOPTS=\" -EL \" COPTS=\" -DAH_BYTE_ORDER=AH_LITTLE_ENDIAN -G 0 -mips32 -mno-abicalls -fno-pic -Wa,--trap -Wa,-relax-branch -fno-strict-aliasing -fno-common -fomit-frame-pointer -mlong-calls \" make KERNELPATH=$KERNELDIR ARCH=$CPU CROSS_COMPILE=$CROSS_COMPILE $EXTRAOPTION;"
+		    ( cd $DIR/$REVISIONDIR; LDOPTS=" -EL " COPTS=" -DAH_BYTE_ORDER=AH_LITTLE_ENDIAN -G 0 -mips32 -mno-abicalls -fno-pic -Wa,--trap -Wa,-relax-branch -fno-strict-aliasing -fno-common -fomit-frame-pointer -mlong-calls " make KERNELPATH=$KERNELDIR ARCH=$CPU CROSS_COMPILE=$CROSS_COMPILE $EXTRAOPTION; )
+		else
+		    echo "make KERNELPATH=$KERNELDIR ARCH=$CPU CROSS_COMPILE=$CROSS_COMPILE $EXTRAOPTION;"
+    		    ( cd $DIR/$REVISIONDIR; make KERNELPATH=$KERNELDIR ARCH=$CPU CROSS_COMPILE=$CROSS_COMPILE $EXTRAOPTION; )
+		fi
 	    fi
 	    
 	    if [ ! -e $MODULSDIR ]; then
