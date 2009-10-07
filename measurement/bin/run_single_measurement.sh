@@ -165,10 +165,10 @@ fi
 ####################################################
 
 if [ $RUNMODENUM -le 1 ]; then
-    echo "reboot all nodes"
+    echo "Reboot all nodes"
     NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
      
-    echo "wait for all nodes"
+    echo "Wait for all nodes"
     sleep 30
     NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodesandssh
 fi
@@ -339,6 +339,13 @@ if [ $RUNMODENUM -le 5 ]; then
     if [ $LOADCLICKMOD -eq 1 ]; then
 	check_nodes
     fi
+
+########################################################
+###### Preload Click-, Log- & Application-Stuff ########
+########################################################
+#TODO:
+#just load everything once to have it in the cache like: cat click > /dev/null on each maschine
+
     
 ########################################################
 ###### Setup Click-, Log- & Application-Stuff ##########
@@ -369,15 +376,15 @@ if [ $RUNMODENUM -le 5 ]; then
 			
 			if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
 			    CLICKWAITTIME=`expr $TIME + 2`
-			    screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT > /tmp/click/config; sleep $CLICKWAITTIME; echo -n > /tmp/click/config\""
+			    screen -S $SCREENNAME -p $SCREENT -X stuff "echo -n \"\" | ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT > /tmp/click/config; sleep $CLICKWAITTIME; echo -n > /tmp/click/config\""
 
  			    sleep 0.1
 			    SCREENT="$node\_$nodedevice\_kcm"	
 			    screen -S $SCREENNAME -X screen -t $SCREENT
   			    sleep 0.1
-			    screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"rm -f $LOGFILE ; cat /proc/kmsg >> $LOGFILE \""
+			    screen -S $SCREENNAME -p $SCREENT -X stuff "echo -n \"\" | ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"rm -f $LOGFILE ; cat /proc/kmsg >> $LOGFILE \""
 			else
-			    screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
+			    screen -S $SCREENNAME -p $SCREENT -X stuff "echo -n \"\" | ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
 			fi
 		fi
 
@@ -391,7 +398,7 @@ if [ $RUNMODENUM -le 5 ]; then
 			SCREENT="$node\_$nodedevice\_app"	
 			screen -S $SCREENNAME -X screen -t $SCREENT
    			sleep 0.1
-			screen -S $SCREENNAME -p $SCREENT -X stuff "ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$APPLICATION  start > $APPLOGFILE 2>&1\""
+			screen -S $SCREENNAME -p $SCREENT -X stuff "echo -n \"\" | ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"$APPLICATION  start > $APPLOGFILE 2>&1\""
 		fi
 	done
     done
@@ -438,7 +445,7 @@ if [ $RUNMODENUM -le 5 ]; then
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
 	#add 5 second extra to make sure that we are not faster than the devices (click,application)
-	WAITTIME=`expr $TIME + 5`
+	WAITTIME=`expr $TIME + 25`
 	echo "Wait for $WAITTIME sec"
 
 	# Countdown
@@ -454,26 +461,32 @@ if [ $RUNMODENUM -le 5 ]; then
 ###################################################
 ##### Kill progs for logfile for kclick  ##########
 ###################################################
+#TODO
+# "echo -n "" | ssh .... : for mips please use "run_on_node" instead
 
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
+	echo "Kill Click on Nodes:"
 	for node in $NODELIST; do
 	    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	
 	    for nodedevice in $NODEDEVICELIST; do
+	    	echo -n "$node"
+
 		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
 		CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
 		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
 		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
-			    TAILPID=`ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "pidof cat"`
-			    ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill $TAILPID"
+			    TAILPID=`echo -n "" | ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "pidof cat"`
+			    echo -n "" | ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill $TAILPID"
 		else
 		    if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
 				NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
-				CLICKPID=`ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "pidof click-$NODEARCH"`
+				CLICKPID=`echo -n "" | ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "pidof click-$NODEARCH"`
 				if [ "x$CLICKPID" != "x" ]; then
 					for cpid in $CLICKPID; do
-						ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill $cpid"
+						echo -n "PID: $CLICKPID !"
+						echo -n "" | ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "kill $cpid"
 					done
 				fi
 		    fi
@@ -482,9 +495,9 @@ if [ $RUNMODENUM -le 5 ]; then
 		APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
 		
                 if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-			ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "$APPLICATION  stop"
+			echo -n "" | ssh -i $DIR/../../host/etc/keys/id_dsa root@$node "$APPLICATION  stop"
                 fi
-
+		echo " done"
 	    done
 	done
     fi
@@ -499,6 +512,7 @@ if [ $RUNMODENUM -le 5 ]; then
 ##### Check Nodes and finish ##########
 #######################################
 
+    echo "Check nodes"
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
         check_nodes
     fi
