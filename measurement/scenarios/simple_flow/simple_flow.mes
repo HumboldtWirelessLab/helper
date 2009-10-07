@@ -1,0 +1,3 @@
+#NODE		DEVICE	MODULSDIR				MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	LOGFILE			APP	APPLOGFILE
+sk110		ath1	BASEDIR/nodes/lib/modules/i586  		-	monitor.default		-		sink.click	LOGDIR/sk110.log	-	-
+sk111		ath1	BASEDIR/nodes/lib/modules/i586  		-	monitor.default		-		sink.click	LOGDIR/sk111.log	-	-
