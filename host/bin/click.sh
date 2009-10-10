@@ -30,7 +30,7 @@ case "$1" in
 		for node in $NODELIST; do
 		    echo "$node"
 		    if [ !  "x$MODULSDIR" = "x" ]; then
-			run_on_node $node "MODULSDIR=$MODULSDIR ./click.sh install" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
+			    run_on_node $node "MODULSDIR=$MODULSDIR ./click.sh install" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
 		    fi
 		done
 		;;
