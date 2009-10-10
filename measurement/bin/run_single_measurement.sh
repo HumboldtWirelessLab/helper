@@ -345,6 +345,35 @@ if [ $RUNMODENUM -le 5 ]; then
 ########################################################
 #TODO:
 #just load everything once to have it in the cache like: cat click > /dev/null on each maschine
+    for node in $NODELIST; do
+      NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+	    NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
+	
+	    LOADCLICK=0
+      for nodedevice in $NODEDEVICELIST; do
+        CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
+
+        CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
+        CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
+        LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
+
+        if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
+			    LOADCLICK=1
+	  	  fi
+
+		    APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
+		    APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $10}'`
+		
+		    if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
+          run_on_node $node "cat $APPLICATION > /dev/null" "/" $DIR/../etc/keys/id_dsa			
+		    fi
+      done
+      
+      if [ "x$LOADCLICK" = "x1" ]; then
+        run_on_node $node "cat $NODEBINDIR/click-align-$NODEARCH > /dev/null" "/" $DIR/../etc/keys/id_dsa
+        run_on_node $node "cat $NODEBINDIR/click-$NODEARCH > /dev/null" "/" $DIR/../etc/keys/id_dsa
+      fi
+    done
 
     
 ########################################################
@@ -355,23 +384,23 @@ if [ $RUNMODENUM -le 5 ]; then
     RUN_CLICK_APPLICATION=0
 
     for node in $NODELIST; do
-	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+      NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	
-	NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
+      NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
 	
-	for nodedevice in $NODEDEVICELIST; do
-		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
+      for nodedevice in $NODEDEVICELIST; do
+        CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
 
-		CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
-		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
-		LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
+        CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
+        CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
+        LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
 
-		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
+        if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
 			
-			RUN_CLICK_APPLICATION=1
+        RUN_CLICK_APPLICATION=1
 			
-			SCREENT="$node\_$nodedevice\_click"	
-			screen -S $SCREENNAME -X screen -t $SCREENT
+        SCREENT="$node\_$nodedevice\_click"	
+        screen -S $SCREENNAME -X screen -t $SCREENT
    			sleep 0.1
 			
 			if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
@@ -381,10 +410,11 @@ if [ $RUNMODENUM -le 5 ]; then
  			    sleep 0.1
 			    SCREENT="$node\_$nodedevice\_kcm"	
 			    screen -S $SCREENNAME -X screen -t $SCREENT
-  			    sleep 0.1
+          sleep 0.1
 			    screen -S $SCREENNAME -p $SCREENT -X stuff "echo -n \"\" | ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"rm -f $LOGFILE ; cat /proc/kmsg >> $LOGFILE \""
 			else
-			    screen -S $SCREENNAME -p $SCREENT -X stuff "echo -n \"\" | ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
+#			    screen -S $SCREENNAME -p $SCREENT -X stuff "echo -n \"\" | ssh -i $DIR/../../host/etc/keys/id_dsa root@$node \"export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
+			    screen -S $SCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
 			fi
 		fi
 
@@ -409,33 +439,32 @@ if [ $RUNMODENUM -le 5 ]; then
 
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
-        for node in $NODELIST; do
-	    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-	    for nodedevice in $NODEDEVICELIST; do
-		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
+      for node in $NODELIST; do
+        NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+        for nodedevice in $NODEDEVICELIST; do
+          CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
 
-		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
+          CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
 
-		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-		    SCREENT="$node\_$nodedevice\_click"
+          if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
+            SCREENT="$node\_$nodedevice\_click"
+            screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
+
+            CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
+            if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
+              SCREENT="$node\_$nodedevice\_kcm"
+			        screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
+		        fi
+		      fi
+
+		      APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
+
+          if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
+		        SCREENT="$node\_$nodedevice\_app"	
     		    screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
-
-		    CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
-		    if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
-			SCREENT="$node\_$nodedevice\_kcm"
-			screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
-		    fi
-		fi
-
-		APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
-
-		if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-		    SCREENT="$node\_$nodedevice\_app"	
-    		    screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
-		fi
+		      fi
+	      done
 	    done
-	done
-	
     fi
 
 ###################################################
