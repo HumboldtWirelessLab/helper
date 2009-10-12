@@ -186,7 +186,7 @@ case "$1" in
 			if [ "x$CRCERROR" = "x" ]; then
 				CRCERROR=$DEFAULT_CRCERROR
 			fi
-			echo "echo  \"$CRCERROR\" > /proc/sys/net/$DEVICE/monitor_crc_errors"
+			echo "echo \"$CRCERROR\" > /proc/sys/net/$DEVICE/monitor_crc_errors"
 			echo "$CRCERROR" > /proc/sys/net/$DEVICE/monitor_crc_errors
 
 			if [ "x$PHYERROR" = "x" ]; then
