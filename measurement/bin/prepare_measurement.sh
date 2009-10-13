@@ -56,7 +56,18 @@ case "$1" in
 		    
 		    if [ ! "x$NOSPACELINE" = "x" ]; then
 		        if [ $ISCOMMENT -eq 0 ]; then
-			    read CNODE CDEV CMODDIR CMODOPT WIFICONFIG CCMODDIR CLICK CCLOG CAPP CAPPL <<< $line
+			    
+			    #read CNODE CDEV CMODDIR CMODOPT WIFICONFIG CCMODDIR CLICK CCLOG CAPP CAPPL <<< $line
+			    CNODE=`echo $line | awk '{print $1}'`
+			    CDEV=`echo $line | awk '{print $2}'`
+			    CMODDIR=`echo $line | awk '{print $3}'`
+			    CMODOPT=`echo $line | awk '{print $4}'`
+			    WIFICONFIG=`echo $line | awk '{print $5}'`
+			    CCMODDIR=`echo $line | awk '{print $6}'`
+			    CLICK=`echo $line | awk '{print $7}'`
+			    CCLOG=`echo $line | awk '{print $8}'`
+			    CAPP=`echo $line | awk '{print $9}'`
+			    CAPPL=`echo $line | awk '{print $10}'`
 			
 			    WIFICONFIG=`echo "$WIFICONFIG" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 
