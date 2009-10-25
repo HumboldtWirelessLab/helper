@@ -171,16 +171,16 @@ done
 
 if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
   echo "Start local process"
-  $LOCALPROCESS start
+  $LOCALPROCESS prestart
 fi
 
 echo "Start measurement !"
 
-RESULT=`(cd $FINALRESULTDIR; CLICKMODE=$CLICKMODE CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/run_single_measurement.sh 5>&1 6>&2 1>> $LOGDIR/$LOGFILE 2>&1)`
+RESULT=`(cd $FINALRESULTDIR; LOCALPROCESS=$LOCALPROCESS CLICKMODE=$CLICKMODE CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/run_single_measurement.sh 5>&1 6>&2 1>> $LOGDIR/$LOGFILE 2>&1)`
 
 if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
   echo "Stop local process"
-  $LOCALPROCESS stop
+  $LOCALPROCESS poststop
 fi
 
 echo $RESULT
