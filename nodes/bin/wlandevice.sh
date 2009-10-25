@@ -228,7 +228,13 @@ case "$1" in
 	    ${IFCONFIG} $DEVICE up
 	    ;;	    
     "getmac")
-      MADDR=`$IFCONFIG $DEVICE | grep HWaddr | awk '{print $5}' | sed -e "s#-# #g" -e "s#:# #g" | awk '{print $1":"$2":"$3":"$4":"$5":"$6}'`
+      MADDRRAW=`$IFCONFIG $DEVICE | grep HWaddr | awk '{print $5}' | sed -e "s#-# #g" -e "s#:# #g"`
+      MADWIFI=`echo $MADDRRAW | awk '{print $1}'`
+      if [ "x$MADWIFI" = "x06" ]; then
+        MADDR=`echo $MADDRRAW | awk '{print $1":"$2":"$3":"$4":"$5":"$6}'`
+      else
+        MADDR=`echo $MADDRRAW | awk '{print "00:"$2":"$3":"$4":"$5":"$6}'`
+      fi
       echo $MADDR
       ;;
     *)
