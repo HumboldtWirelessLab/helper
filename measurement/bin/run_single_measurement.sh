@@ -186,6 +186,15 @@ echo "Set marker for reboot-detection"
 
 NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmarker
 
+###################################
+##### Prestart local process ######
+###################################
+
+if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
+  echo "Local process: prestart"
+  $LOCALPROCESS prestart >> $FINALRESULTDIR/localapp.log
+fi
+
 ##################################
 ###### Load Wifi-Moduls ##########
 ##################################
@@ -297,27 +306,34 @@ fi
 ######################################################
 ###### Get Wifiinfo and Start Screensession ##########
 ######################################################
+#TODO: rename nodelist
 
 if [ $RUNMODENUM -le 5 ]; then
 
-    echo "Get Wifiinfo"
+  echo "Get Wifiinfo"
 
-    for node in $NODELIST; do
-	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-	for nodedevice in $NODEDEVICELIST; do
-	    CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
+  for node in $NODELIST; do
+    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+    for nodedevice in $NODEDEVICELIST; do
+      CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
 	    echo "Deviceconfig for $node:$nodedevice" 
 	    if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
-		NODE=$node DEVICES=$nodedevice $DIR/../../host/bin/wlandevices.sh getiwconfig
+        NODE=$node DEVICES=$nodedevice $DIR/../../host/bin/wlandevices.sh getiwconfig
 	    fi
-	done
-    done
+	    
+	    if [ "x$WANTNODELIST" = "xyes" ]; then
+	      MADDR=`run_on_node $node "DEVICE=$nodedevice $DIR/../../nodes/bin/wlandevice.sh getmac" "/" $DIR/../../host/etc/keys/id_dsa`
+	      echo "$node $nodedevice $MADDR" >> $FINALRESULTDIR/nodelist
+	    fi
+	    
+	  done
+  done
 
-    SCREENNAME="measurement_$ID"
+  SCREENNAME="measurement_$ID"
     
-    screen -d -m -S $SCREENNAME
+  screen -d -m -S $SCREENNAME
 
-    NODEBINDIR="$DIR/../../nodes/bin"
+  NODEBINDIR="$DIR/../../nodes/bin"
 
 ###################################
 ###### Setup Clickmodule ##########
@@ -343,8 +359,7 @@ if [ $RUNMODENUM -le 5 ]; then
 ########################################################
 ###### Preload Click-, Log- & Application-Stuff ########
 ########################################################
-#TODO:
-#just load everything once to have it in the cache like: cat click > /dev/null on each maschine
+
     for node in $NODELIST; do
       NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
       NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
@@ -440,10 +455,10 @@ if [ $RUNMODENUM -le 5 ]; then
     if [ "x$LOCALPROCESS" != "x" ]; then
       CPWD=`pwd`
       echo ""
-      echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $PWD/app.log 2>&1"
+      echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
       screen -S $SCREENNAME -X screen -t localprocess
       sleep 0.1
-      screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $CPWD/app.log 2>&1"
+      screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
       sleep 0.5
       screen -S $SCREENNAME -p localprocess -X stuff $'\n'
     fi
@@ -543,8 +558,8 @@ if [ $RUNMODENUM -le 5 ]; then
   if [ "x$LOCALPROCESS" != "x" ]; then
     CPWD=`pwd`
     echo ""
-    echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $PWD/app.log 2>&1"
-    screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $CPWD/app.log 2>&1"
+    echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
+    screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
     sleep 0.1
     screen -S $SCREENNAME -p localprocess -X stuff $'\n'
  fi
@@ -566,6 +581,15 @@ if [ $RUNMODENUM -le 5 ]; then
     
     echo "ok" 1>&$STATUSFD
 
+fi
+
+#######################################
+##### Poststop local process ##########
+#######################################
+
+if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
+  echo "Stop local process"
+  $LOCALPROCESS poststop >> $FINALRESULTDIR/app.log
 fi
 
 echo "Finished measurement. Status: ok."
