@@ -2,7 +2,6 @@ import click.ControlSocket;
 
 import java.net.InetAddress;
 import java.io.IOException;
-import static java.lang.System.out;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,7 +32,7 @@ public class ClickConnection {
      try {
        cliccs = new ControlSocket(clickipaddr, clickport);
      } catch ( IOException e) {
-       out.println("Unable to connect to AP");
+       System.out.println("Unable to connect to AP");
        e.printStackTrace();
      }
   }
