@@ -437,15 +437,16 @@ if [ $RUNMODENUM -le 5 ]; then
 ####### Start Click- & Application-Stuff ##########
 ###################################################
 
-    if [ "x$LOCALPORCESS" != "x" ]; then
+    if [ "x$LOCALPROCESS" != "x" ]; then
       CPWD=`pwd`
-      echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start > $PWD/app.log 2>&1\""
+      echo ""
+      echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $PWD/app.log 2>&1"
       screen -S $SCREENNAME -X screen -t localprocess
       sleep 0.1
-      screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start > $CPWD/app.log 2>&1\""
-      sleep 0.1
+      screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $CPWD/app.log 2>&1"
+      sleep 0.5
       screen -S $SCREENNAME -p localprocess -X stuff $'\n'
-	  fi
+    fi
 
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
@@ -539,10 +540,11 @@ if [ $RUNMODENUM -le 5 ]; then
 	done
     fi
 
-  if [ "x$LOCALPORCESS" != "x" ]; then
+  if [ "x$LOCALPROCESS" != "x" ]; then
     CPWD=`pwd`
-    echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop > $PWD/app.log 2>&1\""
-    screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop > $CPWD/app.log 2>&1\""
+    echo ""
+    echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $PWD/app.log 2>&1"
+    screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $CPWD/app.log 2>&1"
     sleep 0.1
     screen -S $SCREENNAME -p localprocess -X stuff $'\n'
  fi

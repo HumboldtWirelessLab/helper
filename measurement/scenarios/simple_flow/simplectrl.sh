@@ -18,7 +18,12 @@ case "$SIGN" in
       ;;
 esac
 
+echo "das Script: $1"
+
 case "$1" in
+    prestart)
+	echo "prestart"
+        ;;
     start)
         echo "Start crtl"
         sleep 10;
@@ -29,6 +34,9 @@ case "$1" in
     stop)
         echo "Stop ctrl"
         ;;
+    poststop)
+	echo "poststop"
+	;;
     *)
 	echo "Use $0 start|stop"
 	;;
