@@ -427,8 +427,8 @@ if [ $RUNMODENUM -le 5 ]; then
 
 			SCREENT="$node\_$nodedevice\_app"	
 			screen -S $SCREENNAME -X screen -t $SCREENT
-   			sleep 0.1
-			screen -S $SCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $APPLICATION start > $APPLOGFILE 2>&1\""
+   		sleep 0.1
+			screen -S $SCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"$APPLICATION start > $APPLOGFILE 2>&1\""
 		fi
 	done
     done
@@ -436,6 +436,16 @@ if [ $RUNMODENUM -le 5 ]; then
 ###################################################
 ####### Start Click- & Application-Stuff ##########
 ###################################################
+
+    if [ "x$LOCALPORCESS" != "x" ]; then
+      CPWD=`pwd`
+      echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start > $PWD/app.log 2>&1\""
+      screen -S $SCREENNAME -X screen -t localprocess
+      sleep 0.1
+      screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start > $CPWD/app.log 2>&1\""
+      sleep 0.1
+      screen -S $SCREENNAME -p localprocess -X stuff $'\n'
+	  fi
 
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
@@ -528,6 +538,14 @@ if [ $RUNMODENUM -le 5 ]; then
 	    done
 	done
     fi
+
+  if [ "x$LOCALPORCESS" != "x" ]; then
+    CPWD=`pwd`
+    echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop > $PWD/app.log 2>&1\""
+    screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop > $CPWD/app.log 2>&1\""
+    sleep 0.1
+    screen -S $SCREENNAME -p localprocess -X stuff $'\n'
+ fi
 
 #####################################
 ##### Close Screen-Session ##########
