@@ -217,18 +217,22 @@ case "$1" in
 
 		
 	    echo "Finished device config"
-	;;
+	    ;;
     "start")
 	    if [ "x$CONFIG" = "x" ]; then
-		echo "Use CONFIG to set the config"
-		exit 0
+        echo "Use CONFIG to set the config"
+        exit 0
 	    fi
 
 	    echo "$IFCONFIG $DEVICE up"
 	    ${IFCONFIG} $DEVICE up
-	;;	    
+	    ;;	    
+    "getmac")
+      MADDR=`$IFCONFIG $DEVICE | grep HWaddr | awk '{print $5}' | sed -e "s#-# #g" -e "s#:# #g" | awk '{print $1":"$2":"$3":"$4":"$5":"$6}'`
+      echo $MADDR
+      ;;
     *)
-	;;
+    ;;
 esac
 
 exit 0
