@@ -20,6 +20,6 @@ esac
 
 . $DIR/functions.sh
 
-java -jar JClickClient.jar $@
+java -jar $DIR/JClickClient.jar $@
 
 exit 0
