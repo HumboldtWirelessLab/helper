@@ -171,7 +171,7 @@ done
 
 if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
   echo "Start local process"
-  $LOCALPROCESS prestart
+  $LOCALPROCESS prestart >> $FINALRESULTDIR/app.log
 fi
 
 echo "Start measurement !"
@@ -180,7 +180,7 @@ RESULT=`(cd $FINALRESULTDIR; LOCALPROCESS=$LOCALPROCESS CLICKMODE=$CLICKMODE CON
 
 if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
   echo "Stop local process"
-  $LOCALPROCESS poststop
+  $LOCALPROCESS poststop >> $FINALRESULTDIR/app.log
 fi
 
 echo $RESULT
