@@ -428,7 +428,7 @@ if [ $RUNMODENUM -le 5 ]; then
 			SCREENT="$node\_$nodedevice\_app"	
 			screen -S $SCREENNAME -X screen -t $SCREENT
    			sleep 0.1
-			screen -S $SCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"$APPLICATION  start > $APPLOGFILE 2>&1\""
+			screen -S $SCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $APPLICATION start > $APPLOGFILE 2>&1\""
 		fi
 	done
     done
