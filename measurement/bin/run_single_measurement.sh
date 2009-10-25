@@ -589,7 +589,7 @@ fi
 
 if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
   echo "Stop local process"
-  $LOCALPROCESS poststop >> $FINALRESULTDIR/app.log
+  $LOCALPROCESS poststop >> $FINALRESULTDIR/localapp.log
 fi
 
 echo "Finished measurement. Status: ok."
