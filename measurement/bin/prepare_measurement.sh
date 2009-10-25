@@ -130,7 +130,7 @@ case "$1" in
 				    
 				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" != "xkernel" ]; then
 				      if [ "x$CONTROLSOCKET" != "xno" ]; then
-				        echo "ControlSocket(tcp, 7777);" > $CLICKFINALNAME
+				        echo "ControlSocket(tcp, 7777);" >> $CLICKFINALNAME
 				      fi
 				    fi
 				    

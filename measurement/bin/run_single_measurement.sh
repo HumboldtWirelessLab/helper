@@ -453,15 +453,15 @@ if [ $RUNMODENUM -le 5 ]; then
             CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
             if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
               SCREENT="$node\_$nodedevice\_kcm"
-			        screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
-		        fi
-		      fi
+	      screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
+	    fi
+	  fi
 
-		      APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
+	  APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
 
           if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
 		        SCREENT="$node\_$nodedevice\_app"	
-    		    screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
+    		        screen -S $SCREENNAME -p $SCREENT -X stuff $'\n'
 		      fi
 	      done
 	    done
