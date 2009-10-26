@@ -18,37 +18,48 @@ case "$SIGN" in
       ;;
 esac
 
-echo "das Script: $1"
-
 case "$1" in
     prestart)
-        echo "prestart"
+        exit 0
         ;;
     start)
-        echo "Start crtl"
         sleep 10
         for n in $NODELIST; do
 	  echo "CONNECT TO $n  ###############################"
           clickctrl.sh read $n 7777 lt links
         done
-	SRCMAC=`cat $FINALRESULTDIR/nodelist | grep sk110 | awk '{print $3}'`
-	DSTMAC=`cat $FINALRESULTDIR/nodelist | grep sk111 | awk '{print $3}'`
-	  echo "CONNECT TO sk110  ###############################"
-	clickctrl.sh write sk110 7777 sf add_flow \"$SRCMAC $DSTMAC 1000 100 0 2000 1\"
-	sleep 2
-        echo "CONNECT TO sk110  ###############################"
-	clickctrl.sh write sk110 7777 sf active 0
-	clickctrl.sh read sk110 7777 sf txflows
-	clickctrl.sh read sk110 7777 sf rxflows
-	echo "CONNECT TO sk111  ###############################"
-	clickctrl.sh read sk111 7777 sf txflows
-	clickctrl.sh read sk111 7777 sf rxflows
+	
+	for s in $NODELIST; do
+	  for d in $NODELIST; do
+	    if [ "x$s" != "x$d" ]; then
+	      SRCMAC=`cat $FINALRESULTDIR/nodelist | grep $s | awk '{print $3}'`
+	      DSTMAC=`cat $FINALRESULTDIR/nodelist | grep $d | awk '{print $3}'`
+	      
+	      echo "CONNECT TO $s  ###############################"
+	      clickctrl.sh write $s 7777 sf add_flow $SRCMAC $DSTMAC 1000 100 0 4000 1
+	      sleep 5
+	      
+              echo "CONNECT TO $s  ###############################"
+	      clickctrl.sh write $s 7777 sf active 0
+	      clickctrl.sh read $s 7777 sf txflows
+#	      clickctrl.sh read $s 7777 sf rxflows
+	      echo "CONNECT TO $d  ###############################"
+#	      clickctrl.sh read $d 7777 sf txflows
+	      clickctrl.sh read $d 7777 sf rxflows
+	    fi
+	  done
+	done
+	echo "RXFlows"
+	for s in $NODELIST; do
+	  clickctrl.sh read $s 7777 sf rxflows
+	done	
+	echo "done"
         ;;
     stop)
-        echo "Stop ctrl"
+        exit 0
         ;;
     poststop)
-        echo "poststop"
+        exit 0
         ;;
     *)
 	echo "Use $0 start|stop"
