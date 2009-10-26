@@ -50,6 +50,11 @@ public class ClickClient {
       }
 
       InetAddress ip;
+      String command;
+      command = args[5];
+      for ( int i = 6; i < args.length; i++) command = command + " " + args[i];
+      //System.out.println("Command: " + command);
+
       try {
         ip = InetAddress.getByName(args[1]);
       } catch(UnknownHostException e) {
@@ -60,7 +65,7 @@ public class ClickClient {
       Integer p = new Integer(args[2]);
       ClickConnection cc = new ClickConnection(ip, p.intValue());
       cc.openClickConnection();
-      int result = cc.writeHandler(args[3], args[4], args[5]);
+      int result = cc.writeHandler(args[3], args[4], command);
       cc.closeClickConnection();
 
     } else {
