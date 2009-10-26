@@ -22,7 +22,7 @@ echo "das Script: $1"
 
 case "$1" in
     prestart)
-	echo "prestart"
+        echo "prestart"
         ;;
     start)
         echo "Start crtl"
@@ -35,8 +35,8 @@ case "$1" in
         echo "Stop ctrl"
         ;;
     poststop)
-	echo "poststop"
-	;;
+        echo "poststop"
+        ;;
     *)
 	echo "Use $0 start|stop"
 	;;
