@@ -3,7 +3,7 @@ SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=100
+TIME=1200
 
 #CLICKMODE=kernel | userlevel | both
 CLICKMODE=userlevel
