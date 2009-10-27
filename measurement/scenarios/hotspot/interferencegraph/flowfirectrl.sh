@@ -27,24 +27,32 @@ case "$1" in
         for n in $NODELIST; do
 	        echo "############################### Setup single Flow on $n ###############################"
 	        #start end paketsize bw
-          clickctrl.sh write $n 7777 qc flow_insert 1000 3000 1500 1
+          clickctrl.sh write $n 7777 qc flow_insert 1000 3000 1200 2
           sleep 5
 	        echo "######################### Read stats for single Flow on $n ############################"
-          clickctrl.sh read $n 7777 qc flow_stats
-          sleep 1
+         RAWSTATS=`clickctrl.sh read $n 7777 qc flow_stats`
+	 echo $RAWSTATS
+	 STATS=`echo $RAWSTATS | grep "Rate" | awk '{print $4}'`
+	 echo "$n none $STATS none" >> $FINALRESULTDIR/ig.stats
+         sleep 1
         done
 	
-	      for s in $NODELIST; do
-	        for d in $NODELIST; do
-	          if [ "x$s" != "x$d" ]; then
+	      for n in $NODELIST; do
+	        for m in $NODELIST; do
+	          if [ "x$n" != "x$m" ]; then
      	        echo "############################### Setup Flows on $n and $m ###############################"
 	            #start end paketsize bw
-              clickctrl.sh write $n 7777 qc flow_insert 1000 3000 1500 1
-              clickctrl.sh write $m 7777 qc flow_insert 1000 3000 1500 1
+              clickctrl.sh write $n 7777 qc flow_insert 1000 3000 1200 2
+              clickctrl.sh write $m 7777 qc flow_insert 1000 3000 1200 2
               sleep 5
               echo "######################### Read stats for Flows on $n and $m ############################"
-              clickctrl.sh read $n 7777 qc flow_stats
-              clickctrl.sh read $m 7777 qc flow_stats
+              RAWSTATSA=`clickctrl.sh read $n 7777 qc flow_stats`
+              RAWSTATSB=`clickctrl.sh read $m 7777 qc flow_stats`
+	      echo $RAWSTATSA
+	      echo $RAWSTATSB
+	      STATSA=`echo $RAWSTATSA | grep "Rate" | awk '{print $4}'`
+	      STATSB=`echo $RAWSTATSB | grep "Rate" | awk '{print $4}'`
+              echo "$n $m $STATSA $STATSB" >> $FINALRESULTDIR/ig.stats
               sleep 1
             fi
           done
