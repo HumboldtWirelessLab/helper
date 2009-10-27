@@ -27,7 +27,7 @@ case "$1" in
         for n in $NODELIST; do
 	        echo "############################### Setup single Flow on $n ###############################"
 	        #start end paketsize bw
-          clickctrl.sh write $n 7777 qc flow_insert 1000 3000 1200 2
+          clickctrl.sh write $n 7777 qc flow_insert 1000 3000 1200 4
           sleep 5
 	        echo "######################### Read stats for single Flow on $n ############################"
          RAWSTATS=`clickctrl.sh read $n 7777 qc flow_stats`
@@ -42,8 +42,8 @@ case "$1" in
 	          if [ "x$n" != "x$m" ]; then
      	        echo "############################### Setup Flows on $n and $m ###############################"
 	            #start end paketsize bw
-              clickctrl.sh write $n 7777 qc flow_insert 1000 3000 1200 2
-              clickctrl.sh write $m 7777 qc flow_insert 1000 3000 1200 2
+              clickctrl.sh write $n 7777 qc flow_insert 1000 3000 1200 4
+              clickctrl.sh write $m 7777 qc flow_insert 1000 3000 1200 4
               sleep 5
               echo "######################### Read stats for Flows on $n and $m ############################"
               RAWSTATSA=`clickctrl.sh read $n 7777 qc flow_stats`
