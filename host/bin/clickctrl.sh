@@ -20,6 +20,23 @@ esac
 
 . $DIR/functions.sh
 
-java -jar $DIR/JClickClient.jar $@
+NETCAT="nc $2 $3"
+
+if [ "x$1" = "xwrite" ]; then
+  ELEMENT=$4
+  HANDLER=$5
+  shift 5
+  echo "write $ELEMENT.$HANDLER $@" | $NETCAT
+else
+ if [ "x$1" = "xread" ]; then
+   echo "read $4.$5" | $NETCAT
+ else
+   echo "Unknown commend"
+   exit 0
+ fi
+ 
+fi
+
+#java -jar $DIR/JClickClient.jar $@
 
 exit 0
