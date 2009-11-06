@@ -164,6 +164,9 @@ case "$1" in
 #		POSTFIX=$POSTFIX $DIR/prepare-sim.sh cleanup $2
 #		rm $TCLFILE
 		;;
+	"help")
+		echo "Use $0 run dis-file result-dir"
+		;;
 	*)
 		$0 help
 		;;
