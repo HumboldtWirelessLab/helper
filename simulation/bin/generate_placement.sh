@@ -1,33 +1,42 @@
 #!/bin/sh
 
-V=1
-NODE=110
-DISTANCE=60
 
-while [ $V -le 10 ]; do
 
-  RUNX=1
-  RUNY=1
+case "$1" in
+	"random")
+	  X=`$(( $RANDOM / $2 ))`
+	  Y=`$(( $RANDOM / $2 ))`
+  *)
+    V=1
+    NODE=110
+    DISTANCE=60
 
-  while [ $RUNY -lt $V ]; do
-    X=`expr $V \* $DISTANCE`
-    Y=`expr $RUNY \* $DISTANCE`
+    while [ $V -le 10 ]; do
 
-    echo "sk$NODE $X $Y 0"
-    RUNY=`expr $RUNY + 1`
-    NODE=`expr $NODE + 1`
-  done
+      RUNX=1
+      RUNY=1
 
-  while [ $RUNX -le $V ]; do
-    Y=`expr $V \* $DISTANCE`
-    X=`expr $RUNX \* $DISTANCE`
-    echo "sk$NODE $X $Y 0"
-    RUNX=`expr $RUNX + 1`
-    NODE=`expr $NODE + 1`
-  done
+      while [ $RUNY -lt $V ]; do
+        X=`expr $V \* $DISTANCE`
+        Y=`expr $RUNY \* $DISTANCE`
 
-  V=`expr $V + 1`
+        echo "sk$NODE $X $Y 0"
+        RUNY=`expr $RUNY + 1`
+        NODE=`expr $NODE + 1`
+      done
 
-done
+      while [ $RUNX -le $V ]; do
+        Y=`expr $V \* $DISTANCE`
+        X=`expr $RUNX \* $DISTANCE`
+        echo "sk$NODE $X $Y 0"
+        RUNX=`expr $RUNX + 1`
+        NODE=`expr $NODE + 1`
+      done
+
+      V=`expr $V + 1`
+
+    done
+    ;;
+esac   
 
 exit 0;

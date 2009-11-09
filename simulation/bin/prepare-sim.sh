@@ -60,6 +60,11 @@ case "$1" in
 				
 				  ( cd $CONFIGDIR; cat $CLICK | sed -e "s#//[0-$DEBUG]/##g" -e "s#/\*[0-$DEBUG]/##g" -e "s#/[0-$DEBUG]\*/##g" -e "s#DEBUGLEVEL#$DEBUG#g" | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAPTMPL#g" -e "s#TODEVICE#WIFIENCAPTMPL -> TORAWDEVICE#g" -e "s#FROMRAWDEVICE#FromSimDevice(NODEDEVICE,4096)#g" -e "s#WIFIDECAPTMPL#Strip(14)#g" -e "s#TORAWDEVICE#ToSimDevice(NODEDEVICE)#g" -e "s#WIFIENCAPTMPL#AddEtherNsclick()#g" | sed -e "s#NODEDEVICE#eth0#g" -e"s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $CLICKFINALNAME )
 				  ( cd $CONFIGDIR; echo "Script( wait $TIME.001, stop);" >> $CLICKFINALNAME )
+				  
+				  if [ "x$HANDLERSCRIPT" != "x" ]; then
+				    ( cd $CONFIGDIR; $DIR/../../measurement/bin/handle_script.sh $HANDLERSCRIPT $CNODE >> $CLICKFINALNAME )
+				  fi
+				  
         else
 				  CLICKFINALNAME="-"
         fi
