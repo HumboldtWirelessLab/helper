@@ -90,9 +90,10 @@ device_wifi
 -> Label_brnether::Null()
 -> BRN2EtherDecap()
 //4/-> Print("Foo",100)
--> brn_clf::Classifier(    0/04,  //BrnDSR
+-> brn_clf::Classifier(    0/04,  //BroadcastRouting
                            0/11,  //SimpleFlooding
                            0/10,  //SimpleFlow
+			                     0/13,  //Eventhandler
                              -  );//other
                                     
 brn_clf[0] 
@@ -116,7 +117,7 @@ brn_clf[2]
 //4/-> Print("Raus damit")
 -> [0]bcr;
 
-brn_clf[3] -> Discard;
+brn_clf[4] -> Discard;
 
 bcr[0]
 //4/-> Print("juhuhuhu")
@@ -136,7 +137,7 @@ bcr[1]
       -> BRN2EtherEncap(USEANNO true) -> [0]sfl[1] 
       -> BRN2EtherEncap(USEANNO true)
       //4/-> Print("SimpleFlood-Ether-OUT")
-      -> RandomDelayQueue(MINJITTER 5, MAXJITTER 70, DIFFJITTER 35)
+      -> RandomDelayQueue(MINJITTER 2, MAXJITTER 70, DIFFJITTER 35)
       -> [0]device_wifi;
 
 toMeAfterDsr[0] 
@@ -151,16 +152,27 @@ toMeAfterDsr[2]
  //4/-> Print("DSR-out: Foreign/Client")
   -> [1]device_wifi;
 
+brn_clf[3]
+-> StripBRNHeader()
+//4/-> Print("To Eventhandler")
+-> eh::EventHandler(/*DEBUG 4*/);
+
 Idle() ->
-en::EventNotifier(/*DEBUG 4*/)
+en::EventNotifier(ETHERADDRESS deviceaddress, EVENTHANDLERADDR 00:03:47:70:89:00 , /*4/ DEBUG 4 /4*/)
 -> Discard;
 
 en[1]
-//-> Print("event")
--> EtherEncap( 0x8680, deviceaddress, ff:ff:ff:ff:ff:ff) -> [0]bcr;
+//4/-> Print("event")
+-> BRN2EtherEncap(USEANNO true) -> t::Tee(2)
+//4/-> Print("event ethern")
+-> [0]bcr;
+
+t[1]
+-> toMeAfterDsr;
 
 Script(
   wait RUNTIME,
-  read sfl.stat,
-  read en.stats
+//  read sfl.stat,
+//  read en.stats
+  read eh.stats
 );
