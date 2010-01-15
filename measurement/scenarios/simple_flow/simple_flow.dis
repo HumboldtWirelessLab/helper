@@ -26,3 +26,5 @@ WANTNODELIST=yes
 GPS=no
 NOTICE=no
 LOS=no
+
+DEBUG=2

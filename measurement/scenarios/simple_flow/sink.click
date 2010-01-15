@@ -150,7 +150,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   wififrame_clf[1]
     -> WifiDecap()
     -> nbdetect
-//    -> Print("Data")
+//4/    -> Print("Data")
     -> brn_ether_clf :: Classifier( 12/8086, - )
     -> lp_clf :: Classifier( 14/06, - )
     -> BRN2EtherDecap()
@@ -222,6 +222,5 @@ toMeAfterDsr[2] -> /*Print("DSR-out: Foreign/Client") ->*/ [1]device_wifi;
 
 Script(
   wait RUNTIME,
-  read lt.links,
-  stop
+  read lt.links
 );
