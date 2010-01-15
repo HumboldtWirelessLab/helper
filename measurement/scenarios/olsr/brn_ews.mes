@@ -1,0 +1,13 @@
+#NODE		DEVICE	MODULSDIR				MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	LOGFILE		APP			APPLOGFILE
+sk110		ath1	BASEDIR/nodes/lib/modules/i586  		-	ahdemo.ews		-		-		-		CONFIGDIR/olsr.sh	LOGDIR/sk110_app.log
+#sk111		ath1	BASEDIR/nodes/lib/modules/i586  		-	ahdemo.ews		-		-		-		CONFIGDIR/olsr.sh	LOGDIR/sk111_app.log
+wgt25		ath0	BASEDIR/nodes/lib/modules/mips  		-	ahdemo.ews		-		-		-		CONFIGDIR/olsr.sh	LOGDIR/wgt25_app.log
+wgt31		ath0	BASEDIR/nodes/lib/modules/mips  		-	ahdemo.ews		-		-		-		CONFIGDIR/olsr.sh	LOGDIR/wgt31_app.log
+wgt33		ath0	BASEDIR/nodes/lib/modules/mips  		-	ahdemo.ews		-		-		-		CONFIGDIR/olsr.sh	LOGDIR/wgt33_app.log
+wgt41		ath0	BASEDIR/nodes/lib/modules/mips  		-	ahdemo.ews		-		-		-		CONFIGDIR/olsr.sh	LOGDIR/wgt41_app.log
+#wgt44		ath0	BASEDIR/nodes/lib/modules/mips  		-	ahdemo.ews		-		-		-		CONFIGDIR/olsr.sh	LOGDIR/wgt44_app.log
+wgt51		ath0	BASEDIR/nodes/lib/modules/mips  		-	ahdemo.ews		-		-		-		CONFIGDIR/olsr.sh	LOGDIR/wgt51_app.log
+wgt52		ath0	BASEDIR/nodes/lib/modules/mips  		-	ahdemo.ews		-		-		-		CONFIGDIR/olsr.sh	LOGDIR/wgt52_app.log
+wgt53		ath0	BASEDIR/nodes/lib/modules/mips  		-	ahdemo.ews		-		-		-		CONFIGDIR/olsr.sh	LOGDIR/wgt53_app.log
+#wgt77		ath0	BASEDIR/nodes/lib/modules/mips  		-	ahdemo.ews		-		-		-		CONFIGDIR/olsr.sh	LOGDIR/wgt77_app.log
+wgt78		ath0	BASEDIR/nodes/lib/modules/mips  		-	ahdemo.ews		-		-		-		CONFIGDIR/olsr.sh	LOGDIR/wgt78_app.log

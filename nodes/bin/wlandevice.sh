@@ -150,6 +150,15 @@ case "$1" in
 			fi
 	    fi
 
+	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ] || [ "$MODE" = "ahdemo" ]; then
+		if [ ! "x$WEPKEY" = "x" ] && [ ! "x$WEPMODE" = "x" ]; then
+		    echo "$IWCONFIG $DEVICE key $WEPKEY key $WEPMODE" 
+		    ${IWCONFIG} $DEVICE key $WEPKEY key $WEPMODE
+		    sleep 1
+		fi
+	    fi
+	    
+	    
 	    if [ "x$DIVERSITY" = "x" ]; then
 			DIVERSITY=$DEFAULT_DIVERSITY
 	    fi
@@ -168,14 +177,14 @@ case "$1" in
 	    echo "sysctl -w dev.$PHYDEV.rxantenna=$RXANTENNA"
 	    sysctl -w dev.$PHYDEV.rxantenna=$RXANTENNA
 
-		if [ "x$INTMIT" = "x" ]; then
+	    if [ "x$INTMIT" = "x" ]; then
 			INTMIT=$DEFAULT_INTMIT
-		fi
-		echo "sysctl -w dev.$PHYDEV.intmit=$INTMIT"
-		sysctl -w dev.$PHYDEV.intmit=$INTMIT
+	    fi
+	    echo "sysctl -w dev.$PHYDEV.intmit=$INTMIT"
+	    sysctl -w dev.$PHYDEV.intmit=$INTMIT
 
 
-		if [ "$MODE" = "monitor" ]; then
+	    if [ "$MODE" = "monitor" ]; then
 			
 			if [ "x$WIFITYPE" = "x" ]; then
 				WIFITYPE=$DEFAULT_WIFITYPE
@@ -207,14 +216,13 @@ case "$1" in
 			echo "$IWPRIV $DEVICE channelswitch $CHANNELSWITCH"
 			${IWPRIV} $DEVICE channelswitch $CHANNELSWITCH
 
-		fi
+	    fi
 		
-		if [ "x$DISABLECCA" = "x" ]; then
+	    if [ "x$DISABLECCA" = "x" ]; then
 			DISABLECCA=$DEFAULT_DISABLECCA
-		fi	    
-		echo "sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA"
-		sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA
-
+	    fi	    
+	    echo "sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA"
+	    sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA
 		
 	    echo "Finished device config"
 	    ;;
