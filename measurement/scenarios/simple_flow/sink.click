@@ -124,6 +124,8 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   wifioutq::NotifierQueue(50)
   -> TODEVICE;
+  //-> WIFIENCAPTMPL -> TORAWDEVICE;
+
   //-> AddEtherNsclick()
   //-> Print("To Device")
   //-> toDevice::ToSimDevice($devname);
@@ -131,11 +133,16 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   //FromSimDevice($devname, SNAPLEN 1500)
   //-> Strip(14)                              //-> ATH2Decap(ATHDECAP true)
   //  -> Print("FromDev")
-  FROMDEVICE
+  FROMRAWDEVICE -> tee::Tee() -> WIFIDECAPTMPL
+  //FROMDEVICE
   -> FilterPhyErr()
   -> filter :: FilterTX()
   -> wififrame_clf :: Classifier( 0/00%0f,  // management frames
-                                      - ); 
+                                      - );
+				      
+				
+  tee[1]
+  ->ToDump(RESULTDIR/NODENAME.NODEDEVICE.dump);      
 
   wififrame_clf[0]
 	-> Discard;

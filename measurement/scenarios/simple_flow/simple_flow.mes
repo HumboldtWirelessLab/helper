@@ -1,6 +1,6 @@
 #NODE		DEVICE	MODULSDIR				MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	LOGFILE			APP	APPLOGFILE
 sk110		ath1	BASEDIR/nodes/lib/modules/i586  		-	monitor.default		-		sink.click	LOGDIR/sk110.log	-	-
-sk111		ath1	BASEDIR/nodes/lib/modules/i586  		-	monitor.default		-		sink.click	LOGDIR/sk111.log	-	-
+#sk111		ath1	BASEDIR/nodes/lib/modules/i586  		-	monitor.default		-		sink.click	LOGDIR/sk111.log	-	-
 wgt25		ath0	BASEDIR/nodes/lib/modules/mips  		-	monitor.default		-		sink.click	LOGDIR/wgt25.log	-	-
 wgt31		ath0	BASEDIR/nodes/lib/modules/mips  		-	monitor.default		-		sink.click	LOGDIR/wgt31.log	-	-
 wgt33		ath0	BASEDIR/nodes/lib/modules/mips  		-	monitor.default		-		sink.click	LOGDIR/wgt33.log	-	-
@@ -9,5 +9,5 @@ wgt41		ath0	BASEDIR/nodes/lib/modules/mips  		-	monitor.default		-		sink.click	L
 wgt51		ath0	BASEDIR/nodes/lib/modules/mips  		-	monitor.default		-		sink.click	LOGDIR/wgt51.log	-	-
 wgt52		ath0	BASEDIR/nodes/lib/modules/mips  		-	monitor.default		-		sink.click	LOGDIR/wgt52.log	-	-
 wgt53		ath0	BASEDIR/nodes/lib/modules/mips  		-	monitor.default		-		sink.click	LOGDIR/wgt53.log	-	-
-wgt77		ath0	BASEDIR/nodes/lib/modules/mips  		-	monitor.default		-		sink.click	LOGDIR/wgt77.log	-	-
+#wgt77		ath0	BASEDIR/nodes/lib/modules/mips  		-	monitor.default		-		sink.click	LOGDIR/wgt77.log	-	-
 wgt78		ath0	BASEDIR/nodes/lib/modules/mips  		-	monitor.default		-		sink.click	LOGDIR/wgt78.log	-	-
