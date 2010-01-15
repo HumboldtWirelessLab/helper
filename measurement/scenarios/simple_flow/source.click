@@ -214,5 +214,4 @@ toMeAfterDsr[2] -> /*Print("DSR-out: Foreign/Client") ->*/ [1]device_wifi;
 Script(
   wait RUNTIME,
   read lt.links,
-  stop
 );
