@@ -1,0 +1,25 @@
+NAME=reset
+SIMULATOR=ns2
+RADIO=shadowing11b
+FORGEINNODES=no
+
+TIME=10
+
+#CLICKMODE=kernel | userlevel | both
+CLICKMODE=userlevel
+
+NODETABLE=nocca.mes
+NODEPLACEMENTFILE=placement.default
+
+LOGDIR=WORKDIR
+LOGFILE=measurement.log
+
+RESULTDIR=WORKDIR
+EVALUATIONSDIR=WORKDIR
+EVALUATIONSDIRPOSTFIX=_evaluation
+
+GPS=no
+NOTICE=no
+LOS=no
+
+WANTNODELIST=yes
