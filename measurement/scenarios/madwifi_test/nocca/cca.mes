@@ -1,0 +1,5 @@
+#NODE		DEVICE	MODULSDIR			MODOPTIONS	WIFICONFIG		CLICKMODDIR				CLICKSCRIPT		LOGFILE			APP	APPLOGFILE
+sk110		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.default		BASEDIR/nodes/lib/modules/i586		packetsource.click	LOGDIR/sk110.log	-	-
+sk111		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.default		BASEDIR/nodes/lib/modules/i586		packetsource2.click	LOGDIR/sk111.log	-	-
+sk112		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.default		BASEDIR/nodes/lib/modules/i586		receiver.click		LOGDIR/sk112.log	-	-
+#wgt25		ath0	BASEDIR/nodes/lib/modules/mips	-		monitor.default		BASEDIR/nodes/lib/modules/i586		receiver.click		LOGDIR/sk112.log	-	-
