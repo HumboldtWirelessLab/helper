@@ -24,20 +24,14 @@ BRN2PacketSource(1400, 10, 1000, 14, 2 ,16)
 // -> WifiEncap(0x00, 0:0:0:0:0:0)
 // -> SetTXRate(22)
 // -> wlan_out_queue;
-
 				    
 
-
 rt::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
-//"OFFSET", 0, cpUnsigned, &_offset,
-//"RT", 0, cpElement, &_rtable,
-//"THRESHOLD", 0, cpUnsigned, &_packet_size_threshold,
-//"ALT_RATE", 0, cpBool, &_alt_rate,
-//"ACTIVE", 0, cpBool, &_active,
-//"PERIOD", 0, cpUnsigned, &_period,
-								      
+
 wlan_out_queue
--> mr::MadwifiRate(OFFSET 4, RT rt, THRESHOLD 0, ALT_RATE true, ACTIVE true, PERIOD 1000) 
+//-> mr::MadwifiRate(OFFSET 4, RT rt, THRESHOLD 0, ALT_RATE true, ACTIVE true, PERIOD 1000) 
+//-> arf::AutoRateFallback(OFFSET 4, RT rt, THRESHOLD 0, ACTIVE true, ADAPTIVE_STEPUP false, STEPUP 1 /*Integer*/, STEPDOWN 1 /*Integer*/ ) 
+-> pr::ProbeTXRate(OFFSET 4, RT rt, THRESHOLD 0, ACTIVE true, DEBUG false, WINDOW 1000)
 -> SetTXPower(16)
 //-> WIFIENCAP
 //-> Print("Raw",100)
@@ -50,7 +44,9 @@ FROMDEVICE
 
  
 filter_tx[1]
- -> [1]mr[1]
+// -> [1]mr[1]
+// -> [1]arf[1]
+ -> [1]pr[1]
  -> Discard;
 
 
