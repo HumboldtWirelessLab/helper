@@ -165,12 +165,17 @@ for node in $NODELIST; do
 #		echo $node $nodedevice
 		for wificonfig_ac in $WIFICONFIG; do
 
-			if [ -e $CONFIGDIR/$wificonfig_ac ]; then
+		        if [ -e $wificonfig_ac ]; then
+			    cp $wificonfig_ac $FINALRESULTDIR
+			else
+			    if [ -e $CONFIGDIR/$wificonfig_ac ]; then
 				cp $CONFIGDIR/$wificonfig_ac $FINALRESULTDIR
-			fi
-			if [ -e $DIR/../../nodes/etc/wifi/$wificonfig_ac ]; then
-				cp $DIR/../../nodes/etc/wifi/$wificonfig_ac $FINALRESULTDIR
-			fi
+			    else
+				if [ -e $DIR/../../nodes/etc/wifi/$wificonfig_ac ]; then
+				    cp $DIR/../../nodes/etc/wifi/$wificonfig_ac $FINALRESULTDIR
+				fi
+			    fi
+			fi    
 
 		done
 	done
@@ -178,7 +183,6 @@ done
 
 echo "Start measurement !"
 
-#exit 0
 RESULT=`(cd $FINALRESULTDIR; WANTNODELIST=$WANTNODELIST FINALRESULTDIR=$FINALRESULTDIR LOCALPROCESS=$LOCALPROCESS CLICKMODE=$CLICKMODE CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/run_single_measurement.sh 5>&1 6>&2 1>> $LOGDIR/$LOGFILE 2>&1)`
 
 echo $RESULT
