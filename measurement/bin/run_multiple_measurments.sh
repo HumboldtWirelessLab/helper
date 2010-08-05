@@ -20,11 +20,15 @@ esac
 
 if [ "x$1" = "xhelp" ] || [ "x$1" = "x" ]; then
   echo "Skript to run measurements as much as you want. After each measurement you'll be ask whether you want one more."
-  echo "Use $0 disfile to start"
+  echo "Use $0 disfile to start. Options (ENVIRONMENTVARS):"
+  echo "FIRSTRUNMODE (REBOOT|CLICK): What should be done before the first measuremnt (TESTBED)"
+  echo 
   exit 0
 fi 
 
 DISFILE=$1
+
+. $DISFILE
 
 if [ "x$FIRSTRUNMODE" = "x" ]; then
   RUNMODE=REBOOT
@@ -32,13 +36,22 @@ else
   RUNMODE=$FIRSTRUNMODE
 fi
 
-if [ "x$MULTIMODE" = "x" ]; then
-  MULTIMODE="ASK"
+if [ "x$MULTIRUNMODE" = "x" ]; then
+  MULTIRUNMODE="CLICK"
+fi
+
+if [ "x$MULTIREPEAT" = "x" ]; then
+  MULTIREPEAT="ASK"
+fi
+
+if [ "x$MULTIWAIT" = "x" ]; then
+  MULTIWAIT="0"
 fi
 
 if [ "x$SIMULATION" = "x" ]; then
   SIMULATION="0"
 fi
+
 
 RUNNUMBER=0
 key=y
@@ -51,7 +64,7 @@ while [ "x$key" = "xy" ]; do
       RUNNUMBER=`expr $RUNNUMBER + 1`
 
       if [ "x$MULTIWAIT" = "x1" ]; then
-        echo "Press Key to run $RUNNUMBER measurement"
+        echo -n "Press Key to run $RUNNUMBER. measurement"
         read -n 1 trash
       fi
 
@@ -64,24 +77,18 @@ while [ "x$key" = "xy" ]; do
       
       if [ $SIMULATION -eq 0 ]; then
         RUNMODE=$RUNMODE $DIR/run_measurement.sh $DISFILE $NEXT
+        RUNMODE=$MULTIRUNMODE
       else
       	$DIR/../../simulation/bin/ns2-sim.sh run $DISFILE $NEXT
       fi
       
-     
-      if [ "x$MULTIRUNMODE" = "x" ]; then
-        RUNMODE=CLICK
-      else
-        RUNMODE=$MULTIRUNMODE
-      fi
-      
-      if [ "$MULTIMODE" = "LOOP" ]; then
-        if [ $RUNNUMBER -eq $RUNS ]; then
-          key=n
-        fi
-      else   
+      if [ "$MULTIREPEAT" = "ASK" ]; then
         echo -n "Another Measurement (y/n) ? "
         read key
+      else   
+        if [ $RUNNUMBER -eq $MULTIREPEAT ]; then
+          key=n
+        fi
       fi
 
 done

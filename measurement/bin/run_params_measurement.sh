@@ -37,26 +37,34 @@ recursive() {
     
     if [ $1 -eq 0 ]; then
  
-      rm -rf $MDIR.$CONFIGS
-      mkdir $MDIR.$CONFIGS
+      rm -rf $MDIR/PARAMS_$CONFIGS
+      mkdir -p $MDIR/PARAMS_$CONFIGS
       
-      ALLDIRS="$ALLDIRS $MDIR.$CONFIGS"
+      ALLDIRS="$ALLDIRS $MDIR/PARAMS_$CONFIGS"
       
       local i=0;
       while [ $i -lt ${#VARFIELD[@]} ]; do
         ACVALUE=(${VALUEFIELD[$i]})
         SEDARG="$SEDARG -e s#${VARFIELD[$i]}#${ACVALUE[${GLOBALINDEX[$i]}]}#g"
  
-        echo "${VARFIELD[$i]}=${ACVALUE[${GLOBALINDEX[$i]}]}" >> $MDIR.$CONFIGS/config
+        echo "${VARFIELD[$i]}=${ACVALUE[${GLOBALINDEX[$i]}]}" >> $MDIR/PARAMS_$CONFIGS/config
  
         let "i = $i +1"
       done
       
       for acfile in  `ls $MDIR`; do
         if [ "$acfile" = "$PARAMSFILE" ]; then
-          cp $MDIR/$acfile $MDIR.$CONFIGS/
+          cp $MDIR/$acfile $MDIR/PARAMS_$CONFIGS/
         else
-          cat $MDIR/$acfile | sed $SEDARG > $MDIR.$CONFIGS/$acfile
+	  if [ "x$acfile" = "x" ]; then
+	    echo "No acfile"
+	  else
+	    #echo "foo $MDIR $acfile"
+	    if [ -f $MDIR/$acfile ]; then
+        	cat $MDIR/$acfile | sed $SEDARG > $MDIR/PARAMS_$CONFIGS/$acfile
+	    fi
+	    #echo "foo2"
+	  fi
         fi
       done
       
@@ -86,8 +94,8 @@ case "$1" in
           SIMULATION=0
         fi
         
-        if [ "x$FIRSTRUNMODE" = "x" ]; then
-          FIRSTRUNMODE="REBOOT"
+        if [ "x$PARAMSRUNMODE" = "x" ]; then
+          PARAMSRUNMODE="REBOOT"
         fi
          
 		MDIR=`dirname $2`
@@ -111,6 +119,8 @@ case "$1" in
 		
 		VARFIELD=($VARS)
 		
+		echo $VARFIELD
+		
 		. $MDIR/$PARAMSFILE
 		
 		i=0
@@ -128,16 +138,21 @@ case "$1" in
 		
 		CURRUN=1
 		
+		#echo $ALLDIRS
+		
      	for acdir in $ALLDIRS; do
      	
      	  if [ "x$PARAMSWAIT" = "x1" ]; then
-     	    echo "Press any key to run $CURRUN. params"
+     	    echo -n "Press any key to run $CURRUN. params measurement"
      	    read -n 1 trash
      	  fi
      	  echo "Run $CURRUN. params"
 		  NOW=`pwd`
 		  ( cd $acdir; SIMULATION=$SIMULATION FIRSTRUNMODE=$FIRSTRUNMODE MULTIRUNMODE=$MULTIRUNMODE MULTIMODE="LOOP" RUNS=$MULTIREPEAT MULTIWAIT=$MULTIWAIT $DIR/run_multiple_measurments.sh $2; cd $NOW)
 		  let "CURRUN=$CURRUN + 1"
+		  
+		  #TODO think about
+		  FIRSTRUNMODE=$PARAMSRUNMODE
 		done
 	
 	

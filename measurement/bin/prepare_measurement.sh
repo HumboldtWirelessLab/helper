@@ -72,13 +72,13 @@ case "$1" in
 			    WIFICONFIG=`echo "$WIFICONFIG" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 
 			    if [ ! "x$WIFICONFIG" = "x" ] && [ ! "x$WIFICONFIG" = "x-" ]; then
-				if [ -f  $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then                                                                                                                                                   
-				    . $DIR/../../nodes/etc/wifi/$WIFICONFIG
-				    WIFICONFIGFINALNAME="$DIR/../../nodes/etc/wifi/$WIFICONFIG"
+				if [ -f  $CONFIGDIR/$WIFICONFIG ]; then                                                                                                                                                   
+				    . $CONFIGDIR/$WIFICONFIG
+				    WIFICONFIGFINALNAME=$CONFIGDIR/$WIFICONFIG
 				else
-				    if [ -f  $CONFIG/$WIFICONFIG ]; then                                                                                                                                                   
-					. $CONFIG/$WIFICONFIG
-					WIFICONFIGFINALNAME=$CONFIG/$WIFICONFIG
+				    if [ -f  $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then                                                                                                                                                   
+					. $DIR/../../nodes/etc/wifi/$WIFICONFIG
+					WIFICONFIGFINALNAME="$DIR/../../nodes/etc/wifi/$WIFICONFIG"
 				    else
 					if [ -f $WIFICONFIG ]; then
 					    . $WIFICONFIG
@@ -151,7 +151,7 @@ case "$1" in
 				CLICKFINALNAME="-"
 			    fi
 			
-			    echo "$CNODE $CDEV $CMODDIR $CMODOPT $WIFICONFIG $CCMODDIR $CLICKFINALNAME $CCLOG $CAPP $CAPPL" | sed -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" >> $RESULTDIR/$NODETABLE.$POSTFIX
+			    echo "$CNODE $CDEV $CMODDIR $CMODOPT $WIFICONFIGFINALNAME $CCMODDIR $CLICKFINALNAME $CCLOG $CAPP $CAPPL" | sed -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" >> $RESULTDIR/$NODETABLE.$POSTFIX
 
 			fi
 		    fi
