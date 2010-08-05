@@ -43,6 +43,7 @@ case "$1" in
 		;;
 	"waitfornodes")
 		for node in $NODELIST; do
+		    echo "$node"
 		    AVAILABLE=`node_available $node`
 		    while [ $AVAILABLE = "n" ]; do
 			sleep 1;

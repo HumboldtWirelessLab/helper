@@ -157,10 +157,12 @@ for node in $NODELIST; do
 
 	NODEDEVICELIST=`cat $FINALRESULTDIR/$NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
+	echo $node $NODEDEVICELIST
 	for nodedevice in $NODEDEVICELIST; do
 
-		WIFICONFIG=`cat $FINALRESULTDIR/$NODETABLE | awk '{print $1" "$2" "$5}' | grep "^$node $nodedevice" | awk '{print $3}' | sort -u`
+		WIFICONFIG=`cat $FINALRESULTDIR/$NODETABLE | awk '{print $1" "$2" "$5}' | egrep "^$node $nodedevice" | awk '{print $3}' | sort -u`
 
+#		echo $node $nodedevice
 		for wificonfig_ac in $WIFICONFIG; do
 
 			if [ -e $CONFIGDIR/$wificonfig_ac ]; then
@@ -176,6 +178,7 @@ done
 
 echo "Start measurement !"
 
+#exit 0
 RESULT=`(cd $FINALRESULTDIR; WANTNODELIST=$WANTNODELIST FINALRESULTDIR=$FINALRESULTDIR LOCALPROCESS=$LOCALPROCESS CLICKMODE=$CLICKMODE CONFIGFILE=$NODETABLE MARKER=$NAME STATUSFD=5 TIME=$TIME ID=$NAME RUNMODE=$RUNMODE $DIR/run_single_measurement.sh 5>&1 6>&2 1>> $LOGDIR/$LOGFILE 2>&1)`
 
 echo $RESULT
