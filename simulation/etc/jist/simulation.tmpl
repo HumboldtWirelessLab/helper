@@ -1,0 +1,118 @@
+import jist.swans.Constants;
+import click.sim.builder.ClickBuilder;
+import click.runtime.ClickInterface;
+import brn.sim.DataManager;
+import brn.sim.AbstractDriver;
+import brn.sim.builder.*;
+import test.brn.mesh.MeshClickParams;
+
+public class JistSimulation extends AbstractDriver {
+
+  public void runlocal() throws Exception {
+    MeshClickParams params = new MeshClickParams();
+
+    int level = DataManager.LEVEL_ALL;
+//  int timebarLevel = DataManager.LEVEL_OFF;
+    int timebarLevel = DataManager.LEVEL_ALL;
+    params.handlerFieldLevel = level;
+    params.handlerRadioLevel = level;
+    params.handlerRadioDivLevel = level;
+    params.handlerMacLevel = level;
+    params.handlerRateLevel = level;
+    params.handlerNetLevel = level;
+    params.handlerRouteLevel = level;
+    params.handlerTransLevel = level;
+    params.handlerFlowLevel = level;
+
+    params.handlerRadioTimeBarLevel = timebarLevel;
+    params.handlerMacTimeBarLevel = timebarLevel;
+    params.handlerNetTimeBarLevel = timebarLevel;
+
+    params.handlerForwardGraphLevel = level;
+    params.handlerLinkTableLevel = level;
+    params.handlerLinkQualityLevel = level;
+
+    PathLossBuilder.LogDistanceParams pathloss = new PathLossBuilder.LogDistanceParams();
+    FieldBuilder.FieldParams field = (FieldBuilder.FieldParams) params.field;
+    field.fieldX = 1200;
+    field.fieldY = 1200;
+    field.pathloss = pathloss;
+    field.spatial_mode = Constants.SPATIAL_LINEAR;
+    FadingBuilder.PunnooseRicianParams fading = new FadingBuilder.PunnooseRicianParams();
+    fading.maxVelocity = 16;
+    field.fading = fading;
+
+    RadioBuilder.NoiseAdditiveBerParams radio = new RadioBuilder.NoiseAdditiveBerParams();
+    radio.placement = Constants.PLACEMENT_GRID;
+    radio.connectivityBitRate = Constants.BANDWIDTH_6Mbps;
+    radio.placementOpts = "4,4";
+    radio.fieldX = field.fieldX;
+    radio.fieldY = field.fieldY;
+    radio.useAnnos = true;
+    radio.setBitErrorModel(brn.swans.Constants.BITERRORS_NONE);
+    radio.recvCorruptPackets = false;
+
+    ClickBuilder.MacMadwifiParams mac = new ClickBuilder.MacMadwifiParams();
+    RateBuilder.AnnoMultiParams rate = new RateBuilder.AnnoMultiParams();
+    mac.setRateSelection(rate);
+    mac.macPromisc = true;
+    mac.useAnnos = radio.useAnnos;
+    mac.useBitRateAnnos = true;
+    mac.encap = ClickInterface.SIMCLICK_PTYPE_WIFI_EXTRA;
+
+    ClickBuilder.NetParams net = new ClickBuilder.NetParams();
+    net.protocolMapper = new int[] { Constants.NET_PROTOCOL_UDP, Constants.NET_PROTOCOL_TCP };
+    String clickFiles =  "/usr/src/openwrt/BerlinRoofNet/brn.sim/brn.jist.click/res/click/mesh/cluster/dcluster.click";
+    net.clickfile = clickFiles;
+    net.clickLibrary = "jistclick";
+/*
+    TransBuilder.UdpParams transParams = new TransBuilder.UdpParams();
+
+    AppBuilder.VirtualAntennaControllerAppParams vacParams = new AppBuilder.VirtualAntennaControllerAppParams();
+    vacParams.serverPort = 4000;
+    vacParams.serverAddr = new NetAddress("0.0.0.1");
+    vacParams.client = false;
+  */
+    params.nodeNumber = new int[1];
+    params.nodeParams = new NodeBuilder.NodeParams[1];
+
+    // set parameters
+    params.nodeNumber[0] = 4*4;
+    params.nodeParams[0] = new NodeBuilder.NodeParams();//NodeBuilder.AppParams();
+    params.nodeParams[0].radio = radio;
+    params.nodeParams[0].mac = mac;
+    params.nodeParams[0].net = net;
+    params.nodeParams[0].route = null;
+//    ((NodeBuilder.AppParams)params.nodeParams[0]).trans = transParams;
+//    ((NodeBuilder.AppParams)params.nodeParams[0]).setApp(vacParams);
+/*
+    ClickBuilder.NetParams net2 = new ClickBuilder.NetParams();
+    net2.protocolMapper = new int[] { Constants.NET_PROTOCOL_UDP, Constants.NET_PROTOCOL_TCP };
+    net2.clickfile = "res/click/mesh/";
+    net2.clickLibrary = "jistclick";
+
+    params.nodeNumber[1] = 1;
+    params.nodeParams[1] = new NodeBuilder.NodeParams();
+    params.nodeParams[1].radio = radio;
+    params.nodeParams[1].mac = mac;
+    params.nodeParams[1].net = net2;
+    params.nodeParams[1].route = null;
+  */
+    params.endTime = 90;
+    params.seed = 1001;
+    super.run(params);
+  }
+
+
+  public static void main(String[] args) {
+    JistSimulation clt = new JistSimulation();
+
+    try {
+      clt.runlocal();
+    } catch (Exception e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
+
+  }
+
+}
