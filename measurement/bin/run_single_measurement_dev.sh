@@ -38,7 +38,7 @@ check_nodes() {
 	echo "Nodestatus: $NODESTATUS"
 	echo "WHHHHOOOOO: LOOKS LIKE RESTART! GOD SAVE THE WATCHDOG"
 	echo "Current Mode: $CURRENTMODE"
-	echo "Nodes: $NODELIST"
+	echo "Nodes: $NODESTATUS"
 	echo "reboot all nodes"
 	NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
 

@@ -43,6 +43,23 @@ case "$1" in
 		    fi
 		done
 		;;
+	"extramount")
+		for node in $NODELIST; do
+		    echo "EXTRAMOUNT: $node"
+		    
+		    ENVIRONMENTFILE=`cat $DIR/../../nodes/etc/environment/nodesenvironment.conf | grep "^$node" | awk '{print $2}'`
+		    . $DIR/../../nodes/etc/environment/$ENVIRONMENTFILE
+		    
+		    echo "$EXTRANFS;$EXTRANFSTARGET;$EXTRANFSSERVER"
+		    
+		    if [ ! "x$EXTRANFS" = "x" ] && [ ! "x$EXTRANFSTARGET" = "x" ] &&  [ ! "x$EXTRANFSSERVER" = "x" ]; then
+			run_on_node $node "mkdir $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
+       			run_on_node $node "mount -o nolock $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
+		    else
+			echo "NFSHOME not set, so no mount."
+		    fi
+		done
+		;;
 	"watchdogstart")
 		for node in $NODELIST; do
 		    echo "$node"
