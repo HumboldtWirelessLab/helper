@@ -37,7 +37,7 @@ check_nodes() {
 	echo "Nodestatus: $NODESTATUS"
 	echo "WHHHHOOOOO: LOOKS LIKE RESTART! GOD SAVE THE WATCHDOG"
 	echo "Current Mode: $CURRENTMODE"
-	echo "Nodes: $NODELIST"
+	echo "Nodes: $NODESTATUS"
 	echo "reboot all nodes"
 	NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
 
@@ -180,6 +180,7 @@ fi
 if [ $RUNMODENUM -le 2 ]; then
     echo "Setup environment"
     NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mount
+    NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh extramount
 fi
 
 echo "Set marker for reboot-detection"
@@ -557,6 +558,10 @@ if [ $RUNMODENUM -le 5 ]; then
   if [ "x$LOCALPROCESS" != "x" ]; then
     CPWD=`pwd`
     echo ""
+    screen -S $SCREENNAME -p localprocess -X stuff $'\n'
+    sleep 0.1
+    screen -S $SCREENNAME -p localprocess -X stuff $'\n'
+    sleep 0.1
     echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
     screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
     sleep 0.1

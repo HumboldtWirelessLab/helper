@@ -37,15 +37,19 @@ case "$1" in
 		done
 		;;
 	"statusmarker")	
+	        FAILEDNODES=""
 		for node in $NODELIST; do
 		    RESULT=`run_on_node $node "ls $MARKER" "/" $DIR/../etc/keys/id_dsa 2>&1`
 		    if [ ! "x$RESULT" = "x$MARKER" ]; then
-			echo "failed"
-			exit 0
+		        FAILEDNODES="$FAILEDNODES $node"
 		    fi
 		done
-		
-		echo "ok"
+
+		if [ "x$FAILEDNODES" = "x" ]; then
+		    echo "ok"
+		else
+		    echo "$FAILEDNODES"
+		fi
 		;;
 	"clearmarker")	
 		for node in $NODELIST; do
