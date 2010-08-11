@@ -23,6 +23,8 @@ esac
 NODELIST=`cat $CONFIGFILE | grep -v "#" | awk '{print $1}' | sort -u`
 RUN_CLICK_APPLICATION=0
 
+SCREENFILENAME=screenmap
+
 ##############################################
 ###### Functions to check the nodes ##########
 ##############################################
@@ -35,17 +37,17 @@ check_nodes() {
     NODESTATUS=`NODELIST=$NODELIST MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh statusmarker`
 
     if [ ! "x$NODESTATUS" = "xok" ]; then
-	echo "Nodestatus: $NODESTATUS"
-	echo "WHHHHOOOOO: LOOKS LIKE RESTART! GOD SAVE THE WATCHDOG"
-	echo "Current Mode: $CURRENTMODE"
-	echo "Nodes: $NODELIST"
-	echo "reboot all nodes"
-	NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
+      echo "Nodestatus: $NODESTATUS"
+      echo "WHHHHOOOOO: LOOKS LIKE RESTART! GOD SAVE THE WATCHDOG"
+      echo "Current Mode: $CURRENTMODE"
+      echo "Nodes: $NODELIST"
+      echo "reboot all nodes"
+      NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
 
-	echo "wait for all nodes"
-	sleep 20
-	echo "error" 1>&$STATUSFD
-	exit 0
+      echo "wait for all nodes"
+      sleep 20
+      echo "error" 1>&$STATUSFD
+      exit 0
     fi
 }
 
@@ -116,6 +118,77 @@ abort_measurement() {
 ###### Check RUNMODE. What do you want to do ? ##########
 #########################################################
 
+screenname_for_node() {
+  RESULT=`cat $2 | grep -e "^$1[[:space:]]" | awk '{print $2}'`
+  echo $RESULT
+}
+
+
+run_command_on_node() {
+
+  SCREENNAME=`screenname_for_node $1 $SCREENFILENAME`
+
+  screen -S $SCREENNAME -p $1 -X stuff "NODELIST=$1 $DIR/../../host/bin/run_on_nodes.sh $2"
+  sleep 0.3
+  screen -S $SCREENNAME -p $1 -X stuff $'\n'
+
+}
+
+run_command_on_screen() {
+
+  SCREENNAME=`screenname_for_node $1 $SCREENFILENAME`
+
+  echo "Debug: $SCREENNAME" >&5
+  screen -S $SCREENNAME -p $1 -X stuff "LOGMARKER=$1 $2"
+  sleep 0.3
+  screen -S $SCREENNAME -p $1 -X stuff $'\n'
+
+}
+
+##############################
+###### SYNC - stuff ##########
+##############################
+
+wait_for_nodes() {
+  NODES=$1
+  STATEFILE=$2
+  
+  ALL=0
+  
+  while [ $ALL -eq 0 ]; do
+    NO_NODES=0
+    STATE_NODES=0;
+    OK_NODES=0;
+    
+    for n in $NODES; do
+      NO_NODES=`expr $NO_NODES + 1`
+      
+      if [ -f $STATEFILE ]; then
+        STATE_NODES=`expr $STATE_NODES + 1`
+        STATE=`cat $STATEFILE | awk '{print $1}'`
+        if [ $STATE -eq 0 ]; then
+          OK_NODES=`expr $OK_NODES + 1`
+        fi
+      fi
+    done
+    
+    if [ $NO_NODES -eq $STATE_NODES ]; then
+      ALL=1;
+    fi
+  done
+  
+  if [ $NO_NODES -eq $OK_NODES ]; then
+    echo "0"
+  else
+    echo "1"
+  fi
+
+}
+
+#########################################################
+###### Check RUNMODE. What do you want to do ? ##########
+#########################################################
+
 if [ "x$RUNMODE" = "x" ]; then
     RUNMODE=UNKNOWN
 fi
@@ -149,7 +222,6 @@ esac
 ### Create screen for all nodes ####
 ####################################
 
-SCREENFILENAME=screenmap
 
 SCREENNUMBER=1
 NODE_IN_SCREEN=1                                                                                                                                                                                                                                                                       
@@ -175,7 +247,59 @@ for node in $NODELIST; do
 
 done
 
+sleep 1
 #screen -ls
+
+###############################
+######### STATUSDIR ###########
+###############################
+
+rm -rf 
+mkdir status
+
+###############################
+##### START PREPARE NODES #####
+###############################
+
+echo "Start node setup"
+for node in $NODELIST; do
+  run_command_on_screen $node "NODELIST=\"$node\" $DIR/prepare_single_node.sh"
+done
+
+####################################
+###### Wait for all nodes ##########
+####################################
+
+####################################################
+###### Reboot all nodes and wait for them ##########
+####################################################
+
+###################################
+###### Setup Environment ##########
+###################################
+
+###################################
+##### Prestart local process ######
+###################################
+
+##################################
+###### Load Wifi-Moduls ##########
+##################################
+
+############################
+###### Setup Wifi ##########
+############################
+
+######################################################
+###### Get Wifiinfo and Start Screensession ##########
+######################################################
+
+###################################
+###### Setup Clickmodule ##########
+###################################
+
+
+ SYNCSTATE=`wait_for_nodes "$NODELIST" status/$LOGMARKER\_preload.state"`
 
 
 
@@ -213,254 +337,15 @@ fi
 
 exit 0
 
-####################################
-###### Wait for all nodes ##########
-####################################
-
-echo "check all nodes"
-NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodes
-
-if [ $RUNMODENUM -eq 0 ]; then
-    echo -n "Check marker ($MARKER): "
-    CHECKNODESTATUS=`get_node_status`
-    echo "$CHECKNODESTATUS"
-    if [ ! "x$CHECKNODESTATUS" = "xok" ]; then
-	RUNMODENUM=1
-    else
-	RUNMODENUM=5
-    fi
-fi
-
-####################################################
-###### Reboot all nodes and wait for them ##########
-####################################################
-
-if [ $RUNMODENUM -le 1 ]; then
-    echo "Reboot all nodes"
-    NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
-     
-    echo "Wait for all nodes"
-    sleep 30
-    NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodesandssh
-fi
-
-###################################
-###### Setup Environment ##########
-###################################
-
-if [ $RUNMODENUM -le 2 ]; then
-    echo "Setup environment"
-    NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mount
-fi
-
-echo "Set marker for reboot-detection"
-
-NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmarker
-
-###################################
-##### Prestart local process ######
-###################################
-
-if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
-  echo "Local process: prestart"
-  $LOCALPROCESS prestart >> $FINALRESULTDIR/localapp.log
-fi
-
-##################################
-###### Load Wifi-Moduls ##########
-##################################
-
-if [ $RUNMODENUM -le 3 ]; then
-
-    echo "Load Modules"
-    CURRENTMODE="LOAD MODULES"
-    LOADMODULES=0
-
-    NODELIST="$NODELIST" $DIR/../../host/bin/wlanmodules.sh rmmod
-
-    for node in $NODELIST; do
-
-	MODULSDIR=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $3}' | tail -n 1`
-	MODOPTIONS=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $4}' | tail -n 1`
-	CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $5}' | tail -n 1`
-
-	if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
-	    if [ "x$MODOPTIONS" = "x" ] || [ "x$MODOPTIONS" = "x-" ]; then
-		RECOMMENDMODOPTIONS=`cat $CONFIG | grep RECOMMENDMODOPTIONS | awk -F= '{print $2}'`
-		if [ "x$RECOMMENDMODOPTIONS" != "x" ]; then
-		    MODOPTIONS=$RECOMMENDMODOPTIONS
-		else
-		    MODOPTIONS=modoptions.default
-		fi
-	    fi	
-
-	    NODELIST="$node" MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../host/bin/wlanmodules.sh insmod
-	    LOADMODULES=1
-	fi
-    done
-
-    if [ $LOADMODULES -eq 1 ]; then
-	#check nodes and sleep, only if modules are need to load
-	check_nodes
-	sleep 1
-    fi
-fi
-
-############################
-###### Setup Wifi ##########
-############################
-
-if [ $RUNMODENUM -le 4 ]; then
-
-    echo "Setup Wifi"
-    CURRENTMODE="CREATE WIFI"
-    CREATEWIFI=0
-    
-    for node in $NODELIST; do
-	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-	for nodedevice in $NODEDEVICELIST; do
-	    CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
-	    if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
-		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/../../host/bin/wlandevices.sh create
-		CREATEWIFI=1
-	    fi
-	done
-    done
-
-    if [ $CREATEWIFI -eq 1 ]; then
-	#check nodes and sleep if device should be created
-	check_nodes
-	sleep 1
-	#extra sleep for WGTs
-	sleep 2
-    fi
-
-    CURRENTMODE="START WIFI"
-    STARTWIFI=0
-
-    for node in $NODELIST; do
-	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-	for nodedevice in $NODEDEVICELIST; do
-	    CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
-	    if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
-    		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/../../host/bin/wlandevices.sh start
-	        STARTWIFI=1
-	    fi
-	done
-    done
-
-    if [ $STARTWIFI -eq 1 ]; then
-        check_nodes
-	sleep 1
-    fi
-    
-    CURRENTMODE="CONFIG WIFI"
-    CONFIGWIFI=0
-
-    for node in $NODELIST; do
-	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-	for nodedevice in $NODEDEVICELIST; do
-	    CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
-	    if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
-		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/../../host/bin/wlandevices.sh config
-		CONFIGWIFI=1
-	    fi
-	done
-    done
-
-    if [ $CONFIGWIFI -eq 1 ]; then
-        check_nodes
-    fi
-    
-fi
-
-######################################################
-###### Get Wifiinfo and Start Screensession ##########
-######################################################
-#TODO: rename nodelist
-
-if [ $RUNMODENUM -le 5 ]; then
-
-  echo "Get Wifiinfo"
-
-  for node in $NODELIST; do
-    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-    for nodedevice in $NODEDEVICELIST; do
-      CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
-	    echo "Deviceconfig for $node:$nodedevice" 
-	    if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
-        NODE=$node DEVICES=$nodedevice $DIR/../../host/bin/wlandevices.sh getiwconfig
-	    fi
-	    
-	    if [ "x$WANTNODELIST" = "xyes" ]; then
-	      MADDR=`run_on_node $node "DEVICE=$nodedevice $DIR/../../nodes/bin/wlandevice.sh getmac" "/" $DIR/../../host/etc/keys/id_dsa`
-	      echo "$node $nodedevice $MADDR" >> $FINALRESULTDIR/nodelist
-	    fi
-	    
-	  done
-  done
+#####################################
+###### Start Screensession ##########
+#####################################
 
   SCREENNAME="measurement_$ID"
     
   screen -d -m -S $SCREENNAME
 
   NODEBINDIR="$DIR/../../nodes/bin"
-
-###################################
-###### Setup Clickmodule ##########
-###################################
-
-    CURRENTMODE="LOAD CLICKMOD"
-    LOADCLICKMOD=0
-
-    for node in $NODELIST; do
-
-	CLICKMODDIR=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $6}' | tail -n 1`
-
-	if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
-	    NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh reloadmod
-	    LOADCLICKMOD=1
-	fi
-    done
-
-    if [ $LOADCLICKMOD -eq 1 ]; then
-	check_nodes
-    fi
-
-########################################################
-###### Preload Click-, Log- & Application-Stuff ########
-########################################################
-
-    for node in $NODELIST; do
-      NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-      NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
-	
-      LOADCLICK=0
-      for nodedevice in $NODEDEVICELIST; do
-        CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
-
-        CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
-        CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
-        LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
-
-        if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-	    LOADCLICK=1
-	fi
-
-	APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
-	APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $10}'`
-		
-	if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-	    echo "Application preload on $node"
-    	    run_on_node $node "cat $APPLICATION > /dev/null" "/" $DIR/../../host/etc/keys/id_dsa
-	fi
-      done
-      
-      if [ "x$LOADCLICK" = "x1" ]; then
-	echo "Click preload on $node"
-        run_on_node $node "export CLICKPATH=$NODEBINDIR/../etc/click;echo \"Script(wait 0,stop);\" | $NODEBINDIR/click-align-$NODEARCH | $NODEBINDIR/click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa
-      fi
-    done
 
     
 ########################################################
