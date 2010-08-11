@@ -556,16 +556,17 @@ if [ $RUNMODENUM -le 5 ]; then
     fi
 
   if [ "x$LOCALPROCESS" != "x" ]; then
-    CPWD=`pwd`
-    echo ""
-    screen -S $SCREENNAME -p localprocess -X stuff $'\n'
-    sleep 0.1
-    screen -S $SCREENNAME -p localprocess -X stuff $'\n'
-    sleep 0.1
-    echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
-    screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
-    sleep 0.1
-    screen -S $SCREENNAME -p localprocess -X stuff $'\n'
+#    CPWD=`pwd`
+#    echo ""
+#    screen -S $SCREENNAME -p localprocess -X stuff $'\n'
+#    sleep 0.1
+#    screen -S $SCREENNAME -p localprocess -X stuff $'\n'
+#    sleep 0.1
+#    echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
+#    screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
+#    sleep 0.1
+#    screen -S $SCREENNAME -p localprocess -X stuff $'\n'
+     PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
  fi
 
 #####################################

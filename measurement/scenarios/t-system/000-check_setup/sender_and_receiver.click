@@ -4,10 +4,10 @@ FROMRAWDEVICE
 //  -> ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump");
   -> ToDump("/tmp/extra/test/NODENAME.NODEDEVICE.dump");
 
-BRN2PacketSource(1000, 10, 500000, 14, 2 ,16)
+BRN2PacketSource(1000, 14, 500000, 14, 2 ,16)
   -> EtherEncap(0x8088, my_wlan,  FF:FF:FF:FF:FF:FF )
   -> WifiEncap(0x00, 0:0:0:0:0:0)
-  -> SetTXRate(12)
+  -> SetTXRate(2)
 //  -> SetTXRates(RATE0 108, RATE1 22, RATE2 4, RATE3 2, TRIES0 3, TRIES1 2, TRIES2 2, TRIES3 2)
   -> wlan_out::SetTXPower(15);
 	  
