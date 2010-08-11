@@ -1,9 +1,10 @@
 BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
 FROMRAWDEVICE
-  -> ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump");
+//  -> ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump");
+  -> ToDump("/tmp/extra/NODENAME.NODEDEVICE.dump");
 
-BRN2PacketSource(20, 10, 1000, 14, 2 ,16)
+BRN2PacketSource(1000, 10, 500000, 14, 2 ,16)
   -> EtherEncap(0x8088, my_wlan,  FF:FF:FF:FF:FF:FF )
   -> WifiEncap(0x00, 0:0:0:0:0:0)
   -> SetTXRate(12)
@@ -28,7 +29,8 @@ wlan_out
   -> TORAWDEVICE;
 
 rawouttee[1]
-  -> ToDump("RESULTDIR/NODENAME.NODEDEVICE.out.dump");
+  -> ToDump("/tmp/extra/NODENAME.NODEDEVICE.out.dump");
+//  -> ToDump("RESULTDIR/NODENAME.NODEDEVICE.out.dump");
 
 Script(
   wait RUNTIME,

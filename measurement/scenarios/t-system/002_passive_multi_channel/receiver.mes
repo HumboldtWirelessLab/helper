@@ -6,13 +6,13 @@ sk111		ath1	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.clic
 sk112		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.click	LOGDIR/sk112.ath0.log	-		-
 sk112		ath1	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.click	LOGDIR/sk112.ath1.log	-		-
 wgt25           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt25.ath0.log   -               -
-#wgt28           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt28.ath0.log   -               -
+wgt28           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt28.ath0.log   -               -
 wgt29           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt29.ath0.log   -               -
 wgt31           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt31.ath0.log   -               -
-wgt32           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt32.ath0.log   -               -
+#wgt32           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt32.ath0.log   -               -
 wgt33           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt33.ath0.log   -               -
 wgt37           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt37.ath0.log   -               -
-#wgt40           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt40.ath0.log   -               -
+wgt40           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt40.ath0.log   -               -
 wgt41           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt41.ath0.log   -               -
 wgt42           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt42.ath0.log   -               -
 wgt44           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               receiver.click  LOGDIR/wgt44.ath0.log   -               -

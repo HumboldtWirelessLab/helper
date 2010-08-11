@@ -1,4 +1,4 @@
-FromDump("wgt25.ath0.dump")
+FromDump("DUMP",STOP true)
   -> packets :: Counter
   -> ath2_decap :: Ath2Decap(ATHDECAP true)
   -> filter_tx :: FilterTX()
@@ -11,12 +11,13 @@ error_clf[0]
 
 error_clf[1]
   -> crc :: Counter
+//  -> Print("CRCerror",TIMESTAMP true)
   -> PrintWifi("CRCerror",TIMESTAMP true)
   -> Discard;
 
 error_clf[2]
   -> phy :: Counter
-  -> Print("Phy")
+  -> Print("Phy", TIMESTAMP true)
   -> Discard;
 
 filter_tx[1]
@@ -27,28 +28,3 @@ filter_tx[1]
 ath2_decap[1]
   -> toosmall :: Counter
   -> Discard;
-
-Script(
-	wait 3,
-	
-	read packets.count,
-	read packets.rate,
-	
-	read ok.count,
-	read ok.rate,
-
-	read crc.count,
-	read crc.rate,
-
-	read phy.count,
-	read phy.rate,
-
-	read txpa.count,
-	read txpa.rate,	
-	
-	read toosmall.count,
-	read toosmall.rate,
-	
-	stop
-);
-  

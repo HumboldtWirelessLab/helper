@@ -43,7 +43,6 @@ check_nodes() {
       echo "Nodes: $NODELIST"
       echo "reboot all nodes"
       NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
-
       echo "wait for all nodes"
       sleep 20
       echo "error" 1>&$STATUSFD
