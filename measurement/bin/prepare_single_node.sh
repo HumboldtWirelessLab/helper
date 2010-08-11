@@ -96,7 +96,7 @@ LOGMARKER=$NODELIST
 echo "$NODELIST" > status/$LOGMARKER\_reboot.log
 
 echo "check node $NODELIST" >> status/$LOGMARKER\_reboot.log
-NODELIST="$NODELIST" $DIR/.././host/bin/system.sh waitfornodes >> status/$LOGMARKER\_reboot.log
+NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodes >> status/$LOGMARKER\_reboot.log
 
 if [ $RUNMODENUM -eq 0 ]; then
     echo -n "Check marker ($MARKER): " >> status/$LOGMARKER\_reboot.log
@@ -131,6 +131,7 @@ echo "0" > status/$LOGMARKER\_reboot.state
 if [ $RUNMODENUM -le 2 ]; then
     echo "Setup environment $NODELIST" > status/$LOGMARKER\_environment.log
     NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mount >> status/$LOGMARKER\_environment.log
+    NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh extramount >> status/$LOGMARKER\_environment.log
 fi
 
 echo "Set marker for reboot-detection $NODELIST" >> status/$LOGMARKER\_environment.log
@@ -307,6 +308,8 @@ fi
 ###### Preload Click-, Log- & Application-Stuff ########
 ########################################################
 
+  NODEBINDIR="$DIR/../../nodes/bin"
+
   for node in $NODELIST; do
     NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
     NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
@@ -328,12 +331,12 @@ fi
 		
 	    if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
 	      echo "Application preload on $node" >> status/$LOGMARKER\_preload.log
-        run_on_node $node "cat $APPLICATION > /dev/null" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log
+    	      run_on_node $node "cat $APPLICATION > /dev/null" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log
 	    fi
     done
       
     if [ "x$LOADCLICK" = "x1" ]; then
-	    echo "Click preload on $node" >> status/$LOGMARKER\_preload.log
+      echo "Click preload on $node" >> status/$LOGMARKER\_preload.log
       run_on_node $node "export CLICKPATH=$NODEBINDIR/../etc/click;echo \"Script(wait 0,stop);\" | $NODEBINDIR/click-align-$NODEARCH | $NODEBINDIR/click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log
     fi
   done

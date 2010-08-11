@@ -41,11 +41,11 @@ check_nodes() {
       echo "WHHHHOOOOO: LOOKS LIKE RESTART! GOD SAVE THE WATCHDOG"
       echo "Current Mode: $CURRENTMODE"
       echo "Nodes: $NODELIST"
-      echo "reboot all nodes"
-      NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
-      echo "wait for all nodes"
-      sleep 20
-      echo "error" 1>&$STATUSFD
+#      echo "reboot all nodes"
+#      NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
+#      echo "wait for all nodes"
+#      sleep 20
+#      echo "error" 1>&$STATUSFD
       exit 0
     fi
 }
@@ -150,9 +150,13 @@ run_command_on_screen() {
 
 wait_for_nodes() {
   NODES=$1
-  STATEFILE=$2
   
   ALL=0
+
+  #DEBUGFILE=status/wait_$2
+  DEBUGFILE=/dev/null
+
+  echo "wait for $1" >> $DEBUGFILE
   
   while [ $ALL -eq 0 ]; do
     NO_NODES=0
@@ -160,6 +164,10 @@ wait_for_nodes() {
     OK_NODES=0;
     
     for n in $NODES; do
+    
+      STATEFILE="status/$n$2"  >> $DEBUGFILE
+      
+      echo "looking for $STATEFILE" >> $DEBUGFILE
       NO_NODES=`expr $NO_NODES + 1`
       
       if [ -f $STATEFILE ]; then
@@ -171,9 +179,13 @@ wait_for_nodes() {
       fi
     done
     
+    echo "RESULT: $NO_NODES $OK_NODES" >> $DEBUGFILE
+    
     if [ $NO_NODES -eq $STATE_NODES ]; then
       ALL=1;
     fi
+    
+    sleep 1
   done
   
   if [ $NO_NODES -eq $OK_NODES ]; then
@@ -297,10 +309,9 @@ done
 ###### Setup Clickmodule ##########
 ###################################
 
-
- SYNCSTATE=`wait_for_nodes "$NODELIST" status/$LOGMARKER\_preload.state"`
-
-
+echo "Wait for nodes"
+SYNCSTATE=`wait_for_nodes "$NODELIST" _preload.state`
+echo "all nodes ready"
 
 ####################################
 #### Kill screen for all nodes #####
@@ -333,8 +344,6 @@ done
 if [ $NODE_IN_SCREEN -gt 1 ]; then 
   screen -S $SCREENNAME -X quit
 fi
-
-exit 0
 
 #####################################
 ###### Start Screensession ##########
@@ -510,12 +519,13 @@ exit 0
     fi
 
   if [ "x$LOCALPROCESS" != "x" ]; then
-    CPWD=`pwd`
-    echo ""
-    echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
-    screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
-    sleep 0.1
-    screen -S $SCREENNAME -p localprocess -X stuff $'\n'
+#    CPWD=`pwd`
+#    echo ""
+#    echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
+#    screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
+#    sleep 0.1
+#    screen -S $SCREENNAME -p localprocess -X stuff $'\n'
+    PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
  fi
 
 #####################################
@@ -534,8 +544,6 @@ exit 0
     fi
     
     echo "ok" 1>&$STATUSFD
-
-fi
 
 #######################################
 ##### Poststop local process ##########

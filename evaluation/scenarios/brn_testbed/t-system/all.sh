@@ -75,11 +75,11 @@ if [ ! -e evaluation/processing_done ]; then
 	$DIR/../../../bin/fromdump.sh $dump > evaluation/${node}.dat 2>&1
 	echo "post-processing $node"
 	#cat evaluation/$node.dat | grep "OKPacket:" | awk '{ print $2 "\t" $3 "\t" $5 "\t" $8 "\t" $9 }' | sed -s 's/://g' | sed -s 's/Mb//g' | sed -s 's/mgmt/0/g' | sed -s 's/cntl/1/g' | sed -s 's/data/2/g' > evaluation/${node}_ok.dat
-	cat evaluation/$node.dat | grep "OKPacket:" | awk '{ print $2 "\t" $3 "\t" $5 "\t" $8}' | sed -s 's/://g' | sed -s 's/Mb//g' | sed -s 's/mgmt/0/g' | sed -s 's/cntl/1/g' | sed -s 's/data/2/g' > evaluation/${node}_ok.dat
-	cat evaluation/$node.dat | grep "CRCerror:" | awk '{ print $2 "\t" $3 "\t" $5 }' | sed -s 's/://g' | sed -s 's/Mb//g' > evaluation/${node}_crc.dat
-	cat evaluation/$node.dat | grep "PHYerror:" | awk '{ print $2 "\t" $3 }' | sed -s 's/://g' | sed -s 's/Mb//g' > evaluation/${node}_phy.dat
-	cat evaluation/$node.dat | grep "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $10 }' | sort -u  > evaluation/${node}_bssid.dat
-	cat evaluation/$node.dat | grep "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $10 }' | sort -u  | wc -l >> evaluation/all_bssid.dat
+	cat evaluation/$node.dat | grep -P "OKPacket:" | awk '{ print $2 "\t" $3 "\t" $5 "\t" $8}' | sed -s 's/://g' | sed -s 's/Mb//g' | sed -s 's/mgmt/0/g' | sed -s 's/cntl/1/g' | sed -s 's/data/2/g' > evaluation/${node}_ok.dat
+	cat evaluation/$node.dat | grep -P "CRCerror:" | awk '{ print $2 "\t" $3 "\t" $5 }' | sed -s 's/://g' | sed -s 's/Mb//g' > evaluation/${node}_crc.dat
+	cat evaluation/$node.dat | grep -P "PHYerror:" | awk '{ print $2 "\t" $3 }' | sed -s 's/://g' | sed -s 's/Mb//g' > evaluation/${node}_phy.dat
+	cat evaluation/$node.dat | grep -P "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $10 }' | sort -u  > evaluation/${node}_bssid.dat
+	cat evaluation/$node.dat | grep -P "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $10 }' | sort -u  | wc -l >> evaluation/all_bssid.dat
 	if [ "x$OUTMAC" != "x" ]; then
           cat evaluation/$node.dat | grep "OKPacket:" | grep $OUTMAC | awk '{ print $6 }' | sed -s 's/+//g' | awk -F "/" '{ print $1 }' > evaluation/${node}_rssi_ref.dat
 	fi

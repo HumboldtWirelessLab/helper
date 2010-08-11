@@ -26,5 +26,11 @@ filter_tx[1]
   -> Discard;
   
 ath2_decap[1]
+  -> CheckLength(4)
+  -> minl :: CheckLength(3)[1]
+  -> Print("Sync",TIMESTAMP true)
   -> toosmall :: Counter
   -> Discard;
+
+  minl -> Discard;
+  

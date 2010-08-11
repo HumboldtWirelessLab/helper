@@ -41,7 +41,7 @@ if [ "x$MULTIRUNMODE" = "x" ]; then
 fi
 
 if [ "x$MULTIREPEAT" = "x" ]; then
-  MULTIREPEAT="ASK"
+  MULTIREPEAT="1"
 fi
 
 if [ "x$MULTIWAIT" = "x" ]; then
