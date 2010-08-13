@@ -15,10 +15,10 @@ FROMRAWDEVICE
 //    -> td :: ToDump("/tmp/extra/mess_2/NODENAME.NODEDEVICE.dump"/*, SNAPLEN 150*/);
 //  -> Idle;
 
-  Idle
-  -> Socket(UDP, 0.0.0.0, 60000)
-  -> Print("Sync",TIMESTAMP true)
-  -> td;
+//  Idle
+//  -> Socket(UDP, 0.0.0.0, 60000)
+//  -> Print("Sync",TIMESTAMP true)
+//  -> td;
 
 Script(
   wait RUNTIME,
