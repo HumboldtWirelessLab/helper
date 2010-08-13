@@ -153,8 +153,8 @@ wait_for_nodes() {
   
   ALL=0
 
-  #DEBUGFILE=status/wait_$2
-  DEBUGFILE=/dev/null
+  DEBUGFILE=status/wait_$2
+  #DEBUGFILE=/dev/null
 
   echo "wait for $1" >> $DEBUGFILE
   

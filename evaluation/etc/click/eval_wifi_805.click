@@ -7,6 +7,8 @@ FromDump("DUMP",STOP true)
 error_clf[0]
   -> ok :: Counter
   -> PrintWifi("OKPacket",TIMESTAMP true)
+  -> WifiDecap()
+  -> Print("Ether")
   -> Discard;
 
 error_clf[1]
