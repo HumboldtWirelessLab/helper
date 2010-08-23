@@ -23,13 +23,15 @@ esac
 case "$1" in
   "prestart")
     echo "prestart"
-    killall update_gps.sh
+    killall update_gps.sh 2>&1
     ;;
   "start")
     echo "Start"
+    $DIR/update_gps.sh &
     ;;
   "stop")
     echo "stop"
+    killall update_gps.sh 2>&1
     ;;
   "poststop")
     echo "poststop"

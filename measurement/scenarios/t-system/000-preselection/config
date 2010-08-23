@@ -1,6 +1,7 @@
 CHANNEL=select
 GPS=yes
 LOCALPROCESS=localproc.sh
-MODOPTIONS=/home/testbed/helper/nodes/etc/madwifi/modoptions.germany
+CHECKPROCESS=checkdump.sh
+MODOPTIONS=/home/testbed/helper/nodes/etc/madwifi/modoptions.pcmcia
 MODULSDIR=/home/testbed/helper/nodes/lib/modules/i586/
-RUNTIME=300
+RUNTIME=30

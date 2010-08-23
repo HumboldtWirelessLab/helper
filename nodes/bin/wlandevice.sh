@@ -239,6 +239,9 @@ case "$1" in
       MADDR=`$IFCONFIG $DEVICE | grep HWaddr | awk '{print $5}' | sed -e "s#-# #g" -e "s#:# #g" | awk '{print $1":"$2":"$3":"$4":"$5":"$6}'`
       echo $MADDR
       ;;
+    "getiwconfig")
+      ${IWCONFIG} $DEVICE
+      ;;
     *)
     ;;
 esac

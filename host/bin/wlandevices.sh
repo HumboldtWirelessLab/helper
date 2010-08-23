@@ -61,7 +61,7 @@ case "$1" in
 	"getiwconfig")
 		for device in $DEVICES; do
 		    echo "config $NODE $device"
-		    run_on_node $NODE "/usr/sbin/iwconfig $device" "/" $DIR/../etc/keys/id_dsa
+		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh getiwconfig" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
 		    run_on_node $NODE "/sbin/sysctl dev.wifi0.disable_cca" "/" $DIR/../etc/keys/id_dsa
 		done
 		;;
