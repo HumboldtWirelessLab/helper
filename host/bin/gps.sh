@@ -242,7 +242,7 @@ case "$1" in
     TRY=0;
     
     while [ $TRY -lt 10 ]; do
-      LINE=`gpspipe -w -n 5 | grep MID2 | tail -n 1`
+      LINE=`gpspipe -w -n 5 | grep -e "MID2|GSA" | tail -n 1`
       if [ "x$LINE" != "x"  ]; then
         LAT=`echo $LINE | awk '{print $4}'`
         LONG=`echo $LINE | awk '{print $5}'`
