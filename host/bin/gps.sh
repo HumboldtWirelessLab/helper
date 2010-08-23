@@ -238,6 +238,22 @@ case "$1" in
 		URL="http://maps.google.com/maps?t=k&hl=de&ie=UTF8&ll=$LATITUDE,$LONGITUDE&spn=0.001521,0.004442&z=18"
 		firefox "$URL"
 		;;
+  "getgpspos")
+    TRY=0;
+    
+    while [ $TRY -lt 10 ]; do
+      LINE=`gpspipe -w -n 5 | grep MID2 | tail -n 1`
+      if [ "x$LINE" != "x"  ]; then
+        LAT=`echo $LINE | awk '{print $4}'`
+        LONG=`echo $LINE | awk '{print $5}'`
+        HEIGHT="0.0"
+        echo "$LAT $LONG $HEIGHT"
+        exit 0
+      fi
+      TRY=`expr $TRY + 1`
+    done
+    echo "0.0 0.0 0.0"
+    ;;
 	"help")
 		echo "Take a look at http://www.kowoma.de/gps/zusatzerklaerungen/NMEA.htm"
 		;;

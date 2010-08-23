@@ -20,7 +20,8 @@ esac
 
 . $DIR/functions.sh
 
-NETCAT="nc $2 $3"
+#TODO: Timeout of 1 sec is used. Try to remove
+NETCAT="nc -w 1 $2 $3"
 
 if [ "x$1" = "xwrite" ]; then
   ELEMENT=$4
