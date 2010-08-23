@@ -1,0 +1,6 @@
+CHANNEL=select
+GPS=yes
+LOCALPROCESS=localproc.sh
+MODOPTIONS=/home/testbed/helper/nodes/etc/madwifi/modoptions.germany
+MODULSDIR=/home/testbed/helper/nodes/lib/modules/i586/
+RUNTIME=300

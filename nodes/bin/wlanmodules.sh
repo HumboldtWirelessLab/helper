@@ -53,7 +53,7 @@ case "$1" in
 		insmod ${MODULSDIR}/ath_pci.ko $ATH_PCI 
 		;;
     "uninstall")
-		MODLIST="wlan_xauth wlan_wep wlan_tkip wlan_scan_ap wlan_scan_sta wlan_ccmp wlan_acl ath_pci ath_rate_sample ath_rate_minstrel wlan ath_hal hostap_pci hostap ieee80211_crypt "
+		MODLIST="ath5k ath wlan_xauth wlan_wep wlan_tkip wlan_scan_ap wlan_scan_sta wlan_ccmp wlan_acl ath_pci ath_rate_sample ath_rate_minstrel wlan ath_hal hostap_pci hostap ieee80211_crypt "
 		
 		for mod in $MODLIST
 		do
