@@ -116,6 +116,7 @@ while [ $WANTEXIT -eq 0 ]; do
  # exit 0
 
   if [ $FIRSTRUN -eq 1 ]; then
+    NODELIST=localhost MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../../../host/bin/wlanmodules.sh rmmod >> $FINALRESULTDIR/measurement.log
     NODELIST=localhost MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../../../host/bin/wlanmodules.sh insmod >> $FINALRESULTDIR/measurement.log
     NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log
 
