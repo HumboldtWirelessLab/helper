@@ -55,6 +55,7 @@ while [ $WANTEXIT -eq 0 ]; do
     FIRSTNODE=""
 
     GPSD=`ps -le | grep gpsd | wc -l | awk '{print $1}'`
+    GPSD=1
     if [ $GPSD -eq 0 ]; then
       echo -n "Warning: no GPS ! Exit (y/n) ? "
       read key
@@ -115,17 +116,17 @@ while [ $WANTEXIT -eq 0 ]; do
  # exit 0
 
   if [ $FIRSTRUN -eq 1 ]; then
-    NODELIST=localhost MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../host/bin/wlanmodules.sh insmod >> $FINALRESULTDIR/measurement.log
-    NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log
+    NODELIST=localhost MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../../../host/bin/wlanmodules.sh insmod >> $FINALRESULTDIR/measurement.log
+    NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log
 
-    NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log
+    NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log
     
     FIRSTRUN=0
   fi
 
-  NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log
+  NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log
 
-  NODE=localhost DEVICES=ath0 $DIR/../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt
+  NODE=localhost DEVICES=ath0 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt
 
   PATH=$DIR/../../host/bin:$PATH;RUNTIME=$TIME RESULTDIR=$FINALRESULTDIR NODELIST=localhost $DIR/$LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1
 
