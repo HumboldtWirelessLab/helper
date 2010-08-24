@@ -239,16 +239,36 @@ case "$1" in
 		firefox "$URL"
 		;;
   "getgpspos")
+    if [ "x$MAXTRY" = "x" ]; then
+      MAXTRY=10
+    fi
     TRY=0;
     
-    while [ $TRY -lt 10 ]; do
+    while [ $TRY -lt $MAXTRY ]; do
       LINE=`gpspipe -w -n 5 | grep -E "MID2|GSA" | tail -n 1`
       if [ "x$LINE" != "x"  ]; then
-        LAT=`echo $LINE | awk '{print $4}'`
-        LONG=`echo $LINE | awk '{print $5}'`
-        HEIGHT="0.0"
-        echo "$LAT $LONG $HEIGHT"
-        exit 0
+        NEWGPSD=`echo $LINE | grep "class" | wc -l`
+        if [ $NEWGPSD -eq 0 ]; then
+          LAT=`echo $LINE | awk '{print $4}'`
+          LONG=`echo $LINE | awk '{print $5}'`
+          HEIGHT="0.0"
+          echo "$LAT $LONG $HEIGHT"
+          exit 0
+        else
+          LAT=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $12}'`
+          LONG=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $14}'`
+          HEIGHT="0.0"
+          LATH=`echo $LAT | sed "s#\.# #g" | awk '{print $1}'`
+          LATL=`echo $LAT | sed "s#\.# #g" | awk '{print $2}' | cut -b 1-6`
+          LONGH=`echo $LONG | sed "s#\.# #g" | awk '{print $1}'`
+          LONGL=`echo $LONG | sed "s#\.# #g" | awk '{print $2}' | cut -b 1-6`
+          LAT="$LATH.$LATL"
+          LONG="$LONGH.$LONGL"
+          if [ $LATH -ne 180 ]; then
+            echo "$LAT $LONG $HEIGHT"
+            exit 0
+          fi
+        fi
       fi
       TRY=`expr $TRY + 1`
     done

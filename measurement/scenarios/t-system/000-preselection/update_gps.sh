@@ -19,7 +19,7 @@ case "$SIGN" in
 esac
 
 while [ true ]; do
-  POS=`$DIR/../../../../host/bin/gps.sh getgpspos`
+  POS=`MAXTRY=$MAXGPSTRY $DIR/../../../../host/bin/gps.sh getgpspos`
   echo "$POS"
   if [ "x$POS" != "x0.0 0.0 0.0" ]; then
     echo "" | $DIR/../../../../host/bin/clickctrl.sh write localhost 7777 gps gps_coord $POS
