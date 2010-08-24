@@ -15,4 +15,4 @@ Script(
   stop
 );
 
-ControlSocket(udp, 7777);
+ControlSocket(tcp, 7777);

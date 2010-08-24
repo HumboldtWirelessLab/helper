@@ -30,12 +30,14 @@ fi
 
 RUN=$1
 
+NOSTEPS=13
+
 if [ -e $DIR/$RUN ]; then
   echo "Measurement no. $RUN already exist. CHoose higher one !!"
   exit 0
 fi
 
-killall click
+NODELIST=localhost $DIR/../../../../host/bin/run_on_nodes.sh "killall click" > /dev/null 2>&1
 
 WANTEXIT=0
 
@@ -108,41 +110,90 @@ while [ $WANTEXIT -eq 0 ]; do
 
   cat $DIR/receiver.click | sed "s#RESULTDIR#$FINALRESULTDIR#g" | sed "s#RUNTIME#$RUNTIME#g" > $FINALRESULTDIR/receiver.click
 
+  STEP=1
+
   if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
-    echo "Local process: prestart"
+    echo "Local process: prestart ($STEP/$NOSTEPS)"
+    STEP=`expr $STEP + 1`
     $DIR/$LOCALPROCESS prestart >> $FINALRESULTDIR/localapp.log
   fi
 
  # exit 0
 
   if [ $FIRSTRUN -eq 1 ]; then
-    NODELIST=localhost MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../../../host/bin/wlanmodules.sh rmmod >> $FINALRESULTDIR/measurement.log
-    NODELIST=localhost MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../../../host/bin/wlanmodules.sh insmod >> $FINALRESULTDIR/measurement.log
-    NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log
+    echo "Remove old Modules ($STEP/$NOSTEPS)"
+    STEP=`expr $STEP + 1`
+    NODELIST=localhost MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../../../host/bin/wlanmodules.sh rmmod >> $FINALRESULTDIR/measurement.log 2>&1
+    
+    echo "Load Modules  ($STEP/$NOSTEPS)"
+    STEP=`expr $STEP + 1`
+    NODELIST=localhost MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../../../host/bin/wlanmodules.sh insmod >> $FINALRESULTDIR/measurement.log 2>&1
 
-    NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log
+    echo "Create Device  ($STEP/$NOSTEPS)"
+    STEP=`expr $STEP + 1`
+    NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
+
+    echo "Start Device  ($STEP/$NOSTEPS)"
+    STEP=`expr $STEP + 1`
+    NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
     
     FIRSTRUN=0
+  else
+    STEP=`expr $STEP + 4`
   fi
 
-  NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log
+  echo "Config device  ($STEP/$NOSTEPS)"
+  STEP=`expr $STEP + 1`
+  NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
 
-  NODE=localhost DEVICES=ath0 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt
+  echo "Get device info (Control) ($STEP/$NOSTEPS)"
+  STEP=`expr $STEP + 1`
+  NODE=localhost DEVICES=ath0 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
 
+  echo "Start local process ($STEP/$NOSTEPS)"
+  STEP=`expr $STEP + 1`
   PATH=$DIR/../../host/bin:$PATH;RUNTIME=$TIME RESULTDIR=$FINALRESULTDIR NODELIST=localhost $DIR/$LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1
 
-  #(cd $FINALRESULTDIR; click receiver.click > $FINALRESULTDIR/click.log 2>&1)
+  echo "Start click ($STEP/$NOSTEPS)"
+  STEP=`expr $STEP + 1`
+  NODELIST=localhost $DIR/../../../../host/bin/run_on_nodes.sh "(cd $FINALRESULTDIR; /home/testbed/click-brn/userlevel/click receiver.click > $FINALRESULTDIR/click.log 2>&1)" &
 
+  #add 5 second extra to make sure that we are not faster than the devices (click,application)
+  WAITTIME=`expr $RUNTIME + 5`
+  echo "Wait for $WAITTIME sec"
+  #Countdown
+  echo -n -e "Wait... \033[1G"
+  for ((i = $WAITTIME; i > 0; i--)); do echo -n -e "Wait... $i \033[1G" ; sleep 1; done
+  echo -n -e "                 \033[1G"
+  #Normal wait
+  #sleep $WAITTIME
+
+  echo "Kill click ($STEP/$NOSTEPS)"
+  STEP=`expr $STEP + 1`
+  NODELIST=localhost $DIR/../../../../host/bin/run_on_nodes.sh "killall click" >> $FINALRESULTDIR/measurement.log 2>&1
+
+  echo "Stop local process ($STEP/$NOSTEPS)"
+  STEP=`expr $STEP + 1`
   PATH=$DIR/../../host/bin:$PATH;NODELIST=localhost $DIR/$LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
+  
+  echo "Poststop local process ($STEP/$NOSTEPS)"
+  STEP=`expr $STEP + 1`
   PATH=$DIR/../../host/bin:$PATH;NODELIST=localhost $DIR/$LOCALPROCESS poststop >> $FINALRESULTDIR/localapp.log
+
+  echo "Check Measurement ($STEP/$NOSTEPS)"
+  STEP=`expr $STEP + 1`
+  echo "############################# CHECK #################################"
+  PATH=$DIR/../../host/bin:$PATH;NODELIST=localhost RESULTDIR=$FINALRESULTDIR $DIR/$CHECKPROCESS test >> $FINALRESULTDIR/test.log
+  cat $FINALRESULTDIR/test.log
+  echo "######################### CHECK END #################################"
 
   echo -n "Exit (No more mearements) (y/n) ? "
   read key
-    
+
   if [ "x$key" = "xy" ]; then
     exit 0
   fi
-  
+
   RUN=`expr $RUN + 1`
   
 done
