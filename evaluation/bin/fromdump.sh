@@ -18,5 +18,8 @@ case "$SIGN" in
 	;;
 esac
 
-cat $DIR/../etc/click/eval_wifi_805.click | sed "s#DUMP#$1#g" | click 2>&1
-
+if [ "x$GPS" = "xyes" ]; then
+  cat $DIR/../etc/click/eval_wifi_805_gps.click | sed "s#DUMP#$1#g" | click 2>&1
+else
+  cat $DIR/../etc/click/eval_wifi_805.click | sed "s#DUMP#$1#g" | click 2>&1
+fi
