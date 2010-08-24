@@ -78,7 +78,7 @@ while [ $WANTEXIT -eq 0 ]; do
         echo -n "Get Position ! Press any key !"
         read key
 	
-        $DIR/../../../../host/bin/gps.sh getgpspos > $FINALRESULTDIR/gps.info
+        MAXTRY=$MAXGPSTRY $DIR/../../../../host/bin/gps.sh getgpspos > $FINALRESULTDIR/gps.info
     fi
   fi
 

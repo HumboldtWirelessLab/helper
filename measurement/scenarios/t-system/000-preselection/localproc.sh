@@ -27,7 +27,7 @@ case "$1" in
     ;;
   "start")
     echo "Start"
-    $DIR/update_gps.sh &
+    MAXGPSTRY=$MAXGPSTRY $DIR/update_gps.sh &
     ;;
   "stop")
     echo "stop"
