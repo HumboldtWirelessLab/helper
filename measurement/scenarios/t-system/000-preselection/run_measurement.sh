@@ -107,8 +107,13 @@ while [ $WANTEXIT -eq 0 ]; do
   fi
 
   cat $DIR/wificonfig | sed "s#PARAMSCHANNEL#$FINALCHANNEL#g" > $FINALRESULTDIR/wificonfig
-
-  cat $DIR/receiver.click | sed "s#RESULTDIR#$FINALRESULTDIR#g" | sed "s#RUNTIME#$RUNTIME#g" > $FINALRESULTDIR/receiver.click
+  
+  if [ -f $FINALRESULTDIR/gps.info ]; then
+    STARTGPS=`cat $FINALRESULTDIR/gps.info`
+  else
+    STARTGPS="0.0 0.0 0.0"
+  fi
+  cat $DIR/receiver.click | sed "s#RESULTDIR#$FINALRESULTDIR#g" | sed "s#RUNTIME#$RUNTIME#g" | sed "s#STARTGPS#$STARTGPS#g" > $FINALRESULTDIR/receiver.click
 
   STEP=1
 
