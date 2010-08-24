@@ -7,7 +7,7 @@ FromDevice(ath0, PROMISC true, OUTBOUND true)
   -> td :: ToDump("RESULTDIR/devel.ath0.dump");
 
 Script(
-  write gps.gps_coord 0.0 0.0 0.0,
+  write gps.gps_coord STARTGPS,
 );
 
 Script(
