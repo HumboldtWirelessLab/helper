@@ -40,6 +40,11 @@ error_clf[5]
   -> Discard;
 
 error_clf[6]
+  -> zerorate :: Counter
+  -> BRN2PrintWifi("ZeroRateError",TIMESTAMP true)
+  -> Discard;
+      
+error_clf[7]
   -> unknown :: Counter
   -> BRN2PrintWifi("UNKNOWNerror",TIMESTAMP true)
   -> Discard;
