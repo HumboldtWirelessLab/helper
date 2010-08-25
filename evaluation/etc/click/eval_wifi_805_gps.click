@@ -2,7 +2,6 @@ FromDump("DUMP",STOP true)
   -> packets :: Counter
   -> GPSPrint(NOWRAP true)
   -> GPSDecap()
-//  -> Ath2Print(INCLUDEATH true)
   -> ath2_decap :: Ath2Decap(ATHDECAP true)
   -> filter_tx :: FilterTX()
   -> error_clf :: WifiErrorClassifier();
