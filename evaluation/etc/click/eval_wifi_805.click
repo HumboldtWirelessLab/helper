@@ -1,38 +1,67 @@
 FromDump("DUMP",STOP true)
   -> packets :: Counter
+//  -> Ath2Print(INCLUDEATH true)
   -> ath2_decap :: Ath2Decap(ATHDECAP true)
   -> filter_tx :: FilterTX()
   -> error_clf :: WifiErrorClassifier();
 			      
 error_clf[0]
   -> ok :: Counter
-  -> PrintWifi("OKPacket",TIMESTAMP true)
+  -> BRN2PrintWifi("OKPacket",TIMESTAMP true)
   -> WifiDecap()
-  -> Print("Ether")
+//  -> Print("Ether")
   -> Discard;
 
 error_clf[1]
   -> crc :: Counter
-//  -> Print("CRCerror",TIMESTAMP true)
-  -> PrintWifi("CRCerror",TIMESTAMP true)
+  -> BRN2PrintWifi("CRCerror",TIMESTAMP true)
   -> Discard;
 
 error_clf[2]
   -> phy :: Counter
-  -> Print("Phy", TIMESTAMP true)
+  -> BRN2PrintWifi("PHYerror", TIMESTAMP true)
+  -> Discard;
+
+error_clf[3]
+  -> fifo :: Counter
+  -> BRN2PrintWifi("FifoError",TIMESTAMP true)
+  -> Discard;
+
+error_clf[4]
+  -> decrypt :: Counter
+  -> BRN2PrintWifi("DecryptError",TIMESTAMP true)
+  -> Discard;
+
+error_clf[5]
+  -> mic :: Counter
+  -> BRN2PrintWifi("MICerror",TIMESTAMP true)
+  -> Discard;
+
+error_clf[6]
+  -> unknown :: Counter
+  -> BRN2PrintWifi("UNKNOWNerror",TIMESTAMP true)
+  -> Discard;
+
+ath2_decap[2]
+  -> Print("ATHOPERATION")
   -> Discard;
 
 filter_tx[1]
   -> txpa :: Counter
-  -> PrintWifi("TXFeedback",TIMESTAMP true)
+  -> BRN2PrintWifi("TXFeedback",TIMESTAMP true)
   -> Discard;
-  
+
 ath2_decap[1]
-  -> CheckLength(4)
+  -> maxl :: CheckLength(4)
   -> minl :: CheckLength(3)[1]
   -> Print("Sync",TIMESTAMP true)
   -> toosmall :: Counter
   -> Discard;
 
-  minl -> Discard;
+  maxl[1]
+  -> Print("DumpError")
+  -> Discard;
   
+  minl
+  -> Print("DumpError")
+  -> Discard;
