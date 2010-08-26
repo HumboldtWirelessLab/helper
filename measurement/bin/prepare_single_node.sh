@@ -20,6 +20,7 @@ esac
 
 . $DIR/../../host/bin/functions.sh
 
+#TODO NExt Var looks old and is not used
 RUN_CLICK_APPLICATION=0
 
 ##############################
@@ -27,12 +28,20 @@ RUN_CLICK_APPLICATION=0
 ##############################
 
 wait_for_master_state() {
-  #DEBUGFILE=status/wait_$2
-  DEBUGFILE=/dev/null
+  DEBUGFILE=status/wait_$1\_$2
+#  DEBUGFILE=/dev/null
 
   echo "wait for master" >> $DEBUGFILE
   
   while [ ! -f status/master_$1.state ] && [ ! -f status/master_abort.state ]; do
+    if [ -f status/master_$1.state ]; then
+      echo "got status/master_$1.state" >> $DEBUGFILE
+    fi
+    if [ -f status/master_abort.state ]; then
+      echo "got status/master_abort.state" >> $DEBUGFILE
+    fi
+    
+    echo "wait for master" >> $DEBUGFILE
     sleep 1
   done
   
@@ -376,11 +385,9 @@ echo "0" > status/$LOGMARKER\_preload.state
 ######### WAIT FOR CLICK FINISHED ###########
 #############################################
 
-wait_for_master_state measurement
+wait_for_master_state measurement $LOGMARKER
 
 ############ Kill everything ################
-
-if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
   echo "Kill Click on Nodes:" >> status/$LOGMARKER\_killclick.log
   for node in $NODELIST; do
@@ -416,21 +423,19 @@ if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
       echo " done" >> status/$LOGMARKER\_killclick.log
     done
   done
-fi
 
-echo "0"  status/$LOGMARKER\_killclick.state
+echo "0" > status/$LOGMARKER\_killclick.state
   
 #######################################
 ##### Check Nodes and finish ##########
 #######################################
-  
-wait_for_master_state killmeasurement
+
+wait_for_master_state killmeasurement $LOGMARKER
 
 echo "Check nodes" >> status/$LOGMARKER\_finalnodecheck.log
-if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
-  check_nodes >> status/$LOGMARKER\_finalnodecheck.log
-fi
 
-echo "0" >> status/$LOGMARKER\_finalnodecheck.state
+check_nodes >> status/$LOGMARKER\_finalnodecheck.log
+
+echo "0" > status/$LOGMARKER\_finalnodecheck.state
 
 exit 0
