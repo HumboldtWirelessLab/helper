@@ -8,7 +8,7 @@ BRNAddressInfo(my_wlan NODEDEVICE:eth);
 //  -> ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump");
 //  -> ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.dump");
 
-BRN2PacketSource(240, 20, 500000, 14, 2 ,16)
+ps::BRN2PacketSource(240, 20, 500000, 14, 2 ,16)
   -> EtherEncap(0x8088, my_wlan,  06:0B:6B:09:ED:73 )
   -> WifiEncap(0x00, 0:0:0:0:0:0)
   -> SetTXRate(12)
@@ -33,6 +33,11 @@ Idle
   -> Socket(UDP, 0.0.0.0, 60000)                                                                                                                                                                                                                                    
   -> Print("Sync",TIMESTAMP true)                                                                                                                                                                                                                                   
   -> tdout;
+
+Script(
+  wait 110,
+  write ps.active false
+);
 
 Script(
   wait RUNTIME,
