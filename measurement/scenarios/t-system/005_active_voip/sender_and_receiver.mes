@@ -1,9 +1,9 @@
 #NODE		DEVICE	MODULSDIR			MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	CLICKLOGFILE		APPLICATION	APPLICATIONLOGFILE
 sk110		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.click	LOGDIR/sk110.ath0.log	-		-
 #sk110		ath1	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.click	LOGDIR/sk110.ath1.log	-		-
-#sk111		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.click	LOGDIR/sk111.ath0.log	-		-
+sk111		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.click	LOGDIR/sk111.ath0.log	-		-
 #sk111		ath1	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.click	LOGDIR/sk111.ath1.log	-		-
-#sk112		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.click	LOGDIR/sk112.ath0.log	-		-
+sk112		ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.click	LOGDIR/sk112.ath0.log	-		-
 #sk112		ath1	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.click	LOGDIR/sk112.ath1.log	-		-
 #wgt23           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt23.ath0.log   -               -
 wgt24           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt24.ath0.log   -               -
@@ -36,4 +36,4 @@ wgt78           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.
 wgt79           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt79.ath0.log   -               -
 wgt81           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt81.ath0.log   -               -
 wgt82           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt82.ath0.log   -               -
-wgt201           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt201.ath0.log   -               -
+#wgt201           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt201.ath0.log   -               -
