@@ -8,7 +8,7 @@ BRNAddressInfo(my_wlan NODEDEVICE:eth);
 //  -> ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump");
 //  -> ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.dump");
 
-ps::BRN2PacketSource(240, 20, 500000, 14, 2 ,16)
+ps::BRN2PacketSource(SIZE 240, INTERVAL 20, MAXSEQ 500000, CHANNEL 14, BITRATE 2, POWER 16, ACTIVE false)
   -> EtherEncap(0x8088, my_wlan,  06:0B:6B:09:ED:73 )
   -> WifiEncap(0x00, 0:0:0:0:0:0)
   -> SetTXRate(12)
@@ -23,11 +23,11 @@ wlan_out
 
 rawouttee[1]
   -> tdout :: ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.out.dump");
-//  -> tdout :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.out.dump");
+  //-> tdout :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.out.dump");
 
   fdq[1]
   -> ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.drop.dump");
-//  -> ToDump("RESULTDIR/NODENAME.NODEDEVICE.drop.dump");
+  //-> ToDump("RESULTDIR/NODENAME.NODEDEVICE.drop.dump");
 
 Idle                                                                                                                                                                                                                                                              
   -> Socket(UDP, 0.0.0.0, 60000)                                                                                                                                                                                                                                    
@@ -35,6 +35,8 @@ Idle
   -> tdout;
 
 Script(
+  wait 120,
+  write ps.active true,
   wait 110,
   write ps.active false
 );
