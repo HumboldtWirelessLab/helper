@@ -239,13 +239,20 @@ case "$1" in
 		firefox "$URL"
 		;;
   "getgpspos")
+    HASGPS=`gpsctl 2>&1 | sed -e "s#^.*at##g" | awk '{print $1}'`
+    
+    if [ "x$HASGPS" = "x0" ]; then
+      echo "0.0 0.0 0.0"
+      exit 0
+    fi
+
     if [ "x$MAXTRY" = "x" ]; then
-      MAXTRY=10
+      MAXTRY=5
     fi
     TRY=0;
     
     while [ $TRY -lt $MAXTRY ]; do
-      LINE=`gpspipe -w -n 5 | grep -E "MID2|GSA" | tail -n 1`
+      LINE=`gpspipe -w -n 10 | grep -E "MID2|GSA" | tail -n 1`
       if [ "x$LINE" != "x"  ]; then
         NEWGPSD=`echo $LINE | grep "class" | wc -l`
         if [ $NEWGPSD -eq 0 ]; then
