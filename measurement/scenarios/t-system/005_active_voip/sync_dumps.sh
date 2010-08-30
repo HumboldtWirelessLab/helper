@@ -25,7 +25,7 @@ case "$1" in
 	ssh 192.168.4.117 "kill -9 $SYNCPID"
         echo "Start Sync"
 	scp $DIR/send_sync 192.168.4.117:/tmp
-	ssh 192.168.4.117 "/tmp/send_sync 60000 192.168.3.100 30 &"
+	ssh 192.168.4.117 "/tmp/send_sync 60000 192.168.3.100 30 &" &
 	;;
     stop)
 	SYNCPID=`ssh 192.168.4.117 "pidof send_sync"`

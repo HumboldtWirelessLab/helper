@@ -1,10 +1,14 @@
 BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
 FROMRAWDEVICE
-//-> tdraw :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump");
-  -> tdraw :: ToDump("/tmp/extra/test/NODENAME.NODEDEVICE.dump");
+//-> SimpleQueue(CAPACITY 500)
+  -> ct::Counter()
+//  ->Discard;
+//  -> tdraw::TODUMP("/tmp/extra/test/NODENAME.NODEDEVICE.dump");
+  -> tdraw::TODUMP("RESULTDIR/NODENAME.NODEDEVICE.dump");
   
 Script(
-  wait RUNTIME,
+  wait 59,
+  read ct.count,
   stop
 );
