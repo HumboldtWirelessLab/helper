@@ -20,6 +20,11 @@ esac
 
 MINNUM=$1
 MAXNUM=$2
+STEP=$3
+
+if [ "x$STEP" = "x" ]; then
+  STEP=1
+fi
 
 rm -f sender_and_receiver_voip.mes sender_and_receiver_voip.dis
 
@@ -47,8 +52,8 @@ while [ $MINNUM -le $MAXNUM ]; do
   ssh 192.168.4.117 "rm -rf /localhome/testbed/voip"
   
   RUNNUM=`expr $RUNNUM + 1`
-  USECONFIGLINES=`expr $USECONFIGLINES + 5`
-  MINNUM=`expr $MINNUM + 5`
+  USECONFIGLINES=`expr $USECONFIGLINES + $STEP`
+  MINNUM=`expr $MINNUM + $STEP`
   
   rm -f sender_and_receiver_voip.mes sender_and_receiver_voip.dis
 done

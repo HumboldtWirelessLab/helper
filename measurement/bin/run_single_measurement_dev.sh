@@ -101,6 +101,7 @@ abort_measurement() {
     fi
 
     screen -S $SCREENNAME -X quit
+    screen -S $LOCALSCREENNAME -X quit
 
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
         check_nodes
@@ -415,15 +416,31 @@ fi
 ###################################################
 ####### Start Click- & Application-Stuff ##########
 ###################################################
+    LOCALSCREENNAME="local_$ID"
 
-    if [ "x$LOCALPROCESS" != "x" ]; then
-      echo ""
-      echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
-      screen -S $SCREENNAME -X screen -t localprocess
-      sleep 0.1
-      screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;RUNTIME=$TIME RESULTDIR=$FINALRESULTDIR NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
-      sleep 0.5
-      screen -S $SCREENNAME -p localprocess -X stuff $'\n'
+      echo "check fo localstuff: $REMOTEDUMP ; $LOCALPROCESS" >> $FINALRESULTDIR/remotedump.log 2>&1 
+    if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
+      screen -d -m -S $LOCALSCREENNAME
+      echo "check fo remote Dump: $REMOTEDUMP" >> $FINALRESULTDIR/remotedump.log 2>&1 
+      
+      sleep 0.3
+      if [ "x$REMOTEDUMP" = "xyes" ]; then
+        echo "Start remotedump" >> $FINALRESULTDIR/remotedump.log 2>&1
+        screen -S $LOCALSCREENNAME -X screen -t remotedump                                                                                                                                                                                                                          
+	sleep 0.3                                                                                                                                                                                                                                                                     
+	screen -S $LOCALSCREENNAME -p remotedump -X stuff "(cd $FINALRESULTDIR/;export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-i586 $FINALRESULTDIR/remotedump.click >> $FINALRESULTDIR/remotedump.log 2>&1)"
+	sleep 0.5                                                                                                                                                                                                                                                                     
+	screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n' 
+      fi
+      
+      if [ "x$LOCALPROCESS" != "x" ]; then
+        echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
+        screen -S $LOCALSCREENNAME -X screen -t localprocess
+        sleep 0.1
+        screen -S $LOCALSCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;RUNTIME=$TIME RESULTDIR=$FINALRESULTDIR NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
+        sleep 0.5
+        screen -S $LOCALSCREENNAME -p localprocess -X stuff $'\n'
+      fi
     fi
 
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
@@ -519,21 +536,19 @@ fi
     fi
 
   if [ "x$LOCALPROCESS" != "x" ]; then
-#    CPWD=`pwd`
-#    echo ""
-#    echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
-#    screen -S $SCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1"
-#    sleep 0.1
-#    screen -S $SCREENNAME -p localprocess -X stuff $'\n'
     PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
- fi
+  fi
 
 #####################################
 ##### Close Screen-Session ##########
 #####################################
 
     screen -S $SCREENNAME -X quit
-
+    
+    if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
+      screen -S $LOCALSCREENNAME -X quit
+    fi
+    
 #######################################
 ##### Check Nodes and finish ##########
 #######################################

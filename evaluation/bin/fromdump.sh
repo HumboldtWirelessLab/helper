@@ -19,13 +19,21 @@ case "$SIGN" in
 esac
 
 if [ "x$ATH" = "xyes" ]; then
-  ATHEXTRA="_inc_ath"
+  ATHREP=""
 else
-  ATHEXTRA=""
+  ATHREP="//"
+fi
+
+if [ "x$SEQ" = "xyes" ]; then
+  SEQREP=""
+else
+  SEQREP="//"
 fi
 
 if [ "x$GPS" = "xyes" ]; then
-  cat $DIR/../etc/click/eval_wifi_805$ATHEXTRA\_gps.click | sed "s#DUMP#$1#g" | click 2>&1
+  GPSREP=""
 else
-  cat $DIR/../etc/click/eval_wifi_805$ATHEXTRA.click | sed "s#DUMP#$1#g" | click 2>&1
+  GPSREP="//"
 fi
+
+cat $DIR/../etc/click/eval_wifi_805.click | sed "s#DUMP#$1#g" | sed "s#//SEQ#$SEQREP#g" | sed "s#//ATH#$ATHREP#g" | sed "s#//GPS#$GPSREP#g" | click 2>&1

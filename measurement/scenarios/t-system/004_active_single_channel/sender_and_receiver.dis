@@ -3,7 +3,7 @@ SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=120
+TIME=60
 
 NODETABLE=sender_and_receiver.mes
 NODEPLACEMENTFILE=placement.default
@@ -20,3 +20,6 @@ NOTICE=no
 LOS=no
 
 CONTROLSOCKET=no
+
+REMOTEDUMP=yes
+DUMPIP=192.168.4.3

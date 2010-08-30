@@ -11,7 +11,7 @@ wgt25           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.
 wgt28           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt28.ath0.log   -               -
 wgt29           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt29.ath0.log   -               -
 wgt31           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt31.ath0.log   -               -
-wgt32           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt32.ath0.log   -               -
+#wgt32           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt32.ath0.log   -               -
 wgt33           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt33.ath0.log   -               -
 #wgt34           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt34.ath0.log   -               -
 wgt37           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt37.ath0.log   -               -
@@ -22,10 +22,10 @@ wgt42           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.
 #wgt43           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt43.ath0.log   -               -
 wgt44           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt44.ath0.log   -               -
 wgt45           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt45.ath0.log   -               -
-wgt46           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt46.ath0.log   -               -
-wgt47           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt47.ath0.log   -               -
+#wgt46           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt46.ath0.log   -               -
+#wgt47           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt47.ath0.log   -               -
 wgt49           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt49.ath0.log   -               -
-wgt61           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt61.ath0.log   -               -
+#wgt61           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt61.ath0.log   -               -
 wgt63           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt63.ath0.log   -               -
 wgt70           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt70.ath0.log   -               -
 #wgt71           ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel    -               sender_and_receiver.click  LOGDIR/wgt71.ath0.log   -               -
