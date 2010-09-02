@@ -24,17 +24,31 @@ case "$1" in
   "test")
     echo "Testdump"
     if [ -e $RESULTDIR/devel.ath0.dump ]; then
-      echo "Dumpfile exist"
+      echo "Dumpfile ath0 exist"
     else
-      echo "No Dumpfile"
+      echo "No ath0 Dumpfile"
+      exit 0;
+    fi
+    if [ -e $RESULTDIR/devel.wlan1.dump ]; then
+      echo "Dumpfile wlan1 exist"
+    else
+      echo "No wlan1 Dumpfile"
       exit 0;
     fi
 
     DUMPSIZE=`ls -lisa $RESULTDIR/devel.ath0.dump | awk '{print $7}'`
     if [ $DUMPSIZE -gt 0 ]; then
-       echo "Dumpfile size ok."
+       echo "Dumpfile ath0 size ok."
      else
-       echo "Dumpfile too small"
+       echo "Dumpfile ath0 too small"
+       exit 0;
+    fi
+
+    DUMPSIZE=`ls -lisa $RESULTDIR/devel.wlan1.dump | awk '{print $7}'`
+    if [ $DUMPSIZE -gt 0 ]; then
+       echo "Dumpfile wlan1 size ok."
+     else
+       echo "Dumpfile wlan1 too small"
        exit 0;
     fi
 

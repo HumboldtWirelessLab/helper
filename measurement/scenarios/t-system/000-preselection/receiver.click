@@ -6,6 +6,10 @@ FromDevice(ath0, PROMISC true, OUTBOUND true)
   -> GPSEncap(GPS gps)
   -> td :: ToDump("RESULTDIR/devel.ath0.dump");
 
+FromDevice(wlan1, PROMISC true, OUTBOUND true)
+  -> GPSEncap(GPS gps)
+  -> td2 :: ToDump("RESULTDIR/devel.wlan1.dump");
+
 Script(
   write gps.gps_coord STARTGPS,
 );
