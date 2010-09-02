@@ -42,18 +42,18 @@ LOWY=0
 LOWZ=0
 
 NODE=`echo $line | awk '{print $1}'`
-LONG=`echo $line | awk '{print $2}'`
-LAT=`echo $line | awk '{print $3}'`
+LAT=`echo $line | awk '{print $2}'`
+LONG=`echo $line | awk '{print $3}'`
 while read inline; do
 	NODE=`echo $inline | awk '{print $1}'`
-	INLONG=`echo $inline | awk '{print $2}'`
-	INLAT=`echo $inline | awk '{print $3}'`
-  	YDISTANCE=`(cd $DIR; java GeoParser $LONG $LAT $LONG $INLAT) | sed -e "s#\..*##g"`
+	INLAT=`echo $inline | awk '{print $2}'`
+	INLONG=`echo $inline | awk '{print $3}'`
+  	YDISTANCE=`(cd $DIR; java GeoParser $LAT $LONG $INLAT $LONG) | sed -e "s#\..*##g"`
 	G=`greater $LAT $INLAT`
 	if [ $G -eq 1 ]; then
 		YDISTANCE="-$YDISTANCE"
 	fi
-       	XDISTANCE=`(cd $DIR; java GeoParser $LONG $LAT $INLONG $LAT) | sed -e "s#\..*##g"`
+       	XDISTANCE=`(cd $DIR; java GeoParser $LAT $LONG $LAT $INLONG) | sed -e "s#\..*##g"`
 	G=`greater $LONG $INLONG`
 	if [ $G -eq 1 ]; then
 		XDISTANCE="-$XDISTANCE"
@@ -70,8 +70,10 @@ done < $POSTIONFILE
 
 rm -f $POSTIONFILE.pos
 
+MINDIST=0
+
 while read inline; do
-	echo "$inline $LOWX $LOWY" | awk '{print $1" "$2-$5+50" "$3-$6+50" "$4-$7}' >> $POSTIONFILE.pos
+	echo "$inline $LOWX $LOWY $MINDIST" | awk '{print $1" "$2-$5+$7" "$3-$6+$7" "$4}' >> $POSTIONFILE.pos
 done < $POSTIONFILE.pos.tmp
 
 rm -f $POSTIONFILE.pos.tmp

@@ -48,6 +48,18 @@ case "$1" in
 		SIMDISBASENAME=`basename $SIMDIS`
 		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $RESULTDIR/$SIMDISBASENAME.$POSTFIX
 
+		if [ "x$REMOTEDUMP" = "xyes" ]; then
+                  if [ "x$DUMPPORTBASE" = "x" ]; then
+		    DUMPPORTBASE=30000
+		  fi
+                  if [ "x$DUMPIP" = "x" ]; then
+		    DUMPIP="192.168.3.100"
+		  fi
+	  
+		  echo -n "" > $RESULTDIR/remotedump.map
+		  echo -n "" > $RESULTDIR/remotedump.click
+                fi		  
+
 		#Prepare click
 		echo -n "" > $RESULTDIR/$NODETABLE.$POSTFIX
 		while read line; do
@@ -133,9 +145,29 @@ case "$1" in
 				        DEBUG=2
 				      fi
         			    fi
-
-				    ( cd $CONFIGDIR; cat $CLICK | sed -e "s#//[0-$DEBUG]/##g" -e "s#/\*[0-$DEBUG]/##g" -e "s#/[0-$DEBUG]\*/##g" -e "s#DEBUGLEVEL#$DEBUG#g" | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAPTMPL#g" -e "s#TODEVICE#WIFIENCAPTMPL -> TORAWDEVICE#g" | sed -e "s#WIFIDECAPTMPL#$WIFIDECAP#g" -e "s#WIFIENCAPTMPL#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(NODEDEVICE, PROMISC true, OUTBOUND true)#g" -e "s#TORAWDEVICE#ToDevice(NODEDEVICE)#g" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $CLICKFINALNAME )
 				    
+                                    if [ "x$REMOTEDUMP" = "xyes" ]; then
+				      NODUMP=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "TODUMP" | wc -l)`
+				      
+				      NODEDUMPNR=1
+				      
+				      DUMPSEDARG=" -e s#-#-#g"
+				      
+				      while [ $NODEDUMPNR -le $NODUMP ]; do
+                                        DUMPLINE=`( cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "TODUMP" | head -n $NODEDUMPNR | tail -n 1 | sed -e "s#^.*TODUMP(##g" -e "s#).*##g" )`
+					echo "$CNODE $CDEV $NODEDUMPNR $DUMPLINE $DUMPIP $DUMPPORTBASE" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.map
+					NODEDUMPNR=`expr $NODEDUMPNR + 1`
+					DUMPPORTBASE=`expr $DUMPPORTBASE + 1`
+					DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#Socket\(UDP,$DUMPIP,$DUMPPORTBASE,CLIENT\ttrue\)->Discard#g"
+					echo "Idle->Socket(UDP,$DUMPIP,$DUMPPORTBASE,$DUMPIP,$DUMPPORTBASE)->ToDump("$DUMPLINE");" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.click
+			              done
+				    else
+				      DUMPSEDARG=" -e s#TODUMP#ToDump#g"
+				    fi
+			        
+    				    #echo "SED: $DUMPSEDARG"
+				    ( cd $CONFIGDIR; cat $CLICK | sed -e "s#//[0-$DEBUG]/##g" -e "s#/\*[0-$DEBUG]/##g" -e "s#/[0-$DEBUG]\*/##g" -e "s#DEBUGLEVEL#$DEBUG#g" | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAPTMPL#g" -e "s#TODEVICE#WIFIENCAPTMPL -> TORAWDEVICE#g" | sed -e "s#WIFIDECAPTMPL#$WIFIDECAP#g" -e "s#WIFIENCAPTMPL#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(NODEDEVICE, PROMISC true, OUTBOUND true)#g" -e "s#TORAWDEVICE#ToDevice(NODEDEVICE)#g" | sed $DUMPSEDARG | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $CLICKFINALNAME )
+				    				    
 				    echo "Script(wait $TIME, stop);" >> $CLICKFINALNAME
 				    
 				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" != "xkernel" ]; then
@@ -156,6 +188,12 @@ case "$1" in
 			fi
 		    fi
 		done < $CONFIGDIR/$NODETABLE
+		
+		if [ "x$REMOTEDUMP" = "xyes" ]; then
+		  REMOTEDUMPTIME=`expr $TIME + 5`
+		  echo "Script(wait $REMOTEDUMPTIME, stop);" >> $RESULTDIR/remotedump.click
+		fi
+		
 				
 		;;
 	*)

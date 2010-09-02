@@ -18,8 +18,26 @@ case "$SIGN" in
 	;;
 esac
 
-if [ "x$GPS" = "xyes" ]; then
-  cat $DIR/../etc/click/eval_wifi_805_gps.click | sed "s#DUMP#$1#g" | click 2>&1
+if [ "x$ATH" = "xyes" ]; then
+  ATHREP=""
 else
-  cat $DIR/../etc/click/eval_wifi_805.click | sed "s#DUMP#$1#g" | click 2>&1
+  ATHREP="//"
+fi
+
+if [ "x$SEQ" = "xyes" ]; then
+  SEQREP=""
+else
+  SEQREP="//"
+fi
+
+if [ "x$GPS" = "xyes" ]; then
+  GPSREP=""
+else
+  GPSREP="//"
+fi
+
+if [ "x$WIFI" = "x803" ]; then
+  cat $DIR/../etc/click/eval_wifi_803.click | sed "s#DUMP#$1#g" | sed "s#//SEQ#$SEQREP#g" | sed "s#//ATH#$ATHREP#g" | sed "s#//GPS#$GPSREP#g" | click 2>&1
+else
+  cat $DIR/../etc/click/eval_wifi_805.click | sed "s#DUMP#$1#g" | sed "s#//SEQ#$SEQREP#g" | sed "s#//ATH#$ATHREP#g" | sed "s#//GPS#$GPSREP#g" | click 2>&1
 fi
