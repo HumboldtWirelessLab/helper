@@ -1,6 +1,6 @@
 FromDump("DUMP",STOP true)
   -> packets :: Counter
-//GSP  -> GPSPrint(NOWRAP true)
+//GPS  -> GPSPrint(NOWRAP true)
 //GPS  -> GPSDecap()
 //ATH  -> Ath2Print(INCLUDEATH true, NOWRAP true)
   -> ath2_decap :: Ath2Decap(ATHDECAP true)
