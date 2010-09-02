@@ -37,7 +37,7 @@ if [ -e $DIR/$RUN ]; then
   exit 0
 fi
 
-TARGETHOST=blur
+TARGETHOST=localhost
 
 NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "killall click" > /dev/null 2>&1
 
@@ -169,7 +169,7 @@ while [ $WANTEXIT -eq 0 ]; do
 
   echo "Start click ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
-  NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "(cd $FINALRESULTDIR; /localhome/sombrutz/click-brn/userlevel/click receiver.click > $FINALRESULTDIR/click.log 2>&1)" &
+  NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "(cd $FINALRESULTDIR; /home/testbed/click-brn/userlevel/click receiver.click > $FINALRESULTDIR/click.log 2>&1)" &
 
   #add 5 second extra to make sure that we are not faster than the devices (click,application)
   WAITTIME=`expr $RUNTIME + 5`
