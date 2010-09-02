@@ -137,10 +137,12 @@ while [ $WANTEXIT -eq 0 ]; do
     echo "Create Device  ($STEP/$NOSTEPS)"
     STEP=`expr $STEP + 1`
     NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
+    NODE=localhost DEVICES=wlan1 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
 
     echo "Start Device  ($STEP/$NOSTEPS)"
     STEP=`expr $STEP + 1`
     NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
+    NODE=localhost DEVICES=wlan1 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
     
     FIRSTRUN=0
   else
@@ -150,10 +152,12 @@ while [ $WANTEXIT -eq 0 ]; do
   echo "Config device  ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
   NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
+  NODE=localhost DEVICES=wlan1 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
 
   echo "Get device info (Control) ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
   NODE=localhost DEVICES=ath0 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
+  NODE=localhost DEVICES=wlan1 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
 
   echo "Start local process ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
