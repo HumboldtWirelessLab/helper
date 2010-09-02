@@ -56,6 +56,10 @@ if [ -e /usr/sbin/wlanconfig ]; then
 else
     if [ -e /sbin/wlanconfig ]; then
 	WLANCONFIG=/sbin/wlanconfig
+    else
+      if [ -e /usr/bin/wlanconfig ]; then
+	WLANCONFIG=/usr/bin/wlanconfig
+      fi
     fi
 fi
 

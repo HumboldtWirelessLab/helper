@@ -37,7 +37,9 @@ if [ -e $DIR/$RUN ]; then
   exit 0
 fi
 
-NODELIST=localhost $DIR/../../../../host/bin/run_on_nodes.sh "killall click" > /dev/null 2>&1
+TARGETHOST=blur
+
+NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "killall click" > /dev/null 2>&1
 
 WANTEXIT=0
 
@@ -128,21 +130,22 @@ while [ $WANTEXIT -eq 0 ]; do
   if [ $FIRSTRUN -eq 1 ]; then
     echo "Remove old Modules ($STEP/$NOSTEPS)"
     STEP=`expr $STEP + 1`
-    NODELIST=localhost MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../../../host/bin/wlanmodules.sh rmmod >> $FINALRESULTDIR/measurement.log 2>&1
+    NODELIST=$TARGETHOST MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../../../host/bin/wlanmodules.sh rmmod >> $FINALRESULTDIR/measurement.log 2>&1
     
     echo "Load Modules  ($STEP/$NOSTEPS)"
     STEP=`expr $STEP + 1`
-    NODELIST=localhost MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../../../host/bin/wlanmodules.sh insmod >> $FINALRESULTDIR/measurement.log 2>&1
+    NODELIST=$TARGETHOST MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../../../host/bin/wlanmodules.sh insmod >> $FINALRESULTDIR/measurement.log 2>&1
 
     echo "Create Device  ($STEP/$NOSTEPS)"
     STEP=`expr $STEP + 1`
-    NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
-    NODE=localhost DEVICES=wlan1 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
+
+    NODE=$TARGETHOST DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
+    NODE=$TARGETHOST DEVICES=wlan1 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
 
     echo "Start Device  ($STEP/$NOSTEPS)"
     STEP=`expr $STEP + 1`
-    NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
-    NODE=localhost DEVICES=wlan1 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
+    NODE=$TARGETHOST DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
+    NODE=$TARGETHOST DEVICES=wlan1 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
     
     FIRSTRUN=0
   else
@@ -151,21 +154,22 @@ while [ $WANTEXIT -eq 0 ]; do
 
   echo "Config device  ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
-  NODE=localhost DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
-  NODE=localhost DEVICES=wlan1 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
+
+  NODE=$TARGETHOST DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
+  NODE=$TARGETHOST DEVICES=wlan1 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
 
   echo "Get device info (Control) ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
-  NODE=localhost DEVICES=ath0 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
-  NODE=localhost DEVICES=wlan1 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
+  NODE=$TARGETHOST DEVICES=ath0 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
+  NODE=$TARGETHOST DEVICES=wlan1 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
 
   echo "Start local process ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
-  PATH=$DIR/../../host/bin:$PATH;RUNTIME=$TIME RESULTDIR=$FINALRESULTDIR NODELIST=localhost $DIR/$LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1
+  PATH=$DIR/../../host/bin:$PATH;RUNTIME=$TIME RESULTDIR=$FINALRESULTDIR NODELIST=$TARGETHOST $DIR/$LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1
 
   echo "Start click ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
-  NODELIST=localhost $DIR/../../../../host/bin/run_on_nodes.sh "(cd $FINALRESULTDIR; /home/testbed/click-brn/userlevel/click receiver.click > $FINALRESULTDIR/click.log 2>&1)" &
+  NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "(cd $FINALRESULTDIR; /localhome/sombrutz/click-brn/userlevel/click receiver.click > $FINALRESULTDIR/click.log 2>&1)" &
 
   #add 5 second extra to make sure that we are not faster than the devices (click,application)
   WAITTIME=`expr $RUNTIME + 5`
@@ -179,20 +183,20 @@ while [ $WANTEXIT -eq 0 ]; do
 
   echo "Kill click ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
-  NODELIST=localhost $DIR/../../../../host/bin/run_on_nodes.sh "killall click" >> $FINALRESULTDIR/measurement.log 2>&1
+  NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "killall click" >> $FINALRESULTDIR/measurement.log 2>&1
 
   echo "Stop local process ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
-  PATH=$DIR/../../host/bin:$PATH;NODELIST=localhost $DIR/$LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
+  PATH=$DIR/../../host/bin:$PATH;NODELIST=$TARGETHOST $DIR/$LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
   
   echo "Poststop local process ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
-  PATH=$DIR/../../host/bin:$PATH;NODELIST=localhost $DIR/$LOCALPROCESS poststop >> $FINALRESULTDIR/localapp.log
+  PATH=$DIR/../../host/bin:$PATH;NODELIST=$TARGETHOST $DIR/$LOCALPROCESS poststop >> $FINALRESULTDIR/localapp.log
 
   echo "Check Measurement ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
   echo "############################# CHECK #################################"
-  PATH=$DIR/../../host/bin:$PATH;NODELIST=localhost RESULTDIR=$FINALRESULTDIR $DIR/$CHECKPROCESS test >> $FINALRESULTDIR/test.log
+  PATH=$DIR/../../host/bin:$PATH;NODELIST=$TARGETHOST RESULTDIR=$FINALRESULTDIR $DIR/$CHECKPROCESS test >> $FINALRESULTDIR/test.log
   cat $FINALRESULTDIR/test.log
   echo "######################### CHECK END #################################"
 
@@ -206,3 +210,4 @@ while [ $WANTEXIT -eq 0 ]; do
   RUN=`expr $RUN + 1`
   
 done
+

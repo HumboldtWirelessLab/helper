@@ -1,6 +1,8 @@
+- remove roofnode stuff (roofnode.sh, ssh.conf) replace this by routing
+
 - directory for marker, which should be clear before setting a new one. Problem with different measurement (e.g tcp -> receiver -> tcp)
 - outdoorevalution: change in mes-file needs update for evaluation
 - ns2: radiomodell (update, correct value, etc.)
 - measurement: better log-support for kclick (seems to me, that now there are some lines missing)
 - remove 'echo -n ""' in host/bin/function.sh, this is necessary for wgt at University
-- at BASEDIR which points to the base of the framework
+

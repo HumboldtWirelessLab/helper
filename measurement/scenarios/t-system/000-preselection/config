@@ -5,5 +5,5 @@ CHECKPROCESS=checkdump.sh
 MODOPTIONS=/home/testbed/helper/nodes/etc/madwifi/modoptions.pcmcia
 #MODULSDIR=/home/testbed/helper/nodes/lib/modules/i586/
 MODULSDIR=/home/testbed/helper/nodes/lib/modules/i586-new/
-MAXGPSTRY=10
+MAXGPSTRY=3
 RUNTIME=30

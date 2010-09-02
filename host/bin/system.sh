@@ -31,8 +31,14 @@ case "$1" in
 		;;
 	"reboot")
 		for node in $NODELIST; do
-		    echo "$node"
-		    run_on_node $node "reboot" "/" $DIR/../etc/keys/id_dsa
+		    echo -n "$node: "
+		    DENYREBOOT=`cat $DIR/../etc/reboot.deny | grep -e "^$node$" | wc -l`
+		    if [ $DENYREBOOT -eq 1 ]; then
+		      echo "Reboot not allowed !"
+		    else
+		      echo "Reboot"
+		      run_on_node $node "reboot" "/" $DIR/../etc/keys/id_dsa
+		    fi  
 		done
 		;;
 	"status")	

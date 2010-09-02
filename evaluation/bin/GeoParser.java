@@ -52,18 +52,10 @@ public class GeoParser {
 
     if (us) {
       double dist = s / 1609.344;
-      if (dist < 0.2) {
-        return (Math.round(5280 * 1 * dist) / 1);// + ' ft';
-      } else {
-        return (Math.round(1000 * dist) / 1000);// + ' mi';
-      }
+      return (Math.round(5280 * 1 * dist) / 1);// + ' ft';
     } else {
       double dist = s / 1000;
-      if (dist < 1) {
-        return (Math.round(1000 * 1 * dist) / 1);// + ' m';
-      } else {
-        return (Math.round(1000 * dist) / 1000);// + ' km';
-      }
+      return (Math.round(1000 * dist) );// + ' m';
     }
   }
 
@@ -71,10 +63,10 @@ public class GeoParser {
 
     if (args.length != 4) throw new IllegalArgumentException("wrong number of arguments; required: lat1 lon1 lat2 lon2");
 
-    String lat1 = args[1]; //"13.5291316666666000";
-    String lon1 = args[0]; //"52.4303833333333000";
-    String lat2 = args[3]; //"13.5310550000000000";
-    String lon2 = args[2]; //"52.4296600000000000";
+    String lat1 = args[0]; //"13.5291316666666000";
+    String lon1 = args[1]; //"52.4303833333333000";
+    String lat2 = args[2]; //"13.5310550000000000";
+    String lon2 = args[3]; //"52.4296600000000000";
 
     double d = Vincenty_Distance(lat1, lon1, lat2, lon2, false);
 
