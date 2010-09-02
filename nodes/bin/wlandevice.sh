@@ -69,6 +69,27 @@ case "$1" in
 			echo "Use CONFIG to set the config"
 			exit 0
 	    fi
+
+	    WLANDEV=`echo $DEVICE | grep "wlan" | wc -l`
+	    if [ "x$WLANDEV" = "x1" ]; then
+	      if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
+			. $DIR/../../nodes/etc/wifi/$CONFIG
+	      else
+			. $CONFIG
+	      fi
+
+	      . $DIR/../../nodes/etc/wifi/default
+
+
+	      if [ "x$MODE" = "x" ]; then
+	      	MODE=$DEFAULT_MODE
+	      fi
+
+	      ${IFCONFIG} $DEVICE down
+	      echo "iwconfig $DEVICE mode $MODE"
+	      ${IWCONFIG} $DEVICE mode $MODE
+	      exit 0
+	    fi
 	    
 	    PHYDEV=`get_phy_dev $DEVICE`
 	    
@@ -158,6 +179,10 @@ case "$1" in
 		fi
 	    fi
 	    
+	    WLANDEV=`echo $DEVICE | grep "wlan" | wc -l`
+	    if [ "x$WLANDEV" = "x1" ]; then
+	      exit 0
+	    fi
 	    
 	    if [ "x$DIVERSITY" = "x" ]; then
 			DIVERSITY=$DEFAULT_DIVERSITY
