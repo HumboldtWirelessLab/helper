@@ -52,65 +52,6 @@ get_node_status()  {
 }
 
 #########################################################
-############ Clean up after abort #######################
-#########################################################
-
-trap abort_measurement 1 2 3 6
-
-#TODO
-abort_measurement() {
-	
-    echo "Abort Measurement" >&6
-	
-    if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
-
-	for node in $NODELIST; do
-	    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-	
-	    for nodedevice in $NODEDEVICELIST; do
-		CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
-		CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
-		CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
-		if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
-			    TAILPID=`run_on_node $node "pidof cat" "/" $DIR/../../host/etc/keys/id_dsa`
-			    run_on_node $node "kill $TAILPID" "/" $DIR/../../host/etc/keys/id_dsa
-		else
-		    if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-				NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
-				CLICKPID=`run_on_node $node "pidof click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa`
-				if [ "x$CLICKPID" != "x" ]; then
-					for cpid in $CLICKPID; do
-						run_on_node $node "kill $cpid" "/" $DIR/../../host/etc/keys/id_dsa
-					done
-				fi
-		    fi
-		fi
-		
-		APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
-		
-        if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-			run_on_node $node "$APPLICATION  stop" "/" $DIR/../../host/etc/keys/id_dsa
-        fi
-
-	    done
-	done
-    fi
-
-    screen -S $SCREENNAME -X quit
-    screen -S $LOCALSCREENNAME -X quit
-
-    if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
-        check_nodes
-    fi
-    
-    echo "abort" 1>&$STATUSFD
-
-    echo "Finished measurement. Status: abort."
-
-    exit 0
-}
-
-#########################################################
 ###### Check RUNMODE. What do you want to do ? ##########
 #########################################################
 
@@ -604,11 +545,11 @@ set_master_state 0 preload
 ###################################################
 
   set_master_state 0 measurement
-  
+
   echo "Wait for nodes"
   SYNCSTATE=`wait_for_nodes "$NODELIST" _killclick.state`
   echo "all nodes ready"
- 
+
   if [ "x$LOCALPROCESS" != "x" ]; then
     PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
   fi
@@ -617,15 +558,13 @@ set_master_state 0 preload
 ##### Close Screen-Session ##########
 #####################################
 
-    screen -S $SCREENNAME -X quit
-    
     if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
       screen -S $LOCALSCREENNAME -X quit
     fi
-    
-  screen -S $MEASUREMENTSCREENNAME -X quit
 
->>>>>>> ParallelMeasurement: more sync:measurement/bin/run_single_measurement_dev.sh
+    screen -S $MEASUREMENTSCREENNAME -X quit
+
+
 #######################################
 ##### Check Nodes and finish ##########
 #######################################
@@ -643,7 +582,7 @@ set_master_state 0 preload
 #################################################
 
 SCREENNUMBER=1
-NODE_IN_SCREEN=1                                                                                                                                                                                                                                                                       
+NODE_IN_SCREEN=1
 MAX_NODE_PER_SCREEN=30
 
 for node in $NODELIST; do
@@ -680,3 +619,4 @@ fi
 echo "Finished measurement. Status: ok."
 
 exit 0
+
