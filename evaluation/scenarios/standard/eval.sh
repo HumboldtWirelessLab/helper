@@ -5,7 +5,7 @@ pwd=$(pwd)
 
 SIGN=`echo $dir | cut -b 1`
 
-MATLABHOST="gruenau"
+MATLABHOST="localhost"
 
 case "$SIGN" in
   "/")
