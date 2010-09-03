@@ -246,10 +246,10 @@ if [ $RUNMODENUM -le 4 ]; then
   if [ $CONFIGWIFI -eq 1 ]; then
     check_nodes status/$LOGMARKER\_wificonfig.state >> status/$LOGMARKER\_wificonfig.log
   fi
-    
-  echo "0" > status/$LOGMARKER\_wificonfig.state
 
 fi
+
+echo "0" > status/$LOGMARKER\_wificonfig.state
 
 ##############################
 ###### Get Wifiinfo ##########
@@ -277,9 +277,9 @@ if [ $RUNMODENUM -le 5 ]; then
 	  done
   done
 
-  echo "0" > status/$LOGMARKER\_wifiinfo.state
-
 fi
+
+echo "0" > status/$LOGMARKER\_wifiinfo.state
 
 ###################################
 ###### Setup Clickmodule ##########
