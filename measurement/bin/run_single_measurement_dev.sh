@@ -24,7 +24,8 @@ NODELIST=`cat $CONFIGFILE | grep -v "#" | awk '{print $1}' | sort -u`
 
 RUN_CLICK_APPLICATION=0
 
-SCREENFILENAME=screenmap
+NODESCREENFILENAME=nodescreenmap
+MSCREENFILENAME=measurementscreenmap
 
 CURRENTMODE="START"
 
@@ -37,11 +38,6 @@ check_nodes() {
       echo "WHHHHOOOOO: LOOKS LIKE RESTART! GOD SAVE THE WATCHDOG"
       echo "Current Mode: $CURRENTMODE"
       echo "Nodes: $NODELIST"
-#      echo "reboot all nodes"
-#      NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot
-#      echo "wait for all nodes"
-#      sleep 20
-#      echo "error" 1>&$STATUSFD
       exit 0
     fi
 }
@@ -49,37 +45,6 @@ check_nodes() {
 get_node_status()  {
     NODESTATUS=`NODELIST=$NODELIST MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh statusmarker`
     echo "$NODESTATUS"
-}
-
-#########################################################
-###### Check RUNMODE. What do you want to do ? ##########
-#########################################################
-
-screenname_for_node() {
-  RESULT=`cat $2 | grep -e "^$1[[:space:]]" | awk '{print $2}'`
-  echo $RESULT
-}
-
-
-run_command_on_node() {
-
-  SCREENNAME=`screenname_for_node $1 $SCREENFILENAME`
-
-  screen -S $SCREENNAME -p $1 -X stuff "NODELIST=$1 $DIR/../../host/bin/run_on_nodes.sh $2"
-  sleep 0.3
-  screen -S $SCREENNAME -p $1 -X stuff $'\n'
-
-}
-
-run_command_on_screen() {
-
-  SCREENNAME=`screenname_for_node $1 $SCREENFILENAME`
-
-  echo "Debug: $SCREENNAME" >&5
-  screen -S $SCREENNAME -p $1 -X stuff "LOGMARKER=$1 $2"
-  sleep 0.3
-  screen -S $SCREENNAME -p $1 -X stuff $'\n'
-
 }
 
 ##############################
@@ -192,8 +157,11 @@ abort_measurement() {
     screen -S $SCREENNAME -X quit
   fi
   
-  if [ "x$MEASUREMENTSCREENNAME" != "x" ]; then
-    screen -S $MEASUREMENTSCREENNAME -X quit
+  if [ -f $MSCREENFILENAME ]; then
+    MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | sort -u`
+    for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
+      screen -S $MEASUREMENTSCREENNAME -X quit
+    done
   fi
    
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
@@ -218,7 +186,7 @@ screenname_for_node() {
 
 run_command_for_node() {
 
-  SCREENNAME=`screenname_for_node $1 $SCREENFILENAME`
+  SCREENNAME=`screenname_for_node $1 $NODESCREENFILENAME`
 
   echo "Debug: $SCREENNAME" >&5
   screen -S $SCREENNAME -p $1 -X stuff "LOGMARKER=$1 $2"
@@ -277,7 +245,7 @@ for node in $NODELIST; do
 
   sleep 0.5;
   screen -S $SCREENNAME -X screen -t $node 
-  echo "$node $SCREENNAME" >> $SCREENFILENAME
+  echo "$node $SCREENNAME" >> $NODESCREENFILENAME
 
   NODE_IN_SCREEN=`expr $NODE_IN_SCREEN + 1`
 
@@ -386,16 +354,20 @@ set_master_state 0 clickmodule
 ###### Start Measurement Screensession ##########
 #################################################
 
-  MEASUREMENTSCREENNAME="measurement_$ID"
+  MSCREENNUM=1
+  MEASUREMENTSCREENNAME="measurement_$ID_$MSCREENNUM"
+
+  CURRENTMSCREENNUM=1
     
   screen -d -m -S $MEASUREMENTSCREENNAME
 
   NODEBINDIR="$DIR/../../nodes/bin"
-
     
 ########################################################
 ###### Setup Click-, Log- & Application-Stuff ##########
 ########################################################
+  
+  rm $MSCREENFILENAME
 
   CURRENTMODE="RUN CLICK AND APPLICATION"
   RUN_CLICK_APPLICATION=0
@@ -412,12 +384,15 @@ set_master_state 0 clickmodule
       CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
       LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
 
+      echo "$node $nodedevice $MEASUREMENTSCREENNAME" >> $MSCREENFILENAME
+
       if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
 			
         RUN_CLICK_APPLICATION=1
 			
         SCREENT="$node\_$nodedevice\_click"	
         screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
+        CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
    		  sleep 0.1
 			
 		  	if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
@@ -427,6 +402,7 @@ set_master_state 0 clickmodule
  			    sleep 0.1
 			    SCREENT="$node\_$nodedevice\_kcm"	
 			    screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
+          CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
 			    sleep 0.1
 			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"rm -f $LOGFILE; cat /proc/kmsg >> $LOGFILE \""
 			  else
@@ -443,9 +419,19 @@ set_master_state 0 clickmodule
 
 			  SCREENT="$node\_$nodedevice\_app"	
 			  screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
+			  CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
    		  sleep 0.1
 			  screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"$APPLICATION start > $APPLOGFILE 2>&1\""
 		  fi
+		  	
+		  if [ $CURRENTMSCREENNUM -gt 25 ]; then
+		    MSCREENNUM=`expr $MSCREENNUM + 1`
+        MEASUREMENTSCREENNAME="measurement_$ID_$MSCREENNUM"
+
+        CURRENTMSCREENNUM=1
+    
+        screen -d -m -S $MEASUREMENTSCREENNAME
+      fi
 	  done
   done
 
@@ -458,10 +444,10 @@ SYNCSTATE=`wait_for_nodes "$NODELIST" _preload.state`
 echo "all nodes ready"
 set_master_state 0 preload
 
+#########################################################
+####### Start Local Click- & Application-Stuff ##########
+#########################################################
 
-###################################################
-####### Start Click- & Application-Stuff ##########
-###################################################
     LOCALSCREENNAME="local_$ID"
 
     echo "check fo localstuff: $REMOTEDUMP ; $LOCALPROCESS" >> $FINALRESULTDIR/remotedump.log 2>&1 
@@ -473,10 +459,10 @@ set_master_state 0 preload
       if [ "x$REMOTEDUMP" = "xyes" ]; then
         echo "Start remotedump" >> $FINALRESULTDIR/remotedump.log 2>&1
         screen -S $LOCALSCREENNAME -X screen -t remotedump                                                                                                                                                                                                                          
-	sleep 0.3                                                                                                                                                                                                                                                                     
-	screen -S $LOCALSCREENNAME -p remotedump -X stuff "(cd $FINALRESULTDIR/;export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-i586 $FINALRESULTDIR/remotedump.click >> $FINALRESULTDIR/remotedump.log 2>&1)"
-	sleep 0.5                                                                                                                                                                                                                                                                     
-	screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n' 
+	      sleep 0.3                                                                                                                                                                                                                                                                     
+	      screen -S $LOCALSCREENNAME -p remotedump -X stuff "(cd $FINALRESULTDIR/;export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-i586 $FINALRESULTDIR/remotedump.click >> $FINALRESULTDIR/remotedump.log 2>&1)"
+        sleep 0.5                                                                                                                                                                                                                                                                     
+	      screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n' 
       fi
       
       if [ "x$LOCALPROCESS" != "x" ]; then
@@ -490,6 +476,10 @@ set_master_state 0 preload
 
     fi
 
+###################################################
+####### Start Click- & Application-Stuff ##########
+###################################################
+
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
       for node in $NODELIST; do
@@ -499,14 +489,16 @@ set_master_state 0 preload
 
           CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
 
+          CMEASUREMENTSCREENNAME=`cat $MSCREENFILENAME | grep "$node $nodedevice " | awk '{print $3}'`
+
           if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
             SCREENT="$node\_$nodedevice\_click"
-            screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
+            screen -S $CMEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
 
             CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
             if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
               SCREENT="$node\_$nodedevice\_kcm"
-              screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
+              screen -S $CMEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
 	          fi
           fi
 
@@ -514,7 +506,7 @@ set_master_state 0 preload
 
           if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
 		        SCREENT="$node\_$nodedevice\_app"	
-            screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
+            screen -S $CMEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
 		      fi
 	      done
 	    done
@@ -562,7 +554,10 @@ set_master_state 0 preload
       screen -S $LOCALSCREENNAME -X quit
     fi
 
-    screen -S $MEASUREMENTSCREENNAME -X quit
+    MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | sort -u`
+    for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
+      screen -S $MEASUREMENTSCREENNAME -X quit
+    done
 
 
 #######################################
