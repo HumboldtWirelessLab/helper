@@ -83,7 +83,19 @@ case "$1" in
 			
 			    WIFICONFIG=`echo "$WIFICONFIG" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 
-			    if [ ! "x$WIFICONFIG" = "x" ] && [ ! "x$WIFICONFIG" = "x-" ]; then
+			    ISGROUP=`echo $CNODE | grep "group:" | wc -l`
+			    
+			    if [ "x$ISGROUP" = "x1" ]; then
+			      GROUP=`echo $CNODE | sed "s#group:##g"`
+			      CNODES=`cat $CONFIGDIR/$GROUP`
+			      echo "NODES: $CNODE"
+			    else
+			      CNODES=$CNODE
+			    fi
+			    
+			    for CNODE in $CNODES; do
+			    
+			      if [ ! "x$WIFICONFIG" = "x" ] && [ ! "x$WIFICONFIG" = "x-" ]; then
 				if [ -f  $CONFIGDIR/$WIFICONFIG ]; then                                                                                                                                                   
 				    . $CONFIGDIR/$WIFICONFIG
 				    WIFICONFIGFINALNAME=$CONFIGDIR/$WIFICONFIG
@@ -128,11 +140,11 @@ case "$1" in
 					WIFIDECAP="Null()"
 					;;
 				esac
-			    else
+			      else
 				WIFICONFIGFINALNAME="-"
-			    fi
+			      fi
 			
-			    if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
+			      if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
 				CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 			    
 				if [ -e $CLICK ] || [ -e $CONFIGDIR/$CLICK ]; then
@@ -146,6 +158,9 @@ case "$1" in
 				      fi
         			    fi
 				    
+				    ###################
+				    ### Remote Dump ###
+				    ###################
                                     if [ "x$REMOTEDUMP" = "xyes" ]; then
 				      NODUMP=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "TODUMP" | wc -l)`
 				      
@@ -176,15 +191,16 @@ case "$1" in
 				      fi
 				    fi
 				    
-				else
+				  else
 				    CLICKFINALNAME="-"
-				fi
-			    else
-				CLICKFINALNAME="-"
-			    fi
+				  fi
+			      else
+			   	CLICKFINALNAME="-"
+			      fi
 			
-			    echo "$CNODE $CDEV $CMODDIR $CMODOPT $WIFICONFIGFINALNAME $CCMODDIR $CLICKFINALNAME $CCLOG $CAPP $CAPPL" | sed -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" >> $RESULTDIR/$NODETABLE.$POSTFIX
+			      echo "$CNODE $CDEV $CMODDIR $CMODOPT $WIFICONFIGFINALNAME $CCMODDIR $CLICKFINALNAME $CCLOG $CAPP $CAPPL" | sed -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" -e "s#NODENAME#$CNODE#g" -e "s#NODEDEVICE#$CDEV#g" >> $RESULTDIR/$NODETABLE.$POSTFIX
 
+                          done
 			fi
 		    fi
 		done < $CONFIGDIR/$NODETABLE
