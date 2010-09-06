@@ -87,7 +87,7 @@ case "$1" in
 			    
 			    if [ "x$ISGROUP" = "x1" ]; then
 			      GROUP=`echo $CNODE | sed "s#group:##g"`
-			      CNODES=`cat $CONFIGDIR/$GROUP`
+			      CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#"`
 			      echo "NODES: $CNODE"
 			    else
 			      CNODES=$CNODE
