@@ -29,6 +29,10 @@ MSCREENFILENAME=measurementscreenmap
 
 CURRENTMODE="START"
 
+##############################
+###### NODE Checker ##########
+##############################
+
 check_nodes() {
 
     NODESTATUS=`NODELIST=$NODELIST MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh statusmarker`
@@ -118,36 +122,36 @@ abort_measurement() {
 	
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
-	for node in $NODELIST; do
+  for node in $NODELIST; do
     NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	
     for nodedevice in $NODEDEVICELIST; do
-		  CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
-		  CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
-		  CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
-		  if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
-        TAILPID=`run_on_node $node "pidof cat" "/" $DIR/../../host/etc/keys/id_dsa`
-        run_on_node $node "kill $TAILPID" "/" $DIR/../../host/etc/keys/id_dsa
-		  else
-		    if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-				  NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
-				  CLICKPID=`run_on_node $node "pidof click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa`
-			 	  if [ "x$CLICKPID" != "x" ]; then
-				 	  for cpid in $CLICKPID; do
-						  run_on_node $node "kill $cpid" "/" $DIR/../../host/etc/keys/id_dsa
-					  done
-				  fi
-		    fi
-		  fi
+	CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
+	CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
+	CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
+	if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
+    	    TAILPID=`run_on_node $node "pidof cat" "/" $DIR/../../host/etc/keys/id_dsa`
+    	    run_on_node $node "kill $TAILPID" "/" $DIR/../../host/etc/keys/id_dsa
+	else
+	    if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
+		NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
+		CLICKPID=`run_on_node $node "pidof click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa`
+		if [ "x$CLICKPID" != "x" ]; then
+		  for cpid in $CLICKPID; do
+                    run_on_node $node "kill $cpid" "/" $DIR/../../host/etc/keys/id_dsa
+		  done
+		fi
+	    fi
+        fi
 		
-		  APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
+	APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
 		
       if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
 			  run_on_node $node "$APPLICATION  stop" "/" $DIR/../../host/etc/keys/id_dsa
       fi
 
     done
-	done
+  done
   
   fi
   
@@ -402,7 +406,7 @@ set_master_state 0 clickmodule
  			    sleep 0.1
 			    SCREENT="$node\_$nodedevice\_kcm"	
 			    screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
-          CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
+                              CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
 			    sleep 0.1
 			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"rm -f $LOGFILE; cat /proc/kmsg >> $LOGFILE \""
 			  else
@@ -459,10 +463,10 @@ set_master_state 0 preload
       if [ "x$REMOTEDUMP" = "xyes" ]; then
         echo "Start remotedump" >> $FINALRESULTDIR/remotedump.log 2>&1
         screen -S $LOCALSCREENNAME -X screen -t remotedump                                                                                                                                                                                                                          
-	      sleep 0.3                                                                                                                                                                                                                                                                     
-	      screen -S $LOCALSCREENNAME -p remotedump -X stuff "(cd $FINALRESULTDIR/;export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-i586 $FINALRESULTDIR/remotedump.click >> $FINALRESULTDIR/remotedump.log 2>&1)"
+        sleep 0.3                                                                                                                                                                                                                                                                     
+	screen -S $LOCALSCREENNAME -p remotedump -X stuff "(cd $FINALRESULTDIR/;export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-i586 $FINALRESULTDIR/remotedump.click >> $FINALRESULTDIR/remotedump.log 2>&1)"
         sleep 0.5                                                                                                                                                                                                                                                                     
-	      screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n' 
+	screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n' 
       fi
       
       if [ "x$LOCALPROCESS" != "x" ]; then
