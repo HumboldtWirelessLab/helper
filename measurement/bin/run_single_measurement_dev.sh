@@ -366,8 +366,10 @@ set_master_state 0 clickmodule
 ########################################################
 ###### Setup Click-, Log- & Application-Stuff ##########
 ########################################################
-  
-  rm $MSCREENFILENAME
+
+  if [ -f $MSCREENFILENAME ]; then
+    rm $MSCREENFILENAME
+  fi
 
   CURRENTMODE="RUN CLICK AND APPLICATION"
   RUN_CLICK_APPLICATION=0
