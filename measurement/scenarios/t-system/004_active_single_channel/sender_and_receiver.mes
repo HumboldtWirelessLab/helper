@@ -2,6 +2,7 @@
 #group:sk  ath0    BASEDIR/nodes/lib/modules/i586     -          monitor.b.channel  -            receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
 #group:sk  ath1    BASEDIR/nodes/lib/modules/i586     -          monitor.b.channel  -            receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
 group:pcs ath0    BASEDIR/nodes/lib/modules/i586-pc-click  -          monitor.b.channel.nc  BASEDIR/nodes/lib/modules/i586-pc-click         receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
+#group:pcs ath0    BASEDIR/nodes/lib/modules/i586-pc-click  -          monitor.b.channel.nc  -         receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
 #group:wgt ath0    BASEDIR/nodes/lib/modules/mips     -          monitor.b.channel  -            receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
 #tchi     ath0    BASEDIR/nodes/lib/modules/i586-chi -          monitor.b.channel  -            receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
 #tchi      ath0    BASEDIR/nodes/lib/modules/i586-chi -          monitor.b.channel  -            sender_and_receiver.click LOGDIR/NODENAME.NODEDEVICE.log -           -
