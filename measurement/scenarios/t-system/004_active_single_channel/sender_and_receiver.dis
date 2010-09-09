@@ -3,7 +3,7 @@ SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=5
+TIME=60
 
 NODETABLE=sender_and_receiver.mes
 NODEPLACEMENT=random
