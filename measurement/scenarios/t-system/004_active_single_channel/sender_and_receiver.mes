@@ -1,6 +1,8 @@
 #NODE     DEVICE  MODULSDIR                          MODOPTIONS WIFICONFIG         CLICKMODDIR  CLICKSCRIPT               CLICKLOGFILE                   APPLICATION APPLICATIONLOGFILE
-group:sk  ath0    BASEDIR/nodes/lib/modules/i586     -          monitor.b.channel  -            receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
+#group:sk  ath0    BASEDIR/nodes/lib/modules/i586     -          monitor.b.channel  -            receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
 #group:sk  ath1    BASEDIR/nodes/lib/modules/i586     -          monitor.b.channel  -            receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
-group:wgt ath0    BASEDIR/nodes/lib/modules/mips     -          monitor.b.channel  -            receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
-tchi      ath0    BASEDIR/nodes/lib/modules/i586-chi -          monitor.b.channel  -            receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
-tpsi      ath0    BASEDIR/nodes/lib/modules/i586-psi -          monitor.b.channel  -            sender_and_receiver.click LOGDIR/NODENAME.NODEDEVICE.log -           -
+#group:wgt ath0    BASEDIR/nodes/lib/modules/mips     -          monitor.b.channel  -            receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
+#tchi      ath0    BASEDIR/nodes/lib/modules/i586-chi -          monitor.b.channel  -            receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
+#tpsi      ath0    BASEDIR/nodes/lib/modules/i586-psi -          monitor.b.channel  -            sender_and_receiver.click LOGDIR/NODENAME.NODEDEVICE.log -           -
+group:wgt  ath0    BASEDIR/nodes/lib/modules/i586     -          monitor.b.channel  -            receiver.click            LOGDIR/NODENAME.NODEDEVICE.log -           -
+sk110      ath0    BASEDIR/nodes/lib/modules/i586-psi -          monitor.b.channel  -            sender_and_receiver.click LOGDIR/NODENAME.NODEDEVICE.log -           -
