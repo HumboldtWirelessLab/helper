@@ -158,6 +158,8 @@ case "$1" in
 				      fi
         			    fi
 				    
+				    echo -n "" > $CLICKFINALNAME
+				    
 				    ###################
 				    ### Remote Dump ###
 				    ###################
@@ -173,7 +175,15 @@ case "$1" in
 					echo "$CNODE $CDEV $NODEDUMPNR $DUMPLINE $DUMPIP $DUMPPORTBASE" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.map
 					NODEDUMPNR=`expr $NODEDUMPNR + 1`
 					DUMPPORTBASE=`expr $DUMPPORTBASE + 1`
-					DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#Socket\(UDP,$DUMPIP,$DUMPPORTBASE,CLIENT\ttrue\)->Discard#g"
+					
+			                if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" != "xkernel" ]; then
+					  DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#Socket\(UDP,$DUMPIP,$DUMPPORTBASE,CLIENT\ttrue\)->Discard#g"
+					else
+					  echo "BRNAddressInfo(ethdev eth0:eth);" >> $CLICKFINALNAME
+					  echo "BRNAddressInfo(ipdev eth0:ip);" >> $CLICKFINALNAME
+					  DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#UDPIPEncap(SRC\tipdev,SPORT\t30000,DST\t$DUMPIP,DPORT\t$DUMPPORTBASE,CHECKSUM\ttrue)->EtherEncap(ETHERTYPE\t0x0800,SRC\tethdev,DST\t$DUMPMAC)->ToDevice(eth0)#g"
+					fi
+					  
 					echo "Idle->Socket(UDP,$DUMPIP,$DUMPPORTBASE,$DUMPIP,$DUMPPORTBASE)->ToDump("$DUMPLINE");" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.click
 			              done
 				    else
@@ -181,9 +191,12 @@ case "$1" in
 				    fi
 			        
     				    #echo "SED: $DUMPSEDARG"
-				    #( cd $CONFIGDIR; cat $CLICK | sed -e "s#//[0-$DEBUG]/##g" -e "s#/\*[0-$DEBUG]/##g" -e "s#/[0-$DEBUG]\*/##g" -e "s#DEBUGLEVEL#$DEBUG#g" | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAPTMPL#g" -e "s#TODEVICE#WIFIENCAPTMPL -> TORAWDEVICE#g" | sed -e "s#WIFIDECAPTMPL#$WIFIDECAP#g" -e "s#WIFIENCAPTMPL#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(NODEDEVICE, PROMISC true, OUTBOUND true, SNIFFER false)#g" -e "s#TORAWDEVICE#ToDevice(NODEDEVICE)#g" | sed $DUMPSEDARG | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $CLICKFINALNAME )
-				    ( cd $CONFIGDIR; cat $CLICK | sed -e "s#//[0-$DEBUG]/##g" -e "s#/\*[0-$DEBUG]/##g" -e "s#/[0-$DEBUG]\*/##g" -e "s#DEBUGLEVEL#$DEBUG#g" | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAPTMPL#g" -e "s#TODEVICE#WIFIENCAPTMPL -> TORAWDEVICE#g" | sed -e "s#WIFIDECAPTMPL#$WIFIDECAP#g" -e "s#WIFIENCAPTMPL#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(NODEDEVICE)#g" -e "s#TORAWDEVICE#ToDevice(NODEDEVICE)#g" | sed $DUMPSEDARG | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $CLICKFINALNAME )
-				    				    
+				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" != "xkernel" ]; then
+				      ( cd $CONFIGDIR; cat $CLICK | sed -e "s#//[0-$DEBUG]/##g" -e "s#/\*[0-$DEBUG]/##g" -e "s#/[0-$DEBUG]\*/##g" -e "s#DEBUGLEVEL#$DEBUG#g" | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAPTMPL#g" -e "s#TODEVICE#WIFIENCAPTMPL -> TORAWDEVICE#g" | sed -e "s#WIFIDECAPTMPL#$WIFIDECAP#g" -e "s#WIFIENCAPTMPL#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(NODEDEVICE, PROMISC true, OUTBOUND true, SNIFFER false)#g" -e "s#TORAWDEVICE#ToDevice(NODEDEVICE)#g" | sed $DUMPSEDARG | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $CLICKFINALNAME )
+				    else
+				      ( cd $CONFIGDIR; cat $CLICK | sed -e "s#//[0-$DEBUG]/##g" -e "s#/\*[0-$DEBUG]/##g" -e "s#/[0-$DEBUG]\*/##g" -e "s#DEBUGLEVEL#$DEBUG#g" | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAPTMPL#g" -e "s#TODEVICE#WIFIENCAPTMPL -> TORAWDEVICE#g" | sed -e "s#WIFIDECAPTMPL#$WIFIDECAP#g" -e "s#WIFIENCAPTMPL#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(NODEDEVICE)#g" -e "s#TORAWDEVICE#ToDevice(NODEDEVICE)#g" | sed $DUMPSEDARG | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $CLICKFINALNAME )
+				    fi
+				    
 				    echo "Script(wait $TIME, stop);" >> $CLICKFINALNAME
 				    
 				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" != "xkernel" ]; then

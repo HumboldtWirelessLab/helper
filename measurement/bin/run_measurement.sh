@@ -181,6 +181,7 @@ for node in $NODELIST; do
 	done
 done
 
+exit 0
 echo "Start measurement !"
 
 #TODO: is CLICKMODE used ???
