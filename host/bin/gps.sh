@@ -252,13 +252,21 @@ case "$1" in
     TRY=0;
     
     while [ $TRY -lt $MAXTRY ]; do
-      LINE=`gpspipe -w -n 10 | grep -E "MID2|GSA" | tail -n 1`
+      LINE=`gpspipe -w -n 10 | grep -E "MID2|GSA|TPV" | tail -n 1`
+#      LINE=`cat $GPSFILE | grep -E "MID2|GSA|TPV" | tail -n 1`
       if [ "x$LINE" != "x"  ]; then
         NEWGPSD=`echo $LINE | grep "class" | wc -l`
         if [ $NEWGPSD -eq 0 ]; then
-          LAT=`echo $LINE | awk '{print $4}'`
-          LONG=`echo $LINE | awk '{print $5}'`
-          HEIGHT="0.0"
+	  ISMID=`echo $LINE | grep "MID2" | wc -l`
+          if [ $ISMID -eq 1 ]; then
+	    LAT=`echo $LINE | awk '{print $4}'`
+            LONG=`echo $LINE | awk '{print $5}'`
+            HEIGHT="0.0"
+	  else
+	    LAT=`echo $LINE | sed -e "s#^.*lat\":##g" -e "s#,"lon.*$##g" | awk '{print $1}'`
+            LONG=`echo $LINE | sed -e "s#^.*lon\":# #g" -e "s#,"alt.*$##g" | awk '{print $5}'`
+            HEIGHT="0.0"
+	  fi
           echo "$LAT $LONG $HEIGHT"
           exit 0
         else
