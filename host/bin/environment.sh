@@ -37,7 +37,7 @@ case "$1" in
 		    . $DIR/../../nodes/etc/environment/$ENVIRONMENTFILE
 		    
 		    if [ ! "x$NFSHOME" = "x" ]; then
-			run_on_node $node "mount -o nolock $NFSSERVER:$NFSHOME $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			run_on_node $node "mount -t nfs -o nolock $NFSSERVER:$NFSHOME $NFSHOME" "/" $DIR/../etc/keys/id_dsa
 		    else
 			echo "NFSHOME not set, so no mount."
 		    fi
@@ -54,7 +54,7 @@ case "$1" in
 		    
 		    if [ ! "x$EXTRANFS" = "x" ] && [ ! "x$EXTRANFSTARGET" = "x" ] &&  [ ! "x$EXTRANFSSERVER" = "x" ]; then
 			run_on_node $node "mkdir $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
-       			run_on_node $node "mount -o nolock $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
+       			run_on_node $node "mount -t nfs -o nolock $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
 		    else
 			echo "NFSHOME not set, so no mount."
 		    fi

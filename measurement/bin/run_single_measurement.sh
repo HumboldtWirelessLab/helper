@@ -57,14 +57,14 @@ get_node_status()  {
 
 wait_for_nodes() {
   NODES=$1
-  
+
   ALL=0
 
-  #DEBUGFILE=status/wait_$2
-  DEBUGFILE=/dev/null
+  DEBUGFILE=status/wait_$2
+  #DEBUGFILE=/dev/null
 
   echo "wait for $1" >> $DEBUGFILE
-  
+
   while [ $ALL -eq 0 ]; do
     NO_NODES=0
     STATE_NODES=0;
@@ -78,6 +78,7 @@ wait_for_nodes() {
       NO_NODES=`expr $NO_NODES + 1`
       
       if [ -f $STATEFILE ]; then
+        echo "  OK" >> $DEBUGFILE
         STATE_NODES=`expr $STATE_NODES + 1`
         STATE=`cat $STATEFILE | awk '{print $1}'`
         if [ $STATE -eq 0 ]; then
@@ -324,7 +325,7 @@ for state in  $STATES; do
   SYNCSTATE=`wait_for_nodes "$NODELIST" _$state.state`
   set_master_state 0 $state
   
-  NODES_OK=`get_node_ok "$NODELIST" _$state.state`
+  NODES_OK=`get_nodes_ok "$NODELIST" _$state.state`
   COUNT_NODES_ALL=`echo $NODELIST | wc -w`
   COUNT_NODES_OK=`echo $NODES_OK | wc -w`
   echo "done. Nodes: $COUNT_NODES_OK of $COUNT_NODES_ALL." >&6
