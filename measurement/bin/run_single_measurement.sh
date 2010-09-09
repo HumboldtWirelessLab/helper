@@ -113,7 +113,7 @@ get_nodes_ok() {
     STATEFILE="status/$n$2"
       
     if [ -f $STATEFILE ]; then
-      NSTATE=`cat $STATEFILE`
+      NSTATE=`cat $STATEFILE | awk '{print $1}'`
       if [ "x$NSTATE" = "x0" ]; then
         OK_NODES="$OK_NODES $n"
       fi

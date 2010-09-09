@@ -1,42 +1,44 @@
 #!/bin/sh
 
-
+#echo "Placement: $1" >&2
 
 case "$1" in
-	"random")
-	  X=`$(( $RANDOM / $2 ))`
-	  Y=`$(( $RANDOM / $2 ))`
-  *)
-    V=1
-    NODE=110
-    DISTANCE=60
-
-    while [ $V -le 10 ]; do
-
-      RUNX=1
-      RUNY=1
-
-      while [ $RUNY -lt $V ]; do
-        X=`expr $V \* $DISTANCE`
-        Y=`expr $RUNY \* $DISTANCE`
-
-        echo "sk$NODE $X $Y 0"
-        RUNY=`expr $RUNY + 1`
-        NODE=`expr $NODE + 1`
-      done
-
-      while [ $RUNX -le $V ]; do
-        Y=`expr $V \* $DISTANCE`
-        X=`expr $RUNX \* $DISTANCE`
-        echo "sk$NODE $X $Y 0"
-        RUNX=`expr $RUNX + 1`
-        NODE=`expr $NODE + 1`
-      done
-
-      V=`expr $V + 1`
-
-    done
-    ;;
+    "random")
+          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | sort -u`
+          NODECOUNT=`echo $NODES | wc -w`
+          for n in $NODES; do
+	    N=`head -1 /dev/urandom | od -N 2 -t uL | head -n 1 | awk '{print $2}'`
+	    X=`expr $N % $3`
+	    N=`head -1 /dev/urandom | od -N 2 -t uL | head -n 1 | awk '{print $2}'`
+	    Y=`expr $N % $3`
+	    echo "$n $X $Y 0"
+	  done
+	  ;;
+    "grid")
+          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | sort -u`
+          NODECOUNT=`echo $NODES | wc -w`
+          SIDELEN=`echo "sqrt($NODECOUNT)" | bc`
+	  SLSQR=`expr $SIDELEN \* $SIDELEN`
+	  #echo "NODECOUNT: $NODECOUNT  SLSQR: $SLSQR"
+	  if [ $SLSQR -lt $NODECOUNT ]; then
+	    SIDELEN=`expr $SIDELEN + 1`
+	  fi
+	  
+	  #echo "SL: $SIDELEN"
+	  
+	  NODEN=0
+	  SIDESTEP=`expr $3 / \( $SIDELEN - 1 \)`
+	  #echo "ST: $SIDESTEP"
+	  for n in $NODES; do
+	    X=`expr \( $NODEN % $SIDELEN \) \* $SIDESTEP`
+	    Y=`expr \( $NODEN / $SIDELEN \) \* $SIDESTEP`
+	    echo "$n $X $Y 0"
+	    NODEN=`expr $NODEN + 1`
+	  done
+          ;;
+       *)
+          echo "Use $0 random|grid nodefile fieldsize (distance)"
+          ;;
 esac   
 
 exit 0;
