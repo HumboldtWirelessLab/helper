@@ -1,5 +1,24 @@
 #!/bin/sh
 
+dir=$(dirname "$0")
+pwd=$(pwd)
+
+SIGN=`echo $dir | cut -b 1`
+
+case "$SIGN" in
+    "/")
+      DIR=$dir
+      ;;
+    ".")
+      DIR=$pwd/$dir
+      ;;
+     *)
+      echo "Error while getting directory"
+      exit -1
+      ;;
+esac
+                                                                    
+
 case "$1" in
     "install")
 	MODLIST="proclikefs.ko click.ko"
@@ -42,6 +61,31 @@ case "$1" in
 	MODULSDIR=$MODULSDIR $0 uninstall
 	MODULSDIR=$MODULSDIR $0 install
 	;;
+    "kclick_start")
+        echo $$ > /tmp/kclick_tool.pid
+        rm -f $LOGFILE;
+        cat /proc/kmsg >> $LOGFILE &
+        echo $! > /tmp/kclick_log.pid
+        $DIR/kcontrolsocket.sh &
+        echo $! > /tmp/kclick_ctrl.pid
+        ;;
+    "kclick_stop")
+        if [ -f /tmp/kclick_tool.pid ]; then
+          KC_PID=`cat /tmp/kclick_tool.pid`
+          kill -9 $KC_PID
+          rm /tmp/kclick_tool.pid
+        fi
+        if [ -f /tmp/kclick_log.pid ]; then
+          KL_PID=`cat /tmp/kclick_log.pid`
+          kill -9 $KL_PID
+          rm /tmp/kclick_log.pid
+        fi
+        if [ -f /tmp/kclick_ctrl.pid ]; then
+          KCTRL_PID=`cat /tmp/kclick_ctrl.pid`
+          kill -9 $KCTRL_PID
+          rm /tmp/kclick_ctrl.pid
+        fi
+        ;;
     *)
 	echo "unknown options"
 	;;

@@ -23,12 +23,12 @@ wlan_out
   -> TORAWDEVICE;
 
 rawouttee[1]
-  -> tdout :: ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.out.dump");
-  //-> tdout :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.out.dump");
+  //-> tdout :: ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.out.dump");
+  -> tdout :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.out.dump");
 
   fdq[1]
-  -> ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.drop.dump");
-  //-> ToDump("RESULTDIR/NODENAME.NODEDEVICE.drop.dump");
+  //-> ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.drop.dump");
+  -> ToDump("RESULTDIR/NODENAME.NODEDEVICE.drop.dump");
 
 Idle                                                                                                                                                                                                                                                              
   -> Socket(UDP, 0.0.0.0, 60000)                                                                                                                                                                                                                                    

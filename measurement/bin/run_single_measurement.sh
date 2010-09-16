@@ -398,9 +398,12 @@ for state in  $STATES; do
  			    sleep 0.1
 			    SCREENT="$node\_$nodedevice\_kcm"	
 			    screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
-                              CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
+                            CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
 			    sleep 0.1
-			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"rm -f $LOGFILE; tail -f /tmp/click/messages >> $LOGFILE \""
+			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"$NODEBINDIR/click.sh kclick_start\""
+#			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"rm -f $LOGFILE; cat /proc/kmsg >> $LOGFILE \""
+#			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"rm -f $LOGFILE; tail -f /tmp/click/messages >> $LOGFILE \""
+#			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"rm -f $LOGFILE; \""
 			  else
 			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
 			  fi

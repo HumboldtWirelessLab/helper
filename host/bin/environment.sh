@@ -68,8 +68,8 @@ case "$1" in
 		;;
 	"settime")
 		for node in $NODELIST; do
-		    echo "$node"
-		    run_on_node $node "$DIR/../../nodes/bin/" "/" $DIR/../etc/keys/id_dsa
+		    echo "Set time on $node."
+		    run_on_node $node "$DIR/../../nodes/bin/time.sh settime" "/" $DIR/../etc/keys/id_dsa
 		done
 		;;
 	*)

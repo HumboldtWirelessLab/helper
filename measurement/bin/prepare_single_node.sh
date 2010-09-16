@@ -175,6 +175,7 @@ if [ $RUNMODENUM -le 2 ]; then
     echo "Setup environment $NODELIST" > status/$LOGMARKER\_environment.log 2>&1
     NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mount >> status/$LOGMARKER\_environment.log 2>&1
     NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh extramount >> status/$LOGMARKER\_environment.log 2>&1
+    NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh settime >> status/$LOGMARKER\_environment.log 2>&1
 fi
 
 echo "0" > status/$LOGMARKER\_environment.state
@@ -402,6 +403,8 @@ wait_for_master_state measurement $LOGMARKER
       if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
         TAILPID=`run_on_node $node "pidof cat" "/" $DIR/../../host/etc/keys/id_dsa`
         run_on_node $node "kill $TAILPID" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_killclick.log 2>&1
+        NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh rmmod >> status/$LOGMARKER\_killclick.log 2>&1
+        NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh kclick_stop >> status/$LOGMARKER\_killclick.log 2>&1
       else
         if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
           NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`

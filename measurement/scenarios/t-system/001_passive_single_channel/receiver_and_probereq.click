@@ -11,7 +11,7 @@ FROMRAWDEVICE
 //  -> Discard();
   
 //  rawtee[1]
-    -> td :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump");
+    -> td :: TODUMP("RESULTDIR/NODENAME.NODEDEVICE.dump");
 //    -> td :: ToDump("/tmp/extra/test/NODENAME.NODEDEVICE.dump");
 //  -> Idle;
 
