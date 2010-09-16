@@ -1,6 +1,7 @@
-#NODE		DEVICE	MODULSDIR			MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	CLICKLOGFILE			APPLICATION	APPLICATIONLOGFILE
-group:sk	ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.click	LOGDIR/NODENAME.NODEDEVICE.log	-		-
-#group:sk	ath1	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel	-		receiver.click	LOGDIR/NODENAME.NODEDEVICE.log	-		-
-#group:wgt      ath0    BASEDIR/nodes/lib/modules/mips  -               monitor.b.channel       -               receiver.click  LOGDIR/NODENAME.NODEDEVICE.log  -               -
-tchi		ath0	BASEDIR/nodes/lib/modules/i586-chi -		monitor.b.channel       -               receiver2.click  LOGDIR/tchi.ath0.log		-		-
-#tpsi		ath0	BASEDIR/nodes/lib/modules/i586-psi -		monitor.b.channel       -               receiver.click  LOGDIR/tpsi.ath0.log		-		-
+#NODE		DEVICE	MODULSDIR			                 MODOPTIONS WIFICONFIG	      CLICKMODDIR CLICKSCRIPT	  CLICKLOGFILE			 APPLICATION	APPLICATIONLOGFILE
+group:sk	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -	    monitor.b.channel -		  receiver.click  LOGDIR/NODENAME.NODEDEVICE.log -		-
+#group:sk	ath1	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -	    monitor.b.channel -		  receiver.click  LOGDIR/NODENAME.NODEDEVICE.log -		-
+#group:wgt      ath0    BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel -           receiver.click  LOGDIR/NODENAME.NODEDEVICE.log -              -
+group:pcs       ath0    BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel -           receiver.click  LOGDIR/NODENAME.NODEDEVICE.log -              -
+tchi		ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -	    monitor.b.channel -           receiver2.click LOGDIR/NODENAME.NODEDEVICE.log -		-
+#tpsi		ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -	    monitor.b.channel -           receiver.click  LOGDIR/tpsi.ath0.log		 -		-
