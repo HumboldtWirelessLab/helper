@@ -88,12 +88,19 @@ case "$1" in
 			    if [ "x$ISGROUP" = "x1" ]; then
 			      GROUP=`echo $CNODE | sed "s#group:##g"`
 			      CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#"`
-			      echo "NODES: $CNODE"
+			      #echo "NODES: $CNODE"
 			    else
 			      CNODES=$CNODE
 			    fi
 			    
 			    for CNODE in $CNODES; do
+			    
+			      NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$CNODE[[:space:]]*$CDEV" | wc -l`
+			      
+			      if [ $NODEINFILE -ne 0 ]; then
+			        #echo "Found node $CNODE with device $CDEV. Step over" 
+			        continue
+			      fi
 			    
 			      if [ ! "x$WIFICONFIG" = "x" ] && [ ! "x$WIFICONFIG" = "x-" ]; then
 				if [ -f  $CONFIGDIR/$WIFICONFIG ]; then                                                                                                                                                   

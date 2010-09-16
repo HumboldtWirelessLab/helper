@@ -6,11 +6,16 @@ case "$1" in
 	
 	mkdir /tmp/click
 	
+	KERNELVERSION=`uname -r`
+	NODEARCH=`uname -m`
+	
+	FINMODULSDIR=`echo $MODULSDIR | sed -e "s#KERNELVERSION#$KERNELVERSION#g" -e "s#NODEARCH#$NODEARCH#g"`
+	
 	for mod in $MODLIST
 	do
-	    if [ -f ${MODULSDIR}/$mod ]; then
+	    if [ -f ${FINMODULSDIR}/$mod ]; then
 		echo "insmod $mod"
-		insmod ${MODULSDIR}/$mod
+		insmod ${FINMODULSDIR}/$mod
 	    fi
 	done
 	
