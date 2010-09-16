@@ -49,17 +49,17 @@ echo "MAXNUM=$2" >> $DIR/growing_voip.cfg
 echo "STEP=$3" >> $DIR/growing_voip.cfg
 echo "SLEEPTIME=$SLEEPTIME" >> $DIR/growing_voip.cfg
 
-VOIPDIR=`ssh 192.168.4.117 "if [ -e /localhome/testbed/voip ]; then echo '1'; else echo '0'; fi"`
-if [ "x$VOIPDIR" = "x1" ]; then
-  ssh 192.168.4.117 "mv /localhome/testbed/voip /localhome/testbed/voip_$RANDOM"
-fi
+#VOIPDIR=`ssh 192.168.4.117 "if [ -e /localhome/testbed/voip ]; then echo '1'; else echo '0'; fi"`
+#if [ "x$VOIPDIR" = "x1" ]; then
+#  ssh 192.168.4.117 "mv /localhome/testbed/voip /localhome/testbed/voip_$RANDOM"
+#fi
   
-ssh 192.168.4.117 "mkdir /localhome/testbed/voip; chmod 777 /localhome/testbed/voip"
+#ssh 192.168.4.117 "mkdir /localhome/testbed/voip; chmod 777 /localhome/testbed/voip"
     
 RUNMODE=REBOOT DEV=1 ../../../bin/run_measurement.sh sender_and_receiver_voip.dis 1
 
-scp 192.168.4.117:/localhome/testbed/voip/*.dump $DIR/1/
-ssh 192.168.4.117 "rm -rf /localhome/testbed/voip"
+#scp 192.168.4.117:/localhome/testbed/voip/*.dump $DIR/1/
+#ssh 192.168.4.117 "rm -rf /localhome/testbed/voip"
 
 rm -f sender_and_receiver_voip.mes sender_and_receiver_voip.dis $DIR/growing_voip.cfg
 

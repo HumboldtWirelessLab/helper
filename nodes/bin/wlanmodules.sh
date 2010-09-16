@@ -44,6 +44,7 @@ case "$1" in
                 NODEARCH=`uname -m`
 		
                 FINMODULSDIR=`echo $MODULSDIR | sed -e "s#KERNELVERSION#$KERNELVERSION#g" -e "s#NODEARCH#$NODEARCH#g"`
+                echo "Use $FINMODULSDIR"
 			
 		MODLIST="ath_hal.ko wlan.ko ath_rate_sample.ko wlan_acl.ko wlan_ccmp.ko wlan_scan_ap.ko wlan_scan_sta.ko wlan_tkip.ko wlan_wep.ko wlan_xauth.ko"
 		for mod in $MODLIST
@@ -55,7 +56,7 @@ case "$1" in
 		done
 
 		echo "insmod ath_pci $ATH_PCI"
-		insmod ${MODULSDIR}/ath_pci.ko $ATH_PCI 
+		insmod ${FINMODULSDIR}/ath_pci.ko $ATH_PCI 
 		;;
     "uninstall")
 		MODLIST="ath9k ath5k wlan_xauth wlan_wep wlan_tkip wlan_scan_ap wlan_scan_sta wlan_ccmp wlan_acl ath_pci ath_rate_sample ath_rate_minstrel wlan ath_hal hostap_pci hostap ieee80211_crypt "

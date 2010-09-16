@@ -33,15 +33,31 @@ case "$1" in
 	exit 0;
 	;;
     "settime")
-	. ../etc/environment/ntpserver
-	RDATE=`which rdate | wc -l | awk '{print $1}'`
-	if [ $RDATE -gt 0 ]; then
-	    rdate $NTPSERVER > /dev/null 2>&1
+	. $DIR/../etc/environment/ntpserver
+
+	HWCLOCK=`which hwclock | wc -l | awk '{print $1}'`
+	
+	NTPCLIENT=`which ntpclient | wc -l | awk '{print $1}'`
+	if [ $NTPCLIENT -gt 0 ]; then
+	    ntpclient -h $NTPSERVER -s > /dev/null 2>&1
 	    exit 0
 	fi
+
 	NTPDATE=`which ntpdate | wc -l | awk '{print $1}'`
 	if [ $NTPDATE -gt 0 ]; then
 	    ntpdate $NTPSERVER > /dev/null 2>&1
+	    if [ $HWCLOCK -gt 0 ]; then
+	      hwclock --systohc
+	    fi
+	    exit 0
+	fi
+
+	RDATE=`which rdate | wc -l | awk '{print $1}'`
+	if [ $RDATE -gt 0 ]; then
+	    rdate $NTPSERVER > /dev/null 2>&1
+	    if [ $HWCLOCK -gt 0 ]; then
+	      hwclock --systohc
+	    fi
 	    exit 0
 	fi
 	;;
@@ -59,6 +75,7 @@ case "$1" in
 	if [ $TIMEDIFF -gt 0 ]; then
 	    sleep $TIMEDIFF
 	fi
+	;;
     *)
 	;;
 esac
