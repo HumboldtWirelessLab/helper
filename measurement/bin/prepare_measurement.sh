@@ -188,7 +188,7 @@ case "$1" in
 					else
 					  echo "BRNAddressInfo(ethdev eth0:eth);" >> $CLICKFINALNAME
 					  echo "BRNAddressInfo(ipdev eth0:ip);" >> $CLICKFINALNAME
-					  DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#UDPIPEncap(SRC\tipdev,SPORT\t30000,DST\t$DUMPIP,DPORT\t$DUMPPORTBASE,CHECKSUM\tfalse,ALIGNFIX\ttrue)->EtherEncap(ETHERTYPE\t0x0800,SRC\tethdev,DST\t$DUMPMAC)->SimpleQueue(CAPACITY\t500)->ToDevice(eth0);#g"
+					  DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#UDPIPEncap(SRC\tipdev,SPORT\t30000,DST\t$DUMPIP,DPORT\t$DUMPPORTBASE,CHECKSUM\tfalse,ALIGNFIX\ttrue)->EtherEncap(ETHERTYPE\t0x0800,SRC\tethdev,DST\t$DUMPMAC)->ethq::SimpleQueue(CAPACITY\t500)->ToDevice(eth0);#g"
 					fi
 					  
 					echo "Idle->Socket(UDP,$DUMPIP,$DUMPPORTBASE,$DUMPIP,$DUMPPORTBASE)->ToDump("$DUMPLINE");" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.click
