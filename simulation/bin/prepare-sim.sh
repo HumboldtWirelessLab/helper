@@ -55,7 +55,13 @@ case "$1" in
 																					     
 		      for CNODE in $CNODES; do
 																															 
+		        NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$CNODE[[:space:]]*$CDEV" | wc -l`
 			
+                        if [ $NODEINFILE -ne 0 ]; then
+			  #echo "Found node $CNODE with device $CDEV. Step over"  
+			  continue
+			fi
+		      
 			if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
 			    CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 			    
