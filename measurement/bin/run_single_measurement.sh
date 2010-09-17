@@ -192,6 +192,10 @@ abort_measurement() {
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
       check_nodes
   fi
+
+  if [ "x$LOCALSCREENNAME" != "x" ]; then
+    screen -S $LOCALSCREENNAME -X quit
+  fi
     
   echo "abort" 1>&$STATUSFD
 

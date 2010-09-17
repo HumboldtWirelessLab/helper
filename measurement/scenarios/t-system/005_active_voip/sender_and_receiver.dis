@@ -1,4 +1,4 @@
-NAME=receiver
+NAME=active_voip
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
