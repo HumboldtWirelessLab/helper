@@ -33,13 +33,18 @@ case "$1" in
 	exit 0;
 	;;
     "settime")
+        #echo "Settime"
 	. $DIR/../etc/environment/ntpserver
 
 	HWCLOCK=`which hwclock | wc -l | awk '{print $1}'`
 	
 	NTPCLIENT=`which ntpclient | wc -l | awk '{print $1}'`
 	if [ $NTPCLIENT -gt 0 ]; then
-	    ntpclient -h $NTPSERVER -s > /dev/null 2>&1
+	    NTPCLIENT=`which ntpclient`
+	    #echo "found ntpclient $NTPSERVER"
+	    #date
+	    ${NTPCLIENT} -h $NTPSERVER -s > /dev/null 2>&1
+	    #date
 	    exit 0
 	fi
 
