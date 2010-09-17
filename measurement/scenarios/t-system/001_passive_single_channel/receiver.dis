@@ -1,4 +1,4 @@
-NAME=receiver
+NAME=passive_sc
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
