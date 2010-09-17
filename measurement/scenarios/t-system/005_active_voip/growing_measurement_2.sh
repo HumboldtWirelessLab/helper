@@ -36,10 +36,22 @@ fi
 SUMRUNTIME=`expr $MAXNUM - $MINNUM + 3`
 SUMRUNTIME=`expr $SUMRUNTIME \* $SLEEPTIME`
 
-CONFIGLINES=`expr $MAXNUM + 3`
+CONFIGLINES=`expr $MAXNUM`
+#CONFIGLINES=`expr $MAXNUM + 3`
 
 cat sender_and_receiver.dis | sed "s#sender_and_receiver.mes#sender_and_receiver_voip.mes#g" | grep -v CONTROLSOCKET | grep -v LOCALPROCESS | grep -v "TIME=" > sender_and_receiver_voip.dis
-cat sender_and_receiver.mes | grep -v "#" | sed "s#sender_and_receiver.click#sender_and_receiver_ctrl.click#g" | head -n $CONFIGLINES > sender_and_receiver_voip.mes
+#cat sender_and_receiver.mes | grep -v "#" | sed "s#sender_and_receiver.click#sender_and_receiver_ctrl.click#g" | head -n $CONFIGLINES > sender_and_receiver_voip.mes
+
+NODES=`cat all_nodes | head -n $CONFIGLINES`
+
+rm -f sender_and_receiver_voip.mes
+
+for n in $NODES; do
+  echo "$n ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel - sender_and_receiver_ctrl.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> sender_and_receiver_voip.mes
+done
+
+echo "tchi ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel - receiver.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> sender_and_receiver_voip.mes
+
 echo "CONTROLSOCKET=yes" >> sender_and_receiver_voip.dis
 echo "LOCALPROCESS=CONFIGDIR/growing_voip.sh" >> sender_and_receiver_voip.dis
 echo "TIME=$SUMRUNTIME" >> sender_and_receiver_voip.dis
