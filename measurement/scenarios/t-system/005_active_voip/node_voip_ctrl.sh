@@ -21,7 +21,7 @@ esac
 . $DIR/growing_voip.cfg
 
 
-NODELIST=`cat $DIR/sender_and_receiver_voip.mes | grep -v "#" | awk '{print $1}' | sed "s#sk110##g" | sed "s#sk111##g" | sed "s#sk112##g"`
+NODELIST=`cat $DIR/sender_and_receiver_voip.mes | grep -v "#" | grep "sender_and_receiver.click" | awk '{print $1}' | sed "s#sk110##g" | sed "s#sk111##g" | sed "s#sk112##g"`
 
 RUN=1
 
