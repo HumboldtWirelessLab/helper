@@ -64,17 +64,13 @@ case "$1" in
     "kclick_start")
         echo $$ > /tmp/kclick_tool.pid
         rm -f $LOGFILE;
+        echo -n "" > $LOGFILE
         cat /proc/kmsg >> $LOGFILE &
         echo $! > /tmp/kclick_log.pid
         $DIR/kcontrolsocket.sh &
         echo $! > /tmp/kclick_ctrl.pid
         ;;
     "kclick_stop")
-        if [ -f /tmp/kclick_tool.pid ]; then
-          KC_PID=`cat /tmp/kclick_tool.pid`
-          kill -9 $KC_PID
-          rm /tmp/kclick_tool.pid
-        fi
         if [ -f /tmp/kclick_log.pid ]; then
           KL_PID=`cat /tmp/kclick_log.pid`
           kill -9 $KL_PID
@@ -84,6 +80,11 @@ case "$1" in
           KCTRL_PID=`cat /tmp/kclick_ctrl.pid`
           kill -9 $KCTRL_PID
           rm /tmp/kclick_ctrl.pid
+        fi
+        if [ -f /tmp/kclick_tool.pid ]; then
+          KC_PID=`cat /tmp/kclick_tool.pid`
+          kill -9 $KC_PID
+          rm /tmp/kclick_tool.pid
         fi
         ;;
     *)

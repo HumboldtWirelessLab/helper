@@ -395,16 +395,14 @@ wait_for_master_state measurement $LOGMARKER
     NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
     for nodedevice in $NODEDEVICELIST; do
-      echo -n "$node" >> status/$LOGMARKER\_killclick.log
+      echo "$node" >> status/$LOGMARKER\_killclick.log
 
       CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
       CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
       CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
       if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
-        TAILPID=`run_on_node $node "pidof cat" "/" $DIR/../../host/etc/keys/id_dsa`
-        run_on_node $node "kill $TAILPID" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_killclick.log 2>&1
-        NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh rmmod >> status/$LOGMARKER\_killclick.log 2>&1
         NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh kclick_stop >> status/$LOGMARKER\_killclick.log 2>&1
+        NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh rmmod >> status/$LOGMARKER\_killclick.log 2>&1
       else
         if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
           NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
@@ -417,9 +415,9 @@ wait_for_master_state measurement $LOGMARKER
           fi
         fi
       fi
-  
+
       APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
-  
+
       if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
         run_on_node $node "$APPLICATION  stop" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_killclick.log 2>&1
       fi
