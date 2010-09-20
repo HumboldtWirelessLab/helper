@@ -302,7 +302,7 @@ mkdir status
 
 echo "Start node setup"
 for node in $NODELIST; do
-  run_command_for_node $node "RUNMODE=$RUNMODE NODELIST=\"$node\" $DIR/prepare_single_node.sh"
+  run_command_for_node $node "FINALRESULTDIR=$FINALRESULTDIR RUNMODE=$RUNMODE NODELIST=\"$node\" $DIR/prepare_single_node.sh"
 done
 
 #### STATES ####
@@ -339,7 +339,7 @@ for state in  $STATES; do
       echo -n "State: Prestart local process ... " >&6
       
       echo "Local process: prestart"
-      $LOCALPROCESS prestart >> $FINALRESULTDIR/localapp.log
+      RESULTDIR=$FINALRESULTDIR $LOCALPROCESS prestart >> $FINALRESULTDIR/localapp.log
     
       echo "done." >&6
     fi
@@ -421,7 +421,7 @@ for state in  $STATES; do
 			  screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
 			  CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
    		  sleep 0.1
-			  screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"$APPLICATION start > $APPLOGFILE 2>&1\""
+			  screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export FINALRESULTDIR=$FINALRESULTDIR; $APPLICATION start > $APPLOGFILE 2>&1\""
 		  fi
 		  	
 		  if [ $CURRENTMSCREENNUM -gt 25 ]; then
@@ -550,7 +550,7 @@ echo "Finished setup of nodes and screen-session"
   echo "all nodes ready"
 
   if [ "x$LOCALPROCESS" != "x" ]; then
-    PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
+    PATH=$DIR/../../host/bin:$PATH;RESULTDIR=$FINALRESULTDIR NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
   fi
 
 #######################################
@@ -614,7 +614,7 @@ fi
 
 if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
   echo "Stop local process"
-  $LOCALPROCESS poststop >> $FINALRESULTDIR/localapp.log
+  RESULTDIR=$FINALRESULTDIR $LOCALPROCESS poststop >> $FINALRESULTDIR/localapp.log
 fi
 
 echo "Finished measurement. Status: ok."

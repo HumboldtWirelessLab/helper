@@ -1,5 +1,5 @@
 #NODE		DEVICE	MODULSDIR                                        MODOPTIONS WIFICONFIG        CLICKMODDIR                                      CLICKSCRIPT     CLICKLOGFILE                   APPLICATION APPLICATIONLOGFILE
-#wgt76		ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION receiver_ksync.click  LOGDIR/NODENAME.NODEDEVICE.log -           -
+wgt76		ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION receiver_ksync.click  LOGDIR/NODENAME.NODEDEVICE.log -           -
 #group:sk	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -	    monitor.b.channel -		  receiver.click  LOGDIR/NODENAME.NODEDEVICE.log -		-
 #group:sk	ath1	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -	    monitor.b.channel -		  receiver.click  LOGDIR/NODENAME.NODEDEVICE.log -		-
 #group:wgt      ath0    BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel -           receiver.click  LOGDIR/NODENAME.NODEDEVICE.log -              -
