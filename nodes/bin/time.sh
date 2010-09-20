@@ -33,6 +33,8 @@ case "$1" in
 	exit 0;
 	;;
     "settime")
+        NOW=`date`
+        echo "Date: $NOW"
         #echo "Settime"
 	. $DIR/../etc/environment/ntpserver
 
@@ -45,6 +47,8 @@ case "$1" in
 	    #date
 	    ${NTPCLIENT} -h $NTPSERVER -s > /dev/null 2>&1
 	    #date
+	    NOW=`date`
+            echo "(Pre)Date: $NOW"
 	    exit 0
 	fi
 
@@ -54,6 +58,8 @@ case "$1" in
 	    if [ $HWCLOCK -gt 0 ]; then
 	      hwclock --systohc
 	    fi
+	    NOW=`date`
+            echo "(Pre)Date: $NOW"
 	    exit 0
 	fi
 
@@ -63,6 +69,8 @@ case "$1" in
 	    if [ $HWCLOCK -gt 0 ]; then
 	      hwclock --systohc
 	    fi
+	    NOW=`date`
+            echo "(Pre)Date: $NOW"
 	    exit 0
 	fi
 	;;

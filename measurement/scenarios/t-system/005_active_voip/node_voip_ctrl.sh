@@ -21,36 +21,38 @@ esac
 . $DIR/growing_voip.cfg
 
 
-NODELIST=`cat $DIR/sender_and_receiver_voip.mes | grep -v "#" | grep "sender_and_receiver.click" | awk '{print $1}' | sed "s#sk110##g" | sed "s#sk111##g" | sed "s#sk112##g"`
+NODELIST=`cat $DIR/sender_and_receiver_voip.mes | grep -v "#" | grep "sender_and_receiver_ctrl.click" | awk '{print $1}'`
 
 RUN=1
 
-#echo "Nodes: $NODELIST" > $DIR/nodectrl.log
+echo "Nodes: $NODELIST" > $RESULTDIR/nodectrl.log
+
+echo "sleep $SLEEPTIME sec" >> $RESULTDIR/nodectrl.log
 
 sleep $SLEEPTIME
 
 for i in $NODELIST; do
-# echo "START on $i" >> $DIR/nodectrl.log
-  
+  echo "START on $i" >> $RESULTDIR/nodectrl.log
+
   $DIR/../../../../host/bin/clickctrl.sh write $i 7777 ps active true
-    
+
   if [ $RUN -ge $MINNUM ]; then
-#   echo "sleep $SLEEPTIME sec" >> $DIR/nodectrl.log
+   echo "sleep $SLEEPTIME sec" >> $RESULTDIR/nodectrl.log
     sleep $SLEEPTIME
-  
+
     if [ $RUN -gt $MAXNUM ]; then
       break;
     fi
   fi
-  
+
   RUN=`expr $RUN + 1`
 
 done
 
-#echo "stop all" >> $DIR/nodectrl.log
+echo "stop all" >> $RESULTDIR/nodectrl.log
 
 for i in $NODELIST; do
-  #echo "Stop $i" >> $DIR/nodectrl.log
+  echo "Stop $i" >> $RESULTDIR/nodectrl.log
   $DIR/../../../../host/bin/clickctrl.sh write $i 7777 ps active false
 done
 
