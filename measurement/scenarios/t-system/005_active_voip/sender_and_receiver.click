@@ -11,8 +11,9 @@ BRNAddressInfo(my_wlan NODEDEVICE:eth);
 ps::BRN2PacketSource(SIZE 240, INTERVAL 20, MAXSEQ 500000, BURST 1, ACTIVE false)
   -> EtherEncap(0x8088, my_wlan,  06:0B:6B:09:ED:73 )
   -> WifiEncap(0x00, 0:0:0:0:0:0)
-  -> SetTXRates(RATE0 12, TRIES0 7, RATE1 12, TRIES1 7, RATE2 12, TRIES2 7, RATE3 12, TRIES3 7)
-//-> SetTXRate(RATE 12, TRIES 11)
+//  -> SetTXRates(RATE0 108, TRIES0 7, RATE1 108, TRIES1 7, RATE2 108, TRIES2 7, RATE3 108, TRIES3 7)
+//  -> SetTXRates(RATE0 12, TRIES0 7, RATE1 12, TRIES1 7, RATE2 12, TRIES2 7, RATE3 12, TRIES3 7)
+  -> SetTXRate(RATE 12, TRIES 11)
   -> wlan_out::SetTXPower(15);
 	  
 wlan_out
