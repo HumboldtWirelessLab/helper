@@ -70,8 +70,9 @@ case "$1" in
         echo $! > /tmp/kclick_log.pid
         $DIR/kcontrolsocket.sh &
         echo $! > /tmp/kclick_ctrl.pid
+        echo "$DIR" > /tmp/sync.log
 	if [ -f $DIR/sync_gateway-$ARCH ]; then
-	  $DIR/sync_gateway-$ARCH &
+	  $DIR/sync_gateway-$ARCH 60000 192.168.20.2 &
 	  echo $! > /tmp/kclick_syncctrl.pid
         fi
 	;;
