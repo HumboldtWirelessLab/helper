@@ -62,6 +62,7 @@ case "$1" in
 	MODULSDIR=$MODULSDIR $0 install
 	;;
     "kclick_start")
+        ARCH=`uname -m`
         echo $$ > /tmp/kclick_tool.pid
         rm -f $LOGFILE;
         echo -n "" > $LOGFILE
@@ -69,7 +70,11 @@ case "$1" in
         echo $! > /tmp/kclick_log.pid
         $DIR/kcontrolsocket.sh &
         echo $! > /tmp/kclick_ctrl.pid
-        ;;
+	if [ -f $DIR/sync_gateway-$ARCH ]; then
+	  $DIR/sync_gateway-$ARCH &
+	  echo $! > /tmp/kclick_syncctrl.pid
+        fi
+	;;
     "kclick_stop")
         if [ -f /tmp/kclick_log.pid ]; then
           KL_PID=`cat /tmp/kclick_log.pid`
@@ -85,6 +90,11 @@ case "$1" in
           KC_PID=`cat /tmp/kclick_tool.pid`
           kill -9 $KC_PID
           rm /tmp/kclick_tool.pid
+        fi
+        if [ -f /tmp/kclick_syncctrl.pid ]; then
+          SC_PID=`cat /tmp/kclick_syncctrl.pid`
+          kill -9 $SC_PID
+          rm /tmp/kclick_syncctrl.pid
         fi
         ;;
     *)

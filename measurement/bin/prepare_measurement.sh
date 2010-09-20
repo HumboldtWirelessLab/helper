@@ -139,8 +139,8 @@ case "$1" in
 					WIFIDECAP="AthdescDecap()"
 					;;
 				    "805")
-					WIFIENCAP="Ath2Encap(ATHENCAP true)"
-					WIFIDECAP="Ath2Decap(ATHDECAP true)"
+					WIFIENCAP="Ath2Encap(ATHENCAP\ttrue)"
+					WIFIDECAP="Ath2Decap(ATHDECAP\ttrue)"
 					;;
 			    	    *)
 					WIFIENCAP="Null()"
@@ -183,12 +183,12 @@ case "$1" in
 					NODEDUMPNR=`expr $NODEDUMPNR + 1`
 					DUMPPORTBASE=`expr $DUMPPORTBASE + 1`
 					
-			                if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" != "xkernel" ]; then
+			                if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserspace" ]; then
 					  DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#Socket\(UDP,$DUMPIP,$DUMPPORTBASE,CLIENT\ttrue\)->Discard#g"
 					else
 					  echo "BRNAddressInfo(ethdev eth0:eth);" >> $CLICKFINALNAME
 					  echo "BRNAddressInfo(ipdev eth0:ip);" >> $CLICKFINALNAME
-					  DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#UDPIPEncap(SRC\tipdev,SPORT\t30000,DST\t$DUMPIP,DPORT\t$DUMPPORTBASE,CHECKSUM\tfalse,ALIGNFIX\ttrue)->EtherEncap(ETHERTYPE\t0x0800,SRC\tethdev,DST\t$DUMPMAC)->ethq::SimpleQueue(CAPACITY\t500)->ToDevice(eth0);#g"
+					  DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#UDPIPEncap(SRC\tipdev,SPORT\t30000,DST\t$DUMPIP,DPORT\t$DUMPPORTBASE,CHECKSUM\tfalse,ALIGNFIX\ttrue)\n\t->EtherEncap(ETHERTYPE\t0x0800,SRC\tethdev,DST\t$DUMPMAC)->ethq::SimpleQueue(CAPACITY\t500)->ToDevice(eth0);#g"
 					fi
 					  
 					echo "Idle->Socket(UDP,$DUMPIP,$DUMPPORTBASE,$DUMPIP,$DUMPPORTBASE)->ToDump("$DUMPLINE");" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.click
@@ -198,15 +198,23 @@ case "$1" in
 				    fi
 			        
     				    #echo "SED: $DUMPSEDARG"
-				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" != "xkernel" ]; then
-				      ( cd $CONFIGDIR; cat $CLICK | sed -e "s#//[0-$DEBUG]/##g" -e "s#/\*[0-$DEBUG]/##g" -e "s#/[0-$DEBUG]\*/##g" -e "s#DEBUGLEVEL#$DEBUG#g" | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAPTMPL#g" -e "s#TODEVICE#WIFIENCAPTMPL -> TORAWDEVICE#g" | sed -e "s#WIFIDECAPTMPL#$WIFIDECAP#g" -e "s#WIFIENCAPTMPL#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(NODEDEVICE, PROMISC true, OUTBOUND true, SNIFFER false)#g" -e "s#TORAWDEVICE#ToDevice(NODEDEVICE)#g" | sed $DUMPSEDARG | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $CLICKFINALNAME )
+	                            DEBUGSEDARG="-e s#//[0-$DEBUG]/##g -e s#/\*[0-$DEBUG]/##g -e s#/[0-$DEBUG]\*/##g -e s#DEBUGLEVEL#$DEBUG#g"
+				    FROMTODEVICESEDARG="-e s#FROMDEVICE#FROMRAWDEVICE->WIFIDECAPTMPL#g -e s#TODEVICE#WIFIENCAPTMPL->TORAWDEVICE#g"
+				    DIRSEDARG="-e s#NODEDEVICE#$CDEV#g -e s#NODENAME#$CNODE#g -e s#RUNTIME#$TIME#g -e s#RESULTDIR#$RESULTDIR#g -e s#WORKDIR#$WORKDIR#g -e s#BASEDIR#$BASEDIR#g"
+
+				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserspace" ]; then
+				      DEVICESEDARG="-e s#WIFIDECAPTMPL#$WIFIDECAP#g -e s#WIFIENCAPTMPL#$WIFIENCAP#g -e s#FROMRAWDEVICE#FromDevice(NODEDEVICE,PROMISC\ttrue,OUTBOUND\ttrue,SNIFFER\tfalse)#g -e s#TORAWDEVICE#ToDevice(NODEDEVICE)#g"
+				      SYNCARG="-e s#SYNC#Idle\n\t->Socket(UDP,0.0.0.0,60000)\n\t->Print(\"Sync\",TIMESTAMP\ttrue)#g"
 				    else
-				      ( cd $CONFIGDIR; cat $CLICK | sed -e "s#//[0-$DEBUG]/##g" -e "s#/\*[0-$DEBUG]/##g" -e "s#/[0-$DEBUG]\*/##g" -e "s#DEBUGLEVEL#$DEBUG#g" | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAPTMPL#g" -e "s#TODEVICE#WIFIENCAPTMPL -> TORAWDEVICE#g" | sed -e "s#WIFIDECAPTMPL#$WIFIDECAP#g" -e "s#WIFIENCAPTMPL#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(NODEDEVICE)#g" -e "s#TORAWDEVICE#ToDevice(NODEDEVICE)#g" | sed $DUMPSEDARG | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $CLICKFINALNAME )
+				      DEVICESEDARG="-e s#WIFIDECAPTMPL#$WIFIDECAP#g -e s#WIFIENCAPTMPL#$WIFIENCAP#g -e s#FROMRAWDEVICE#FromDevice(NODEDEVICE)#g -e s#TORAWDEVICE#ToDevice(NODEDEVICE)#g"
+				      SYNCARG="-e s#SYNC#FromHost(sync0,192.168.20.1\/24)\n\t->fhc::Classifier(12/0806,12/0800)\n\t->ARPResponder(0.0.0.0/0\t1:1:1:1:1:1)\n\t->ToHost(sync0);\nfhc[1]\n\t->Strip(14)\n\t->MarkIPHeader()\n\t->StripIPHeader()\n\t->max::CheckLength(12)[1]\n\t->Discard;\nmax[0]\n\t->Strip(8)\n\t->Print(TIMESTAMP\ttrue)#g"
 				    fi
+
+				    ( cd $CONFIGDIR; cat $CLICK | sed $DEBUGSEDARG | sed $FROMTODEVICESEDARG | sed $DEVICESEDARG | sed $SYNCARG | sed $DUMPSEDARG | sed $DIRSEDARG >> $CLICKFINALNAME )
 				    
 				    echo "Script(wait $TIME, stop);" >> $CLICKFINALNAME
 				    
-				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" != "xkernel" ]; then
+				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserspace" ]; then
 				      if [ "x$CONTROLSOCKET" != "xno" ]; then
 				        echo "ControlSocket(tcp, 7777);" >> $CLICKFINALNAME
 				      fi
