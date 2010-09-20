@@ -183,7 +183,7 @@ case "$1" in
 					NODEDUMPNR=`expr $NODEDUMPNR + 1`
 					DUMPPORTBASE=`expr $DUMPPORTBASE + 1`
 					
-			                if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserspace" ]; then
+			                if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserlevel" ]; then
 					  DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#Socket\(UDP,$DUMPIP,$DUMPPORTBASE,CLIENT\ttrue\)->Discard#g"
 					else
 					  echo "BRNAddressInfo(ethdev eth0:eth);" >> $CLICKFINALNAME
@@ -202,19 +202,19 @@ case "$1" in
 				    FROMTODEVICESEDARG="-e s#FROMDEVICE#FROMRAWDEVICE->WIFIDECAPTMPL#g -e s#TODEVICE#WIFIENCAPTMPL->TORAWDEVICE#g"
 				    DIRSEDARG="-e s#NODEDEVICE#$CDEV#g -e s#NODENAME#$CNODE#g -e s#RUNTIME#$TIME#g -e s#RESULTDIR#$RESULTDIR#g -e s#WORKDIR#$WORKDIR#g -e s#BASEDIR#$BASEDIR#g"
 
-				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserspace" ]; then
+				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserlevel" ]; then
 				      DEVICESEDARG="-e s#WIFIDECAPTMPL#$WIFIDECAP#g -e s#WIFIENCAPTMPL#$WIFIENCAP#g -e s#FROMRAWDEVICE#FromDevice(NODEDEVICE,PROMISC\ttrue,OUTBOUND\ttrue,SNIFFER\tfalse)#g -e s#TORAWDEVICE#ToDevice(NODEDEVICE)#g"
 				      SYNCARG="-e s#SYNC#Idle\n\t->Socket(UDP,0.0.0.0,60000)\n\t->Print(\"Sync\",TIMESTAMP\ttrue)#g"
 				    else
 				      DEVICESEDARG="-e s#WIFIDECAPTMPL#$WIFIDECAP#g -e s#WIFIENCAPTMPL#$WIFIENCAP#g -e s#FROMRAWDEVICE#FromDevice(NODEDEVICE)#g -e s#TORAWDEVICE#ToDevice(NODEDEVICE)#g"
-				      SYNCARG="-e s#SYNC#FromHost(sync0,192.168.20.1\/24)\n\t->fhc::Classifier(12/0806,12/0800)\n\t->ARPResponder(0.0.0.0/0\t1:1:1:1:1:1)\n\t->ToHost(sync0);\nfhc[1]\n\t->Strip(14)\n\t->MarkIPHeader()\n\t->StripIPHeader()\n\t->max::CheckLength(12)[1]\n\t->Discard;\nmax[0]\n\t->Strip(8)\n\t->Print(TIMESTAMP\ttrue)#g"
+				      SYNCARG="-e s#SYNC#FromHost(sync0,192.168.20.1\/24)\n\t->fhc::Classifier(12/0806,12/0800)\n\t->ARPResponder(0.0.0.0/0\t1:1:1:1:1:1)\n\t->ToHost(sync0);\nfhc[1]\n\t->Strip(14)\n\t->MarkIPHeader()\n\t->StripIPHeader()\n\t->max::CheckLength(12)[1]\n\t->Discard;\nmax[0]\n\t->Strip(8)\n\t//->Print(TIMESTAMP\ttrue)#g"
 				    fi
 
 				    ( cd $CONFIGDIR; cat $CLICK | sed $DEBUGSEDARG | sed $FROMTODEVICESEDARG | sed $DEVICESEDARG | sed $SYNCARG | sed $DUMPSEDARG | sed $DIRSEDARG >> $CLICKFINALNAME )
 				    
 				    echo "Script(wait $TIME, stop);" >> $CLICKFINALNAME
 				    
-				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserspace" ]; then
+				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserlevel" ]; then
 				      if [ "x$CONTROLSOCKET" != "xno" ]; then
 				        echo "ControlSocket(tcp, 7777);" >> $CLICKFINALNAME
 				      fi

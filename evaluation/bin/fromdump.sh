@@ -37,7 +37,7 @@ else
 fi
 
 if [ "x$WIFI" = "x803" ]; then
-  cat $DIR/../etc/click/eval_wifi_803.click | sed "s#DUMP#$1#g" | sed "s#//SEQ#$SEQREP#g" | sed "s#//ATH#$ATHREP#g" | sed "s#//GPS#$GPSREP#g" | click 2>&1
+  cat $DIR/../etc/click/eval_wifi_803.click | sed "s#DUMP#$1#g" | sed "s#//SEQ#$SEQREP#g" | sed "s#//ATH#$ATHREP#g" | sed "s#//GPS#$GPSREP#g" | click-align | click 2>&1
 else
-  cat $DIR/../etc/click/eval_wifi_805.click | sed "s#DUMP#$1#g" | sed "s#//SEQ#$SEQREP#g" | sed "s#//ATH#$ATHREP#g" | sed "s#//GPS#$GPSREP#g" | click 2>&1
+  cat $DIR/../etc/click/eval_wifi_805.click | sed "s#DUMP#$1#g" | sed "s#//SEQ#$SEQREP#g" | sed "s#//ATH#$ATHREP#g" | sed "s#//GPS#$GPSREP#g" | click-align | click 2>&1
 fi

@@ -152,7 +152,7 @@ mv $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp.real $FINALRESULTDIR/$DISCRIPTIONFIL
 echo "DISFILE: $DISCRIPTIONFILENAME.real" >> $FINALRESULTDIR/measurement.info
 
 echo "Copy Configs !"
-exit 0
+
 for node in $NODELIST; do
 
 	NODEDEVICELIST=`cat $FINALRESULTDIR/$NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
