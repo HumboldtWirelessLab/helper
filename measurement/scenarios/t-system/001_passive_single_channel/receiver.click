@@ -7,7 +7,5 @@ FROMRAWDEVICE
 //  -> Discard;
 
 
-Idle
-  -> Socket(UDP, 0.0.0.0, 60000)
-  -> Print("Sync",TIMESTAMP true)
+Idle  -> Socket(UDP, 0.0.0.0, 60000) -> Print("Sync",TIMESTAMP true)
   -> Discard;
