@@ -239,7 +239,20 @@ case "$1" in
 		firefox "$URL"
 		;;
   "getgpspos")
-    HASGPS=`gpsctl 2>&1 | sed -e "s#^.*at##g" | awk '{print $1}'`
+    HASGPS=0
+    
+    for d in /dev/ttyUSB0 /dev/ttyACM0; do
+      #TESTGPS=`gpsctl $d 2>&1 | grep "at" | sed -e "s#^.*at##g" | awk '{print $1}'`
+      TESTGPS=`gpsctl 2>&1 | grep -v "(null)" | wc -l`
+       #echo "$d $TESTGPS"
+      if [ "x$TESTGPS" != "x0" ] && [ "x$TESTGPS" != "x" ]; then
+        HASGPS=1
+      fi
+    done
+    
+    if [ "x$GPSFILE" != "x" ]; then
+      HASGPS=1
+    fi
     
     if [ "x$HASGPS" = "x0" ]; then
       echo "0.0 0.0 0.0"
@@ -252,16 +265,22 @@ case "$1" in
     TRY=0;
     
     while [ $TRY -lt $MAXTRY ]; do
-      LINE=`gpspipe -w -n 10 | grep -E "MID2|GSA" | tail -n 1`
+      if [ "x$GPSFILE" != "x" ]; then
+        LINE=`cat $GPSFILE | grep -E "MID2|GSA|TPV" | tail -n 1`
+      else
+        LINE=`gpspipe -w -n 10 | grep -E "MID2|GSA|TPV" | tail -n 1`
+      fi
       if [ "x$LINE" != "x"  ]; then
         NEWGPSD=`echo $LINE | grep "class" | wc -l`
         if [ $NEWGPSD -eq 0 ]; then
-          LAT=`echo $LINE | awk '{print $4}'`
+	  #old gps-tools
+	  LAT=`echo $LINE | awk '{print $4}'`
           LONG=`echo $LINE | awk '{print $5}'`
           HEIGHT="0.0"
           echo "$LAT $LONG $HEIGHT"
           exit 0
         else
+	  #new gps-tools
           LAT=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $12}'`
           LONG=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $14}'`
           HEIGHT="0.0"

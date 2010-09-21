@@ -28,6 +28,15 @@ if [ "x$1" = "x" ]; then
   exit 0
 fi
 
+
+trap abort_measurement 1 2 3 6
+
+abort_measurement() {
+  NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "killall click" > /dev/null 2>&1
+  exit 0
+}
+
+
 RUN=$1
 
 NOSTEPS=13
@@ -39,7 +48,21 @@ fi
 
 TARGETHOST=localhost
 
+
+echo "Kill old click"
 NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "killall click" > /dev/null 2>&1
+
+echo "Unload old modules"
+NODELIST=$TARGETHOST MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../../../host/bin/wlanmodules.sh rmmod > /dev/null 2>&1
+NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "rmmod ar9170usb" > /dev/null 2>&1
+
+echo "Load new Modules"
+NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "modprobe ath5k" > /dev/null 2>&1
+NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "modprobe ath9k" > /dev/null 2>&1
+NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "modprobe ar9170usb" > /dev/null 2>&1
+
+echo "Restart gpsd"
+NODELIST=$TARGETHOST $DIR/../../../../host/bin/run_on_nodes.sh "/etc/init.d/gpsd restart" > /dev/null 2>&1
 
 WANTEXIT=0
 
@@ -95,27 +118,114 @@ while [ $WANTEXIT -eq 0 ]; do
 
   echo "Prepare the Scripts !"
 
-  if [ "x$CHANNEL" = "xselect" ]; then
-    FINALCHANNEL=0
-    VALIDCHANNEL=0
-    while [ $VALIDCHANNEL -eq 0 ]; do
-      echo -n "Choose one of the channels $AVAILABLECHANNELS: "
-      read key
-      VALIDCHANNEL=`echo $AVAILABLECHANNELS | grep " $key " | wc -l`
-    done
-    FINALCHANNEL=$key
+  FOUNDDEVICES=""
+
+  SEDARG=""
+
+  EXATH0=`iwconfig 2>&1 | grep wifi0 | awk '{print $1}' 2>/dev/null`
+  if [ "x$EXATH0" != "xwifi0" ]; then
+    EXATH0=`iwconfig 2>&1 | grep wlan0 | awk '{print $1}' 2>/dev/null`
+    if [ "x$EXATH0" = "xwlan0" ]; then
+      EXATH0="1"
+      echo "Found intern WIFI"
+      SEDARG="$SEDARG -e s#//ath0##g"
+      FOUNDDEVICES="$FOUNDDEVICES ath0"
+    else
+      EXATH0="0"
+    fi
   else
-    FINALCHANNEL=$CHANNEL
+    EXATH0="1"
+    echo "Found intern WIFI"
+    SEDARG="$SEDARG -e s#//ath0##g"
+    FOUNDDEVICES="$FOUNDDEVICES ath0"
   fi
 
-  cat $DIR/wificonfig | sed "s#PARAMSCHANNEL#$FINALCHANNEL#g" > $FINALRESULTDIR/wificonfig
-  
+  EXATH1=`iwconfig 2>&1 | grep wifi1 | awk '{print $1}' 2>/dev/null`
+  if [ "x$EXATH1" != "xwifi1" ]; then
+    EXATH1=`iwconfig 2>&1 | grep wlan1 | awk '{print $1}' 2>/dev/null`
+    if [ "x$EXATH1" = "xwlan1" ]; then
+      EXATH1="1"
+      echo "Found pcmcia WIFI"
+      SEDARG="$SEDARG -e s#//ath1##g"
+      FOUNDDEVICES="$FOUNDDEVICES ath1"
+    else
+      EXATH1="0"
+    fi
+  else
+    EXATH1="1"
+    echo "Found pcmcia WIFI"
+    SEDARG="$SEDARG -e s#//ath1##g"
+    FOUNDDEVICES="$FOUNDDEVICES ath1"
+  fi
+
+  EXWLAN2=`iwconfig 2>&1 | grep wlan2 | awk '{print $1}' 2>/dev/null`
+  if [ "x$EXWLAN2" = "xwlan2" ]; then
+    EXWLAN2="1"
+    echo "Found USB1 WIFI"
+    SEDARG="$SEDARG -e s#//wlan2##g"
+    FOUNDDEVICES="$FOUNDDEVICES wlan2"
+  else
+    EXWLAN2="0"
+  fi
+
+  EXWLAN3=`iwconfig 2>&1 | grep wlan3 | awk '{print $1}' 2> /dev/null`
+  if [ "x$EXWLAN3" = "xwlan3" ]; then
+    EXWLAN3="1"
+    echo "Found USB2 WIFI"
+    SEDARG="$SEDARG -e s#//wlan3##g"
+    FOUNDDEVICES="$FOUNDDEVICES wlan3"
+  else
+    EXWLAN3="0"
+  fi
+
+  if [ "x$CHANNEL" = "xselect" ]; then
+    for d in ath0 ath1 wlan2 wlan3; do
+      DEVEX=`echo $FOUNDDEVICES | grep $d | wc -l`
+
+      if [ "x$DEVEX" = "x1" ]; then
+        FINALCHANNEL=0
+        VALIDCHANNEL=0
+        while [ $VALIDCHANNEL -eq 0 ]; do
+          echo -n "DEVICE $d: Choose one of the channels $AVAILABLECHANNELS: "
+          read key
+          VALIDCHANNEL=`echo $AVAILABLECHANNELS | grep " $key " | wc -l`
+        done
+        FINALCHANNEL=$key
+      else
+        FINALCHANNEL=1
+      fi
+      cat $DIR/wificonfig | sed "s#PARAMSCHANNEL#$FINALCHANNEL#g" > $FINALRESULTDIR/wificonfig_$d
+    done
+  else
+    FINALCHANNEL=$CHANNEL
+    if [ "x$INTERN_CHANNEL" != "x" ]; then
+      cat $DIR/wificonfig | sed "s#PARAMSCHANNEL#$INTERN_CHANNEL#g" > $FINALRESULTDIR/wificonfig_ath0
+    else
+      cat $DIR/wificonfig | sed "s#PARAMSCHANNEL#$FINALCHANNEL#g" > $FINALRESULTDIR/wificonfig_ath0
+    fi
+    if [ "x$PCMCIA_CHANNEL" != "x" ]; then
+      cat $DIR/wificonfig | sed "s#PARAMSCHANNEL#$PCMCIA_CHANNEL#g" > $FINALRESULTDIR/wificonfig_ath1
+    else
+      cat $DIR/wificonfig | sed "s#PARAMSCHANNEL#$FINALCHANNEL#g" > $FINALRESULTDIR/wificonfig_ath1
+    fi
+    if [ "x$USB1_CHANNEL" != "x" ]; then
+      cat $DIR/wificonfig | sed "s#PARAMSCHANNEL#$USB1_CHANNEL#g" > $FINALRESULTDIR/wificonfig_wlan2
+    else
+      cat $DIR/wificonfig | sed "s#PARAMSCHANNEL#$FINALCHANNEL#g" > $FINALRESULTDIR/wificonfig_wlan2
+    fi
+    if [ "x$USB2_CHANNEL" != "x" ]; then
+      cat $DIR/wificonfig | sed "s#PARAMSCHANNEL#$USB2_CHANNEL#g" > $FINALRESULTDIR/wificonfig_wlan3
+    else
+      cat $DIR/wificonfig | sed "s#PARAMSCHANNEL#$FINALCHANNEL#g" > $FINALRESULTDIR/wificonfig_wlan3
+    fi
+  fi
+
   if [ -f $FINALRESULTDIR/gps.info ]; then
     STARTGPS=`cat $FINALRESULTDIR/gps.info`
   else
     STARTGPS="0.0 0.0 0.0"
   fi
-  cat $DIR/receiver.click | sed "s#RESULTDIR#$FINALRESULTDIR#g" | sed "s#RUNTIME#$RUNTIME#g" | sed "s#STARTGPS#$STARTGPS#g" > $FINALRESULTDIR/receiver.click
+  cat $DIR/receiver.click | sed $SEDARG | sed "s#PROBETIME#$PROBETIME#g" | sed "s#RESULTDIR#$FINALRESULTDIR#g" | sed "s#RUNTIME#$RUNTIME#g" | sed "s#STARTGPS#$STARTGPS#g" > $FINALRESULTDIR/receiver.click
 
   STEP=1
 
@@ -139,14 +249,29 @@ while [ $WANTEXIT -eq 0 ]; do
     echo "Create Device  ($STEP/$NOSTEPS)"
     STEP=`expr $STEP + 1`
 
-    NODE=$TARGETHOST DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
-    NODE=$TARGETHOST DEVICES=wlan1 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
+    NODE=$TARGETHOST DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig_ath0 $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
+    if [ "x$EXATH1" = "x1" ]; then
+      NODE=$TARGETHOST DEVICES=ath1 CONFIG=$FINALRESULTDIR/wificonfig_ath1 $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
+    fi
+    if [ "x$EXWLAN2" = "x1" ]; then
+      NODE=$TARGETHOST DEVICES=wlan2 CONFIG=$FINALRESULTDIR/wificonfig_wlan2 $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
+    fi
+    if [ "x$EXWLAN3" = "x1" ]; then
+      NODE=$TARGETHOST DEVICES=wlan3 CONFIG=$FINALRESULTDIR/wificonfig_wlan3 $DIR/../../../../host/bin/wlandevices.sh create >> $FINALRESULTDIR/measurement.log 2>&1
+    fi
 
     echo "Start Device  ($STEP/$NOSTEPS)"
     STEP=`expr $STEP + 1`
-    NODE=$TARGETHOST DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
-    NODE=$TARGETHOST DEVICES=wlan1 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
-    
+    NODE=$TARGETHOST DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig_ath0 $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
+    if [ "x$EXATH1" = "x1" ]; then
+      NODE=$TARGETHOST DEVICES=ath1 CONFIG=$FINALRESULTDIR/wificonfig_ath1 $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
+    fi
+    if [ "x$EXWLAN2" = "x1" ]; then
+      NODE=$TARGETHOST DEVICES=wlan2 CONFIG=$FINALRESULTDIR/wificonfig_wlan2 $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
+    fi
+    if [ "x$EXWLAN3" = "x1" ]; then
+      NODE=$TARGETHOST DEVICES=wlan3 CONFIG=$FINALRESULTDIR/wificonfig_wlan3 $DIR/../../../../host/bin/wlandevices.sh start >> $FINALRESULTDIR/measurement.log 2>&1
+    fi
     FIRSTRUN=0
   else
     STEP=`expr $STEP + 4`
@@ -155,14 +280,28 @@ while [ $WANTEXIT -eq 0 ]; do
   echo "Config device  ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
 
-  NODE=$TARGETHOST DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
-  NODE=$TARGETHOST DEVICES=wlan1 CONFIG=$FINALRESULTDIR/wificonfig $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
-
+    NODE=$TARGETHOST DEVICES=ath0 CONFIG=$FINALRESULTDIR/wificonfig_ath0 $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
+    if [ "x$EXATH1" = "x1" ]; then
+      NODE=$TARGETHOST DEVICES=ath1 CONFIG=$FINALRESULTDIR/wificonfig_ath1 $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
+    fi
+    if [ "x$EXWLAN2" = "x1" ]; then
+      NODE=$TARGETHOST DEVICES=wlan2 CONFIG=$FINALRESULTDIR/wificonfig_wlan2 $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
+    fi
+    if [ "x$EXWLAN3" = "x1" ]; then
+      NODE=$TARGETHOST DEVICES=wlan3 CONFIG=$FINALRESULTDIR/wificonfig_wlan3 $DIR/../../../../host/bin/wlandevices.sh config >> $FINALRESULTDIR/measurement.log 2>&1
+    fi
   echo "Get device info (Control) ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
-  NODE=$TARGETHOST DEVICES=ath0 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
-  NODE=$TARGETHOST DEVICES=wlan1 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
-
+    NODE=$TARGETHOST DEVICES=ath0 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
+    if [ "x$EXATH1" = "x1" ]; then
+      NODE=$TARGETHOST DEVICES=ath1 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
+    fi
+    if [ "x$EXWLAN2" = "x1" ]; then
+      NODE=$TARGETHOST DEVICES=wlan2 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
+    fi
+    if [ "x$EXWLAN3" = "x1" ]; then
+      NODE=$TARGETHOST DEVICES=wlan3 $DIR/../../../../host/bin/wlandevices.sh getiwconfig >> $FINALRESULTDIR/wificonfig.txt 2>&1
+    fi
   echo "Start local process ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
   PATH=$DIR/../../host/bin:$PATH;RUNTIME=$TIME RESULTDIR=$FINALRESULTDIR NODELIST=$TARGETHOST $DIR/$LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1
@@ -176,8 +315,54 @@ while [ $WANTEXIT -eq 0 ]; do
   echo "Wait for $WAITTIME sec"
   #Countdown
   echo -n -e "Wait... \033[1G"
-  for ((i = $WAITTIME; i > 0; i--)); do echo -n -e "Wait... $i \033[1G" ; sleep 1; done
-  echo -n -e "                 \033[1G"
+  for ((i = $WAITTIME; i > 0; i--)); do
+    WAITSTR="Wait... $i Status:"
+    
+    SIZESTR=""
+    if [ "x$EXATH0" = "x1" ]; then
+        if [ -f $FINALRESULTDIR/devel.ath0.dump ]; then
+	  S=`ls -lah $FINALRESULTDIR/devel.ath0.dump | awk '{print $5}'`
+	  SIZESTR="$SIZESTR ATH0: $S"
+	else
+	  SIZESTR="$SIZESTR ATH0: 0"
+	fi
+    fi
+    if [ "x$EXATH1" = "x1" ]; then
+        if [ -f $FINALRESULTDIR/devel.ath1.dump ]; then
+	  S=`ls -lah $FINALRESULTDIR/devel.ath1.dump | awk '{print $5}'`
+	  SIZESTR="$SIZESTR ATH1: $S"
+	else
+	  SIZESTR="$SIZESTR ATH1: 0"
+	fi
+    fi
+    if [ "x$EXWLAN2" = "x1" ]; then
+        if [ -f $FINALRESULTDIR/devel.wlan2.dump ]; then
+	  S=`ls -lah $FINALRESULTDIR/devel.wlan2.dump | awk '{print $5}'`
+	  SIZESTR="$SIZESTR WLAN2: $S"
+	else
+	  SIZESTR="$SIZESTR WLAN2: 0"
+	fi
+    fi
+    if [ "x$EXWLAN3" = "x1" ]; then
+        if [ -f $FINALRESULTDIR/devel.wlan3.dump ]; then
+	  S=`ls -lah $FINALRESULTDIR/devel.wlan3.dump | awk '{print $5}'`
+	  SIZESTR="$SIZESTR WLAN3: $S"
+	else
+	  SIZESTR="$SIZESTR WLAN3: 0"
+	fi
+    fi
+    
+    if [ -f $FINALRESULTDIR/localapp.log ]; then
+      GPSSTR=`cat $FINALRESULTDIR/localapp.log | tail -n 1`
+    else
+      GPSSTR="0.0 0.0 0.0"
+    fi
+    
+    echo -n -e "$WAITSTR$SIZESTR GPS: $GPSSTR               \033[1G" ;
+
+    sleep 1; 
+  done
+  echo -n -e "                                                                                             \033[1G"
   #Normal wait
   #sleep $WAITTIME
 
@@ -188,7 +373,7 @@ while [ $WANTEXIT -eq 0 ]; do
   echo "Stop local process ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
   PATH=$DIR/../../host/bin:$PATH;NODELIST=$TARGETHOST $DIR/$LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
-  
+
   echo "Poststop local process ($STEP/$NOSTEPS)"
   STEP=`expr $STEP + 1`
   PATH=$DIR/../../host/bin:$PATH;NODELIST=$TARGETHOST $DIR/$LOCALPROCESS poststop >> $FINALRESULTDIR/localapp.log

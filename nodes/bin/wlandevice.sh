@@ -92,6 +92,7 @@ case "$1" in
 	      ${IFCONFIG} $DEVICE down
 	      echo "iwconfig $DEVICE mode $MODE"
 	      ${IWCONFIG} $DEVICE mode $MODE
+	      ${IFCONFIG} $DEVICE up
 	      exit 0
 	    fi
 	    
