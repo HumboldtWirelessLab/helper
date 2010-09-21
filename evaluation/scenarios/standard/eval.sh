@@ -32,10 +32,12 @@ OUTNODES=""
 for od in $OUTDUMPS; do
   OUTNODE=`echo $od | sed "s#\.# #g" | awk '{print $1}'`
   OUTDEVICE=`echo $od | sed "s#\.# #g" | awk '{print $2}'`
-  OUTMACS=`cat $od | grep "Sequence" | awk '{print $6$7}' | cut -b 5-14  | sort -u`
+  OUTMACS=`cat $od | grep "Sequence" | awk '{print $6$7}' | cut -b 5-16  | sort -u`
 
   for om in $OUTMACS; do
-    echo "$OUTNODE $OUTDEVICE $om" >> outmacs.dat
+    FORMATEDMAC=`echo $om | awk '{print substr($1,1,2)"-"substr($1,3,2)"-"substr($1,5,2)"-"substr($1,7,2)"-"substr($1,9,2)"-"substr($1,11,2)}'`
+    SINGLEOUTMAC=$FORMATEDMAC
+    echo "$OUTNODE $OUTDEVICE $FORMATEDMAC" >> outmacs.dat
   done
 
   NEWOUTNODE=`cat $od | grep "Sequence" | awk '{print $5" "$6" "$7}' | sort -u`
@@ -91,13 +93,13 @@ for dump in `ls *.dump.all.dat`; do
 	cat $dump | grep "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $10 }' | sort -u  >  $BASEFILE.bssid.dat
 	cat $dump | grep "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $10 }' | sort -u  | wc -l >> all_bssid.dat
 	
-	#if [ "x$OUTMAC" != "x" ]; then
-        #  cat $dump | grep -P "OKPacket:" | grep $OUTMAC | awk '{ print $6 }' | sed -s 's/+//g' | awk -F "/" '{ print $1 }' >  $BASEFILE.rssi_ref.dat
- 	#fi
+	if [ "x$SINGLEOUTMAC" != "x" ]; then
+          cat $dump | grep "OKPacket:" | grep $SINGLEOUTMAC | awk '{ print $6 }' | sed -s 's/+//g' | awk -F "/" '{ print $1 }' >  $BASEFILE.rssi_ref.dat
+ 	fi
 	  
 	cat $dump | grep "Sequence:" | awk '{ print $2"\tSRCMAC" $6$7 "\t" $9 }' | sed "s#SRCMACffff##g" | sed "s#:##g" >>  $BASEFILE.seq_no.dat.tmp
 	cat $BASEFILE.seq_no.dat.tmp | awk '{print $2" "$3}'>> all_seq_no.dat.tmp
-        cat $BASEFILE.seq_no.dat.tmp | awk '{print $1"\t"$2"\t"strtonum("0x"$3)}' >>   $BASEFILE.seq_no.dat
+        cat $BASEFILE.seq_no.dat.tmp | awk '{print $1"\t"$2"\t"strtonum("0x"$3)}' >> $BASEFILE.seq_no.dat
 	rm $BASEFILE.seq_no.dat.tmp
     fi
 done
@@ -109,7 +111,42 @@ touch processing_done
 
 NODELIST="$NODELIST }"
 
+which matlab > /dev/null
+
+if [ $? -ne 0 ]; then
+  echo "No matlab. Abort evaluation."
+  exit 0
+fi
+
 echo $NODELIST
+
+echo "Copy Data"
+cp $DIR/*.m .
+
+echo "Channel load all"
+matlab -nodesktop -nosplash -r "try,measure_channel_load_all($NODELIST),catch,exit(1),end,exit(0)"
+
+if [ $? -ne 0 ]; then
+  echo "Ohh, matlab error."
+fi
+
+echo "Channel load buckets"
+matlab -nodesktop -nosplash -r "try,measure_channel_load_buckets_all($NODELIST),catch,exit(1),end,exit(0)"
+
+if [ $? -ne 0 ]; then
+  echo "Ohh, matlab error."
+fi
+
+if [ "x$SINGLEOUTMAC" != "x" ]; then
+  echo "RSSI Ref"
+  matlab -nodesktop -nosplash -r "try,measure_rssi_ref($NODELIST),catch,exit(1),end,exit(0)"
+
+  if [ $? -ne 0 ]; then
+    echo "Ohh, matlab error."
+  fi
+fi
+
+for i in `ls *.eps`; do epstopdf $i -o=$i.pdf; done
 
 #
 #MATLABDIR=matlab_$RANDOM
@@ -117,7 +154,7 @@ echo $NODELIST
 #echo "Prepare matlab"
 #ssh $MATLABHOST "mkdir $MATLABDIR"
 #echo "Copy Data"
-#scp $DIR/*.m $MATLABHOST:$MATLABDIR
+#cp $DIR/*.m $MATLABHOST:$MATLABDIR
 #scp evaluation/* $MATLABHOST:$MATLABDIR
 
 #-nojvm

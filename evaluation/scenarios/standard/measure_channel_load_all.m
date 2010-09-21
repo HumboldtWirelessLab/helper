@@ -1,16 +1,5 @@
 function measure_channel_load_all(nodes)
 
-%clear;
-%addpath('3/');
-
-%nodes = {'wgt25' 'wgt28' 'wgt31' 'wgt32' 'wgt33' 'wgt44' 'wgt46' 'wgt49' 'wgt63' 'wgt70' 'wgt74' 'wgt76' 'wgt77' 'wgt78' 'wgt79' 'wgt81' 'wgt82'};
-%nodes = {'wgt25' 'wgt28' 'wgt31' 'wgt33' 'wgt44' 'wgt46' 'wgt49' 'wgt63' 'wgt70' 'wgt74' 'wgt76' 'wgt77' 'wgt78' 'wgt79' 'wgt81' 'wgt82'};
-%nodes = {'wgt25' 'wgt29' 'wgt31' 'wgt32' 'wgt33' 'wgt37' 'wgt41' 'wgt44' 'wgt45' 'wgt46' 'wgt49' 'wgt63' 'wgt70' 'wgt74' 'wgt76' 'wgt77' 'wgt78' 'wgt79' 'wgt81' 'wgt82' 'sk111' 'sk112' 'sk113' 'sk114'};
-%nodes = {'sk110' 'sk111' 'sk112' 'sk113' 'sk114' 'sk115' 'wgt25' 'wgt29' 'wgt31' 'wgt32' 'wgt33' 'wgt37' 'wgt41' 'wgt42' 'wgt44' 'wgt45' 'wgt46' 'wgt49' 'wgt63' 'wgt70' 'wgt74' 'wgt76' 'wgt77' 'wgt78' 'wgt79' 'wgt81' 'wgt82'};
-%nodes = {'sk110' 'sk111' 'sk112' 'sk113' 'sk114' 'sk115' 'wgt25' 'wgt31' 'wgt33' 'wgt37' 'wgt41' 'wgt42' 'wgt44' 'wgt45' 'wgt46' 'wgt49' 'wgt63' 'wgt70' 'wgt76' 'wgt77' 'wgt78' 'wgt79' 'wgt81' 'wgt82'};
-
-%nodes=load('nodes.dat')
-
 nodes
 
 chan_load_perc_ok = zeros(size(nodes,2), 4);
