@@ -6,3 +6,5 @@
 - measurement: better log-support for kclick (seems to me, that now there are some lines missing)
 - remove 'echo -n ""' in host/bin/function.sh, this is necessary for wgt at University
 
+-Check recommentmodotions if node has more than one device ? WHat if there are different.
+-check whether modoptions(countrycode) allow the wanted channel(s).

@@ -1,9 +1,9 @@
-NAME=receiver
+NAME=passive_sc
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=10
+TIME=60
 
 NODETABLE=receiver.mes
 NODEPLACEMENTFILE=placement.default
@@ -20,3 +20,10 @@ NOTICE=no
 LOS=no
 
 CONTROLSOCKET=no
+
+CLICKMODE=kernel
+REMOTEDUMP=yes
+DUMPIP=192.168.3.2
+DUMPMAC=00:11:11:d1:dd:8c
+
+LOCALPROCESS=CONFIGDIR/sync_dumps.sh

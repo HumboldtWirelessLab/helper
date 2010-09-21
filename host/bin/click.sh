@@ -46,6 +46,12 @@ case "$1" in
 		    run_on_node $node "MODULSDIR=$MODULSDIR ./click.sh reinstall" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
 		done
 		;;
+	"kclick_stop")
+		for node in $NODELIST; do
+		    echo "$node"
+		    run_on_node $node "MODULSDIR=$MODULSDIR ./click.sh kclick_stop" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
+		done
+		;;
 	*)
 		$0 help
 		;;
