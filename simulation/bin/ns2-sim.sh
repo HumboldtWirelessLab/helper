@@ -209,6 +209,10 @@ case "$1" in
 		fi
 
 		( cd $FINALRESULTDIR; ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+		
+		if [ $? -eq 0 ]; then
+		  MODE=sim SIM=ns2 CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh
+		fi		
 		;;
 	"help")
 		echo "Use $0 run dis-file result-dir"

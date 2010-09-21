@@ -40,7 +40,7 @@ Mac/802_11 set basicRate_         11.0e6           ;# 11Mbps
 Mac/802_11 set RTSThreshold_ 3000
 Mac/802_11 set ShortRetryLimit_ 7               ;# retransmittions
 Mac/802_11 set LongRetryLimit_  4               ;# retransmissions
-
+Mac/802_11 set TXFeedback_ 1
 #
 # The network channel, physical layer, MAC, propagation model,
 # and antenna model are all standard ns-2.
