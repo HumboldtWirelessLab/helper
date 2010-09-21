@@ -1,4 +1,5 @@
 CHANNEL=select
+#CHANNEL=fix
 GPS=yes
 LOCALPROCESS=localproc.sh
 CHECKPROCESS=checkdump.sh
@@ -6,4 +7,11 @@ MODOPTIONS=/home/testbed/helper/nodes/etc/madwifi/modoptions.pcmcia
 #MODULSDIR=/home/testbed/helper/nodes/lib/modules/i586/
 MODULSDIR=/home/testbed/helper/nodes/lib/modules/i586-new/
 MAXGPSTRY=3
-RUNTIME=30
+RUNTIME=1800
+
+INTERN_CHANNEL=36
+PCMCIA_CHANNEL=1
+USB1_CHANNEL=6
+USB2_CHANNEL=11
+
+PROBETIME=1
