@@ -4,7 +4,6 @@ FROMRAWDEVICE
 //-> SimpleQueue(CAPACITY 500)
   -> ct::Counter()
 //  ->Discard;
-//  -> tdraw::TODUMP("/tmp/extra/test/NODENAME.NODEDEVICE.dump");
   -> tdraw::TODUMP("RESULTDIR/NODENAME.NODEDEVICE.dump");
 
 Script(

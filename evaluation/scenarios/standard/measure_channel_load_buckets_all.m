@@ -10,9 +10,9 @@ all_data = zeros(no_buckets, size(nodes,2));
 
 for i=1:size(nodes,2)
    i
-   chan_load_perc_ok = measure_channel_load_buckets(strcat(nodes{i}, '_ok.dat'), true, no_buckets); 
-   chan_load_perc_crc = measure_channel_load_buckets(strcat(nodes{i}, '_crc.dat'), false, no_buckets); 
-   %chan_load_perc_phy(i,:) = measure_channel_load(strcat(nodes{i}, '_phy.dat')); 
+   chan_load_perc_ok = measure_channel_load_buckets(strcat(nodes{i}, '.dump.ok.dat'), true, no_buckets); 
+   chan_load_perc_crc = measure_channel_load_buckets(strcat(nodes{i}, '.dump.crc.dat'), false, no_buckets); 
+   %chan_load_perc_phy(i,:) = measure_channel_load(strcat(nodes{i}, '.dump.phy.dat')); 
    
    data = [chan_load_perc_ok(:,2:end) chan_load_perc_crc(:,1)];
    all_data(:,i) = chan_load_perc_ok(:,1);
