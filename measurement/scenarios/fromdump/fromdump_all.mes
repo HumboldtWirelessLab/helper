@@ -1,2 +1,0 @@
-#NODE		DEVICE		MODULSDIR	MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	LOGFILE			APP	APPLOGFILE
-sk110		ath0		-		-		monitor.default		-		fromdump.click	LOGDIR/receiver.log	-	-

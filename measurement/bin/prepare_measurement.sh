@@ -50,7 +50,7 @@ case "$1" in
 
 		if [ "x$REMOTEDUMP" = "xyes" ]; then
                   if [ "x$DUMPPORTBASE" = "x" ]; then
-		    DUMPPORTBASE=30000
+		    DUMPPORTBASE=40000
 		  fi
                   if [ "x$DUMPIP" = "x" ]; then
 		    DUMPIP="192.168.3.100"
@@ -83,7 +83,26 @@ case "$1" in
 			
 			    WIFICONFIG=`echo "$WIFICONFIG" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 
-			    if [ ! "x$WIFICONFIG" = "x" ] && [ ! "x$WIFICONFIG" = "x-" ]; then
+			    ISGROUP=`echo $CNODE | grep "group:" | wc -l`
+			    
+			    if [ "x$ISGROUP" = "x1" ]; then
+			      GROUP=`echo $CNODE | sed "s#group:##g"`
+			      CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#"`
+			      #echo "NODES: $CNODE"
+			    else
+			      CNODES=$CNODE
+			    fi
+			    
+			    for CNODE in $CNODES; do
+			    
+			      NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$CNODE[[:space:]]*$CDEV" | wc -l`
+			      
+			      if [ $NODEINFILE -ne 0 ]; then
+			        #echo "Found node $CNODE with device $CDEV. Step over" 
+			        continue
+			      fi
+			    
+			      if [ ! "x$WIFICONFIG" = "x" ] && [ ! "x$WIFICONFIG" = "x-" ]; then
 				if [ -f  $CONFIGDIR/$WIFICONFIG ]; then                                                                                                                                                   
 				    . $CONFIGDIR/$WIFICONFIG
 				    WIFICONFIGFINALNAME=$CONFIGDIR/$WIFICONFIG
@@ -120,19 +139,19 @@ case "$1" in
 					WIFIDECAP="AthdescDecap()"
 					;;
 				    "805")
-					WIFIENCAP="Ath2Encap(ATHENCAP true)"
-					WIFIDECAP="Ath2Decap(ATHDECAP true)"
+					WIFIENCAP="Ath2Encap(ATHENCAP\ttrue)"
+					WIFIDECAP="Ath2Decap(ATHDECAP\ttrue)"
 					;;
 			    	    *)
 					WIFIENCAP="Null()"
 					WIFIDECAP="Null()"
 					;;
 				esac
-			    else
+			      else
 				WIFICONFIGFINALNAME="-"
-			    fi
+			      fi
 			
-			    if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
+			      if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
 				CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 			    
 				if [ -e $CLICK ] || [ -e $CONFIGDIR/$CLICK ]; then
@@ -146,6 +165,11 @@ case "$1" in
 				      fi
         			    fi
 				    
+				    echo -n "" > $CLICKFINALNAME
+				    
+				    ###################
+				    ### Remote Dump ###
+				    ###################
                                     if [ "x$REMOTEDUMP" = "xyes" ]; then
 				      NODUMP=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "TODUMP" | wc -l)`
 				      
@@ -158,7 +182,15 @@ case "$1" in
 					echo "$CNODE $CDEV $NODEDUMPNR $DUMPLINE $DUMPIP $DUMPPORTBASE" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.map
 					NODEDUMPNR=`expr $NODEDUMPNR + 1`
 					DUMPPORTBASE=`expr $DUMPPORTBASE + 1`
-					DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#Socket\(UDP,$DUMPIP,$DUMPPORTBASE,CLIENT\ttrue\)->Discard#g"
+					
+			                if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserlevel" ]; then
+					  DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#Socket\(UDP,$DUMPIP,$DUMPPORTBASE,CLIENT\ttrue\)->Discard#g"
+					else
+					  echo "BRNAddressInfo(ethdev eth0:eth);" >> $CLICKFINALNAME
+					  echo "BRNAddressInfo(ipdev eth0:ip);" >> $CLICKFINALNAME
+					  DUMPSEDARG="$DUMPSEDARG -e s#TODUMP\(.*$DUMPLINE.*\)#UDPIPEncap(SRC\tipdev,SPORT\t30000,DST\t$DUMPIP,DPORT\t$DUMPPORTBASE,CHECKSUM\tfalse,ALIGNFIX\ttrue)\n\t->EtherEncap(ETHERTYPE\t0x0800,SRC\tethdev,DST\t$DUMPMAC)->ethq::SimpleQueue(CAPACITY\t500)->ToDevice(eth0);#g"
+					fi
+					  
 					echo "Idle->Socket(UDP,$DUMPIP,$DUMPPORTBASE,$DUMPIP,$DUMPPORTBASE)->ToDump("$DUMPLINE");" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.click
 			              done
 				    else
@@ -166,25 +198,38 @@ case "$1" in
 				    fi
 			        
     				    #echo "SED: $DUMPSEDARG"
-				    ( cd $CONFIGDIR; cat $CLICK | sed -e "s#//[0-$DEBUG]/##g" -e "s#/\*[0-$DEBUG]/##g" -e "s#/[0-$DEBUG]\*/##g" -e "s#DEBUGLEVEL#$DEBUG#g" | sed -e "s#FROMDEVICE#FROMRAWDEVICE -> WIFIDECAPTMPL#g" -e "s#TODEVICE#WIFIENCAPTMPL -> TORAWDEVICE#g" | sed -e "s#WIFIDECAPTMPL#$WIFIDECAP#g" -e "s#WIFIENCAPTMPL#$WIFIENCAP#g" -e "s#FROMRAWDEVICE#FromDevice(NODEDEVICE, PROMISC true, OUTBOUND true)#g" -e "s#TORAWDEVICE#ToDevice(NODEDEVICE)#g" | sed $DUMPSEDARG | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $CLICKFINALNAME )
-				    				    
+	                            DEBUGSEDARG="-e s#//[0-$DEBUG]/##g -e s#/\*[0-$DEBUG]/##g -e s#/[0-$DEBUG]\*/##g -e s#DEBUGLEVEL#$DEBUG#g"
+				    FROMTODEVICESEDARG="-e s#FROMDEVICE#FROMRAWDEVICE->WIFIDECAPTMPL#g -e s#TODEVICE#WIFIENCAPTMPL->TORAWDEVICE#g"
+				    DIRSEDARG="-e s#NODEDEVICE#$CDEV#g -e s#NODENAME#$CNODE#g -e s#RUNTIME#$TIME#g -e s#RESULTDIR#$RESULTDIR#g -e s#WORKDIR#$WORKDIR#g -e s#BASEDIR#$BASEDIR#g"
+
+				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserlevel" ]; then
+				      DEVICESEDARG="-e s#WIFIDECAPTMPL#$WIFIDECAP#g -e s#WIFIENCAPTMPL#$WIFIENCAP#g -e s#FROMRAWDEVICE#FromDevice(NODEDEVICE,PROMISC\ttrue,OUTBOUND\ttrue,SNIFFER\tfalse)#g -e s#TORAWDEVICE#ToDevice(NODEDEVICE)#g"
+				      SYNCARG="-e s#SYNC#Idle\n\t->Socket(UDP,0.0.0.0,60000)\n\t->Print(\"Sync\",TIMESTAMP\ttrue)#g"
+				    else
+				      DEVICESEDARG="-e s#WIFIDECAPTMPL#$WIFIDECAP#g -e s#WIFIENCAPTMPL#$WIFIENCAP#g -e s#FROMRAWDEVICE#FromDevice(NODEDEVICE)#g -e s#TORAWDEVICE#ToDevice(NODEDEVICE)#g"
+				      SYNCARG="-e s#SYNC#FromHost(sync0,192.168.20.1\/24)\n\t->fhc::Classifier(12/0806,12/0800)\n\t->ARPResponder(0.0.0.0/0\t1:1:1:1:1:1)\n\t->ToHost(sync0);\nfhc[1]\n\t->Strip(14)\n\t->MarkIPHeader()\n\t->StripIPHeader()\n\t->max::CheckLength(12)[1]\n\t->Discard;\nmax[0]\n\t->Strip(8)\n\t//->Print(TIMESTAMP\ttrue)#g"
+				    fi
+
+				    ( cd $CONFIGDIR; cat $CLICK | sed $DEBUGSEDARG | sed $FROMTODEVICESEDARG | sed $DEVICESEDARG | sed $SYNCARG | sed $DUMPSEDARG | sed $DIRSEDARG >> $CLICKFINALNAME )
+				    
 				    echo "Script(wait $TIME, stop);" >> $CLICKFINALNAME
 				    
-				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" != "xkernel" ]; then
+				    if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserlevel" ]; then
 				      if [ "x$CONTROLSOCKET" != "xno" ]; then
 				        echo "ControlSocket(tcp, 7777);" >> $CLICKFINALNAME
 				      fi
 				    fi
 				    
-				else
+				  else
 				    CLICKFINALNAME="-"
-				fi
-			    else
-				CLICKFINALNAME="-"
-			    fi
+				  fi
+			      else
+			   	CLICKFINALNAME="-"
+			      fi
 			
-			    echo "$CNODE $CDEV $CMODDIR $CMODOPT $WIFICONFIGFINALNAME $CCMODDIR $CLICKFINALNAME $CCLOG $CAPP $CAPPL" | sed -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" >> $RESULTDIR/$NODETABLE.$POSTFIX
+			      echo "$CNODE $CDEV $CMODDIR $CMODOPT $WIFICONFIGFINALNAME $CCMODDIR $CLICKFINALNAME $CCLOG $CAPP $CAPPL" | sed -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" -e "s#NODENAME#$CNODE#g" -e "s#NODEDEVICE#$CDEV#g" >> $RESULTDIR/$NODETABLE.$POSTFIX
 
+                          done
 			fi
 		    fi
 		done < $CONFIGDIR/$NODETABLE

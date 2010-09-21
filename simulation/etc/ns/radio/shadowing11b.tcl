@@ -28,6 +28,7 @@ Phy/WirelessPhy set RXThresh_ 3.28984e-09   ;# communication radius
 Mac/802_11 set dataRate_ 11Mb
 Mac/802_11 set basicRate_ 1Mb 
 Mac/802_11 set RTSThreshold_ 3000
+Mac/802_11 set TXFeedback_ 1
 
 #
 # The network channel, physical layer, MAC, propagation model,

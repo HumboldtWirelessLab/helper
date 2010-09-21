@@ -12,7 +12,7 @@ error_clf[0]
   -> BRN2PrintWifi("OKPacket",TIMESTAMP true)
   -> WifiDecap()
 //SEQ  -> seq_clf :: Classifier( 12/8088, - )
-//SEQ  -> Print("Ether", TIMESTAMP true)
+//SEQ  -> Print("Seq:", TIMESTAMP true)
   -> Discard;
 
 //SEQ seq_clf[1]

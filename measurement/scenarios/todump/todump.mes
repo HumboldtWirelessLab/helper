@@ -1,2 +1,0 @@
-#NODE	DEVICE	MODULSDIR			MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	LOGFILE			APP	APPLOGFILE
-sk112	ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.default		-		todump.click	LOGDIR/todump.log	-	-

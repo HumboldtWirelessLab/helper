@@ -6,9 +6,9 @@ FROMRAWDEVICE
 //  ->Discard;
 //  -> tdraw::TODUMP("/tmp/extra/test/NODENAME.NODEDEVICE.dump");
   -> tdraw::TODUMP("RESULTDIR/NODENAME.NODEDEVICE.dump");
-  
+
 Script(
-  wait 59,
+  wait 55,
   read ct.count,
   stop
 );

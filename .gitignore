@@ -1,1 +1,6 @@
 *.ko
+nodes/home
+*.iws
+*.iml
+*.ipr
+src/jClickClient/classes/*

@@ -65,14 +65,10 @@ chmod 777 $FINALRESULTDIR
 case "$1" in
 	"run")
 		POSTFIX=ns2
-    if [ "x$NODEPLACEMENT" = "xRANDOM" ]; then
-      USERANDOMPLM=yes
-    else
-      USERANDOMPLM=no
-    fi
-    
+
 		DISCRIPTIONFILENAME=`basename $DISCRIPTIONFILE`
-		if [ $USERANDOMPLM = "yes" ]; then
+
+                if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ]; then
 		  cat $DISCRIPTIONFILE | sed -e "s#[[:space:]]*NODEPLACEMENTFILE[[:space:]]*=.*##g" -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
 		  echo "NODEPLACEMENTFILE=$FINALRESULTDIR/placementfile.plm" >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
 		else
@@ -92,33 +88,48 @@ case "$1" in
 		NODECOUNT=`cat $NODETABLE | grep -v "#" | wc -l`
 		cat $DIR/../etc/ns/radio/$RADIO\.tcl > $TCLFILE
 
+                if [ "x$NODEPLACEMENT" = "x" ]; then
+		  echo "use default plm"
+		  NODEPLACEMENT="random"
+		fi
+		if [ "x$FIELDSIZE" = "x" ]; then
+		  FIELDSIZE=1000
+		fi
+		
+                if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ]; then
+#		  echo "Gen Placement: $NODEPLACEMENT"
+		  $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
+		  FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
+                fi
+
 		POS_X_MAX=0
 		POS_Y_MAX=0
 		POS_Z_MAX=0
-		if [ $USERANDOMPLM = "yes" ]; then
+                if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ]; then
 		  POS_X_MAX=$FIELDSIZE
 		  POS_Y_MAX=$FIELDSIZE
 		  POS_Z_MAX=0
-		  FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
+		  #FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
 		else
 		  if [ -e $DIR/../etc/nodeplacement/$NODEPLACEMENTFILE ]; then
 		    FINALPLMFILE="$DIR/../etc/nodeplacement/$NODEPLACEMENTFILE"
-      else
-        if [ -e $CONFIGDIR/$NODEPLACEMENTFILE ]; then
-          FINALPLMFILE="$CONFIGDIR/$NODEPLACEMENTFILE"
-        else
-          if [ -e $NODEPLACEMENTFILE ]; then
+                  else
+                    if [ -e $CONFIGDIR/$NODEPLACEMENTFILE ]; then
+                      FINALPLMFILE="$CONFIGDIR/$NODEPLACEMENTFILE"
+                    else
+                      if [ -e $NODEPLACEMENTFILE ]; then
 		        FINALPLMFILE=$NODEPLACEMENTFILE
-          else
-            if [ -e $FINALRESULTDIR/$NODEPLACEMENTFILE ]; then
-              FINALPLMFILE="$FINALRESULTDIR/$NODEPLACEMENTFILE"
-            else
-              FINALPLMFILE="$DIR/../etc/nodeplacement/placement.default"
-            fi
-          fi
-        fi
-      fi
-		  
+                      else
+                        if [ -e $FINALRESULTDIR/$NODEPLACEMENTFILE ]; then
+                          FINALPLMFILE="$FINALRESULTDIR/$NODEPLACEMENTFILE"
+                        else
+                          FINALPLMFILE="$DIR/../etc/nodeplacement/placement.default"
+                        fi
+                      fi
+                    fi
+                  fi
+		 
+		  echo "FIN: $FINALPLMFILE"  
 		  for node in $NODELIST; do
 		    POS_X=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		    POS_Y=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
@@ -137,7 +148,9 @@ case "$1" in
 		  POS_X_MAX=`expr $POS_X_MAX + 50`
 		  POS_Y_MAX=`expr $POS_Y_MAX + 50`
 		  POS_Z_MAX=`expr $POS_Z_MAX + 50`
-    fi
+                fi
+		 
+#		echo "FIN: $FINALPLMFILE"  
     
 		echo "set xsize $POS_X_MAX" >> $TCLFILE
 		echo "set ysize $POS_Y_MAX" >> $TCLFILE
@@ -156,7 +169,7 @@ case "$1" in
 		    for nodedevice in $NODEDEVICELIST; do		    
 			    CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
 			    echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
-          i=`expr $i + 1`
+                            i=`expr $i + 1`
 		    done
 		done
 		
@@ -166,21 +179,10 @@ case "$1" in
 		
 		i=0
 
-    if [ $USERANDOMPLM = "yes" ]; then
-      rm -rf $FINALPLMFILE
-		fi
-		
 		for node in $NODELIST; do
-		    if [ $USERANDOMPLM = "yes" ]; then
-		      POS_X=$(( $RANDOM % $FIELDSIZE ))
-		      POS_Y=$(( $RANDOM % $FIELDSIZE ))
-		      POS_Z=0
-		      echo "$node $POS_X $POS_Y $POS_Z" >> $FINALPLMFILE
-		    else
-		      POS_X=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
-		      POS_Y=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
-		      POS_Z=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
-		    fi
+                    POS_X=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
+		    POS_Y=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
+		    POS_Z=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
 		    
 		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		
@@ -207,9 +209,10 @@ case "$1" in
 		fi
 
 		( cd $FINALRESULTDIR; ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
-
-#		POSTFIX=$POSTFIX $DIR/prepare-sim.sh cleanup $2
-#		rm $TCLFILE
+		
+		if [ $? -eq 0 ]; then
+		  MODE=sim SIM=ns2 CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh
+		fi		
 		;;
 	"help")
 		echo "Use $0 run dis-file result-dir"
