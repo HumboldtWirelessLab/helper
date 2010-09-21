@@ -7,9 +7,9 @@ chan_load_perc_crc = zeros(size(nodes,2), 1);
 %chan_load_perc_phy = zeros(size(nodes,2), 1);
 for i=1:size(nodes,2)
    i
-   chan_load_perc_ok(i,:) = measure_channel_load(strcat(nodes{i}, '_ok.dat'), true); 
-   chan_load_perc_crc(i,:) = measure_channel_load(strcat(nodes{i}, '_crc.dat'), false); 
-   %chan_load_perc_phy(i,:) = measure_channel_load(strcat(nodes{i}, '_phy.dat')); 
+   chan_load_perc_ok(i,:) = measure_channel_load(strcat(nodes{i}, '.dump.ok.dat'), true); 
+   chan_load_perc_crc(i,:) = measure_channel_load(strcat(nodes{i}, '.dump.crc.dat'), false); 
+   %chan_load_perc_phy(i,:) = measure_channel_load(strcat(nodes{i}, '.dump.phy.dat')); 
 end
 
 

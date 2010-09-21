@@ -2,7 +2,7 @@ function measure_rssi_ref(nodes)
 
 all_rssi = zeros(size(nodes,2), 1);
 for i=1:size(nodes,2)
-   v = load(strcat(nodes{i}, '_rssi_ref.dat'));
+   v = load(strcat(nodes{i}, '.dump.rssi_ref.dat'));
    all_rssi(i) = mean(v);
 end
 

@@ -44,7 +44,7 @@ for od in $OUTDUMPS; do
   OUTNODES="$OUTNODES $NEWOUTNODE"
 done
 
-NODELIST=""
+NODEDEVLIST=""
 
 for dump in `ls *.dump.all.dat`; do
     OUT=`echo $dump | grep out | wc -l`
@@ -61,25 +61,10 @@ for dump in `ls *.dump.all.dat`; do
 	  CHANNEL=1
 	fi
 	
-	#TODO: remove remapping
-	if [ $device = "ath1" ]; then
-	    case "$node" in
-	      "sk110")
-    		node="sk113"
-    		;;
-	      "sk111")
-    		node="sk114"
-    		;;
-	      "sk112")
-    		node="sk115"
-    		;;
-	    esac      	
-	fi
-
-        if [ "x$NODELIST" = "x" ]; then
-	  NODELIST="{ '$node'"
+        if [ "x$NODEDEVLIST" = "x" ]; then
+	  NODEDEVLIST="{ '$node.$device'"
 	else
-	  NODELIST="$NODELIST '$node'"
+	  NODEDEVLIST="$NODEDEVLIST '$node.$device'"
 	fi
 
 	echo "processing $dump"
@@ -109,7 +94,7 @@ rm -f all_seq_no.dat.tmp
 
 touch processing_done
 
-NODELIST="$NODELIST }"
+NODEDEVLIST="$NODEDEVLIST }"
 
 which matlab > /dev/null
 
@@ -118,20 +103,20 @@ if [ $? -ne 0 ]; then
   exit 0
 fi
 
-echo $NODELIST
+echo $NODEDEVLIST
 
 echo "Copy Data"
 cp $DIR/*.m .
 
 echo "Channel load all"
-matlab -nodesktop -nosplash -r "try,measure_channel_load_all($NODELIST),catch,exit(1),end,exit(0)"
+matlab -nodesktop -nosplash -r "try,measure_channel_load_all($NODEDEVLIST),catch,exit(1),end,exit(0)" > /dev/null 2>&1
 
 if [ $? -ne 0 ]; then
   echo "Ohh, matlab error."
 fi
 
 echo "Channel load buckets"
-matlab -nodesktop -nosplash -r "try,measure_channel_load_buckets_all($NODELIST),catch,exit(1),end,exit(0)"
+matlab -nodesktop -nosplash -r "try,measure_channel_load_buckets_all($NODEDEVLIST),catch,exit(1),end,exit(0)" > /dev/null 2>&1
 
 if [ $? -ne 0 ]; then
   echo "Ohh, matlab error."
@@ -139,7 +124,7 @@ fi
 
 if [ "x$SINGLEOUTMAC" != "x" ]; then
   echo "RSSI Ref"
-  matlab -nodesktop -nosplash -r "try,measure_rssi_ref($NODELIST),catch,exit(1),end,exit(0)"
+  matlab -nodesktop -nosplash -r "try,measure_rssi_ref($NODEDEVLIST),catch,exit(1),end,exit(0)" > /dev/null 2>&1
 
   if [ $? -ne 0 ]; then
     echo "Ohh, matlab error."
@@ -147,27 +132,3 @@ if [ "x$SINGLEOUTMAC" != "x" ]; then
 fi
 
 for i in `ls *.eps`; do epstopdf $i -o=$i.pdf; done
-
-#
-#MATLABDIR=matlab_$RANDOM
-
-#echo "Prepare matlab"
-#ssh $MATLABHOST "mkdir $MATLABDIR"
-#echo "Copy Data"
-#cp $DIR/*.m $MATLABHOST:$MATLABDIR
-#scp evaluation/* $MATLABHOST:$MATLABDIR
-
-#-nojvm
-#echo "1"
-#ssh $MATLABHOST "cd $MATLABDIR; matlab -nodesktop -nosplash -r \"measure_channel_load_all($NODELIST);exit\""
-#echo "2"
-#ssh $MATLABHOST "cd $MATLABDIR; matlab -nodesktop -nosplash -r \"measure_channel_load_buckets_all($NODELIST);exit\""
-
-#if [ "x$OUTMAC" != "x" ]; then
-#echo "2"
-#  ssh $MATLABHOST "cd $MATLABDIR; matlab -nodesktop -nosplash -r \"measure_rssi_ref($NODELIST);exit\""
-#fi
-
-#scp $MATLABHOST:$MATLABDIR/*.eps evaluation/
-#(cd evaluation/; for i in `ls *.eps`; do epstopdf $i -o=$i.pdf; done)
-#ssh $MATLABHOST "rm -rf $MATLABDIR"
