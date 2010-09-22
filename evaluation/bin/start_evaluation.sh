@@ -36,7 +36,7 @@ if [ "x$EVALUATION" != "x" ]; then
       if [ -f $CONFIGDIR/$i ]; then
         MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $CONFIGDIR/$i
       fi
-    fi 
+    fi
   done
 else
   echo "No evaluation"
