@@ -26,6 +26,9 @@ echo -n "" > all_seq_no.dat
 
 rm -f all_seq_no.dat.tmp
 
+pwd
+ls
+
 OUTDUMPS=`ls *out.dump.all.dat`
 OUTNODES=""
 
@@ -99,9 +102,19 @@ NODEDEVLIST="$NODEDEVLIST }"
 which matlab > /dev/null
 
 if [ $? -ne 0 ]; then
-  echo "No matlab. Abort evaluation."
-  exit 0
+  echo "No matlab. Try octave."
+  which octave > /dev/null
+  if [ $? -ne 0 ]; then
+    echo "No octave. Abort evaluation."
+    exit 0
+  else
+    MATLAB="octave --eval"
+  fi
+else
+  MATLAB="matlab -nodesktop -nosplash -r"
 fi
+
+DEBUGDEV=./matlab.log
 
 echo $NODEDEVLIST
 
@@ -109,14 +122,14 @@ echo "Copy Data"
 cp $DIR/*.m .
 
 echo "Channel load all"
-matlab -nodesktop -nosplash -r "try,measure_channel_load_all($NODEDEVLIST),catch,exit(1),end,exit(0)" > /dev/null 2>&1
+${MATLAB} "try,measure_channel_load_all($NODEDEVLIST),catch,exit(1),end,exit(0)" >> $DEBUGDEV 2>&1
 
 if [ $? -ne 0 ]; then
   echo "Ohh, matlab error."
 fi
 
 echo "Channel load buckets"
-matlab -nodesktop -nosplash -r "try,measure_channel_load_buckets_all($NODEDEVLIST),catch,exit(1),end,exit(0)" > /dev/null 2>&1
+${MATLAB} "try,measure_channel_load_buckets_all($NODEDEVLIST),catch,exit(1),end,exit(0)" >> $DEBUGDEV 2>&1
 
 if [ $? -ne 0 ]; then
   echo "Ohh, matlab error."
@@ -124,7 +137,7 @@ fi
 
 if [ "x$SINGLEOUTMAC" != "x" ]; then
   echo "RSSI Ref"
-  matlab -nodesktop -nosplash -r "try,measure_rssi_ref($NODEDEVLIST),catch,exit(1),end,exit(0)" > /dev/null 2>&1
+  ${MATLAB} "try,measure_rssi_ref($NODEDEVLIST),catch,exit(1),end,exit(0)" >> $DEBUGDEV 2>&1
 
   if [ $? -ne 0 ]; then
     echo "Ohh, matlab error."

@@ -1,6 +1,10 @@
 function chan_load_perc = measure_channel_load(fname, with_frame_type)
 
-    v = load(fname);
+    try
+      v = load(fname);
+    catch
+      v = [];
+    end
     
     if (isempty(v))
         chan_load_perc = 0;
