@@ -29,10 +29,32 @@ if [ ! -e $EVALUATIONDIR ]; then
 fi
 
 for d in `(cd $RESULTDIR;ls *.dump)`; do
-    if [ "x$MODE"="xsim" ]; then
-      ( cd $RESULTDIR; SEQ=yes WIFI=extra $DIR/../../bin/fromdump.sh $RESULTDIR/$d > $EVALUATIONDIR/$d.all.dat )
-    fi
-done  
+    NODENAME=`echo $d | sed "s#\.# #g" | awk '{print $1}'`
+    NODEDEVICE=`echo $d | sed "s#\.# #g" | awk '{print $2}'`
 
+    CLICKFILE=`cat $NODETABLE | grep -e "$NODENAME[[:space:]]*$NODEDEVICE" | awk '{print $7}'`
+
+    HASGPS=`cpp $CLICKFILE | egrep -v "^#" | grep "GPSEncap" | wc -l`
+    if [ $HASGPS -eq 0 ]; then
+      GPS=no
+    else
+      GPS=yes
+    fi
+
+    if [ "x$MODE" = "xsim" ]; then
+      ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=extra $DIR/../../bin/fromdump.sh $RESULTDIR/$d > $EVALUATIONDIR/$d.all.dat )
+    else
+      WIFIFILE=`cat $NODETABLE | grep "$NODENAME[[:space:]]*$NODEDEVICE" | awk '{print $5}'`
+
+      if [ -f $WIFIFILE ]; then
+        . $WIFIFILE
+      else
+        echo "ERROR while getting WIFIINFOFILE ($WIFIFILE). ABORT!!!"
+        exit 1
+      fi
+
+      ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=$WIFITYPE $DIR/../../bin/fromdump.sh $RESULTDIR/$d > $EVALUATIONDIR/$d.all.dat )
+    fi
+done
 
 exit 0

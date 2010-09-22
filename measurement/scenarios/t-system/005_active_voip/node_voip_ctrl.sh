@@ -27,9 +27,11 @@ RUN=1
 
 echo "Nodes: $NODELIST" > $RESULTDIR/nodectrl.log
 
-echo "sleep $SLEEPTIME sec" >> $RESULTDIR/nodectrl.log
+for i in `seq 3`; do
+  echo "sleep $SLEEPTIME sec" >> $RESULTDIR/nodectrl.log
 
-sleep $SLEEPTIME
+  sleep $SLEEPTIME
+done
 
 for i in $NODELIST; do
   echo "START on $i" >> $RESULTDIR/nodectrl.log
@@ -47,6 +49,12 @@ for i in $NODELIST; do
 
   RUN=`expr $RUN + 1`
 
+done
+
+for i in `seq 2`; do
+  echo "sleep $SLEEPTIME sec" >> $RESULTDIR/nodectrl.log
+
+  sleep $SLEEPTIME
 done
 
 echo "stop all" >> $RESULTDIR/nodectrl.log
