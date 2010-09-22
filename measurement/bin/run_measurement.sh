@@ -146,6 +146,7 @@ cat $DISCRIPTIONFILE | sed -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASED
 
 CONFIGDIR=$CONFIGDIR $DIR/prepare_measurement.sh prepare $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp
 mv $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp.real $FINALRESULTDIR/$DISCRIPTIONFILENAME.real
+rm $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp
 
 . $FINALRESULTDIR/$DISCRIPTIONFILENAME.real
 
@@ -155,12 +156,12 @@ echo "Copy Configs !"
 
 for node in $NODELIST; do
 
-	NODEDEVICELIST=`cat $FINALRESULTDIR/$NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+	NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
 	echo $node $NODEDEVICELIST
 	for nodedevice in $NODEDEVICELIST; do
 
-		WIFICONFIG=`cat $FINALRESULTDIR/$NODETABLE | awk '{print $1" "$2" "$5}' | egrep "^$node $nodedevice" | awk '{print $3}' | sort -u`
+		WIFICONFIG=`cat $NODETABLE | awk '{print $1" "$2" "$5}' | egrep "^$node $nodedevice" | awk '{print $3}' | sort -u`
 
 #		echo $node $nodedevice
 		for wificonfig_ac in $WIFICONFIG; do
@@ -190,6 +191,7 @@ RESULT=`(cd $FINALRESULTDIR; WANTNODELIST=$WANTNODELIST FINALRESULTDIR=$FINALRES
 echo $RESULT
 
 if [ $? -eq 0 ]; then
+  echo "MODE=testbed CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.real RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh"
   MODE=testbed CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.real RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh
 fi
 

@@ -46,7 +46,7 @@ case "$1" in
 		. $SIMDIS
 
 		SIMDISBASENAME=`basename $SIMDIS`
-		cat $SIMDIS | sed "s#$NODETABLE#$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $RESULTDIR/$SIMDISBASENAME.$POSTFIX
+		cat $SIMDIS | sed "s#$NODETABLE#$RESULTDIR/$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $RESULTDIR/$SIMDISBASENAME.$POSTFIX
 
 		if [ "x$REMOTEDUMP" = "xyes" ]; then
                   if [ "x$DUMPPORTBASE" = "x" ]; then

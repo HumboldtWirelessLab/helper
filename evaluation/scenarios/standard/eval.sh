@@ -82,7 +82,7 @@ for dump in `ls *.dump.all.dat`; do
 	cat $dump | grep "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $10 }' | sort -u  | wc -l >> all_bssid.dat
 	
 	if [ "x$SINGLEOUTMAC" != "x" ]; then
-          cat $dump | grep "OKPacket:" | grep $SINGLEOUTMAC | awk '{ print $6 }' | sed -s 's/+//g' | awk -F "/" '{ print $1 }' >  $BASEFILE.rssi_ref.dat
+          cat $dump | grep "OKPacket:" | grep -i $SINGLEOUTMAC | awk '{ print $6 }' | sed -s 's/+//g' | awk -F "/" '{ print $1 }' >  $BASEFILE.rssi_ref.dat
  	fi
 	  
 	cat $dump | grep "Sequence:" | awk '{ print $2"\tSRCMAC" $6$7 "\t" $9 }' | sed "s#SRCMACffff##g" | sed "s#:##g" >>  $BASEFILE.seq_no.dat.tmp
