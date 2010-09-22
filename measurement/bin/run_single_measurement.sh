@@ -60,8 +60,8 @@ wait_for_nodes() {
 
   ALL=0
 
-  DEBUGFILE=status/wait_$2
-  #DEBUGFILE=/dev/null
+  #DEBUGFILE=status/wait_$2
+  DEBUGFILE=/dev/null
 
   echo "wait for $1" >> $DEBUGFILE
 
@@ -217,7 +217,7 @@ run_command_for_node() {
 
   SCREENNAME=`screenname_for_node $1 $NODESCREENFILENAME`
 
-  echo "Debug: $SCREENNAME" >&5
+  #echo "Debug: $SCREENNAME" >&5
   screen -S $SCREENNAME -p $1 -X stuff "LOGMARKER=$1 $2"
   sleep 0.3
   screen -S $SCREENNAME -p $1 -X stuff $'\n'
@@ -466,7 +466,7 @@ echo "Finished setup of nodes and screen-session"
       fi
       
       if [ "x$LOCALPROCESS" != "x" ]; then
-        echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
+        #echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
         screen -S $LOCALSCREENNAME -X screen -t localprocess
         sleep 0.1
         screen -S $LOCALSCREENNAME -p localprocess -X stuff "export PATH=$DIR/../../host/bin:$PATH;RUNTIME=$TIME RESULTDIR=$FINALRESULTDIR NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
@@ -553,15 +553,21 @@ echo "Finished setup of nodes and screen-session"
     PATH=$DIR/../../host/bin:$PATH;RESULTDIR=$FINALRESULTDIR NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
   fi
 
+  echo "done." >&6
+
 #######################################
 ##### Check Nodes and finish ##########
 #######################################
 
   set_master_state 0 killmeasurement
 
+  echo -n "State: Check nodes ... " >&6
+
   echo "Wait for nodes"
   SYNCSTATE=`wait_for_nodes "$NODELIST" _finalnodecheck.state`
   echo "all nodes ready"
+
+  echo "done." >&6
 
   echo "ok" 1>&$STATUSFD
 

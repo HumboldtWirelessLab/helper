@@ -158,7 +158,7 @@ for node in $NODELIST; do
 
 	NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
-	echo $node $NODEDEVICELIST
+	#echo $node $NODEDEVICELIST
 	for nodedevice in $NODEDEVICELIST; do
 
 		WIFICONFIG=`cat $NODETABLE | awk '{print $1" "$2" "$5}' | egrep "^$node $nodedevice" | awk '{print $3}' | sort -u`
@@ -191,7 +191,7 @@ RESULT=`(cd $FINALRESULTDIR; WANTNODELIST=$WANTNODELIST FINALRESULTDIR=$FINALRES
 echo $RESULT
 
 if [ $? -eq 0 ]; then
-  echo "MODE=testbed CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.real RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh"
+  #echo "MODE=testbed CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.real RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh"
   MODE=testbed CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.real RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh
 fi
 

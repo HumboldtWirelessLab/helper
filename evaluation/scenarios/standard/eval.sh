@@ -26,9 +26,6 @@ echo -n "" > all_seq_no.dat
 
 rm -f all_seq_no.dat.tmp
 
-pwd
-ls
-
 OUTDUMPS=`ls *out.dump.all.dat`
 OUTNODES=""
 
@@ -116,7 +113,7 @@ fi
 
 DEBUGDEV=./matlab.log
 
-echo $NODEDEVLIST
+#echo $NODEDEVLIST
 
 echo "Copy Data"
 cp $DIR/*.m .
