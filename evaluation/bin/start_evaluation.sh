@@ -20,23 +20,18 @@ esac
 
 . $CONFIGFILE
 
-if [ "x$EVALUATIONSDIR" = "x" ]; then
+if [ "x$EVALUATIONDIR" = "x" ]; then
   EVALUATIONDIR="$RESULTDIR/evaluation"
 fi
 
-if [ ! -e $EVALUATIONSDIR ]; then
-  mkdir -p $EVALUATIONSDIR
+if [ ! -e $EVALUATIONDIR ]; then
+  mkdir -p $EVALUATIONDIR
 fi
 
 if [ "x$EVALUATION" != "x" ]; then
   for i in $EVALUATION; do
-    if [ "x$i" = "xstandard" ]; then
-      for d in `(cd $RESULTDIR;ls *.dump)`; do
-        if [ "x$MODE"="xsim" ]; then
-          ( cd $RESULTDIR; SEQ=yes WIFI=extra $DIR/fromdump.sh $RESULTDIR/$d > $EVALUATIONSDIR/$d.all.dat )
-        fi
-      done  
-      ( cd $EVALUATIONSDIR; RESULTDIR=$RESULTDIR $DIR/../scenarios/standard/eval.sh )
+    if [ -e $DIR/../scenarios/$i ]; then
+      ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $DIR/../scenarios/$i/eval.sh )
     else
       if [ -f $CONFIGDIR/$i ]; then
         MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $CONFIGDIR/$i

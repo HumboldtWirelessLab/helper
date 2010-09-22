@@ -2,8 +2,18 @@ function measure_channel_load_all(nodes)
 
 nodes
 
-chan_load_perc_ok = zeros(size(nodes,2), 4);
-chan_load_perc_crc = zeros(size(nodes,2), 1);
+try
+  chan_load_perc_ok = zeros(size(nodes,2), 4);
+catch
+  chan_load_perc_ok = [];
+end
+
+try
+  chan_load_perc_crc = zeros(size(nodes,2), 1);
+catch
+  chan_load_perc_crc = [];
+end
+
 %chan_load_perc_phy = zeros(size(nodes,2), 1);
 for i=1:size(nodes,2)
    i

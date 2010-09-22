@@ -14,8 +14,8 @@ LOGDIR=WORKDIR
 LOGFILE=measurement.log
 
 RESULTDIR=WORKDIR
-EVALUATIONSDIR=WORKDIR/evaluation
-EVALUATION="standard my_eval.sh"
+EVALUATIONDIR=WORKDIR/evaluation
+EVALUATION="basic standard my_eval.sh"
 
 GPS=no
 NOTICE=no
