@@ -17,9 +17,10 @@ ps::BRN2PacketSource(SIZE 240, INTERVAL 20, MAXSEQ 500000, BURST 1, ACTIVE false
 
 wlan_out
   -> WIFIENCAPTMPL
+  -> SetTimestamp()
   -> rawouttee :: Tee()
   -> fdq :: FrontDropQueue(64)
-  -> af::AgeFilter(MAXAGE 3000ms)
+  //-> af::AgeFilter(MAXAGE 3000ms)
   -> TORAWDEVICE;
 
 rawouttee[1]
@@ -32,8 +33,8 @@ fdq[1]
   //-> ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.drop.dump");
   -> dd::ToDump("RESULTDIR/NODENAME.NODEDEVICE.drop.dump");
 
-af[1]
-  -> dd;
+//af[1]
+//  -> dd;
 
 Idle                                                                                                                                                                                                                                                              
   -> Socket(UDP, 0.0.0.0, 60000)                                                                                                                                                                                                                                    

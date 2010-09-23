@@ -6,7 +6,7 @@ FromDump("DUMP",STOP true)
   -> ath2_decap :: Ath2Decap(ATHDECAP true)
   -> filter_tx :: FilterTX()
   -> error_clf :: WifiErrorClassifier();
-			      
+
 error_clf[0]
   -> ok :: Counter
   -> BRN2PrintWifi("OKPacket",TIMESTAMP true)
@@ -20,12 +20,20 @@ error_clf[0]
 
 error_clf[1]
   -> crc :: Counter
+  -> maxcrclen :: CheckLength(1500)
   -> BRN2PrintWifi("CRCerror", TIMESTAMP true)
+  -> Discard;
+
+  maxcrclen[1]
   -> Discard;
 
 error_clf[2]
   -> phy :: Counter
+  -> maxphylen :: CheckLength(1500)
   -> BRN2PrintWifi("PHYerror", TIMESTAMP true)
+  -> Discard;
+
+  maxphylen[1]
   -> Discard;
 
 error_clf[3]
