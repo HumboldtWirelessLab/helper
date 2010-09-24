@@ -13,7 +13,7 @@ BRN2PacketSource(SIZE 1300, INTERVAL 30, MAXSEQ 500000, BURST 1)
   -> wlan_out::SetTXPower(15);
 
 wlan_out
-  -> WIFIENCAPTMPL
+  -> WIFIENCAP
   -> rawouttee :: Tee()
   -> NotifierQueue(500)
   -> outct::Counter()
