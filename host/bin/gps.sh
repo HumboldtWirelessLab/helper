@@ -240,7 +240,6 @@ case "$1" in
 		;;
   "getgpspos")
     HASGPS=0
-    
     for d in /dev/ttyUSB0 /dev/ttyACM0; do
       #TESTGPS=`gpsctl $d 2>&1 | grep "at" | sed -e "s#^.*at##g" | awk '{print $1}'`
       TESTGPS=`gpsctl 2>&1 | grep -v "(null)" | wc -l`
@@ -249,13 +248,13 @@ case "$1" in
         HASGPS=1
       fi
     done
-    
+
     if [ "x$GPSFILE" != "x" ]; then
       HASGPS=1
     fi
-    
+
     if [ "x$HASGPS" = "x0" ]; then
-      echo "0.0 0.0 0.0"
+      echo "0.0 0.0 0.0 0.0"
       exit 0
     fi
 
@@ -263,7 +262,7 @@ case "$1" in
       MAXTRY=5
     fi
     TRY=0;
-    
+
     while [ $TRY -lt $MAXTRY ]; do
       if [ "x$GPSFILE" != "x" ]; then
         LINE=`cat $GPSFILE | grep -E "MID2|GSA|TPV" | tail -n 1`
@@ -273,32 +272,46 @@ case "$1" in
       if [ "x$LINE" != "x"  ]; then
         NEWGPSD=`echo $LINE | grep "class" | wc -l`
         if [ $NEWGPSD -eq 0 ]; then
-	  #old gps-tools
-	  LAT=`echo $LINE | awk '{print $4}'`
+          #old gps-tools
+          LAT=`echo $LINE | awk '{print $4}'`
           LONG=`echo $LINE | awk '{print $5}'`
-          HEIGHT="0.0"
-          echo "$LAT $LONG $HEIGHT"
+          ALT="0.0"
+          SPEED="0.0"
+          echo "$LAT $LONG $ALT $SPEED"
           exit 0
         else
-	  #new gps-tools
-          LAT=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $12}'`
-          LONG=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $14}'`
-          HEIGHT="0.0"
-          LATH=`echo $LAT | sed "s#\.# #g" | awk '{print $1}'`
-          LATL=`echo $LAT | sed "s#\.# #g" | awk '{print $2}' | cut -b 1-6`
-          LONGH=`echo $LONG | sed "s#\.# #g" | awk '{print $1}'`
-          LONGL=`echo $LONG | sed "s#\.# #g" | awk '{print $2}' | cut -b 1-6`
-          LAT="$LATH.$LATL"
-          LONG="$LONGH.$LONGL"
-          if [ $LATH -ne 180 ]; then
-            echo "$LAT $LONG $HEIGHT"
-            exit 0
+          VALID=`echo $LINE | grep "lat" | wc -l`
+          if [ $VALID -eq 1 ]; then
+            #new gps-tools
+            LAT=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $12}'`
+            LONG=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $14}'`
+            ALT=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $16}'`
+            SPEED=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $26}'`
+            LATH=`echo $LAT | sed "s#\.# #g" | awk '{print $1}'`
+            LATL=`echo $LAT | sed "s#\.# #g" | awk '{print $2}' | cut -b 1-6`
+            LONGH=`echo $LONG | sed "s#\.# #g" | awk '{print $1}'`
+            LONGL=`echo $LONG | sed "s#\.# #g" | awk '{print $2}' | cut -b 1-6`
+            ALTH=`echo $ALT | sed "s#\.# #g" | awk '{print $1}'`
+            ALTL=`echo $ALT | sed "s#\.# #g" | awk '{print $2}' | cut -b 1-6`
+            SPEEDH=`echo $SPEED | sed "s#\.# #g" | awk '{print $1}'`
+            SPEEDL=`echo $SPEED | sed "s#\.# #g" | awk '{print $2}' | cut -b 1-6`
+
+            LAT="$LATH.$LATL"
+            if [ $LAT != "." ]; then
+              LONG="$LONGH.$LONGL"
+              HEIGHT="$ALTH.$ALTL"
+              SPEED="$SPEEDH.$SPEEDL"
+              if [ $LATH -ne 180 ]; then
+                echo "$LAT $LONG $HEIGHT $SPEED"
+                exit 0
+              fi
+            fi
           fi
         fi
       fi
       TRY=`expr $TRY + 1`
     done
-    echo "0.0 0.0 0.0"
+    echo "0.0 0.0 0.0 0.0"
     ;;
 	"help")
 		echo "Take a look at http://www.kowoma.de/gps/zusatzerklaerungen/NMEA.htm"
