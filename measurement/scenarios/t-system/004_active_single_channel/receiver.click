@@ -8,6 +8,5 @@ FROMRAWDEVICE
 
 Script(
   wait 55,
-  read ct.count,
-  stop
+  read ct.count
 );
