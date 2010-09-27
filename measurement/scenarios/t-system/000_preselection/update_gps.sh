@@ -23,8 +23,11 @@ ERRORCOUNT=0
 while [ true ]; do
   POS=`MAXTRY=$MAXGPSTRY $DIR/../../../../host/bin/gps.sh getgpspos`
   echo "$POS"
-  if [ "x$POS" != "x0.0 0.0 0.0" ]; then
-    echo "" | $DIR/../../../../host/bin/clickctrl.sh write localhost 7777 gps gps_coord $POS
+  if [ "x$POS" != "x0.0 0.0 0.0 0.0" ]; then
+    GPSPOS=`echo $POS | awk '{print $1" "$2" "$3}'`
+    SPEED=`echo $POS | awk '{print $4}'`
+    echo "" | $DIR/../../../../host/bin/clickctrl.sh write localhost 7777 gps gps_coord $GPSPOS
+    echo "" | $DIR/../../../../host/bin/clickctrl.sh write localhost 7777 gps speed $SPEED
     ERRORCOUNT=0
   else
     ERRORCOUNT=`expr $ERRORCOUNT + 1`
@@ -37,3 +40,4 @@ while [ true ]; do
     fi
   fi
 done
+
