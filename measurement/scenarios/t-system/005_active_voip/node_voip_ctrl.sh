@@ -21,25 +21,22 @@ esac
 . $DIR/growing_voip.cfg
 
 
-NODELIST=`cat $DIR/sender_and_receiver_voip.mes | grep -v "#" | grep "sender_and_receiver_ctrl.click" | awk '{print $1}'`
+NODELIST=`cat $DIR/sender_and_receiver_voip.mes | grep -v "#" | grep "sender_and_receiver.click" | awk '{print $1}'`
 
 RUN=1
 
 echo "Nodes: $NODELIST" > $RESULTDIR/nodectrl.log
 
-for i in `seq 3`; do
-  echo "sleep $SLEEPTIME sec" >> $RESULTDIR/nodectrl.log
-
-  sleep $SLEEPTIME
-done
+echo "Wait $STARTSLEEPTIME sec to start." >> $RESULTDIR/nodectrl.log
+sleep $STARTSLEEPTIME
 
 for i in $NODELIST; do
-  echo "START on $i" >> $RESULTDIR/nodectrl.log
+  echo "Start voip on node $i." >> $RESULTDIR/nodectrl.log
 
   $DIR/../../../../host/bin/clickctrl.sh write $i 7777 ps active true
 
   if [ $RUN -ge $MINNUM ]; then
-   echo "sleep $SLEEPTIME sec" >> $RESULTDIR/nodectrl.log
+    echo "Wait $SLEEPTIME sec to start the next node." >> $RESULTDIR/nodectrl.log
     sleep $SLEEPTIME
 
     if [ $RUN -gt $MAXNUM ]; then
@@ -51,17 +48,19 @@ for i in $NODELIST; do
 
 done
 
-for i in `seq 2`; do
-  echo "sleep $SLEEPTIME sec" >> $RESULTDIR/nodectrl.log
+echo "Stay $STAYSLEEPTIME sec with all nodes." >> $RESULTDIR/nodectrl.log
+sleep $STAYSLEEPTIME
 
-  sleep $SLEEPTIME
-done
-
-echo "stop all" >> $RESULTDIR/nodectrl.log
+echo "Stop all nodes." >> $RESULTDIR/nodectrl.log
 
 for i in $NODELIST; do
-  echo "Stop $i" >> $RESULTDIR/nodectrl.log
+  echo "Stop $i." >> $RESULTDIR/nodectrl.log
   $DIR/../../../../host/bin/clickctrl.sh write $i 7777 ps active false
 done
+
+echo "Wait $ENDSLEEPTIME sec to let the queue be empty." >> $RESULTDIR/nodectrl.log
+sleep $ENDSLEEPTIME
+
+echo "Finished."
 
 exit 0

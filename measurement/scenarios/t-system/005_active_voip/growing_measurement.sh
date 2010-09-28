@@ -21,41 +21,68 @@ esac
 MINNUM=$1
 MAXNUM=$2
 STEP=$3
+SLEEPTIME=$4
+STARTSLEEPTIME=$5
+STAYSLEEPTIME=$6
+ENDSLEEPTIME=$7
+
 
 if [ "x$STEP" = "x" ]; then
   STEP=1
 fi
 
-rm -f sender_and_receiver_voip.mes sender_and_receiver_voip.dis
+MES_FILE=sender_and_receiver_voip.mes
+
+rm -f $MES_FILE growing_voip.cfg
 
 if [ "x$1" = "x" ] || [ "x$2" = "x" ]; then
-  echo "Use $0 min_no_of_clients max_no_of_clients"
+  echo "Use [FT=yes [CCA=0|1]] $0 min_no_of_clients max_no_of_clients step sleeptime startdelay staydelay enddelay"
 fi
 
-RUNNUM=1
-USECONFIGLINES=`expr $MINNUM + 3`
 
-while [ $MINNUM -le $MAXNUM ]; do
-  cat sender_and_receiver.dis | sed "s#sender_and_receiver.mes#sender_and_receiver_voip.mes#g" > sender_and_receiver_voip.dis
-  cat sender_and_receiver.mes | grep -v "#" | head -n $USECONFIGLINES > sender_and_receiver_voip.mes
 
-  VOIPDIR=`ssh 192.168.4.117 "if [ -e /localhome/testbed/voip ]; then echo '1'; else echo '0'; fi"`
-  if [ "x$VOIPDIR" = "x1" ]; then
-    ssh 192.168.4.117 "mv /localhome/testbed/voip /localhome/testbed/voip_$RANDOM"
-  fi
-  
-  ssh 192.168.4.117 "mkdir /localhome/testbed/voip; chmod 777 /localhome/testbed/voip"
-    
-  RUNMODE=REBOOT DEV=1 ../../../bin/run_measurement.sh sender_and_receiver_voip.dis $RUNNUM
+SUMRUNTIME=`expr $MAXNUM - $MINNUM + 1`
+SUMRUNTIME=`expr $SUMRUNTIME \* $SLEEPTIME`
+SUMRUNTIME=`expr $SUMRUNTIME + $STARTSLEEPTIME + $ENDSLEEPTIME`
 
-  scp 192.168.4.117:/localhome/testbed/voip/*.dump $DIR/$RUNNUM/
-  ssh 192.168.4.117 "rm -rf /localhome/testbed/voip"
-  
-  RUNNUM=`expr $RUNNUM + 1`
-  USECONFIGLINES=`expr $USECONFIGLINES + $STEP`
-  MINNUM=`expr $MINNUM + $STEP`
-  
-  rm -f sender_and_receiver_voip.mes sender_and_receiver_voip.dis
+CONFIGLINES=`expr $MAXNUM`
+
+cat sender_and_receiver.dis | grep -v CONTROLSOCKET | grep -v LOCALPROCESS | grep -v "TIME=" > sender_and_receiver_voip.dis
+
+NODES=`cat all_nodes | grep -v "#" | head -n $CONFIGLINES`
+
+rm -f sender_and_receiver_voip.mes
+
+for n in $NODES; do
+  echo "$n ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel - sender_and_receiver.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
 done
+
+echo "tchi2 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel - receiver_tchi.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
+echo "pc115 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION receiver.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
+
+#foreign traffic
+if [ "x$FT" = "xyes" ]; then
+  if [ "x$CCA" = "0" ]; then
+    echo "pc114 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel.nocca BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION foreign_node.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
+  else
+    echo "pc114 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION foreign_node.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
+  fi
+fi
+
+echo "CONTROLSOCKET=yes" >> sender_and_receiver_voip.dis
+echo "LOCALPROCESS=CONFIGDIR/growing_voip.sh" >> sender_and_receiver_voip.dis
+echo "TIME=$SUMRUNTIME" >> sender_and_receiver_voip.dis
+
+echo "MINNUM=$1" > $DIR/growing_voip.cfg
+echo "MAXNUM=$2" >> $DIR/growing_voip.cfg
+echo "STEP=$3" >> $DIR/growing_voip.cfg
+echo "SLEEPTIME=$SLEEPTIME" >> $DIR/growing_voip.cfg
+echo "STARTSLEEPTIME=$STARTSLEEPTIME" >> $DIR/growing_voip.cfg
+echo "STAYSLEEPTIME=$STAYSLEEPTIME" >> $DIR/growing_voip.cfg
+echo "ENDSLEEPTIME=$ENDSLEEPTIME" >> $DIR/growing_voip.cfg
+
+RUNMODE=REBOOT DEV=1 ../../../bin/run_measurement.sh sender_and_receiver_voip.dis 1
+
+rm -f sender_and_receiver_voip.mes sender_and_receiver_voip.dis $DIR/growing_voip.cfg
 
 exit 0
