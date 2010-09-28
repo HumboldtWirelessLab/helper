@@ -8,6 +8,16 @@
 #include <vector>
 #include <assert.h>
 #include <unistd.h>
+#include <iostream>
+
+
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
+using std::cerr;
+using std::min;
+
 
 /*
  * NB: obscure implementation note: this class does not handle EINTR
@@ -111,8 +121,8 @@ public:
   err_t get_config_reqs(vector<string> &reqs)         { return get_string_vec("", "requirements", reqs); }
 
   struct handler_info_t {
-    String element_name;
-    String handler_name;
+    string element_name;
+    string handler_name;
     bool can_read;
     bool can_write;
     handler_info_t() : can_read(false), can_write(false) { }
