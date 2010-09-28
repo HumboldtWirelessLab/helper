@@ -1,7 +1,0 @@
-BRNAddressInfo(my_wlan NODEDEVICE:eth);
-
-FROMRAWDEVICE
-  -> td :: TODUMP("RESULTDIR/NODENAME.NODEDEVICE.dump");
-
-SYNC
-  -> td;

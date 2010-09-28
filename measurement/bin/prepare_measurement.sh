@@ -35,9 +35,9 @@ else
 fi
 
 add_include() {
-  echo "#include \"helper.inc\""
+  echo "#include \"brn/helper.inc\""
   cat <&0 
-  echo "#include \"helper_tools.inc\""  
+  echo "#include \"brn/helper_tools.inc\""  
 }
 
 
@@ -155,12 +155,13 @@ case "$1" in
                 ###################
                 ### Remote Dump ###
                 ###################
+		DUMPSEDARG=" -e s#-#-#g"
+
                 if [ "x$REMOTEDUMP" = "xyes" ]; then
                   CPPOPTS="$CPPOPTS -DREMOTEDUMP -DDUMPMAC=$DUMPMAC -DDUMPIP=$DUMPIP"
                 
                   DUMPS=`(cd $CONFIGDIR; cat $CLICK | add_include | awk '/TODUMP/ {print NR" "$0}' | grep -v "^[1-9]*[[:space:]]*//" | awk '{print $1}')`
                                     
-                  DUMPSEDARG=" -e s#-#-#g"
                   NODEDUMPNR=1;
                   
                   for i in $DUMPS; do
@@ -190,7 +191,7 @@ case "$1" in
                      CPPOPTS="$CPPOPTS -DCONTROLSOCKET"
                   fi
                 fi
-                
+
                 ( cd $CONFIGDIR; cat $CLICK | add_include | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v "^#" >> $CLICKFINALNAME )
                 
               else
