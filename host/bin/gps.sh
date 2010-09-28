@@ -254,7 +254,11 @@ case "$1" in
     fi
 
     if [ "x$HASGPS" = "x0" ]; then
-      echo "0.0 0.0 0.0 0.0"
+      if [ "x$GPSTIME" = "xyes" ]; then
+        echo "0.0 0.0 0.0 0.0 0.0"
+      else
+        echo "0.0 0.0 0.0 0.0"
+      fi
       exit 0
     fi
 
@@ -267,7 +271,7 @@ case "$1" in
       if [ "x$GPSFILE" != "x" ]; then
         LINE=`cat $GPSFILE | grep -E "MID2|GSA|TPV" | tail -n 1`
       else
-        LINE=`gpspipe -w -n 10 | grep -E "MID2|GSA|TPV" | tail -n 1`
+        LINE=`gpspipe -w -n 7 | grep -E "MID2|GSA|TPV" | tail -n 1`
       fi
       if [ "x$LINE" != "x"  ]; then
         NEWGPSD=`echo $LINE | grep "class" | wc -l`
@@ -277,7 +281,12 @@ case "$1" in
           LONG=`echo $LINE | awk '{print $5}'`
           ALT="0.0"
           SPEED="0.0"
-          echo "$LAT $LONG $ALT $SPEED"
+          TIME="0.0"
+          if [ "x$GPSTIME" = "xyes" ]; then
+            echo "$LAT $LONG $ALT $SPEED $TIME"
+          else
+            echo "$LAT $LONG $ALT $SPEED"
+          fi
           exit 0
         else
           VALID=`echo $LINE | grep "lat" | wc -l`
@@ -296,13 +305,19 @@ case "$1" in
             SPEEDH=`echo $SPEED | sed "s#\.# #g" | awk '{print $1}'`
             SPEEDL=`echo $SPEED | sed "s#\.# #g" | awk '{print $2}' | cut -b 1-6`
 
+            TIME=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $8}'`
+
             LAT="$LATH.$LATL"
             if [ $LAT != "." ]; then
               LONG="$LONGH.$LONGL"
               HEIGHT="$ALTH.$ALTL"
               SPEED="$SPEEDH.$SPEEDL"
               if [ $LATH -ne 180 ]; then
-                echo "$LAT $LONG $HEIGHT $SPEED"
+                if [ "x$GPSTIME" = "xyes" ]; then
+                  echo "$LAT $LONG $HEIGHT $SPEED $TIME"
+                else
+                  echo "$LAT $LONG $HEIGHT $SPEED"
+                fi
                 exit 0
               fi
             fi
@@ -311,7 +326,11 @@ case "$1" in
       fi
       TRY=`expr $TRY + 1`
     done
-    echo "0.0 0.0 0.0 0.0"
+    if [ "x$GPSTIME" = "xyes" ]; then
+      echo "0.0 0.0 0.0 0.0 0.0"
+    else
+      echo "0.0 0.0 0.0 0.0"
+    fi
     ;;
 	"help")
 		echo "Take a look at http://www.kowoma.de/gps/zusatzerklaerungen/NMEA.htm"

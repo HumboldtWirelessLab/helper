@@ -42,7 +42,11 @@ for d in `(cd $RESULTDIR;ls *.dump)`; do
     fi
 
     if [ "x$MODE" = "xsim" ]; then
-      ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=extra $DIR/../../bin/fromdump.sh $RESULTDIR/$d > $EVALUATIONDIR/$d.all.dat )
+      if [ $GPS = "yes" ]; then
+        ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=extra $DIR/../../bin/fromdump.sh $RESULTDIR/$d > $EVALUATIONDIR/$d.all.dat )
+      else
+        ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=extra $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk '{print "0.0 0.0 0.0 0.0 "$0}' > $EVALUATIONDIR/$d.all.dat )
+      fi	
     else
       WIFIFILE=`cat $NODETABLE | grep "$NODENAME[[:space:]]*$NODEDEVICE" | awk '{print $5}'`
 
@@ -53,7 +57,11 @@ for d in `(cd $RESULTDIR;ls *.dump)`; do
         exit 1
       fi
 
-      ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=$WIFITYPE $DIR/../../bin/fromdump.sh $RESULTDIR/$d > $EVALUATIONDIR/$d.all.dat )
+      if [ $GPS = "yes" ]; then
+        ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=$WIFITYPE $DIR/../../bin/fromdump.sh $RESULTDIR/$d > $EVALUATIONDIR/$d.all.dat )
+      else
+        ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=$WIFITYPE $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk '{print "0.0 0.0 0.0 0.0 "$0}' > $EVALUATIONDIR/$d.all.dat )
+      fi
     fi
 done
 
