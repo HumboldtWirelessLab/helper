@@ -1,6 +1,6 @@
 BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
-//FROMRAWDEVICE
+//FROMRAWDEVICE(NODEDEVICE)
 //  -> ath2_decap :: Ath2Decap(ATHDECAP true)                                                                                                                                                                                                                           
 //  -> filter_tx :: FilterTX()          
 //  -> Discard;
@@ -16,12 +16,12 @@ ps::BRN2PacketSource(SIZE 240, INTERVAL 20, MAXSEQ 500000, BURST 1, ACTIVE false
   -> wlan_out::SetTXPower(15);
 
 wlan_out
-  -> WIFIENCAPTMPL
+  -> __WIFIENCAP__
   -> SetTimestamp()
   -> rawouttee :: Tee()
   -> fdq :: FrontDropQueue(64)
   //-> af::AgeFilter(MAXAGE 3000ms)
-  -> TORAWDEVICE;
+  -> TORAWDEVICE(NODEDEVICE);
 
 rawouttee[1]
   -> SetTimestamp()
@@ -36,7 +36,5 @@ fdq[1]
 //af[1]
 //  -> dd;
 
-Idle                                                                                                                                                                                                                                                              
-  -> Socket(UDP, 0.0.0.0, 60000)                                                                                                                                                                                                                                    
-  -> Print("Sync",TIMESTAMP true)                                                                                                                                                                                                                                   
+SYNC
   -> tdout;

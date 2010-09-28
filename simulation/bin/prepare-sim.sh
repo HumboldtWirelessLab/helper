@@ -19,9 +19,9 @@ case "$SIGN" in
 esac
 
 add_include() {
-  echo "#include \"helper.inc\""
+  echo "#include \"brn/helper.inc\""
   cat <&0 
-  echo "#include \"helper_tools.inc\""  
+  echo "#include \"brn/helper_tools.inc\""  
 }
 
 if [ "x$POSTFIX" = "x" ]; then
@@ -87,7 +87,7 @@ case "$1" in
                 fi
               
                 CPPOPTS="-DNODENAME=$CNODE -DNODEDEVICE=$CDEV -DTIME=$TIME"
-                CPPOPTS="$CPPOPTS -DDEBUG=$DEBUG"
+                CPPOPTS="$CPPOPTS -DDEBUGLEVEL=$DEBUG"
                 CPPOPTS="$CPPOPTS -DSIMULATION"
                 CPPOPTS="$CPPOPTS -DWIFITYPE=806"
                 

@@ -6,51 +6,52 @@
 #define extra 806
 
 #if WIFITYPE == 801
-#define WIFIENCAP Null()
-#define WIFIDECAP Null()
+#define __WIFIENCAP__ Null()
+#define __WIFIDECAP__ Null()
 #endif
 
 #if WIFITYPE == 802
-#define WIFIENCAP RadiotapEncap()
-#define WIFIDECAP RadiotapDecap()
+#define __WIFIENCAP__ RadiotapEncap()
+#define __WIFIDECAP__ RadiotapDecap()
 #endif
 
 #if WIFITYPE == 803
-#define WIFIENCAP Prism2Encap()
-#define WIFIDECAP Prism2Decap()
+#define __WIFIENCAP__ Prism2Encap()
+#define __WIFIDECAP__ Prism2Decap()
 #endif
 
 #if WIFITYPE == 804
-#define WIFIENCAP AthdescEncap()
-#define WIFIDECAP AthdescDecap()
+#define __WIFIENCAP__ AthdescEncap()
+#define __WIFIDECAP__ AthdescDecap()
 #endif
 
 #if WIFITYPE == 805
-#define WIFIENCAP Ath2Encap(ATHENCAP true)
-#define WIFIDECAP Ath2Decap(ATHDECAP true)
+#define __WIFIENCAP__ Ath2Encap(ATHENCAP true)
+#define __WIFIDECAP__ Ath2Decap(ATHDECAP true)
 #endif
 
 #if WIFITYPE == ns
-#define WIFIENCAP AddEtherNsclick()
-#define WIFIDECAP Strip(14)
+#define __WIFIENCAP__ AddEtherNsclick()
+#define __WIFIDECAP__ Strip(14)
 #endif
 
 #if WIFITYPE == extra
-#define WIFIENCAP ExtraEncap()
-#define WIFIDECAP ExtraDecap()
+#define __WIFIENCAP__ ExtraEncap()
+#define __WIFIDECAP__ ExtraDecap()
 #endif
 
 #undef ns
 #undef extra
 
+
 /* KERNEL stuff */
 
 #ifdef KERNEL
-#define FROMRAWDEVICE  FromDevice(NODEDEVICE)
-#define TORAWDEVICE  ToDevice(NODEDEVICE)
+#define FROMRAWDEVICE(x)  FromDevice(x)
+#define TORAWDEVICE(x)  ToDevice(x)
 
-#define FROMDEVICE FROMRAWDEVICE -> WIFIDECAP
-#define TODEVICE WIFIENCAP -> TORAWDEVICE
+#define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
+#define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
 
 #ifdef REMOTEDUMP
 BRNAddressInfo(ethdev eth0:eth);
@@ -82,11 +83,11 @@ BRNAddressInfo(ipdev eth0:ip);
 /* USERLEVEL stuff */
 
 #ifdef USERLEVEL
-#define FROMRAWDEVICE FromDevice(NODEDEVICE, PROMISC true, OUTBOUND true, SNIFFER false)
-#define TORAWDEVICE ToDevice(NODEDEVICE)
+#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false)
+#define TORAWDEVICE(x) ToDevice(x)
 
-#define FROMDEVICE FROMRAWDEVICE -> WIFIDECAP
-#define TODEVICE WIFIENCAP -> TORAWDEVICE
+#define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
+#define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
 
 #ifdef REMOTEDUMP
 BRNAddressInfo(ethdev eth0:eth);
@@ -111,11 +112,11 @@ BRNAddressInfo(ipdev eth0:ip);
 
 #ifdef SIMULATION
 
-#define FROMRAWDEVICE FromSimDevice(NODEDEVICE,4096)
-#define TORAWDEVICE ToSimDevice(NODEDEVICE)
+#define FROMRAWDEVICE(x) FromSimDevice(x,4096)
+#define TORAWDEVICE(x) ToSimDevice(x)
 
-#define TODEVICE WIFIENCAP -> TORAWDEVICE
-#define FROMDEVICE FROMRAWDEVICE -> WIFIDECAP
+#define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
+#define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
 
 #define TODUMP ToDump
 

@@ -1,6 +1,6 @@
 BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
-FROMRAWDEVICE
+FROMRAWDEVICE(NODEDEVICE)
   -> TODUMP("RESULTDIR/NODENAME.NODEDEVICE.dump");
 
 BRN2PacketSource(SIZE 1300, INTERVAL 30, MAXSEQ 500000, BURST 1)
@@ -13,11 +13,11 @@ BRN2PacketSource(SIZE 1300, INTERVAL 30, MAXSEQ 500000, BURST 1)
   -> wlan_out::SetTXPower(15);
 
 wlan_out
-  -> WIFIENCAP
+  -> __WIFIENCAP__
   -> rawouttee :: Tee()
   -> NotifierQueue(500)
   -> outct::Counter()
-  -> TORAWDEVICE;
+  -> TORAWDEVICE(NODEDEVICE);
 
 rawouttee[1]
   -> TODUMP("RESULTDIR/NODENAME.NODEDEVICE.out.dump");
