@@ -41,14 +41,13 @@ main(int argc, char **argv)
         char newip[16];
         sprintf(newip,"%d.%d.%d.%d",(unsigned char)he->h_addr_list[0][0],(unsigned char)he->h_addr_list[0][1],(unsigned char)he->h_addr_list[0][2],(unsigned char)he->h_addr_list[0][3]);
         ip = inet_addr(newip);
-//        printf("Addr: %s\n",newip);
+        //printf("Addr: %s\n",newip);
       }
     }
   } else {
-//    printf("1\n");
     ip = inet_addr("127.0.0.1");
   }
-  return 0;
+
   if (argc > 2)
     port = (unsigned short) atoi(argv[2]);
 
@@ -69,7 +68,7 @@ main(int argc, char **argv)
     string data2;
     err = cs.read( argv[3], argv[4], data2);
     ok(err);
-    cout << data2 << "\n";
+    cout << data2 /*<< "\n"*/;
   }
 
   return 0;

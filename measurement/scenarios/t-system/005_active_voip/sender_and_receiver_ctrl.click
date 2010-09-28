@@ -25,12 +25,10 @@ wlan_out
 
 rawouttee[1]
   -> SetTimestamp()
-  //-> tdout :: ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.out.dump");
   -> tdout :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.out.dump");
 
 fdq[1]
   -> SetTimestamp()
-  //-> ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.drop.dump");
   -> dd::ToDump("RESULTDIR/NODENAME.NODEDEVICE.drop.dump");
 
 //af[1]
