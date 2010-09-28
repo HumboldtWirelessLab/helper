@@ -2,6 +2,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
+#include <netdb.h>
 #include <unistd.h>
 #include <string>
 #include <errno.h>
@@ -31,18 +33,18 @@ main(int argc, char **argv)
 
   unsigned short port = 7777;
   unsigned long ip;
-  if (argc > 1)
+  if (argc > 1) {
     ip = inet_addr(argv[1]);
     if(ip==INADDR_NONE) {
-    HOSTENT* he=gethostbyname(argv[1]);
-    if(he!=NULL) {
-      char newip[16];
-      sprintf(newip,"%d.%d.%d.%d",he->h_addr_list[0],he->h_addr_list[1][0],he->h_addr_list[1][1],he->h_addr_list[1][2],he->h_addr_list[1][3]);
-      ip = inet_addr(newip);
-      printf("Addr: %s\n",newip);
-      return 0;
+      struct hostent* he=gethostbyname(argv[1]);
+      if(he!=NULL) {
+        char newip[16];
+        sprintf(newip,"%d.%d.%d.%d",he->h_addr_list[0][0],he->h_addr_list[0][1],he->h_addr_list[0][2],he->h_addr_list[0][3]);
+        ip = inet_addr(newip);
+        //printf("Addr: %s\n",newip);
+      }
     }
-  else
+  } else
     ip = inet_addr("127.0.0.1");
 
   if (argc > 2)
