@@ -5,7 +5,7 @@ FORGEINNODES=no
 
 TIME=300
 
-NODETABLE=sender_and_receiver.mes
+NODETABLE=sender_and_receiver_voip.mes
 NODEPLACEMENTFILE=placement.default
 
 LOGDIR=WORKDIR
