@@ -33,6 +33,15 @@ main(int argc, char **argv)
   unsigned long ip;
   if (argc > 1)
     ip = inet_addr(argv[1]);
+    if(ip==INADDR_NONE) {
+    HOSTENT* he=gethostbyname(argv[1]);
+    if(he!=NULL) {
+      char newip[16];
+      sprintf(newip,"%d.%d.%d.%d",he->h_addr_list[0],he->h_addr_list[1][0],he->h_addr_list[1][1],he->h_addr_list[1][2],he->h_addr_list[1][3]);
+      ip = inet_addr(newip);
+      printf("Addr: %s\n",newip);
+      return 0;
+    }
   else
     ip = inet_addr("127.0.0.1");
 

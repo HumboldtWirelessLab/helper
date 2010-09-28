@@ -30,7 +30,7 @@ fi
 rm -f sender_and_receiver_voip.mes sender_and_receiver_voip.dis growing_voip.cfg
 
 if [ "x$1" = "x" ] || [ "x$2" = "x" ]; then
-  echo "Use $0 min_no_of_clients max_no_of_clients"
+  echo "Use $0 min_no_of_clients max_no_of_clients step sleeptime"
 fi
 
 SUMRUNTIME=`expr $MAXNUM - $MINNUM + 3 + 4`
