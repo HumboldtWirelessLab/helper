@@ -1,6 +1,6 @@
 BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
-//FROMRAWDEVICE
+//FROMRAWDEVICE(NODEDEVICE)
 //  -> ath2_decap :: Ath2Decap(ATHDECAP true)                                                                                                                                                                                                                           
 //  -> filter_tx :: FilterTX()          
 //  -> Discard;
@@ -17,11 +17,11 @@ ps::BRN2PacketSource(SIZE 240, INTERVAL 20, MAXSEQ 500000, BURST 1, ACTIVE false
   -> wlan_out::SetTXPower(15);
 	  
 wlan_out
-  -> WIFIENCAPTMPL
+  -> __WIFIENCAP__
   -> SetTimestamp()
   -> rawouttee :: Tee()
   -> fdq :: FrontDropQueue(64)
-  -> TORAWDEVICE;
+  -> TORAWDEVICE(NODEDEVICE);
 
 rawouttee[1]
   -> tdout :: ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.out.dump");
@@ -31,9 +31,7 @@ rawouttee[1]
   -> ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.drop.dump");
   //-> ToDump("RESULTDIR/NODENAME.NODEDEVICE.drop.dump");
 
-Idle                                                                                                                                                                                                                                                              
-  -> Socket(UDP, 0.0.0.0, 60000)                                                                                                                                                                                                                                    
-  -> Print("Sync",TIMESTAMP true)                                                                                                                                                                                                                                   
+SYNC
   -> tdout;
 
 Script(
@@ -41,9 +39,4 @@ Script(
   write ps.active true,
   wait 110,
   write ps.active false
-);
-
-Script(
-  wait RUNTIME,
-  stop
 );

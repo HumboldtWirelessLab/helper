@@ -1,6 +1,6 @@
 BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
-FROMRAWDEVICE
+FROMRAWDEVICE(NODEDEVICE)
 //-> SimpleQueue(CAPACITY 500)
   -> ct::Counter()
 //  ->Discard;
