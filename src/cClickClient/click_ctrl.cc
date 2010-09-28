@@ -39,14 +39,16 @@ main(int argc, char **argv)
       struct hostent* he=gethostbyname(argv[1]);
       if(he!=NULL) {
         char newip[16];
-        sprintf(newip,"%d.%d.%d.%d",he->h_addr_list[0][0],he->h_addr_list[0][1],he->h_addr_list[0][2],he->h_addr_list[0][3]);
+        sprintf(newip,"%d.%d.%d.%d",(unsigned char)he->h_addr_list[0][0],(unsigned char)he->h_addr_list[0][1],(unsigned char)he->h_addr_list[0][2],(unsigned char)he->h_addr_list[0][3]);
         ip = inet_addr(newip);
-        //printf("Addr: %s\n",newip);
+//        printf("Addr: %s\n",newip);
       }
     }
-  } else
+  } else {
+//    printf("1\n");
     ip = inet_addr("127.0.0.1");
-
+  }
+  return 0;
   if (argc > 2)
     port = (unsigned short) atoi(argv[2]);
 
