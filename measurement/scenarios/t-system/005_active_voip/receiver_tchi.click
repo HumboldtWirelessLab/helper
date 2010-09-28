@@ -1,8 +1,10 @@
 BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
 FROMRAWDEVICE
-  -> tdraw :: TODUMP("RESULTDIR/NODENAME.NODEDEVICE.dump");
+  -> tdraw :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump");
 //  -> tdraw :: ToDump("/tmp/extra/voip/NODENAME.NODEDEVICE.dump");
-
-SYNC
+  
+Idle
+  -> Socket(UDP, 0.0.0.0, 60000)
+  -> Print("Sync",TIMESTAMP true)
   -> tdraw;
