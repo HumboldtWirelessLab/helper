@@ -1,25 +1,17 @@
 BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
-FROMRAWDEVICE
+FROMRAWDEVICE(NODEDEVICE)
 -> ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump");
 
-BRN2PacketSource(1000, 100, 30000, 14, 2, 16)
+BRN2PacketSource(SIZE 100, INTERVAL 100, MAXSEQ 500000, BURST 1)
  -> rrs :: RoundRobinSwitch()
-// -> Print("Foo")
- -> EtherEncap(0x8088, 00:0c:42:0d:85:f1 , 06:0c:42:0c:74:0e )
- 
+ -> EtherEncap(0x8088, 00:0c:0c:0c:0c:01, 06:0b:6b:09:f2:94 )
  -> wifienc :: WifiEncap(0x00, 0:0:0:0:0:0)
- -> SetTXRate(22)
+ -> SetTXRate(2)
  -> wlan_out_queue :: NotifierQueue(100)
  -> SetTXPower(16)
- -> TODEVICE;
+ -> TODEVICE(NODEDEVICE);
 
-// rrs[1]
-// -> Print("Bar")
-// -> EtherEncap(0x8088, 00:0c:52:1d:95:f2 , 06:0c:42:0c:74:0e )
-// -> wifienc;
-
-Script(
-  wait RUNTIME,
-  stop
-);
+rrs[1]
+ -> EtherEncap(0x8088, 00:0c:0c:0c:0c:02, 06:0b:6b:09:f2:94 )
+ -> wifienc;

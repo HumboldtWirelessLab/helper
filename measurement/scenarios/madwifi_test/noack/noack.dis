@@ -1,11 +1,11 @@
-NAME=network
+NAME=noack
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=20
+TIME=60
 
-NODETABLE=network.mes
+NODETABLE=noack.mes
 NODEPLACEMENTFILE=placement.default
 
 LOGDIR=WORKDIR
@@ -13,7 +13,7 @@ LOGFILE=measurement.log
 
 RESULTDIR=WORKDIR
 EVALUATIONSDIR=WORKDIR
-EVALUATIONSDIRPOSTFIX=_evaluation
+#EVALUATION="basic standard"
 
 GPS=no
 NOTICE=no

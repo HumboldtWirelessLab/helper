@@ -1,11 +1,11 @@
-NAME=receiver
+NAME=rts_cts
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=10
+TIME=60
 
-NODETABLE=sender_wmm.mes
+NODETABLE=rts_cts.mes
 NODEPLACEMENTFILE=placement.default
 
 LOGDIR=WORKDIR
@@ -13,7 +13,7 @@ LOGFILE=measurement.log
 
 RESULTDIR=WORKDIR
 EVALUATIONSDIR=WORKDIR
-EVALUATIONSDIRPOSTFIX=_evaluation
+#EVALUATION="basic standard"
 
 GPS=no
 NOTICE=no

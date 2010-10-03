@@ -1,9 +1,0 @@
-#NODE	DEVICE		MODULSDIR			MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT		LOGFILE			APP	APPLOGFILE
-sk110	ath0		BASEDIR/nodes/lib/modules/i586	-	monitor.b.channel11	-		sender_wmm.click	LOGDIR/1_sen.log	-	-
-sk111	ath0		BASEDIR/nodes/lib/modules/i586	-	monitor.b.channel11	-		receiver.click  	LOGDIR/1_rec.log	-	-
-#sk112	ath0		BASEDIR/nodes/lib/modules/i586	-	monitor.b.channel11 	-		receiver.click		LOGDIR/2_rec.log	-	-
-#sk112	ath0		BASEDIR/nodes/lib/modules/i586	-	monitor.b.channel11 	-		receiver.click		LOGDIR/2_rec.log	-	-
-#sk110	ath0		BASEDIR/nodes/lib/modules/i586	-	monitor.b.channel11 	-		receiver.click		LOGDIR/2_rec.log	-	-
-#sk112	ath0		BASEDIR/nodes/lib/modules/i586	-	monitor.b.channel11	-		sender_wmm.click	LOGDIR/1_sen.log	-	-
-#sk112	ath0		BASEDIR/nodes/lib/modules/i586-ubi	-	monitor.ubi.channel3	-		sender_wmm.click	LOGDIR/1_sen.log	-	-
-#sk112	ath0		BASEDIR/nodes/lib/modules/i586	-	monitor.b.channel11	-		sender_wmm.click	LOGDIR/1_sen.log	-	-

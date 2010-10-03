@@ -1,14 +1,11 @@
-NAME=simple
+NAME=cts_to_self
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=10
+TIME=60
 
-#CLICKMODE=kernel | userlevel | both
-CLICKMODE=userlevel
-
-NODETABLE=cca.mes
+NODETABLE=cts_to_self.mes
 NODEPLACEMENTFILE=placement.default
 
 LOGDIR=WORKDIR
@@ -16,10 +13,8 @@ LOGFILE=measurement.log
 
 RESULTDIR=WORKDIR
 EVALUATIONSDIR=WORKDIR
-EVALUATIONSDIRPOSTFIX=_evaluation
+#EVALUATION="basic standard"
 
 GPS=no
 NOTICE=no
 LOS=no
-
-WANTNODELIST=yes

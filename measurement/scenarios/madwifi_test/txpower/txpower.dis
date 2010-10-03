@@ -3,7 +3,7 @@ SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=10
+TIME=60
 
 NODETABLE=txpower.mes
 NODEPLACEMENTFILE=placement.default
@@ -13,7 +13,7 @@ LOGFILE=measurement.log
 
 RESULTDIR=WORKDIR
 EVALUATIONSDIR=WORKDIR
-EVALUATIONSDIRPOSTFIX=_evaluation
+#EVALUATION="basic standard"
 
 GPS=no
 NOTICE=no
