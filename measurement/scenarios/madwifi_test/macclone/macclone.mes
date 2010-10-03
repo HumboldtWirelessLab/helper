@@ -1,3 +1,3 @@
 #NODE	DEVICE	MODULSDIR				MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT		CLICKLOGFILE			APPLICATION		APPLICATIONLOGFILE
-sk110	ath0	BASEDIR/nodes/lib/modules/i586-cs	-		monitor.b.channel6	-		sender_mac_rr.click	LOGDIR/sen.sk110.ath0.log	-			-
-sk111	ath0	BASEDIR/nodes/lib/modules/i586-cs	-		monitor.b.channel6	-		receiver_2.click	LOGDIR/rec.sk111.ath0.log	-			-
+sk110	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		sender_mac_rr.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
+sk111	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		receiver_mirror.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-

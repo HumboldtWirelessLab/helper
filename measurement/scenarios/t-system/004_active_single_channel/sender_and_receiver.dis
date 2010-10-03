@@ -3,7 +3,7 @@ SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=60
+TIME=120
 
 NODETABLE=sender_and_receiver.mes
 NODEPLACEMENT=random
@@ -15,7 +15,7 @@ LOGFILE=measurement.log
 
 RESULTDIR=WORKDIR
 EVALUATIONDIR=WORKDIR/evaluation
-EVALUATION="basic standard my_eval.sh"
+#EVALUATION="basic standard my_eval.sh"
 
 GPS=no
 NOTICE=no
@@ -23,8 +23,8 @@ LOS=no
 
 CONTROLSOCKET=no
 
-CLICKMODE=kernel
-REMOTEDUMP=yes
+CLICKMODE=userlevel
+REMOTEDUMP=no
 DUMPIP=192.168.3.2
 DUMPMAC=00:11:11:d1:dd:8c
 

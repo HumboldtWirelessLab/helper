@@ -173,22 +173,29 @@ abort_measurement() {
 
     done
   done
-  
+
   fi
-  
+
   SYNCSTATE=`wait_for_nodes "$NODELIST" _abort.state`
 
   if [ "x$SCREENNAME" != "x" ]; then
     screen -S $SCREENNAME -X quit
   fi
-  
+
   if [ -f $MSCREENFILENAME ]; then
     MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | sort -u`
     for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
       screen -S $MEASUREMENTSCREENNAME -X quit
     done
   fi
-   
+
+  if [ -f $NODESCREENFILENAME ]; then
+    NODESCREENNAMES=`cat $NODESCREENFILENAME | awk '{print $3}' | sort -u`
+    for NODESCREENNAME in $NODESCREENNAMES; do
+      screen -S $NODESCREENNAME -X quit
+    done
+  fi
+
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
       check_nodes
   fi
@@ -353,7 +360,7 @@ for state in  $STATES; do
     #################################################
 
     MSCREENNUM=1
-    MEASUREMENTSCREENNAME="measurement_$ID_$MSCREENNUM"
+    MEASUREMENTSCREENNAME=measurement_$ID\_$MSCREENNUM
 
     CURRENTMSCREENNUM=1
     
@@ -426,7 +433,7 @@ for state in  $STATES; do
 		  	
 		  if [ $CURRENTMSCREENNUM -gt 25 ]; then
 		    MSCREENNUM=`expr $MSCREENNUM + 1`
-          MEASUREMENTSCREENNAME="measurement_$ID_$MSCREENNUM"
+          MEASUREMENTSCREENNAME=measurement_$ID\_$MSCREENNUM
 
           CURRENTMSCREENNUM=1
     

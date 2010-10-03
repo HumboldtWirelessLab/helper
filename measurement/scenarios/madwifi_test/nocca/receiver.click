@@ -1,9 +1,10 @@
 BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
-FROMRAWDEVICE
-  -> tdraw :: ToDump("RESULTDIR/NODENAME.NODEDEVICE.raw.dump");
-  
+FROMRAWDEVICE(NODEDEVICE)
+  -> ct::Counter()
+  -> tdraw::TODUMP("RESULTDIR/NODENAME.NODEDEVICE.dump");
+
 Script(
-  wait RUNTIME,
-  stop
+  wait 55,
+  read ct.count
 );

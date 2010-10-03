@@ -19,4 +19,5 @@ title('RX Signal Power of Reference Signal');
 grid on;
 
 exportfig(gcf, 'measure_rssi_ref.eps','LineStyleMap',[],'Color','rgb');
+xticklabel_rotate;
 end

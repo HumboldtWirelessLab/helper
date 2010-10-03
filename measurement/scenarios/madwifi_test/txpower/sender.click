@@ -1,18 +1,17 @@
 BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
-BRN2PacketSource(SIZE 500, INTERVAL 50, MAXSEQ 500000, BURST 1)
+BRN2PacketSource(SIZE 150, INTERVAL 50, MAXSEQ 500000, BURST 1)
  -> EtherEncap(0x8088, my_wlan, ff:ff:ff:ff:ff:ff)
  -> WifiEncap(0x00, 0:0:0:0:0:0)
- -> SetTXRate(2)
- -> SetTXPower(16)
  -> rrs :: RoundRobinSwitch()
- -> BRN2SetChannel(CHANNEL 6)
- -> wencap::__WIFIENCAP__
+ -> SetTXPower(15)
+ -> __WIFIENCAP__
  -> wlan_out_queue :: NotifierQueue(100);
 
 rrs[1]
- -> BRN2SetChannel(CHANNEL 11)
- -> wencap;
+ -> SetTXPower(1)
+ -> __WIFIENCAP__
+ -> wlan_out_queue;
 
 wlan_out_queue
  -> TORAWDEVICE(NODEDEVICE);
