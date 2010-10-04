@@ -1,3 +1,3 @@
 #NODE DEVICE MODULSDIR                                        MODOPTIONS WIFICONFIG      CLICKMODDIR CLICKSCRIPT    LOGFILE                        APP APPLOGFILE
-sk110 ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.default -           sender.click   LOGDIR/NODENAME.NODEDEVICE.log -   -
-sk111 ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.default -           receiver.click LOGDIR/NODENAME.NODEDEVICE.log -   -
+pc113 ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test -          monitor.default -           sender.click   LOGDIR/NODENAME.NODEDEVICE.log -   -
+pc115 ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test -          monitor.default -           receiver.click LOGDIR/NODENAME.NODEDEVICE.log -   -
