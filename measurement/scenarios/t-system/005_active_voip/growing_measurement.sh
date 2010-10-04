@@ -37,17 +37,16 @@ rm -f $MES_FILE growing_voip.cfg
 
 if [ "x$1" = "x" ] || [ "x$2" = "x" ]; then
   echo "Use [FT=yes [CCA=0|1]] $0 min_no_of_clients max_no_of_clients step sleeptime startdelay staydelay enddelay"
+  exit 0
 fi
-
-
 
 SUMRUNTIME=`expr $MAXNUM - $MINNUM + 1`
 SUMRUNTIME=`expr $SUMRUNTIME \* $SLEEPTIME`
-SUMRUNTIME=`expr $SUMRUNTIME + $STARTSLEEPTIME + $ENDSLEEPTIME`
+SUMRUNTIME=`expr $SUMRUNTIME + $STARTSLEEPTIME + $STAYSLEEPTIME + $ENDSLEEPTIME`
 
 CONFIGLINES=`expr $MAXNUM`
 
-cat sender_and_receiver.dis | grep -v CONTROLSOCKET | grep -v LOCALPROCESS | grep -v "TIME=" > sender_and_receiver_voip.dis
+cat sender_and_receiver.dis | grep -v "TIME=" > sender_and_receiver_voip.dis
 
 NODES=`cat all_nodes | grep -v "#" | head -n $CONFIGLINES`
 
@@ -58,19 +57,17 @@ for n in $NODES; do
 done
 
 echo "tchi2 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel - receiver_tchi.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
-echo "pc115 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION receiver.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
+echo "pc116 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION receiver.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
 
 #foreign traffic
 if [ "x$FT" = "xyes" ]; then
-  if [ "x$CCA" = "0" ]; then
+  if [ "x$CCA" = "x0" ]; then
     echo "pc114 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel.nocca BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION foreign_node.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
   else
     echo "pc114 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION foreign_node.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
   fi
 fi
 
-echo "CONTROLSOCKET=yes" >> sender_and_receiver_voip.dis
-echo "LOCALPROCESS=CONFIGDIR/growing_voip.sh" >> sender_and_receiver_voip.dis
 echo "TIME=$SUMRUNTIME" >> sender_and_receiver_voip.dis
 
 echo "MINNUM=$1" > $DIR/growing_voip.cfg
