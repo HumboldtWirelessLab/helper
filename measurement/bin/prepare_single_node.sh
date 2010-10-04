@@ -70,7 +70,7 @@ check_nodes() {
     if [ ! "x$NODESTATUS" = "xok" ]; then
 	    echo "Nodestatus: $NODESTATUS" >> status/$NODELIST\_error.log 2>&1
 	    echo "WHHHHOOOOO: LOOKS LIKE RESTART! GOD SAVE THE WATCHDOG" >> status/$NODELIST\_error.log 2>&1
-      echo "Current Mode: $CURRENTMODE" >> status/$NODELIST\_error.log 2>&1
+	    echo "Current Mode: $CURRENTMODE" >> status/$NODELIST\_error.log 2>&1
 	    echo "Node: $NODELIST" >> status/$NODELIST\_error.log 2>&1
 	    echo "reboot the node" >> status/$NODELIST\_error.log 2>&1
 	    NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot >> status/$NODELIST\_error.log 2>&1
@@ -78,9 +78,9 @@ check_nodes() {
 	    echo "wait for all nodes" >> status/$NODELIST\_error.log 2>&1
 	    sleep 20
 	    echo "error" >> status/$NODELIST\_error.log 2>&1
-	    
-	    echo "1" > $1
-	    
+	
+	    (echo "1" > $1)
+	
 	    exit 0
     fi
 }
