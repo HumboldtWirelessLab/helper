@@ -1,0 +1,5 @@
+MODE=monitor
+CHANNEL=11
+POWER=15
+WIFITYPE=805
+RECOMMENDMODOPTIONS=modoptions.nocountry
