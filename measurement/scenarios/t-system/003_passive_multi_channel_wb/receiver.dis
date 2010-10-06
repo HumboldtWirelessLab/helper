@@ -13,7 +13,7 @@ LOGFILE=measurement.log
 
 RESULTDIR=WORKDIR
 EVALUATIONSDIR=WORKDIR/evaluation
-EVALUATION="basic standard"
+#EVALUATION="basic standard"
 
 GPS=no
 NOTICE=no
