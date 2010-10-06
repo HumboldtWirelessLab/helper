@@ -20,21 +20,23 @@ case "$SIGN" in
 	;;
 esac
 
+$DIR/sync_dumps.sh $1
+
 case "$1" in
   "prestart")
     echo "prestart"
     killall update_gps.sh 2>&1
-    killall channel_hopping.sh 2>&1
+    #killall channel_hopping.sh 2>&1
     ;;
   "start")
     echo "Start"
     MAXGPSTRY=$MAXGPSTRY $DIR/update_gps.sh &
-    $DIR/channel_hopping.sh &
+    #$DIR/channel_hopping.sh &
     ;;
   "stop")
     echo "stop"
     killall update_gps.sh 2>&1
-    killall channel_hopping.sh 2>&1
+    #killall channel_hopping.sh 2>&1
     ;;
   "poststop")
     echo "poststop"

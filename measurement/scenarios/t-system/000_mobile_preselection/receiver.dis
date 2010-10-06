@@ -1,9 +1,9 @@
-NAME=receiver
+NAME=mobile_measurement
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=60
+TIME=1800
 
 NODETABLE=receiver.mes
 NODEPLACEMENTFILE=placement.default
@@ -19,9 +19,9 @@ GPS=no
 NOTICE=no
 LOS=no
 
-CONTROLSOCKET=no
+CONTROLSOCKET=yes
 
-LOCALPROCESS=CONFIGDIR/sync_dumps.sh
+LOCALPROCESS=CONFIGDIR/localproc.sh
 
 #MULTIREPEAT="3"
 #MULTIWAIT=0
