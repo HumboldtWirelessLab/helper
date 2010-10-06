@@ -13,9 +13,11 @@ wifiinfo :: WirelessInfo(SSID "");
 //ath0  -> td :: ToDump("RESULTDIR/devel.ath0.dump");
 //ath0 prath0::ProbeRequester(WIRELESS_INFO wifiinfo, ETH my_ath0, RT rates)
 //ath0  -> SetTXRate(2)
+//ath0  -> Print("1")
 //ath0  //-> PrintWifi()
 //ath0  -> Ath2Encap(ATHENCAP true)
 //ath0  -> NotifierQueue(50)
+//ath0  -> Print("2")
 //ath0  -> ToDevice(ath0);
 //ath0  Script(wait PROBETIME, write prath0.send_probe 0, loop);
 
