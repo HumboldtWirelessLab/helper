@@ -34,7 +34,11 @@ case "$VERSION" in
 
     shift 5
 
-    $DIR/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" 
+    if [ "x$1" = "xwrite" ]; then
+	$DIR/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" &
+    else
+	$DIR/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@"
+    fi
 
   ;;
   "java")
