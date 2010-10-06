@@ -28,6 +28,9 @@ if [ ! -e $EVALUATIONDIR ]; then
   mkdir -p $EVALUATIONDIR
 fi
 
+echo $RESULTDIR
+(cd $RESULTDIR;ls *.dump)
+
 for d in `(cd $RESULTDIR;ls *.dump)`; do
     NODENAME=`echo $d | sed "s#\.# #g" | awk '{print $1}'`
     NODEDEVICE=`echo $d | sed "s#\.# #g" | awk '{print $2}'`
@@ -45,8 +48,8 @@ for d in `(cd $RESULTDIR;ls *.dump)`; do
       if [ $GPS = "yes" ]; then
         ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=extra $DIR/../../bin/fromdump.sh $RESULTDIR/$d > $EVALUATIONDIR/$d.all.dat )
       else
-        ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=extra $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk '{print "0.0 0.0 0.0 0.0 "$0}' > $EVALUATIONDIR/$d.all.dat )
-      fi	
+        ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=extra $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk '{print "LAT: 0.0 LONG: 0.0 ALT: 0.0 SPEED: 0.0 "$0}' > $EVALUATIONDIR/$d.all.dat )
+      fi
     else
       WIFIFILE=`cat $NODETABLE | grep "$NODENAME[[:space:]]*$NODEDEVICE" | awk '{print $5}'`
 
@@ -58,9 +61,9 @@ for d in `(cd $RESULTDIR;ls *.dump)`; do
       fi
 
       if [ $GPS = "yes" ]; then
-        ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=$WIFITYPE $DIR/../../bin/fromdump.sh $RESULTDIR/$d > $EVALUATIONDIR/$d.all.dat )
+        ( cd $RESULTDIR; GPS=$GPS SEQ=yes ATH=yes WIFI=$WIFITYPE $DIR/../../bin/fromdump.sh $RESULTDIR/$d > $EVALUATIONDIR/$d.all.dat )
       else
-        ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=$WIFITYPE $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk '{print "0.0 0.0 0.0 0.0 "$0}' > $EVALUATIONDIR/$d.all.dat )
+        ( cd $RESULTDIR; GPS=$GPS SEQ=yes ATH=yes WIFI=$WIFITYPE $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk '{print "LAT: 0.0 LONG: 0.0 ALT: 0.0 SPEED: 0.0 "$0}' > $EVALUATIONDIR/$d.all.dat )
       fi
     fi
 done
