@@ -1,3 +1,4 @@
+RECOMMENDMODOPTIONS=modoptions.nocountry
 MODE=monitor
 CHANNEL=9
 POWER=15
