@@ -62,9 +62,9 @@ echo "pc116 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.ch
 #foreign traffic
 if [ "x$FT" = "xyes" ]; then
   if [ "x$CCA" = "x0" ]; then
-    echo "pc114 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel.nocca BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION foreign_node.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
+    echo "jayto102 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel.nocca BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION foreign_node.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
   else
-    echo "pc114 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION foreign_node.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
+    echo "jayto102 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel.nc BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION foreign_node.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
   fi
 fi
 
