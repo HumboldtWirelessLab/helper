@@ -68,7 +68,7 @@ case "$1" in
 
 		DISCRIPTIONFILENAME=`basename $DISCRIPTIONFILE`
 
-                if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ]; then
+                if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ]; then
 		  cat $DISCRIPTIONFILE | sed -e "s#[[:space:]]*NODEPLACEMENTFILE[[:space:]]*=.*##g" -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
 		  echo "NODEPLACEMENTFILE=$FINALRESULTDIR/placementfile.plm" >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
 		else
@@ -96,22 +96,12 @@ case "$1" in
 		  FIELDSIZE=1000
 		fi
 		
-                if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ]; then
+                if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ]; then
 #		  echo "Gen Placement: $NODEPLACEMENT"
 		  $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
 		  FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
-                fi
-
-		POS_X_MAX=0
-		POS_Y_MAX=0
-		POS_Z_MAX=0
-                if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ]; then
-		  POS_X_MAX=$FIELDSIZE
-		  POS_Y_MAX=$FIELDSIZE
-		  POS_Z_MAX=0
-		  #FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
-		else
-		  if [ -e $DIR/../etc/nodeplacement/$NODEPLACEMENTFILE ]; then
+                else
+             	  if [ -e $DIR/../etc/nodeplacement/$NODEPLACEMENTFILE ]; then
 		    FINALPLMFILE="$DIR/../etc/nodeplacement/$NODEPLACEMENTFILE"
                   else
                     if [ -e $CONFIGDIR/$NODEPLACEMENTFILE ]; then
@@ -128,30 +118,44 @@ case "$1" in
                       fi
                     fi
                   fi
-		 
-		  echo "FIN: $FINALPLMFILE"  
-		  for node in $NODELIST; do
-		    POS_X=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
-		    POS_Y=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
-		    POS_Z=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
-		    if [ $POS_X -gt $POS_X_MAX ]; then
+		fi 
+		
+		POS_X_MAX=0
+		POS_Y_MAX=0
+		POS_Z_MAX=0
+
+		#echo "FIN: $FINALPLMFILE"  
+		for node in $NODELIST; do
+		  POS_X=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
+		  POS_Y=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
+		  POS_Z=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
+		  if [ $POS_X -gt $POS_X_MAX ]; then
 			    POS_X_MAX=$POS_X;
-		    fi
-		    if [ $POS_Y -gt $POS_Y_MAX ]; then
+		  fi
+		  if [ $POS_Y -gt $POS_Y_MAX ]; then
 			    POS_Y_MAX=$POS_Y;
-		    fi
-		    if [ $POS_Z -gt $POS_Z_MAX ]; then
+		  fi
+		  if [ $POS_Z -gt $POS_Z_MAX ]; then
 			    POS_Z_MAX=$POS_Z;
-		    fi
-		  done
+		  fi
+		done
     
-		  POS_X_MAX=`expr $POS_X_MAX + 50`
-		  POS_Y_MAX=`expr $POS_Y_MAX + 50`
-		  POS_Z_MAX=`expr $POS_Z_MAX + 50`
-                fi
-		 
-#		echo "FIN: $FINALPLMFILE"  
-    
+		POS_X_MAX=`expr $POS_X_MAX + 50`
+		POS_Y_MAX=`expr $POS_Y_MAX + 50`
+		POS_Z_MAX=`expr $POS_Z_MAX + 50`
+		
+		if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ]; then
+		  if [ $POS_X_MAX -lt $FIELDSIZE ]; then
+		    POS_X_MAX=$FIELDSIZE
+		  fi
+		  if [ $POS_Y_MAX -lt $FIELDSIZE ]; then
+		    POS_Y_MAX=$FIELDSIZE
+		  fi
+		  POS_Z_MAX=0
+		  #FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
+		fi
+ 
+#		echo "FIN: $FINALPLMFILE"
 		echo "set xsize $POS_X_MAX" >> $TCLFILE
 		echo "set ysize $POS_Y_MAX" >> $TCLFILE
 		echo "set nodecount $NODECOUNT"	>> $TCLFILE
@@ -179,6 +183,7 @@ case "$1" in
 		
 		i=0
 
+		echo -n "" > $FINALRESULTDIR/nodes.mac
 		for node in $NODELIST; do
                     POS_X=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		    POS_Y=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
@@ -189,11 +194,12 @@ case "$1" in
 		    for nodedevice in $NODEDEVICELIST; do		    
 		        echo "\$node_($i) set X_ $POS_X" >> $TCLFILE
 		      	echo "\$node_($i) set Y_ $POS_Y" >> $TCLFILE
-			      echo "\$node_($i) set Z_ $POS_Z" >> $TCLFILE
-			      echo "\$node_($i) label $node.$nodedevice" >> $TCLFILE
+			echo "\$node_($i) set Z_ $POS_Z" >> $TCLFILE
+			echo "\$node_($i) label $node.$nodedevice" >> $TCLFILE
 			
       			POS_X=`expr $POS_X + 1`
-			      i=`expr $i + 1`
+			i=`expr $i + 1`
+			echo "$node $nodedevice $i" >> $FINALRESULTDIR/nodes.mac
 		    done
 		done
 

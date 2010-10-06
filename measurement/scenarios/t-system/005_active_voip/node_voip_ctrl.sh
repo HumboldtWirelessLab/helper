@@ -30,10 +30,13 @@ echo "Nodes: $NODELIST" > $RESULTDIR/nodectrl.log
 echo "Wait $STARTSLEEPTIME sec to start." >> $RESULTDIR/nodectrl.log
 sleep $STARTSLEEPTIME
 
+echo "" > $RESULTDIR/startup_order.dat
+
 for i in $NODELIST; do
   echo "Start voip on node $i." >> $RESULTDIR/nodectrl.log
 
   $DIR/../../../../host/bin/clickctrl.sh write $i 7777 ps active true
+  echo $i >> $RESULTDIR/startup_order.dat
 
   if [ $RUN -ge $MINNUM ]; then
     echo "Wait $SLEEPTIME sec to start the next node." >> $RESULTDIR/nodectrl.log

@@ -1,5 +1,16 @@
 FromDump("DUMP",STOP true)
   -> packets :: Counter
+  -> maxl :: CheckLength(4)
+  -> minl :: CheckLength(3)[1]
+  -> Print("Sync", TIMESTAMP true)
+  -> toosmall :: Counter
+  -> Discard;
+	    
+minl
+  -> Print("DumpError", TIMESTAMP true)
+-> Discard;
+	
+maxl[1]
 //GPS  -> GPSPrint(NOWRAP true)
 //GPS  -> GPSDecap()
   -> rtap_decap :: RadiotapDecap()
@@ -8,7 +19,7 @@ FromDump("DUMP",STOP true)
   -> BRN2PrintWifi("OKPacket",TIMESTAMP true)
   -> WifiDecap()
 //SEQ  -> seq_clf :: Classifier( 12/8088, - )
-//SEQ  -> Print("Ether", TIMESTAMP true)
+//SEQ  -> Print("ReferenceSignal", TIMESTAMP true)
   -> Discard;
 
 //SEQ seq_clf[1]
