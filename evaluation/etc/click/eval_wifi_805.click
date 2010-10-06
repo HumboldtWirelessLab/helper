@@ -1,11 +1,13 @@
 FromDump("DUMP",STOP true)
   -> packets :: Counter
+  -> sync1 :: CheckLength(4)[1]
 //GPS  -> GPSPrint(NOWRAP true)
 //GPS  -> GPSDecap()
-//ATH  -> Ath2Print(INCLUDEATH true, NOWRAP true)
+//ATH  -> athp::Ath2Print(INCLUDEATH true, NOWRAP true)
   -> ath2_decap :: Ath2Decap(ATHDECAP true)
   -> filter_tx :: FilterTX()
   -> error_clf :: WifiErrorClassifier();
+
 
 error_clf[0]
   -> ok :: Counter
@@ -25,15 +27,22 @@ error_clf[1]
   -> Discard;
 
   maxcrclen[1]
+  -> BRN2PrintWifi("CRC_TO_LONGerror", TIMESTAMP true)
   -> Discard;
 
 error_clf[2]
   -> phy :: Counter
   -> maxphylen :: CheckLength(1500)
+  -> minphylen :: CheckLength(13)[1]
   -> BRN2PrintWifi("PHYerror", TIMESTAMP true)
   -> Discard;
 
   maxphylen[1]
+  -> BRN2PrintWifi("PHY_TO_LONGerror", TIMESTAMP true)
+  -> Discard;
+
+  minphylen[0]
+  -> Print("PHY_TO_SHORTerror", TIMESTAMP true)
   -> Discard;
 
 error_clf[3]
@@ -80,7 +89,13 @@ ath2_decap[1]
   maxl[1]
   -> Print("DumpError", TIMESTAMP true)
   -> Discard;
-  
+
   minl
   -> Print("DumpError", TIMESTAMP true)
   -> Discard;
+
+//ATH athp[1]
+//ATH  -> maxl;
+
+sync1[0]
+  -> maxl;
