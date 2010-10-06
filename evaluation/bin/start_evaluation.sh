@@ -18,11 +18,29 @@ case "$SIGN" in
 	;;
 esac
 
-. $CONFIGFILE
+if [ "x$1" != "x" ]; then
+  if [ -f $1 ]; then
+    . $1
+    cat $1 | sed "s#$RESULTDIR#$PWD/#g" > $1.eval
+    . $1.eval
+    CONFIGFILE=$PWD/$1.eval
+  else
+    echo "$1 not found."
+    exit 1
+  fi
+else
+  . $CONFIGFILE
+fi
+
+if [ "x$RESULTDIR" = "x" ]; then
+  RESULTDIR=$PWD
+fi
 
 if [ "x$EVALUATIONDIR" = "x" ]; then
   EVALUATIONDIR="$RESULTDIR/evaluation"
 fi
+
+echo "$RESULTDIR $EVALUATIONDIR"
 
 if [ ! -e $EVALUATIONDIR ]; then
   mkdir -p $EVALUATIONDIR
