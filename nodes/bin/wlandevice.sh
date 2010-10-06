@@ -254,6 +254,11 @@ case "$1" in
 	    echo "sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA"
 	    sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA
 		
+	    if [ "x$CCA_THRESHOLD" = "x" ]; then
+		    echo "sysctl -w dev.$PHYDEV.cca_thresh=$CCA_THRESHOLD"
+		    sysctl -w dev.$PHYDEV.cca_thresh=$CCA_THRESHOLD
+	    fi
+	    
 	    echo "Finished device config"
 	    ;;
     "start")

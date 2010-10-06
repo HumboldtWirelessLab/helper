@@ -1,0 +1,15 @@
+C:\Dokumente und Einstellungen\Joanna\Eclipse\workspace\TopologyGen>java -cp lib
+\jargs.jar;lib\mantissa-7.2.jar;lib\jist.jar;lib\swans.jar;bin NPART.TopologyGen
+erator -n 50 -a uniform -x 100 -y 100  -r 20 -c 1 -t 50 -p 5 -d 0 -s 1.0 -o dot
+
+commands from Bratislav
+
+-n 400 -r 250 -d 0,8 -o ns2 -p 5 -c 10 -t 150 -a distroFF
+
+-n 400 -r 250 -o ns2 -a uniform -x 2500 -y 2500
+
+-n number of nodes
+-r nodes range
+-t number of generated pionts in one node evaluation (Tries)
+-d, -p algorithms parameters
+-c nuber of output files

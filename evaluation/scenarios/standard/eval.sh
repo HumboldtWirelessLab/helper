@@ -26,7 +26,7 @@ echo -n "" > all_seq_no.dat
 
 rm -f all_seq_no.dat.tmp
 
-OUTDUMPS=`ls *out.dump.all.dat`
+OUTDUMPS=`ls *out.dump.all.dat 2> /dev/null`
 OUTNODES=""
 
 for od in $OUTDUMPS; do
@@ -45,48 +45,56 @@ for od in $OUTDUMPS; do
 done
 
 NODEDEVLIST=""
+NODENUMBER=1
 
-for dump in `ls *.dump.all.dat`; do
-    OUT=`echo $dump | grep out | wc -l`
-    if [ $OUT -eq 0 ] ; then
-	node=`echo $dump | sed "s#\.# #g" | awk '{print $1}'`	
-	device=`echo $dump | sed "s#\.# #g" | awk '{print $2}'`
+for dump in `ls *.dump.all.dat 2> /dev/null`; do
+  OUT=`echo $dump | grep out | wc -l`
+  if [ $OUT -eq 0 ] ; then
+	  node=`echo $dump | sed "s#\.# #g" | awk '{print $1}'`	
+	  device=`echo $dump | sed "s#\.# #g" | awk '{print $2}'`
 
-        if [ -f $RESULTDIR/measurement.log ]; then 
-	  CHANNEL=`cat $RESULTDIR/measurement.log | grep -A 2 "config $node $device" | grep channel | awk '{print $4}'`
-	  if [ "x$CHANNEL" = "x" ]; then
-	    CHANNEL=1
-          fi
-	else
-	  CHANNEL=1
-	fi
+    if [ -f $RESULTDIR/measurement.log ]; then 
+	    CHANNEL=`cat $RESULTDIR/measurement.log | grep -A 2 "config $node $device" | grep channel | awk '{print $4}'`
+      if [ "x$CHANNEL" = "x" ]; then
+       CHANNEL=1
+      fi
+	  else
+      CHANNEL=1
+	  fi
 	
-        if [ "x$NODEDEVLIST" = "x" ]; then
-	  NODEDEVLIST="{ '$node.$device'"
-	else
-	  NODEDEVLIST="$NODEDEVLIST '$node.$device'"
-	fi
-
-	echo "processing $dump"
-	echo "$node $CHANNEL" >> nodes.dat
-	
-	BASEFILE=`echo $dump | sed "s#.all.dat##g"`
-	
-	cat $dump | grep "OKPacket:" | awk '{ print $6 "\t" $7 "\t" $9 "\t" $12}' | sed -s 's/://g' | sed -s 's/Mb//g' | sed -s 's/mgmt/0/g' | sed -s 's/cntl/1/g' | sed -s 's/data/2/g' > $BASEFILE.ok.dat
-	cat $dump | grep "CRCerror:" | awk '{ print $6 "\t" $7 "\t" $9 }' | sed -s 's/://g' | sed -s 's/Mb//g' > $BASEFILE.crc.dat
-	cat $dump | grep "PHYerror:" | awk '{ print $6 "\t" $7 }' | sed -s 's/://g' | sed -s 's/Mb//g' >  $BASEFILE.phy.dat
-	cat $dump | grep "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $14 }' | sort -u  >  $BASEFILE.bssid.dat
-	cat $dump | grep "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $14 }' | sort -u  | wc -l >> all_bssid.dat
-	
-	if [ "x$SINGLEOUTMAC" != "x" ]; then
-          cat $dump | grep "OKPacket:" | grep -i $SINGLEOUTMAC | awk '{ print $10 }' | sed -s 's/+//g' | awk -F "/" '{ print $1 }' >  $BASEFILE.rssi_ref.dat
- 	fi
-	  
-	cat $dump | grep "Sequence:" | awk '{ print $6"\tSRCMAC" $10$11 "\t" $13 }' | sed "s#SRCMACffff##g" | sed "s#:##g" >>  $BASEFILE.seq_no.dat.tmp
-	cat $BASEFILE.seq_no.dat.tmp | awk '{print $2" "$3}'>> all_seq_no.dat.tmp
-        cat $BASEFILE.seq_no.dat.tmp | awk '{print $1"\t"$2"\t"strtonum("0x"$3)}' >> $BASEFILE.seq_no.dat
-	rm $BASEFILE.seq_no.dat.tmp
+    if [ "x$NODEDEVLIST" = "x" ]; then
+	    NODEDEVLIST="{ '$node.$device'"
+	  else
+	    NODEDEVLIST="$NODEDEVLIST '$node.$device'"
     fi
+
+    echo "processing $dump"
+    echo "$node $CHANNEL" >> nodes.dat
+    
+    BASEFILE=`echo $dump | sed "s#.all.dat##g"`
+    
+    cat $dump | grep "OKPacket:" | awk '{ print $6 "\t" $7 "\t" $9 "\t" $12}' | sed -s 's/://g' | sed -s 's/Mb//g' | sed -s 's/mgmt/0/g' | sed -s 's/cntl/1/g' | sed -s 's/data/2/g' > $BASEFILE.ok.dat
+    cat $dump | grep "CRCerror:" | awk '{ print $6 "\t" $7 "\t" $9 }' | sed -s 's/://g' | sed -s 's/Mb//g' > $BASEFILE.crc.dat
+    cat $dump | grep "PHYerror:" | awk '{ print $6 "\t" $7 }' | sed -s 's/://g' | sed -s 's/Mb//g' >  $BASEFILE.phy.dat
+    cat $dump | grep "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $14 }' | sort -u  >  $BASEFILE.bssid.dat
+    cat $BASEFILE.bssid.dat | wc -l >> all_bssid.dat
+    
+    if [ "x$SINGLEOUTMAC" != "x" ]; then
+            cat $dump | grep "OKPacket:" | grep -i $SINGLEOUTMAC | awk '{ print $10 }' | sed -s 's/+//g' | awk -F "/" '{ print $1 }' >  $BASEFILE.rssi_ref.dat
+    fi
+      
+    cat $dump | grep "Sequence:" | awk '{ print $6"\tSRCMAC" $10$11 "\t" $13 }' | sed "s#SRCMACffff##g" | sed "s#:##g" >>  $BASEFILE.seq_no.dat.tmp
+    cat $BASEFILE.seq_no.dat.tmp | awk '{print $2" "$3}'>> all_seq_no.dat.tmp
+    cat $BASEFILE.seq_no.dat.tmp | awk '{print $1"\t"$2"\t"strtonum("0x"$3)}' >> $BASEFILE.seq_no.dat
+    
+    rm $BASEFILE.seq_no.dat.tmp
+
+    #cat $dump | grep "Sequence:" | awk '{ print $6"\tSRCMAC" $10$11 "\t" $13 }' |  sed "s#SRCMACffff##g" | sed "s#:##g" | head -n15 | awk -v nodeid="$nodeid" '{ print nodeid "\t" $2 "\t" $5}' | awk --non-decimal-data '{print $1 "\t" $2 "\t" $3 "\t" ("0x"$4)+0 }' | sed -s 's/://g' >> sync.dat
+
+		grep -P "OKPacket:" $node.dat | grep -P "retry" | awk '{ print $6 "\t" $7 "\t" $9 "\t" $12}' | sed -s 's/://g' | sed -s 's/Mb//g' | sed -s 's/mgmt/0/g' | sed -s 's/cntl/1/g' | sed -s 's/data/2/g' > $BASEFILE.retry.dat
+
+    NODENUMBER=`expr $NODENUMBER + 1`
+  fi
 done
 
 cat all_seq_no.dat.tmp | sort -u | awk '{print $1" "strtonum("0x"$2)}' > all_seq_no.dat
@@ -108,7 +116,7 @@ if [ $? -ne 0 ]; then
     MATLAB="octave --eval"
   fi
 else
-  MATLAB="matlab -nodesktop -nosplash -r"
+  MATLAB="matlab -nodesktop -nosplash -nojvm -nodisplay -r"
 fi
 
 DEBUGDEV=./matlab.log

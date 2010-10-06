@@ -1,5 +1,24 @@
 #!/bin/sh
 
+dir=$(dirname "$0")
+pwd=$(pwd)
+
+SIGN=`echo $dir | cut -b 1`
+
+case "$SIGN" in
+  "/")
+    DIR=$dir
+    ;;
+  ".")
+    DIR=$pwd/$dir
+    ;;
+   *)
+     echo "Error while getting directory"
+     exit -1
+     ;;
+esac
+							       
+
 #echo "Placement: $1" >&2
 
 case "$1" in
@@ -36,8 +55,17 @@ case "$1" in
 	    NODEN=`expr $NODEN + 1`
 	  done
           ;;
+    "npart")
+	  NODES=`cat $2 | grep -v "#" | awk '{print $1"\n"}' | sort -u`
+          NODECOUNT=`echo $NODES | wc -w`
+	  REPLACE=`cat $2 | grep -v "#" | awk '{print " -e s#node_" NR - 1 "[[:space:]]#"$1";#g"}' | sed 's/$/ /' | tr -d '\n'`
+	  #REPLACE=`cat $2 | grep -v "#" | awk '{print " \"s#node_" NR - 1 " #"$1" #g\""}'`
+	  #echo "$REPLACE"
+	  NPART_DIR="$DIR/../../src/Npart"
+	  java -classpath $NPART_DIR/classes/production/Npart:$NPART_DIR/lib/jargs.jar:$NPART_DIR/lib/mantissa-7.2.jar NPART.TopologyGenerator -n $NODECOUNT -r 80 -d 0.8 -o ts -p 5 -c 1 -t 150 -a distroL | sed $REPLACE | sed "s#;# #g"
+	  ;;
        *)
-          echo "Use $0 random|grid nodefile fieldsize (distance)"
+          echo "Use $0 random|grid|npart nodefile fieldsize (distance)"
           ;;
 esac   
 
