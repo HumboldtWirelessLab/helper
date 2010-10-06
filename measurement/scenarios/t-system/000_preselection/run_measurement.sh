@@ -113,6 +113,8 @@ while [ $WANTEXIT -eq 0 ]; do
     echo "" >> $FINALRESULTDIR/info
   fi
 
+  cp $DIR/config $FINALRESULTDIR/
+
   DATE=`date +%Y:%m:%d" "%H:%M:%S`
   echo "DATE: $DATE" > $FINALRESULTDIR/measurement.info
 

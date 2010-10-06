@@ -29,7 +29,10 @@ if [ ! -e $EVALUATIONDIR ]; then
 fi
 
 EXTRAENCAP_FILLER="ATH: (X) Status: 0 (OK) Rate: 0 RSSI: 0 LEN: 0 More: 0 DCErr: 0 Ant: 0 Done: 0 CRCErr: 0 DecryptCRC: 0 (OK) Len: 0 TS: 0 Status: 0 (OK) Rate: 0 RSSI: 0 Ant: 0 Noise: 0 Hosttime: 0 Mactime: 0 Channel: 0 Phyerr: 0 PhyerrStr: (none) More: 0 Keyix: 0 "
-GPS_FILLER="0.0 0.0 0.0 0.0 "
+GPS_FILLER="LAT: 0.0 LONG: 0.0 ALT: 0.0 SPEED: 0.0 "
+
+echo $RESULTDIR
+(cd $RESULTDIR;ls *.dump)
 
 for d in `(cd $RESULTDIR;ls *.dump)`; do
     NODENAME=`echo $d | sed "s#\.# #g" | awk '{print $1}'`
