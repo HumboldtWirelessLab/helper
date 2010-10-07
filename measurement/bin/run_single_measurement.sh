@@ -65,7 +65,10 @@ wait_for_nodes() {
 
   echo "wait for $1" >> $DEBUGFILE
 
-  while [ $ALL -eq 0 ]; do
+  FORCE_ABORT=0
+  ROUND=0
+
+  while [ $ALL -eq 0 ] && [ $FORCE_ABORT -eq 0 ]; do
     NO_NODES=0
     STATE_NODES=0;
     OK_NODES=0;
@@ -93,7 +96,18 @@ wait_for_nodes() {
       ALL=1;
     fi
     
-    sleep 1
+    if [ "x$2" != "x" ]; then
+      ROUND=`expr $ROUND + 1`
+      if [ $ROUND -gt $2 ]; then
+        FORCE_ABORT=1
+	echo "Stop waiting....!" >&6
+      fi
+    fi    
+
+    if [ $FORCE_ABORT -eq 0 ]; then
+      sleep 1
+    fi
+    
   done
   
   if [ $NO_NODES -eq $OK_NODES ]; then
@@ -171,7 +185,7 @@ abort_measurement() {
 	APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
 		
       if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-			  run_on_node $node "$APPLICATION  stop" "/" $DIR/../../host/etc/keys/id_dsa
+	run_on_node $node "$APPLICATION  stop" "/" $DIR/../../host/etc/keys/id_dsa
       fi
 
     done
@@ -181,45 +195,46 @@ abort_measurement() {
 
   echo "Kill Click done" >&6
 
+  echo -n"Kill node ctrl ..." >&6
+  for c in `ls status/*nodectrl.pid 2> /dev/null`; do
+    CPID=`cat $c`
+    kill $CPID
+  done
+  echo " done"
+  
   echo -n "Wait for all nodes..." >&6
 
-  SYNCSTATE=`wait_for_nodes "$NODELIST" _abort.state`
+  SYNCSTATE=`wait_for_nodes "$NODELIST" _abort.state 30`
 
   echo "done" >&6
 
   echo -n "Killall screens..." >&6
-
-  if [ "x$SCREENNAME" != "x" ]; then
-    screen -S $SCREENNAME -X quit
-  fi
-
   if [ -f $MSCREENFILENAME ]; then
     MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | sort -u`
     for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
+      echo "Close screen $MEASUREMENTSCREENNAME"
       screen -S $MEASUREMENTSCREENNAME -X quit
     done
   fi
 
   if [ -f $NODESCREENFILENAME ]; then
-    NODESCREENNAMES=`cat $NODESCREENFILENAME | awk '{print $3}' | sort -u`
+    NODESCREENNAMES=`cat $NODESCREENFILENAME | awk '{print $2}' | sort -u`
     for NODESCREENNAME in $NODESCREENNAMES; do
+      echo "Close screen $NODESCREENNAME"
       screen -S $NODESCREENNAME -X quit
     done
-  fi
-
-  echo "done" >&6
-
-  echo -n "Check nodes ... " >&6
-
-  if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
-      check_nodes
   fi
   echo "done" >&6
 
   echo -n "Kill local screen..." >&6
-
   if [ "x$LOCALSCREENNAME" != "x" ]; then
     screen -S $LOCALSCREENNAME -X quit
+  fi
+  echo "done" >&6
+
+  echo -n "Check nodes ... " >&6
+  if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
+      check_nodes
   fi
   echo "done" >&6
 
