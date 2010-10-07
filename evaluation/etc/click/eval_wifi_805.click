@@ -96,14 +96,6 @@ ath2_decap[1]
   -> toosmall2 :: Counter
   -> Discard;
 
-  maxl[1]
-  -> Print("DumpError", TIMESTAMP true)
-  -> Discard;
-
-  minl
-  -> Print("DumpError", TIMESTAMP true)
-  -> Discard;
-
   maxathl[1]
   -> Print("DumpError", TIMESTAMP true)
   -> Discard;
