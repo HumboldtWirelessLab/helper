@@ -122,11 +122,17 @@ case "$RUNMODE" in
 			;;
 esac				
 
+
+############################
+###### Leave pid  ##########
+############################
+LOGMARKER=$NODELIST
+
+echo $PPID > status/$LOGMARKER\_nodectrl.pid
+
 ###############################
 ###### Wait for node ##########
 ###############################
-
-LOGMARKER=$NODELIST
 
 echo "$NODELIST" > status/$LOGMARKER\_reboot.log 2>&1
 
