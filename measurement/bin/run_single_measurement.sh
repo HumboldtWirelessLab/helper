@@ -143,8 +143,11 @@ abort_measurement() {
 	
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
+  echo "Kill Click: " >&6
   for node in $NODELIST; do
     NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+
+    echo "$node" >&6
 	
     for nodedevice in $NODEDEVICELIST; do
 	CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
@@ -176,7 +179,15 @@ abort_measurement() {
 
   fi
 
+  echo "Kill Click done" >&6
+
+  echo -n "Wait for all nodes..." >&6
+
   SYNCSTATE=`wait_for_nodes "$NODELIST" _abort.state`
+
+  echo "done" >&6
+
+  echo -n "Killall screens..." >&6
 
   if [ "x$SCREENNAME" != "x" ]; then
     screen -S $SCREENNAME -X quit
@@ -196,14 +207,22 @@ abort_measurement() {
     done
   fi
 
+  echo "done" >&6
+
+  echo -n "Check nodes ... " >&6
+
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
       check_nodes
   fi
+  echo "done" >&6
+
+  echo -n "Kill local screen..." >&6
 
   if [ "x$LOCALSCREENNAME" != "x" ]; then
     screen -S $LOCALSCREENNAME -X quit
   fi
-    
+  echo "done" >&6
+
   echo "abort" 1>&$STATUSFD
 
   echo "Finished measurement. Status: abort."
