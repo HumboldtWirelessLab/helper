@@ -105,4 +105,5 @@ ath2_decap[1]
   -> Discard;
 
 //ATH athp[1]
+//ATH  -> Print("DumpError", TIMESTAMP true)
 //ATH  -> maxl;
