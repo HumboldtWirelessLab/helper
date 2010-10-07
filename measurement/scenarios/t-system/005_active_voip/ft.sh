@@ -20,8 +20,8 @@ esac
 
 DURATION=60
 STARTTIME=120
-MIDDURATION=60
-ENDDURATION=60
+MIDDURATION=120
+ENDDURATION=120
 
 MAXNODES=38
 
@@ -35,6 +35,7 @@ fi
 
 mv foreign_node.click foreign_node.click.save
 
+if [ "x" = "y" ]; then
 echo "No foreign traffic"
 ./growing_measurement.sh 1 $MAXNODES 1 $DURATION $STARTTIME $MIDDURATION $ENDDURATION
 
@@ -89,6 +90,35 @@ FT=yes CCA=0 ./growing_measurement.sh 1 $MAXNODES 1 $DURATION $STARTTIME $MIDDUR
 mv 1 001-40ft_nocca
 
 
+
+
+echo "Foreign traffic 50% with cca"
+
+cat foreign_node.click.save | sed "s#SIZE 70#SIZE 408#g" | sed "s#INTERVAL 12#INTERVAL 10#g" | sed "s#BURST 4#BURST 1#g" > foreign_node.click
+FT=yes CCA=1 ./growing_measurement.sh 1 $MAXNODES 1 $DURATION $STARTTIME $MIDDURATION $ENDDURATION
+
+mv 1 001-50ft_cca
+
+echo "Foreign traffic 50% with nocca"
+FT=yes CCA=0 ./growing_measurement.sh 1 $MAXNODES 1 $DURATION $STARTTIME $MIDDURATION $ENDDURATION
+
+mv 1 001-50ft_nocca
+
+
+echo "Foreign traffic 10% with cca"
+
+cat foreign_node.click.save | sed "s#SIZE 70#SIZE 8#g" | sed "s#INTERVAL 12#INTERVAL 14#g" | sed "s#BURST 4#BURST 1#g" > foreign_node.click
+FT=yes CCA=1 ./growing_measurement.sh 1 $MAXNODES 1 $DURATION $STARTTIME $MIDDURATION $ENDDURATION
+
+mv 1 001-10ft_cca
+
+fi
+
+cat foreign_node.click.save | sed "s#SIZE 70#SIZE 8#g" | sed "s#INTERVAL 12#INTERVAL 14#g" | sed "s#BURST 4#BURST 1#g" > foreign_node.click
+echo "Foreign traffic 10% with nocca"
+FT=yes CCA=0 ./growing_measurement.sh 1 $MAXNODES 1 $DURATION $STARTTIME $MIDDURATION $ENDDURATION
+
+mv 1 001-10ft_nocca
 
 
 echo "restore org"
