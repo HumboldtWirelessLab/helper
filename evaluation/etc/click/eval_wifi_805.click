@@ -90,10 +90,10 @@ filter_tx[1]
   -> Discard;
 
 ath2_decap[1]
-  -> maxl :: CheckLength(4)
-  -> minl :: CheckLength(3)[1]
+  -> maxathl :: CheckLength(4)
+  -> minathl :: CheckLength(3)[1]
   -> Print("Sync", TIMESTAMP true)
-  -> toosmall :: Counter
+  -> toosmall2 :: Counter
   -> Discard;
 
   maxl[1]
@@ -101,6 +101,14 @@ ath2_decap[1]
   -> Discard;
 
   minl
+  -> Print("DumpError", TIMESTAMP true)
+  -> Discard;
+
+  maxathl[1]
+  -> Print("DumpError", TIMESTAMP true)
+  -> Discard;
+
+  minathl
   -> Print("DumpError", TIMESTAMP true)
   -> Discard;
 
