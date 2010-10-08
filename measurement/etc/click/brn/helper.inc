@@ -1,4 +1,5 @@
 #ifndef WIFITYPE
+#warning No Wifitype. Using default (805).
 #define WIFITYPE 805
 #endif
 

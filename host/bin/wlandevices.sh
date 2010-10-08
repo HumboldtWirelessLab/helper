@@ -54,15 +54,14 @@ case "$1" in
 		;;
 	"start")
 		for device in $DEVICES; do
-		    echo "config $NODE $device"
+		    echo "start $NODE $device"
 		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh start" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
 		done
 		;;
 	"getiwconfig")
 		for device in $DEVICES; do
-		    echo "config $NODE $device"
+		    echo "getinfo $NODE $device"
 		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh getiwconfig" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
-		    run_on_node $NODE "/sbin/sysctl dev.wifi0.disable_cca" "/" $DIR/../etc/keys/id_dsa
 		done
 		;;
 	*)

@@ -70,23 +70,26 @@ case "$1" in
 	;;
     "create")
 	    if [ "x$CONFIG" = "x" ]; then
-			echo "Use CONFIG to set the config"
-			exit 0
+		echo "Use CONFIG to set the config"
+		exit 0
 	    fi
 
+	    #############################
+	    #      WLAN DEV STUFF       #
+	    #############################
 	    WLANDEV=`echo $DEVICE | grep "wlan" | wc -l`
 	    if [ "x$WLANDEV" = "x1" ]; then
 	      if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
-			. $DIR/../../nodes/etc/wifi/$CONFIG
+		. $DIR/../../nodes/etc/wifi/$CONFIG
 	      else
-			. $CONFIG
+		. $CONFIG
 	      fi
 
 	      . $DIR/../../nodes/etc/wifi/default
 
 
 	      if [ "x$MODE" = "x" ]; then
-	      	MODE=$DEFAULT_MODE
+	        MODE=$DEFAULT_MODE
 	      fi
 
 	      ${IFCONFIG} $DEVICE down
@@ -95,19 +98,19 @@ case "$1" in
 	      ${IFCONFIG} $DEVICE up
 	      exit 0
 	    fi
-	    
+
 	    PHYDEV=`get_phy_dev $DEVICE`
-	    
+
 	    if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
 			. $DIR/../../nodes/etc/wifi/$CONFIG
 	    else
 			. $CONFIG
 	    fi
 
-		. $DIR/../../nodes/etc/wifi/default
-	    
+	    . $DIR/../../nodes/etc/wifi/default
+
 	    if [ "x$MODE" = "x" ]; then
-			MODE=$DEFAULT_MODE
+		MODE=$DEFAULT_MODE
 	    fi
 	    echo "$WLANCONFIG $DEVICE create wlandev $PHYDEV wlanmode $MODE"
 	    ${WLANCONFIG} $DEVICE create wlandev $PHYDEV wlanmode $MODE
@@ -124,10 +127,10 @@ case "$1" in
 		echo "Use CONFIG to set the config"
 		exit 0
 	    fi
-	    
+
 	    PHYDEV=`get_phy_dev $DEVICE`
 	    ARCH=`get_arch`
-	    
+
 	    if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
 			. $DIR/../../nodes/etc/wifi/$CONFIG
 	    else
@@ -138,7 +141,7 @@ case "$1" in
 
 
 	    if [ "x$MODE" = "x" ]; then
-	    		MODE=$DEFAULT_MODE
+	    	MODE=$DEFAULT_MODE
 	    fi
 	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ] || [ "$MODE" = "ahdemo" ]; then
 			if [ ! "x$SSID" = "x" ]; then
@@ -158,13 +161,13 @@ case "$1" in
 	    fi
 
 	    if [ "x$CHANNEL" = "x" ]; then
-			CHANNEL=$DEFAULT_CHANNEL
+		CHANNEL=$DEFAULT_CHANNEL
 	    fi
 	    echo "$IWCONFIG $DEVICE channel $CHANNEL"
 	    ${IWCONFIG} $DEVICE channel $CHANNEL
 
 	    if [ "x$POWER" = "x" ]; then
-			POWER=$DEFAULT_POWER
+		POWER=$DEFAULT_POWER
 	    fi
 	    echo "$IWCONFIG $DEVICE txpower $POWER"
 	    ${IWCONFIG} $DEVICE txpower $POWER
@@ -183,36 +186,86 @@ case "$1" in
 		    sleep 1
 		fi
 	    fi
-	    
+
+	    #############################
+	    #      WLAN DEV STUFF       #
+	    #############################
 	    WLANDEV=`echo $DEVICE | grep "wlan" | wc -l`
 	    if [ "x$WLANDEV" = "x1" ]; then
 	      exit 0
 	    fi
-	    
-	    if [ "x$DIVERSITY" = "x" ]; then
-			DIVERSITY=$DEFAULT_DIVERSITY
+
+	    if [ "x$MODE_ABG" != "x" ]; then
+	      # 802.11b/802.11g/802.11a
+	      echo "iwpriv $DEVICE mode $MODE_ABG"
+	      ${IWPRIV} $DEVICE mode $MODE_ABG
 	    fi
-	    echo "echo \"$DIVERSITY\" > /proc/sys/dev/$PHYDEV/diversity"
-	    echo "$DIVERSITY" > /proc/sys/dev/$PHYDEV/diversity
+
+	    if [ "x$PUREG" != "x" ]; then
+	      # disable/enable b
+	      echo "iwpriv $DEVICE pureg $PUREG"
+	      ${IWPRIV} $DEVICE pureg $PUREG
+	    fi
+
+	    if [ "x$PROTMODE" != "x" ]; then
+	      # no ofdm protection
+	      echo "iwpriv $DEVICE protmode $PROTMODE"
+	      ${IWPRIV} $DEVICE protmode $PROTMODE
+	    fi
+
+	    if [ "x$WMM" != "x" ]; then
+	      # no multimedia
+	      echo "iwpriv $DEVICE wmm $WMM"
+	      ${IWPRIV} $DEVICE wmm $WMM
+	    fi
+
+	    if [ "x$AR" != "x" ]; then
+	      # no adaptive radio
+	      echo "iwpriv $DEVICE ar $AR"
+	      ${IWPRIV} $DEVICE ar $AR
+	    fi
+
+	    if [ "x$BURST" != "x" ]; then
+	      # no burst
+	      echo "iwpriv $DEVICE burst $BURST"
+	      ${IWPRIV} $DEVICE burst $BURST
+	    fi
+
+	    if [ "x$FAST_FRAME" != "x" ]; then
+	      # no fast frame
+	      echo "iwpriv $DEVICE ff $FAST_FRAME"
+	      ${IWPRIV} $DEVICE ff $FAST_FRAME
+	    fi
+
+	    if [ "x$ABOLT" != "x" ]; then
+	      # no atheros proprietary in general
+	      echo "iwpriv $DEVICE abolt $ABOLT"
+	      ${IWPRIV} $DEVICE abolt $ABOLT
+	    fi
+
+	    if [ "x$DIVERSITY" = "x" ]; then
+		DIVERSITY=$DEFAULT_DIVERSITY
+	    fi
+	    echo "sysctl -w dev.$PHYDEV.diversity=$DIVERSITY"
+	    sysctl -w dev.$PHYDEV.diversity=$DIVERSITY
 
 	    if [ "x$TXANTENNA" = "x" ]; then
-			TXANTENNA=$DEFAULT_TXANTENNA
+		TXANTENNA=$DEFAULT_TXANTENNA
 	    fi
 	    echo "sysctl -w dev.$PHYDEV.txantenna=$TXANTENNA"
 	    sysctl -w dev.$PHYDEV.txantenna=$TXANTENNA
 
 	    if [ "x$RXANTENNA" = "x" ]; then
-			RXANTENNA=$DEFAULT_RXANTENNA
+		RXANTENNA=$DEFAULT_RXANTENNA
 	    fi
 	    echo "sysctl -w dev.$PHYDEV.rxantenna=$RXANTENNA"
 	    sysctl -w dev.$PHYDEV.rxantenna=$RXANTENNA
 
 	    if [ "x$INTMIT" = "x" ]; then
-			INTMIT=$DEFAULT_INTMIT
+		INTMIT=$DEFAULT_INTMIT
 	    fi
 	    echo "sysctl -w dev.$PHYDEV.intmit=$INTMIT"
 	    sysctl -w dev.$PHYDEV.intmit=$INTMIT
-
 
 	    if [ "$MODE" = "monitor" ]; then
 			
@@ -250,35 +303,38 @@ case "$1" in
 		
 	    if [ "x$DISABLECCA" = "x" ]; then
 			DISABLECCA=$DEFAULT_DISABLECCA
-	    fi	    
+	    fi
 	    echo "sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA"
 	    sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA
-		
+
 	    if [ "x$CCA_THRESHOLD" = "x" ]; then
 		    echo "sysctl -w dev.$PHYDEV.cca_thresh=$CCA_THRESHOLD"
 		    sysctl -w dev.$PHYDEV.cca_thresh=$CCA_THRESHOLD
 	    fi
-	    
+
 	    echo "Finished device config"
 	    ;;
     "start")
 	    if [ "x$CONFIG" = "x" ]; then
-        echo "Use CONFIG to set the config"
-        exit 0
+              echo "Use CONFIG to set the config"
+              exit 0
 	    fi
 
 	    echo "$IFCONFIG $DEVICE up"
 	    ${IFCONFIG} $DEVICE up
-	    ;;	    
+	    ;;
     "getmac")
-      MADDR=`$IFCONFIG $DEVICE | grep HWaddr | awk '{print $5}' | sed -e "s#-# #g" -e "s#:# #g" | awk '{print $1":"$2":"$3":"$4":"$5":"$6}'`
-      echo $MADDR
-      ;;
+            MADDR=`$IFCONFIG $DEVICE | grep HWaddr | awk '{print $5}' | sed -e "s#-# #g" -e "s#:# #g" | awk '{print $1":"$2":"$3":"$4":"$5":"$6}'`
+            echo $MADDR
+            ;;
     "getiwconfig")
-      ${IWCONFIG} $DEVICE
-      ;;
-    *)
-    ;;
+            PHYDEV=`get_phy_dev $DEVICE`
+            ${IWCONFIG} $DEVICE
+            sysctl dev.$PHYDEV.disable_cca
+            sysctl dev.$PHYDEV.cca_thresh
+            ;;
+        *)
+            ;;
 esac
 
 exit 0

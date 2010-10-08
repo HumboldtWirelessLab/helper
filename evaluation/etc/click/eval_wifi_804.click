@@ -9,12 +9,13 @@ FromDump("DUMP",STOP true)
 minl
   -> Print("DumpError", TIMESTAMP true)
   -> Discard;
-	      
-maxl[1]  	    
+
+maxl[1]
 //GPS  -> GPSPrint(NOWRAP true)
 //GPS  -> GPSDecap()
-  -> rtap_decap :: RadiotapDecap()
+  -> rtap_decap :: AthdescDecap()
   -> filter_tx :: FilterTX()
+  -> filter_err :: FilterPhyErr()
   -> ok :: Counter
   -> BRN2PrintWifi("OKPacket",TIMESTAMP true)
   -> WifiDecap()
@@ -28,4 +29,8 @@ maxl[1]
 filter_tx[1]
   -> txpa :: Counter
   -> BRN2PrintWifi("TXFeedback", TIMESTAMP true)
+  -> Discard;
+
+filter_err[1]
+  -> BRN2PrintWifi("CRCError", TIMESTAMP true)
   -> Discard;

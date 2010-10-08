@@ -236,7 +236,7 @@ if [ $RUNMODENUM -le 4 ]; then
   echo "Setup Wifi" > status/$LOGMARKER\_wificonfig.log 2>&1
   CURRENTMODE="CREATE WIFI"
   CREATEWIFI=0
-    
+
   for node in $NODELIST; do
 	  NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 	  for nodedevice in $NODEDEVICELIST; do
@@ -260,21 +260,21 @@ if [ $RUNMODENUM -le 4 ]; then
   STARTWIFI=0
 
   for node in $NODELIST; do
-	  NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
     for nodedevice in $NODEDEVICELIST; do
 	    CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
 	    if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
-    		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/../../host/bin/wlandevices.sh start >> status/$LOGMARKER\_wificonfig.log 2>&1
+		NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/../../host/bin/wlandevices.sh start >> status/$LOGMARKER\_wificonfig.log 2>&1
 	        STARTWIFI=1
 	    fi
-	  done
+    done
   done
 
   if [ $STARTWIFI -eq 1 ]; then
     check_nodes status/$LOGMARKER\_wificonfig.state >> status/$LOGMARKER\_wificonfig.log 2>&1
-	  sleep 1
+    sleep 1
   fi
-    
+
   CURRENTMODE="CONFIG WIFI"
   CONFIGWIFI=0
 
@@ -291,7 +291,9 @@ if [ $RUNMODENUM -le 4 ]; then
 
   if [ $CONFIGWIFI -eq 1 ]; then
     check_nodes status/$LOGMARKER\_wificonfig.state >> status/$LOGMARKER\_wificonfig.log 2>&1
+    sleep 1
   fi
+
 fi
 
 echo "0" > status/$LOGMARKER\_wificonfig.state
