@@ -96,13 +96,13 @@ wait_for_nodes() {
       ALL=1;
     fi
     
-    if [ "x$2" != "x" ]; then
+    if [ "x$3" != "x" ]; then
       ROUND=`expr $ROUND + 1`
-      if [ $ROUND -gt $2 ]; then
+      if [ $ROUND -gt $3 ]; then
         FORCE_ABORT=1
 	echo "Stop waiting....!" >&6
       fi
-    fi    
+    fi
 
     if [ $FORCE_ABORT -eq 0 ]; then
       sleep 1
@@ -305,7 +305,7 @@ esac
 echo -n "Start screen seesion to setup all nodes ... " >&6
 
 SCREENNUMBER=1
-NODE_IN_SCREEN=1                                                                                                                                                                                                                                                                       
+NODE_IN_SCREEN=1
 MAX_NODE_PER_SCREEN=30
 
 for node in $NODELIST; do

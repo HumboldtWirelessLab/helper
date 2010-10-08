@@ -124,14 +124,14 @@ case "$1" in
                     . $WIFICONFIG
 					          WIFICONFIGFINALNAME="$WIFICONFIG"
 					        else
-					          echo "Error: WIFICONFIG does'nt exist"
+					          echo "Error: WIFICONFIG doesn't exist"
 					          WIFICONFIGFINALNAME="-"
-				          fi
+				                fi
 				        fi
-              fi
+                                      fi
 						
-              CPPOPTS="$CPPOPTS -DWIFI=$WIFITYPE"
-            else
+                                      CPPOPTS="$CPPOPTS -DWIFITYPE=$WIFITYPE"
+                              else
 				      WIFICONFIGFINALNAME="-"
 			      fi
 			

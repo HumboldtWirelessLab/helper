@@ -53,11 +53,11 @@ NODES=`cat all_nodes | grep -v "#" | head -n $CONFIGLINES`
 rm -f sender_and_receiver_voip.mes
 
 for n in $NODES; do
-  echo "$n ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel - sender_and_receiver.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
+  echo "$n ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel.nc - sender_and_receiver.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
 done
 
 echo "tchi2 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel - receiver_tchi.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
-echo "pc116 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION receiver.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
+echo "foobar103 ath0 BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION - monitor.b.channel.nc BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION receiver.click LOGDIR/NODENAME.NODEDEVICE.log - -" >> $MES_FILE
 
 #foreign traffic
 if [ "x$FT" = "xyes" ]; then
