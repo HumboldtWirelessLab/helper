@@ -37,10 +37,11 @@ fi
 
 mv foreign_node.click foreign_node.click.save
 
-#echo "No foreign traffic"
-#./growing_measurement.sh 1 $MAXNODES 1 $DURATION $STARTTIME $MIDDURATION $ENDDURATION
+echo "No foreign traffic"
+./growing_measurement.sh 1 $MAXNODES 1 $DURATION $STARTTIME $MIDDURATION $ENDDURATION
 
-#mv 1 $MPREFIX-noft
+mv 1 $MPREFIX-noft
+
 
 
 echo "Foreign traffic 10% with cca"
