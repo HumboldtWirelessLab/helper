@@ -13,7 +13,7 @@ LOGFILE=measurement.log
 
 RESULTDIR=WORKDIR
 EVALUATIONSDIR=WORKDIR/evaluation
-EVALUATION="basic standard"
+#EVALUATION="basic standard"
 
 GPS=no
 NOTICE=no
@@ -22,7 +22,7 @@ LOS=no
 CONTROLSOCKET=no
 
 CLICKMODE=userlevel
-REMOTEDUMP=yes
+REMOTEDUMP=no
 DUMPIP=192.168.3.2
 DUMPMAC=00:11:11:d1:dd:8c
 
