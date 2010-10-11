@@ -443,7 +443,7 @@ wait_for_master_state killmeasurement $LOGMARKER
 
 echo "Check nodes" >> status/$LOGMARKER\_finalnodecheck.log 2>&1
 
-check_nodes >> status/$LOGMARKER\_finalnodecheck.log 2>&1
+check_nodes status/$LOGMARKER\_finalnodecheck.state >> status/$LOGMARKER\_finalnodecheck.log 2>&1
 
 echo "0" > status/$LOGMARKER\_finalnodecheck.state
 
