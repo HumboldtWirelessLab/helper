@@ -18,14 +18,18 @@ case "$SIGN" in
       ;;
 esac
 
-MPREFIX=003
+if [ "x$1" = "x" ]; then
+    MPREFIX=004
+else
+    MPREFIX=00$1
+fi
 
 DURATION=20
 STARTTIME=60
 MIDDURATION=40
 ENDDURATION=60
 
-MAXNODES=38
+MAXNODES=43
 
 #growing_measurement.sh  min_no_of_clients max_no_of_clients step sleeptime startdelay staydelay enddelay
 
