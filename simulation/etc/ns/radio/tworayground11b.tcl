@@ -46,6 +46,7 @@ Mac/802_11 set ShortRetryLimit_ 7               ;# retransmittions
 Mac/802_11 set LongRetryLimit_  4               ;# retransmissions
 Mac/802_11 set TXFeedback_ 1
 Mac/802_11 set Promisc_ 1
+Mac/802_11 set FilterDub_ 0
 
 #
 # The network channel, physical layer, MAC, propagation model,

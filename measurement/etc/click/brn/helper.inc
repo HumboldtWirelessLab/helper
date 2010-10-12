@@ -61,7 +61,8 @@ BRNAddressInfo(ipdev eth0:ip);
 
 #define DUMPPORTBASE DUMPPORT@__LINE__
 
-#define TODUMP(X) UDPIPEncap(SRC ipdev, SPORT 30000, DST DUMPIP, DPORT DUMPPORTBASE, CHECKSUM false, ALIGNFIX true) \
+#define TODUMP(X) TimestampEncap() \
+                   ->UDPIPEncap(SRC ipdev, SPORT 30000, DST DUMPIP, DPORT DUMPPORTBASE, CHECKSUM false, ALIGNFIX true) \
                    ->EtherEncap(ETHERTYPE 0x0800, SRC ethdev, DST DUMPMAC) \
 		   ->ethq::SimpleQueue(CAPACITY 500) \
 		   ->ToDevice(eth0)
@@ -95,7 +96,8 @@ BRNAddressInfo(ethdev eth0:eth);
 BRNAddressInfo(ipdev eth0:ip);					   
 
 #define DUMPPORTBASE DUMPPORT@__LINE__
-#define TODUMP(x) Socket(UDP, DUMPIP, DUMPPORTBASE, CLIENT true ) \
+#define TODUMP(x) -> TimestampEncap() \
+                  -> Socket(UDP, DUMPIP, DUMPPORTBASE, CLIENT true ) \
                   -> Discard
 #else
 #define TODUMP ToDump
