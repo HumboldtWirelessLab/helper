@@ -60,7 +60,7 @@ case "$1" in
 		    DUMPPORTBASE=40000
 		  fi
       if [ "x$DUMPIP" = "x" ]; then
-		    DUMPIP="192.168.3.100"
+		    DUMPIP="192.168.3.2"
 		  fi
 	  
 		  echo -n "" > $RESULTDIR/remotedump.map
@@ -169,7 +169,7 @@ case "$1" in
                     echo "$CNODE $CDEV $NODEDUMPNR $DUMPLINE $DUMPIP $DUMPPORTBASE" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.map
                                   
                     DUMPSEDARG="$DUMPSEDARG -e s#DUMPPORT@$i#$DUMPPORTBASE#g"
-                    echo "Idle->Socket(UDP,$DUMPIP,$DUMPPORTBASE,$DUMPIP,$DUMPPORTBASE)->ToDump("$DUMPLINE");" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.click
+                    echo "Idle->Socket(UDP,$DUMPIP,$DUMPPORTBASE,$DUMPIP,$DUMPPORTBASE)->TimestampDecap()->ToDump("$DUMPLINE");" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.click
                     
                     NODEDUMPNR=`expr $NODEDUMPNR + 1`
                     DUMPPORTBASE=`expr $DUMPPORTBASE + 1`
