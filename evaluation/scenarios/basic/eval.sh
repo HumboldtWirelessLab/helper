@@ -53,7 +53,7 @@ for d in `(cd $RESULTDIR;ls *.dump)`; do
       echo "eval dump"
       OUTPUT_FILLER="$OUTPUT_FILLER$EXTRAENCAP_FILLER"
       echo "$OUTPUT_FILLER"
-      ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=extra $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk -v outfiller="$OUTPUT_FILLER" '{print "outfiller"$0}' > $EVALUATIONDIR/$d.all.dat )
+      ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=extra $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk -v outfiller="$OUTPUT_FILLER" '{print outfiller""$0}' > $EVALUATIONDIR/$d.all.dat )
       echo "fine"
     else
       WIFIFILE=`cat $NODETABLE | grep "$NODENAME[[:space:]]*$NODEDEVICE" | awk '{print $5}'`
@@ -68,7 +68,7 @@ for d in `(cd $RESULTDIR;ls *.dump)`; do
       if [ $WIFITYPE -ne 805 ]; then
         OUTPUT_FILLER="$OUTPUT_FILLER$EXTRAENCAP_FILLER"
       fi
-      ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=$WIFITYPE $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk -v outfiller="$OUTPUT_FILLER" '{print "outfiller"$0}' > $EVALUATIONDIR/$d.all.dat )
+      ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=$WIFITYPE $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk -v outfiller="$OUTPUT_FILLER" '{print outfiller""$0}' > $EVALUATIONDIR/$d.all.dat )
     fi
 done
 

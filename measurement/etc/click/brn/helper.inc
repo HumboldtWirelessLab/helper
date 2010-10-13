@@ -96,7 +96,7 @@ BRNAddressInfo(ethdev eth0:eth);
 BRNAddressInfo(ipdev eth0:ip);					   
 
 #define DUMPPORTBASE DUMPPORT@__LINE__
-#define TODUMP(x) -> TimestampEncap() \
+#define TODUMP(x) TimestampEncap() \
                   -> Socket(UDP, DUMPIP, DUMPPORTBASE, CLIENT true ) \
                   -> Discard
 #else

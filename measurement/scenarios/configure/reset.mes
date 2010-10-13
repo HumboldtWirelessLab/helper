@@ -7,4 +7,5 @@
 #group:sk ath1   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          adhoc.default      -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log CONFIGDIR/ipconfig.sh LOGDIR/app_NODENAME.NODEDEVICE.log
 #group:wgt ath0  BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          adhoc.default      -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log CONFIGDIR/ipconfig.sh LOGDIR/app_NODENAME.NODEDEVICE.log
 #group:pcs ath0  BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          adhoc.default      -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log CONFIGDIR/ipconfig.sh LOGDIR/app_NODENAME.NODEDEVICE.log
-jayto102      ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel.nc -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
+#jayto102      ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel.nc -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
+wgt20      ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test -          monitor.b.channel.nc -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
