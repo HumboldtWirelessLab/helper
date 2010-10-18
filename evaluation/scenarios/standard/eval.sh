@@ -76,14 +76,14 @@ for dump in `ls *.dump.all.dat 2> /dev/null`; do
     BASEFILE=`echo $dump | sed "s#.all.dat##g"`
     
 #offset 6 -> 67
-    cat $dump | grep "OKPacket:" | awk '{ print $67 "\t" $68 "\t" $70 "\t" $73}' | sed -s 's/://g' | sed -s 's/Mb//g' | sed -s 's/mgmt/0/g' | sed -s 's/cntl/1/g' | sed -s 's/data/2/g' > $BASEFILE.ok.dat
-    cat $dump | grep "CRCerror:" | awk '{ print $67 "\t" $68 "\t" $70 }' | sed -s 's/://g' | sed -s 's/Mb//g' > $BASEFILE.crc.dat
-    cat $dump | grep "PHYerror:" | awk '{ print $67 "\t" $68 }' | sed -s 's/://g' | sed -s 's/Mb//g' >  $BASEFILE.phy.dat
+    cat $dump | grep "OKPacket:" | awk '{ print $69 "\t" $70 "\t" $72 "\t" $75}' | sed -s 's/://g' | sed -s 's/Mb//g' | sed -s 's/mgmt/0/g' | sed -s 's/cntl/1/g' | sed -s 's/data/2/g' > $BASEFILE.ok.dat
+    cat $dump | grep "CRCerror:" | awk '{ print $69 "\t" $70 "\t" $72 }' | sed -s 's/://g' | sed -s 's/Mb//g' > $BASEFILE.crc.dat
+    cat $dump | grep "PHYerror:" | awk '{ print $69 "\t" $70 }' | sed -s 's/://g' | sed -s 's/Mb//g' >  $BASEFILE.phy.dat
     cat $dump | grep "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $75 }' | sort -u  >  $BASEFILE.bssid.dat
     cat $BASEFILE.bssid.dat | wc -l >> all_bssid.dat
     
     if [ "x$SINGLEOUTMAC" != "x" ]; then
-            cat $dump | grep "OKPacket:" | grep -i $SINGLEOUTMAC | awk '{ print $71 }' | sed -s 's/+//g' | awk -F "/" '{ print $1 }' >  $BASEFILE.rssi_ref.dat
+            cat $dump | grep "OKPacket:" | grep -i $SINGLEOUTMAC | awk '{ print $73 }' | sed -s 's/+//g' | awk -F "/" '{ print $1 }' >  $BASEFILE.rssi_ref.dat
     fi
       
     cat $dump | grep "Sequence:" | awk '{ print $6"\tSRCMAC" $10$11 "\t" $13 }' | sed "s#SRCMACffff##g" | sed "s#:##g" >>  $BASEFILE.seq_no.dat.tmp
@@ -94,7 +94,7 @@ for dump in `ls *.dump.all.dat 2> /dev/null`; do
 
     #cat $dump | grep "Sequence:" | awk '{ print $6"\tSRCMAC" $10$11 "\t" $13 }' |  sed "s#SRCMACffff##g" | sed "s#:##g" | head -n15 | awk -v nodeid="$nodeid" '{ print nodeid "\t" $2 "\t" $5}' | awk --non-decimal-data '{print $1 "\t" $2 "\t" $3 "\t" ("0x"$4)+0 }' | sed -s 's/://g' >> sync.dat
 
-    cat $dump | grep -P "OKPacket:" | grep -P "retry" | awk '{ print $67 "\t" $68 "\t" $70 "\t" $73}' | sed -s 's/://g' | sed -s 's/Mb//g' | sed -s 's/mgmt/0/g' | sed -s 's/cntl/1/g' | sed -s 's/data/2/g' > $BASEFILE.retry.dat
+    cat $dump | grep -P "OKPacket:" | grep -P "retry" | awk '{ print $69 "\t" $70 "\t" $72 "\t" $75}' | sed -s 's/://g' | sed -s 's/Mb//g' | sed -s 's/mgmt/0/g' | sed -s 's/cntl/1/g' | sed -s 's/data/2/g' > $BASEFILE.retry.dat
 
     NODENUMBER=`expr $NODENUMBER + 1`
   fi

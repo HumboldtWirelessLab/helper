@@ -1,0 +1,8 @@
+#DIR        FOREIGNTRAFFIC	FTSIZE	FTINTERVAL	FTBURST	FTRATE  FTDISABLECCA
+10noft      0               0       0           0       0       0
+10ft_cca    1               503     10          1       12      0
+10ft_nocca  1               503     10          1       12      1
+30ft_cca    1               1063    10          2       12      0
+30ft_nocca  1               1063    10          2       12      1
+50ft_cca    1               915     5           2       12      0
+50ft_nocca  1               915     5           2       12      1
