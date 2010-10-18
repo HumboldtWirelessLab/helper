@@ -49,7 +49,8 @@ fi
 
 
 
-cat foreign_node.click.save | sed "s#SIZE 70#SIZE 93#g" | sed "s#INTERVAL 12#INTERVAL 14#g" | sed "s#BURST 4#BURST 1#g" > foreign_node.click
+#cat foreign_node.click.save | sed "s#SIZE 70#SIZE 93#g" | sed "s#INTERVAL 12#INTERVAL 14#g" | sed "s#BURST 4#BURST 1#g" > foreign_node.click
+cat foreign_node.click.save | sed "s#SIZE 70#SIZE 503#g" | sed "s#INTERVAL 12#INTERVAL 10#g" | sed "s#BURST 4#BURST 1#g" > foreign_node.click
 
 if [ ! -e $MPREFIX-10ft_cca ]; then
   echo "Foreign traffic 10% with cca"
@@ -81,7 +82,8 @@ fi
 
 
 
-cat foreign_node.click.save | sed "s#SIZE 70#SIZE 343#g" | sed "s#INTERVAL 12#INTERVAL 10#g" | sed "s#BURST 4#BURST 1#g" > foreign_node.click
+#cat foreign_node.click.save | sed "s#SIZE 70#SIZE 343#g" | sed "s#INTERVAL 12#INTERVAL 10#g" | sed "s#BURST 4#BURST 1#g" > foreign_node.click
+cat foreign_node.click.save | sed "s#SIZE 70#SIZE 1063#g" | sed "s#INTERVAL 12#INTERVAL 10#g" | sed "s#BURST 4#BURST 2#g" > foreign_node.click
 
 if [ ! -e $MPREFIX-30ft_cca ]; then
   echo "Foreign traffic 30% with cca"
@@ -113,7 +115,8 @@ fi
 
 
 
-cat foreign_node.click.save | sed "s#SIZE 70#SIZE 593#g" | sed "s#INTERVAL 12#INTERVAL 10#g" | sed "s#BURST 4#BURST 1#g" > foreign_node.click
+#cat foreign_node.click.save | sed "s#SIZE 70#SIZE 593#g" | sed "s#INTERVAL 12#INTERVAL 10#g" | sed "s#BURST 4#BURST 1#g" > foreign_node.click
+cat foreign_node.click.save | sed "s#SIZE 70#SIZE 915#g" | sed "s#INTERVAL 12#INTERVAL 5#g" | sed "s#BURST 4#BURST 2#g" > foreign_node.click
 
 if [ ! -e $MPREFIX-50ft_cca ]; then
   echo "Foreign traffic 50% with cca"
