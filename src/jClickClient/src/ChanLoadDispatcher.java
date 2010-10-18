@@ -33,7 +33,11 @@ public class ChanLoadDispatcher {
         }
       }
 
-      if ( cc == null ) cc = new ClickConnection(ip, port);
+      if ( cc == null ) {
+        System.out.println("New connection to " + nodeName + " IP: " + ip.getHostAddress());
+        cc = new ClickConnection(ip, port);
+        cc.openClickConnection();
+      }
     }
 
     String readInfo(String element, String handler) {
@@ -96,13 +100,15 @@ public class ChanLoadDispatcher {
   }
 
   byte[] getData() {
-    byte[] result = new byte[nodes.size() * 2];
+    byte[] result = new byte[nodes.size()/* * 2*/];
 
     for ( int i = 0; i < nodes.size(); i++) {
       ClickNodeInfo cni = (ClickNodeInfo)nodes.get(i);
       String l = cni.readInfo("ate", "busy");
-      result[(i << 1) + 1] = (byte)i;
-      result[(i << 1) + 1] = (new Integer(l)).byteValue();
+//      System.out.println("RES: " + l);
+//      result[(i << 1)] = (byte)i;
+//      result[(i << 1) + 1] = (new Integer(l)).byteValue();
+        result[i] = (new Integer(l)).byteValue();
     }
 
     return result;
@@ -112,16 +118,15 @@ public class ChanLoadDispatcher {
   static Random r = new Random();
 
   public static void main(String[] args) {
-    String host = "localhost";
+    String host = args[1];
     int port = 5019;
     DatagramSocket socket = null;
 
     ChanLoadDispatcher cld = new ChanLoadDispatcher();
-    System.out.println("ARG: " + args[0]);
     cld.loadNodes(args[0]);
     cld.printList();
+    cld.openNodes();
 
-    if ( false ) {
     try {
       InetAddress addr = InetAddress.getByName(host);
       socket = new DatagramSocket();
@@ -149,7 +154,6 @@ public class ChanLoadDispatcher {
         socket.close();
 
       cld.closeNodes();
-    }
     }
   }
 }
