@@ -332,6 +332,7 @@ case "$1" in
             ${IWCONFIG} $DEVICE
             sysctl dev.$PHYDEV.disable_cca
             sysctl dev.$PHYDEV.cca_thresh
+            ${IWPRIV} $DEVICE get_macclone
             ;;
         *)
             ;;
