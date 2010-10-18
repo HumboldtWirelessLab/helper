@@ -21,9 +21,12 @@ esac
 if [ "x$1" != "x" ]; then
   if [ -f $1 ]; then
     . $1
-    cat $1 | sed "s#$RESULTDIR#$PWD/#g" > $1.eval
+    OLDRESULTDIR=$RESULTDIR
+    OLDNODETABLE=`echo $NODETABLE | sed "s#$RESULTDIR#$PWD/#g"`
+    cat $1 | sed "s#$RESULTDIR#$PWD/#g" | sed "s#$NODETABLE#$NODETABLE.eval#g" > $1.eval
     . $1.eval
     CONFIGFILE=$PWD/$1.eval
+    cat $OLDNODETABLE | sed "s#$OLDRESULTDIR/##g" > $NODETABLE
   else
     echo "$1 not found."
     exit 1
