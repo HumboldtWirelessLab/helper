@@ -1,5 +1,7 @@
 #NODE	DEVICE	MODULSDIR				MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT		CLICKLOGFILE			APPLICATION		APPLICATIONLOGFILE
 #sk110	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		sender_mac_rr.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
 #sk111	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		receiver_mirror.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
-pc113	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		sender_mac_rr.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
-pc114	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		receiver_mirror.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
+#pc113	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		sender_mac_rr.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
+#pc114	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		receiver_mirror.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
+wgt74	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		sender_mac_rr.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
+wgt76	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		receiver_mirror.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
