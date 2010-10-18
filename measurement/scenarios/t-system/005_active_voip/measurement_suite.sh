@@ -55,23 +55,23 @@ CONFIGS=`cat $CONFIGFILE | grep -v "#" | awk '{print $1}' | sort -u`
 
 for i in $CONFIGS; do
     LINE=`cat $CONFIGFILE | grep -v "#" | grep $i | head -n 1`
-    
+
     FT=`echo $LINE | awk '{print $2}'`
     FTSIZE=`echo $LINE | awk '{print $3}'`
     FTINTERVAL=`echo $LINE | awk '{print $4}'`
     FTBURST=`echo $LINE | awk '{print $5}'`
     FTRATE=`echo $LINE | awk '{print $6}'`
     FTCCA=`echo $LINE | awk '{print $7}'`
-    
+
     cat foreign_node.click.tmpl | sed "s#SIZE VARSIZE#SIZE $FTSIZE#g" | sed "s#INTERVAL VARINTERVAL#INTERVAL $FTINTERVAL#g" | sed "s#BURST VARBURST#BURST $FTBURST#g" | sed "s#RATE VARRATE#RATE $FTRATE#g" > foreign_node.click
 
     if [ ! -e $MPREFIX-$i ]; then
 	echo "Running $i: Foreign traffic: $FT NOCCA: $FTCCA"
-#	FT=$FT CCA=$FTCCA ./growing_measurement.sh 1 $MAXNODES 1 $DURATION $STARTTIME $MIDDURATION $ENDDURATION
+	FT=$FT CCA=$FTCCA ./growing_measurement.sh 1 $MAXNODES 1 $DURATION $STARTTIME $MIDDURATION $ENDDURATION
 	cp ./foreign_node.click ./1
 	mv 1 $MPREFIX-$i
     fi
-    
+
     rm foreign_node.click
 
 done
