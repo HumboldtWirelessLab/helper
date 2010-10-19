@@ -70,7 +70,7 @@ public class ChanLoadDispatcherTCP {
       loadNodes(nodelist);
       printList();
       openNodes();
-      mssg = new byte[nodes.size()];
+      mssg = new byte[nodes.size() + 1];
     }
 
     List loadNodes(String filename) {
@@ -143,10 +143,14 @@ public class ChanLoadDispatcherTCP {
 
     public synchronized void setNewData(byte[] newmssg) {
       System.arraycopy(newmssg, 0, mssg, 0, newmssg.length);
+      long storeLast = lastUpdate;
       lastUpdate = System.currentTimeMillis();
 
-      if (false) {
-        System.out.print("new data: " + lastUpdate + " ");
+      long diff = lastUpdate - storeLast;
+      double fps = 1000.0;
+      fps /= (double)diff;
+      if (true) {
+        System.out.print("new data: " + lastUpdate + " " + fps + " ");
         for (int j = 0; j < mssg.length; j++) {
           byte b = mssg[j];
           System.out.print(b + " ");
@@ -186,6 +190,7 @@ public class ChanLoadDispatcherTCP {
             lastRead = dataDispatcher.lastUpdate;
             byte[] mssg = dataDispatcher.getNewData();
             out.write(mssg);
+            System.out.println("Send data");
             out.flush();
           } else {
             // no new data available
@@ -222,18 +227,21 @@ public class ChanLoadDispatcherTCP {
 
     ServerSocket server;
     Socket client = null;
+    try {
+      server = new ServerSocket(port);
+//      server.setTrafficClass(IPTOS_LOWDELAY);
+//      server.setTcpNoDelay(true);
 
-    while (true) {
-      try {
-          server = new ServerSocket(port);
+      while (true) {
           client = server.accept();
+          client.setTrafficClass(0x10);
+          client.setTcpNoDelay(true);
           ClientDispatcher cd = new ClientDispatcher(client, dataDispatcher);
           //clientLst.add(cd);
           cd.start();
-
-      } catch(Exception e) {
-          e.printStackTrace();
-      }
+    }
+    } catch(Exception e) {
+      e.printStackTrace();
     }
   }
 
