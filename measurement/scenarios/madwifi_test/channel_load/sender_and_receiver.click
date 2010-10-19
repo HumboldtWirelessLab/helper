@@ -1,7 +1,8 @@
 BRNAddressInfo(my_wlan NODEDEVICE:eth);
 
 FROMRAWDEVICE(NODEDEVICE)
-  -> TODUMP("RESULTDIR/NODENAME.NODEDEVICE.dump");
+  -> Discard;
+  //-> TODUMP("RESULTDIR/NODENAME.NODEDEVICE.dump");
 
 BRN2PacketSource(SIZE 1450, INTERVAL 25, MAXSEQ 500000, BURST 1)
   -> EtherEncap(0x8088, my_wlan,  FF:FF:FF:FF:FF:FF )
@@ -17,5 +18,6 @@ wlan_out
   -> TORAWDEVICE(NODEDEVICE);
 
 rawouttee[1]
-  -> TODUMP("RESULTDIR/NODENAME.NODEDEVICE.out.dump");
+//  -> TODUMP("RESULTDIR/NODENAME.NODEDEVICE.out.dump");
+-> Discard;
 

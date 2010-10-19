@@ -28,7 +28,13 @@
 
 #if WIFITYPE == 805
 #define __WIFIENCAP__ Ath2Encap(ATHENCAP true)
+
+#ifdef ATE
+#define __WIFIDECAP__ Ath2Decap(ATHDECAP true, AIRTIME ATE)
+#else
 #define __WIFIDECAP__ Ath2Decap(ATHDECAP true)
+#endif
+
 #endif
 
 #if WIFITYPE == ns
