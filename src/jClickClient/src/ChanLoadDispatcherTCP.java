@@ -7,15 +7,27 @@ import java.util.*;
  */
 public class ChanLoadDispatcherTCP {
 
-  class ClickNodeInfo {
+  class ClickNodeInfo extends Thread {
     String nodeName;
     ClickConnection cc = null;
     InetAddress ip = null;
     int port;
+    String lastValue = null;
 
     ClickNodeInfo(String nodeName, int port) {
       this.nodeName = nodeName;
       this.port = port;
+    }
+
+    public void run() {
+      while (true) {
+        lastValue = readInfo("ate", "busy");
+        try {
+          sleep(50);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
     }
 
     void openConnection() {
@@ -35,7 +47,11 @@ public class ChanLoadDispatcherTCP {
       }
     }
 
-    String readInfo(String element, String handler) {
+    public String getInfo() {
+      return lastValue;
+    }
+
+    private String readInfo(String element, String handler) {
       if ( cc != null ) {
         return cc.readHandler(element, handler);
       }
@@ -70,7 +86,7 @@ public class ChanLoadDispatcherTCP {
       loadNodes(nodelist);
       printList();
       openNodes();
-      mssg = new byte[nodes.size()];
+      mssg = new byte[nodes.size() + 1];
     }
 
     List loadNodes(String filename) {
@@ -97,6 +113,7 @@ public class ChanLoadDispatcherTCP {
       Iterator li = nodes.iterator();
       while ( li.hasNext() ) {
         ((ClickNodeInfo)li.next()).openConnection();
+        ((ClickNodeInfo)li.next()).start();
       }
     }
 
@@ -119,10 +136,11 @@ public class ChanLoadDispatcherTCP {
 
       for ( int i = 0; i < nodes.size(); i++) {
         ClickNodeInfo cni = (ClickNodeInfo)nodes.get(i);
-        String l = cni.readInfo("ate", "busy");
+        String l = cni.getInfo();
   //      System.out.println("RES: " + l);
   //      result[(i << 1)] = (byte)i;
   //      result[(i << 1) + 1] = (new Integer(l)).byteValue();
+        if (l != null)
           result[i] = (new Integer(l)).byteValue();
       }
       result[result.length-1] = 127;
@@ -134,7 +152,7 @@ public class ChanLoadDispatcherTCP {
       try {
         while (true) {
           setNewData(nextSample());
-          Thread.sleep(100); // emulates new data
+          Thread.sleep(50); // emulates new data
         }
       } catch (InterruptedException e) {
         e.printStackTrace();
@@ -143,10 +161,14 @@ public class ChanLoadDispatcherTCP {
 
     public synchronized void setNewData(byte[] newmssg) {
       System.arraycopy(newmssg, 0, mssg, 0, newmssg.length);
+      long storeLast = lastUpdate;
       lastUpdate = System.currentTimeMillis();
 
-      if (false) {
-        System.out.print("new data: " + lastUpdate + " ");
+      long diff = lastUpdate - storeLast;
+      double fps = 1000.0;
+      fps /= (double)diff;
+      if (true) {
+        System.out.print("new data: " + lastUpdate + " " + fps + " ");
         for (int j = 0; j < mssg.length; j++) {
           byte b = mssg[j];
           System.out.print(b + " ");
@@ -186,6 +208,7 @@ public class ChanLoadDispatcherTCP {
             lastRead = dataDispatcher.lastUpdate;
             byte[] mssg = dataDispatcher.getNewData();
             out.write(mssg);
+            System.out.println("Send data");
             out.flush();
           } else {
             // no new data available
@@ -222,18 +245,22 @@ public class ChanLoadDispatcherTCP {
 
     ServerSocket server;
     Socket client = null;
+    try {
+      server = new ServerSocket(port);
+//      server.setTrafficClass(IPTOS_LOWDELAY);
+//      server.setTcpNoDelay(true);
 
-    while (true) {
-      try {
-          server = new ServerSocket(port);
+      while (true) {
           client = server.accept();
+          client.setTrafficClass(0x10);
+          client.setTcpNoDelay(true);
           ClientDispatcher cd = new ClientDispatcher(client, dataDispatcher);
           //clientLst.add(cd);
           cd.start();
 
-      } catch(Exception e) {
-          e.printStackTrace();
-      }
+    }
+    } catch(Exception e) {
+      e.printStackTrace();
     }
   }
 
