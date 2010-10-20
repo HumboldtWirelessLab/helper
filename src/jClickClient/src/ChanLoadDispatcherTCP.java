@@ -22,6 +22,7 @@ public class ChanLoadDispatcherTCP {
     public void run() {
       while (true) {
         lastValue = readInfo("ate", "busy");
+//       System.out.println("Read: " + lastValue);
         try {
           sleep(50);
         } catch (InterruptedException e) {
@@ -112,8 +113,9 @@ public class ChanLoadDispatcherTCP {
     void openNodes() {
       Iterator li = nodes.iterator();
       while ( li.hasNext() ) {
-        ((ClickNodeInfo)li.next()).openConnection();
-        ((ClickNodeInfo)li.next()).start();
+        ClickNodeInfo cli = (ClickNodeInfo)li.next();
+        cli.openConnection();
+        cli.start();
       }
     }
 
@@ -132,14 +134,12 @@ public class ChanLoadDispatcherTCP {
     }
 
     byte[] getData() {
-      byte[] result = new byte[nodes.size() + 1/* * 2*/];
+      byte[] result = new byte[nodes.size() + 1];
+//      System.out.println("Node: " + nodes.size());
 
       for ( int i = 0; i < nodes.size(); i++) {
         ClickNodeInfo cni = (ClickNodeInfo)nodes.get(i);
         String l = cni.getInfo();
-  //      System.out.println("RES: " + l);
-  //      result[(i << 1)] = (byte)i;
-  //      result[(i << 1) + 1] = (new Integer(l)).byteValue();
         if (l != null)
           result[i] = (new Integer(l)).byteValue();
       }

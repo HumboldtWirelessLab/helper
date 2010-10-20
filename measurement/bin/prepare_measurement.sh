@@ -35,7 +35,9 @@ else
 fi
 
 add_include() {
-  echo "#include \"brn/helper.inc\""
+  if [ "x$1" = "x" ]; then
+    echo "#include \"brn/helper.inc\""
+  fi
   cat <&0 
   echo "#include \"brn/helper_tools.inc\""  
 }
@@ -191,9 +193,14 @@ case "$1" in
                      CPPOPTS="$CPPOPTS -DCONTROLSOCKET"
                   fi
                 fi
-
-                ( cd $CONFIGDIR; cat $CLICK | add_include | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v "^#" >> $CLICKFINALNAME )
                 
+                HELPER_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "helper.inc" | wc -l)`
+                
+                if [ $HELPER_INC -gt 0 ]; then
+                  ( cd $CONFIGDIR; cat $CLICK | add_include no | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v "^#" >> $CLICKFINALNAME )
+                else
+                  ( cd $CONFIGDIR; cat $CLICK | add_include | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v "^#" >> $CLICKFINALNAME )
+                fi
               else
                 CLICKFINALNAME="-"
               fi
