@@ -1,3 +1,5 @@
+package click;
+
 import click.ControlSocket;
 
 import java.net.InetAddress;
