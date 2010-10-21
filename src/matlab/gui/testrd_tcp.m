@@ -63,7 +63,7 @@ try
           numTraces = 100;
           f = zeros(numDataSrc, numTraces);
           
-          subplot(1,2,1);
+          subplot(2,2,1);
           [X,Y] = meshgrid(1:numTraces, 1:numDataSrc);
           
           h = surfc(X,Y,f);
@@ -81,13 +81,13 @@ try
           
           
           f2 = zeros(numDataSrc, numTraces);
-          subplot(1,2,2);
+          subplot(2,2,2);
           [X,Y] = meshgrid(1:numTraces, 1:numDataSrc);
           
-          h = surfc(X,Y,f);
+          h2 = surfc(X,Y,f2);
           zlim([0 100]);
           colormap hsv;
-          set(h,'ZDataSource','f');
+          set(h2,'ZDataSource','f2');
           %set(h, 'EdgeColor', 'None');
           %alpha(0.5);
           shading interp;
@@ -107,7 +107,7 @@ try
               f2 = circshift(f2',1)';
               f2(:,1) = newdata(numDataSrc+1:2*numDataSrc);
               
-              refreshdata;
+              refreshdata([h h2]);
           end
         end
     end
