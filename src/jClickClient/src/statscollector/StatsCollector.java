@@ -68,6 +68,6 @@ public class StatsCollector {
     StatsCollector cdtcp = new StatsCollector();
     StatsInfo si = new StatsInfo(args[1]);
     cdtcp.startDataDispatcher(args[0],si);
-    //cdtcp.handleClients(60001);
+    cdtcp.handleClients(60001);
   }
 }

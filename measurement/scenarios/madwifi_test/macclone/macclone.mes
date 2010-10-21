@@ -5,3 +5,5 @@
 #pc114	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		receiver_mirror.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
 wgt74	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		sender_mac_rr.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
 wgt76	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		receiver_mirror.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
+#wgt51	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		sender_mac_rr.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
+#wgt52	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test	-		monitor.macclone	-		receiver_mirror.click	LOGDIR/NODENAME.NODEDEVICE.log	-			-
