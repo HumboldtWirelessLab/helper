@@ -29,8 +29,8 @@ public class DataDispatcher extends Thread {
     loadNodes(nodelist);
     setStatsInfo(stats);
     printList();
-    //openNodes();
-    //startNodes();
+    openNodes();
+    startNodes();
     mssg = new byte[1 + nodes.size() * statsInfo.getSize() + 1];
   }
 

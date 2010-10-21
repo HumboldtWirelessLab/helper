@@ -298,9 +298,15 @@ case "$1" in
 			fi
 			echo "$IWPRIV $DEVICE channelswitch $CHANNELSWITCH"
 			${IWPRIV} $DEVICE channelswitch $CHANNELSWITCH
+			
+			if [ "x$CUTIL_PACKET_THRESHOLD" != "x" ]; then
+			    echo "sysctl -w dev.$PHYDEV.cutil_pkt_threshold=$CUTIL_PACKET_THRESHOLD"
+			    sysctl -w dev.$PHYDEV.cutil_pkt_threshold=$CUTIL_PACKET_THRESHOLD
+			fi
+			
 
 	    fi
-		
+
 	    if [ "x$DISABLECCA" = "x" ]; then
 			DISABLECCA=$DEFAULT_DISABLECCA
 	    fi

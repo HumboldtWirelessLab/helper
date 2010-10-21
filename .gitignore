@@ -4,3 +4,4 @@ nodes/home
 *.iml
 *.ipr
 src/jClickClient/classes/*
+*.class
