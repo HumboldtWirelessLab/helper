@@ -2,30 +2,7 @@
 host = '192.168.5.197'; %'localhost';
 port = 60001;
 
-scrsz = get(0,'ScreenSize');
-figure('Position',[100 scrsz(4)/2-100 scrsz(3)/2 scrsz(4)/2]);
-h = gcf;
-set(h,'RendererMode','Manual')  %  If you don't do this, the surface plot
-set(h,'Renderer','OpenGL')      %    will draw VERY slowly.
-
-numDataSrc = 38;
-numTraces = 100;
-f = zeros(numDataSrc, numTraces);
-
-[X,Y] = meshgrid(1:numTraces, 1:numDataSrc);
-h = surfc(X,Y,f);
-zlim([0 100]);
-colormap hsv;
-set(h,'ZDataSource','f');
-%set(h, 'EdgeColor', 'None');
-%alpha(0.5);
-shading interp;
-%view(80+180,40+20)
-xlabel('Time');
-ylabel('Node');
-zlabel('Channel Load (%)');
-colorbar;    
-set(gcf,'CloseRequestFcn', 'delete(gcf), input_socket.close');
+startplot = 0;
 
 % init TCP connection
 import java.net.Socket
@@ -64,17 +41,74 @@ try
 
         % pick-up the last
         idx = find(message == 127);
-        if (size(idx,1) > 1)
+        if (size(idx,2) > 1)
             newdata = message(idx(end-1)+1:idx(end)-1);
         else
             newdata = message(1:idx(end)-1);
         end
+        
+        numDataSrc = newdata(1);
+        newdata = newdata(2:end);
         newdata = newdata';
 
-        if (~isempty(newdata) && size(newdata,1) == numDataSrc)
-            f = circshift(f',1)';
-            f(:,1) = newdata;
-            refreshdata;
+        if ( startplot == 0 )
+          scrsz = get(0,'ScreenSize');
+  
+          figure('Position',[100 scrsz(4)/2-100 scrsz(3)/2 scrsz(4)/2]);
+          h = gcf;
+          set(h,'RendererMode','Manual')  %  If you don't do this, the surface plot
+          set(h,'Renderer','OpenGL')      %    will draw VERY slowly.
+
+          %numDataSrc = 38;
+          numTraces = 100;
+          f = zeros(numDataSrc, numTraces);
+          
+          subplot(2,2,1);
+          [X,Y] = meshgrid(1:numTraces, 1:numDataSrc);
+          
+          h = surfc(X,Y,f);
+          zlim([0 100]);
+          colormap hsv;
+          set(h,'ZDataSource','f');
+          %set(h, 'EdgeColor', 'None');
+          %alpha(0.5);
+          shading interp;
+          %view(80+180,40+20)
+          xlabel('Time');
+          ylabel('Node');
+          zlabel('Channel Load (%)');
+          colorbar;    
+          
+          
+          f2 = zeros(numDataSrc, numTraces);
+          subplot(2,2,2);
+          [X,Y] = meshgrid(1:numTraces, 1:numDataSrc);
+          
+          h2 = surfc(X,Y,f2);
+          zlim([0 100]);
+          colormap hsv;
+          set(h2,'ZDataSource','f2');
+          %set(h, 'EdgeColor', 'None');
+          %alpha(0.5);
+          shading interp;
+          %view(80+180,40+20)
+          xlabel('Time');
+          ylabel('Node');
+          zlabel('Channel Load (%)');
+          colorbar;    
+
+          set(gcf,'CloseRequestFcn', 'delete(gcf), input_socket.close');
+          startplot = 1;
+        else
+          if (~isempty(newdata) && size(newdata,1) > numDataSrc)
+              
+              f = circshift(f',1)';
+              f(:,1) = newdata(1:numDataSrc);
+              f2 = circshift(f2',1)';
+              f2(:,1) = newdata(numDataSrc+1:2*numDataSrc);
+              
+              refreshdata([h h2]);
+          end
         end
     end
 catch Exp

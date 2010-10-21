@@ -13,9 +13,12 @@ rawdevice::RAWDEV(DEVNAME NODEDEVICE, DEVICE wireless);
 ate::AirTimeEstimation(MAX_AGE 1000);
 
 rawdevice
+//  -> t::Tee()
   -> __WIFIDECAP__
   -> ate
   -> Discard;
+
+//  t[1]
 //  -> ToDump("RESULTDIR/NODENAME.NODEDEVICE.dump");
 
 Idle
