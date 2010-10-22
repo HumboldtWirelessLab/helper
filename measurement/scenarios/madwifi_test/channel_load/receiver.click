@@ -1,5 +1,5 @@
 #define DEBUGLEVEL 2
-#define ATE ate
+#define CST cst
 
 #include "brn/helper.inc"
 #include "brn/brn.click"
@@ -10,12 +10,12 @@ wireless::BRN2Device(DEVICENAME "NODEDEVICE", ETHERADDRESS deviceaddress, DEVICE
 
 rawdevice::RAWDEV(DEVNAME NODEDEVICE, DEVICE wireless);
 
-ate::AirTimeEstimation(MAX_AGE 1000);
+cst::ChannelStats(MAX_AGE 1000);
 
 rawdevice
 //  -> t::Tee()
   -> __WIFIDECAP__
-  -> ate
+  -> cst
   -> Discard;
 
 //  t[1]
