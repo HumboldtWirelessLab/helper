@@ -11,18 +11,15 @@
 # PREFIX is a variable set from the outside to distinguish between different dumps.
 #
 # The script ignores the following outputs:
-# 	Packets with the label "ATHOPERATION:", "PHY_TO_SHORTerror:" as well as "DumpError:"
+# 	Packets with the label "ATHOPERATION:", "PHY_TO_SHORTerror:", "ZeroRateError", as well as "DumpError:"
 # 	also all "(TX)" printouts
-# Every ignored line can be found in PREFIX.ingoredlines.log.
+# Every ignored line can be found in PREFIX.ignoredlines.log.
 #
 # In case of unkown types and subtypes the click printout would be:
 #	unknown-types-[:digit:]+ 
 #	unknown-subtype-[:digit:]+ 
 # In those cases type and subtype will carry the digit negative number -[:digit:], where digit comes from the 
 # click printout.
-#
-# IMPORTANT: changes brn2_printwifif.cc to include ssid: tag for valid ssids. Is it in the 
-# repository? also added rates: tag to BRN2PrintWifi::rates_string(Vector<int> rates) and BRN2PrintWifi::unparse_beacon(Packet *p) {
 #
 # Plot vergleich:
 #	IBSS zusammengelegt, data packets mit nods und beacons mit IBSS capability 
@@ -41,6 +38,7 @@ BEGIN {
 	used["(invalid_ssid)"] = -3;
 	used["(empty)"] = -4;
 	used[""] = -5;# the ssid was not found (might have been one or more whitespaces), but we saw a ssid: tag
+	usedSize = 5; # bug workaround, length() doesn't work for array in some unstable older versions of awk
 
 
 
@@ -100,16 +98,16 @@ BEGIN {
 	# so the *.idx file is being created within the END{ awk statement.
 	
 	# empty the files
-	print "Created " PREFIX".ingoredlines.log";
+	print "\tCreated " PREFIX".ignoredlines.log";
 	printf "" > ignoredLinesLog;
 	
-	print "Created " PREFIX".stringmap.idx ";
+	print "\tCreated " PREFIX".stringmap.idx ";
 	printf "" > StringMap;
 	
-	print "Created " PREFIX".data.dat ";
+	print "\tCreated " PREFIX".data.dat ";
 	printf "" > dataDat;
 	
-	print "Created " PREFIX".ssid.idx ";
+	print "\tCreated " PREFIX".ssid.idx ";
 	printf "" > SSIDMap;
 	
 	for ( PacketLabel in PacketLabelMap ){
@@ -131,16 +129,16 @@ BEGIN {
 	printf  "\tant\tdone\tCRCerr\tdecryptCRC\tSEClen\tts\tSECstatus\tSECrate\tSECrssi" >> dataDat;
 	printf  "\tSECant\tnoise\thosttime\tmactime\tchannel\tchannelUtil\tdriverFlags\tFlags\tphyErr\tphyErrStr" >> dataDat;
 	printf  "\tSECmore\tkeyix\tpacketLabelnum\ttime\tsizebytes" >> dataDat; 
-	printf "\tTHRDRate\tTHRDrssi\tTHRDnoise\tFrameType\tFrameSubType\tdstMacInt\tsrcMacInt\tbssidInt\tpacketChan" >> dataDat;
+	printf "\tTHRDRate\tTHRDrssi\tTHRDnoise\tFrameType\tFrameSubType\tAddr1\tAddr2\tAddr3\tpacketChan" >> dataDat;
 	printf "\tssidInt\tseq\tIBSS\tESS\tPRIVACY\tCF_POLLABLE\tCF_POLLREQ\tRetry" >> dataDat; 
 	printf "\n" >> dataDat;
 	
-	print "processing.. "
+	print "\tAWK-Script: processing.. "
 }
 
 
 {
-	printf  "\x0d" "line: " FNR; 
+	printf  "\x0d" "\tline: " FNR; 
 
 	# minimum of 72 entries needed, sometimes lower entries(fault) occur
 	check(16, "Not enough entries");
@@ -164,28 +162,16 @@ BEGIN {
 	SEClen=$34; ts=$36; SECstatus=$38; SECrate=$41; SECrssi=$43; SECant=$45;noise=$47;hosttime=$49;mactime=$51; 
 	channel=$53; channelUtil=$55; driverFlags=$57; Flags=$59; phyErr=$61; phyErrStr=$63;
 	
-
-	# PhyerrStr : (HAL_PHYERR_CCK_RESTART) -> 0, (HAL_PHYERR_OFDM_RESTART) -> 1, (HAL_PHYERR_TOR) -> 2, (none) -> 3	
-	switch ( phyErrStr ) {
-		case "(HAL_PHYERR_CCK_RESTART)":
-			phyErrStr = PhyerrStrMap[phyErrStr];
-			break;
-		case "(HAL_PHYERR_OFDM_RESTART)":
-			phyErrStr = PhyerrStrMap[phyErrStr];
-			break;
-		case "(HAL_PHYERR_TOR)":	
-			phyErrStr = PhyerrStrMap[phyErrStr];
-			break;
-		case "(none)":
-			phyErrStr = PhyerrStrMap[phyErrStr];
-			break;
-		default:
-			phyErrStr = PhyerrStrMap["ERROR"];
-			break;
+	# either we know it 
+	if ( phyErrStr in PhyerrStrMap ){
+		phyErrStr = PhyerrStrMap[phyErrStr];
+	# or we don't
+	} else {
+		phyErrStr = PhyerrStrMap["PyherrStrERROR"];
 	}
 	
 	# just in case
-	if ( phyErrStr == PhyerrStrMap["PyherrStrERROR"] ){	print "Error: in " FNR ": " " unknown PhyerrStr" > "/dev/stderr";}
+	if ( phyErrStr == PhyerrStrMap["PyherrStrERROR"] ){	ignoreLine("unknown PhyerrStr"); }
 	
 	SECmore=$65; keyix=$67; packetLabel=$68; time=$69; 
 	
@@ -194,43 +180,27 @@ BEGIN {
 	
 	# PacketLabel: ATHOPERATION: 0, CRCerror: 1, CRC_TO_LONGerror: 2, OKPacket: 3, PHYerror: 4, PHY_TO_SHORTerror: 5, PHY_TO_LONGerror: 6, ZeroRateError: 7
 	# ignore "ATHOPERATION:" and "PHY_TO_SHORTerror: and ZeroRateError
-
-
-	switch ( packetLabel ){
-		case "ATHOPERATION:":
-			ignoreLine("ATHOPERATION"); # ignore
-			packetLabelnum = PacketLabelMap[packetLabel];
-			break;
-		case "CRCerror:":
-			packetLabelnum = PacketLabelMap[packetLabel];
-			break;
-		case "CRC_TO_LONGerror:":
-			packetLabelnum = PacketLabelMap[packetLabel];
-			break;
-		case "OKPacket:":
-			packetLabelnum = PacketLabelMap[packetLabel];
-			break;
-		case "PHYerror:":
-			packetLabelnum = PacketLabelMap[packetLabel];
-			break;
-		case "PHY_TO_SHORTerror:":
-			ignoreLine("PHY_TO_SHORTerror"); #ingore
-			packetLabelnum = PacketLabelMap[packetLabel];
-			break;
-		case "PHY_TO_LONGerror:":
-			packetLabelnum = PacketLabelMap[packetLabel];
-			break;
-		case "ZeroRateError:":
-			ignoreLine("ZeroRateError");#ignore
-			packetLabelnum = PacketLabelMap[packetLabel];
-			break;
-		default:
-			packetLabelnum = PacketLabelMap["ERROR"];
-			break;
+	if ( packetLabel == "ATHOPERATION:"){
+		ignoreLine("ATHOPERATION"); # ignore
+		packetLabelnum = PacketLabelMap[packetLabel];
+	} else if (packetLabel == "PHY_TO_SHORTerror:"){
+		ignoreLine("PHY_TO_SHORTerror"); #ingore
+		packetLabelnum = PacketLabelMap[packetLabel];
+	} else if ( packetLabel == "ZeroRateError:" ) {
+		ignoreLine("ZeroRateError");#ignore
+		packetLabelnum = PacketLabelMap[packetLabel];
+	# either we know it 
+	}else if ( packetLabel in PacketLabelMap ){
+		packetLabelnum = PacketLabelMap[phyErrStr];
+	# or we don't
+	} else {
+		packetLabelnum = PacketLabelMap["PacketLabelERROR"];
 	}
 	
+		
+	
 	# just in case
-	if ( packetLabelnum == PacketLabelMap["PacketLabelERROR"] ){	print "Error: in " FNR ": " " unknown PacketLabel: " packetLabel": " $0> "/dev/stderr";}
+	if ( packetLabelnum == PacketLabelMap["PacketLabelERROR"] ){ignoreLine("unknown PacketLabel: " packetLabel);}
 	
 	#1286360669.405125:  140 |  1Mb +11/-96 |
 	#time sizebytes | rate rssi/noise
@@ -247,66 +217,47 @@ BEGIN {
 	# FrameType FrameSubType
 	# 71 72
 	FrameTypeString = $75; 
-	
-	switch ( FrameTypeString ){		
-		case "mgmt":
-			FrameType = FrameTypeMap[FrameTypeString];
-			break;
-		case "cntl":
-			FrameType = FrameTypeMap[FrameTypeString];
-			break;
-		case "data":
-			FrameType = FrameTypeMap[FrameTypeString];
-			break;
-		case /unknown-type-[0-9]+/:
 
-			if ( FrameTypeString in FrameTypeMap ){
-				FrameType = FrameTypeMap[FrameTypeString];
-			} else {
-				# unknown type: we take the number at the end as negative error value
-				split(FrameTypeString, tmp, "-" )
-				FrameType = -tmp[3];
-				FrameTypeMap[FrameTypeString] = -tmp[3];# save new unknown-type
-			}
-
-			break;
-		default:
-			FrameType = FrameTypeMap["ERROR"];
-			break;
-	
+	# either we know it 
+	# if type in map take its integer 
+	if ( FrameTypeString in FrameTypeMap ){		
+		FrameType = FrameTypeMap[FrameTypeString];
+	# if it is a new unknown subtype add it to the map 
+	} else if ( /unknown-type-[0-9]+/ ) {
+		# unknown type: we take the number at the end as negative error value
+		split(FrameTypeString, tmp, "-" )
+		FrameType = -tmp[3];
+		FrameTypeMap[FrameTypeString] = -tmp[3];# save new unknown-type
+	# else it is some other error
+	} else {
+		FrameType = FrameTypeMap["FrameTypeERROR"];
 	}
 	
 	# just in case
-	if ( FrameType == FrameTypeMap["FrameTypeERROR"] ){	print "Error: in " FNR ": " " unknown FrameType: " FrameTypeString": " $0> "/dev/stderr";}
+	if ( FrameType == FrameTypeMap["FrameTypeERROR"] ){	ignoreLine("unknown FrameType: " FrameTypeString);}
 	
 	FrameSubTypeString = $76;
 	
 	# if type in map take its integer 
 	if ( FrameSubTypeString in 	FrameSubTypeMap ){
-		
 		FrameSubType = FrameSubTypeMap[FrameSubTypeString];
-	
 	# if it is a new unknown subtype add it to the map 
 	} else if ( /unknown-subtype-[0-9]+/ ) {
-	
 		# unknown subtype: we take the number at the end as negative error value
 		split(FrameSubTypeString, tmp, "-" )
 		FrameSubTypeMap[FrameSubTypeString] = -tmp[3];# using an offset
 		FrameSubType = FrameSubTypeMap[FrameSubTypeString];
-	
 	# else it is some other error
 	} else {
-	
-		FrameSubType = FrameSubTypeMap["ERROR"];
-	
+		FrameSubType = FrameSubTypeMap["FrameSubTypeERROR"];
 	}
 	
 	# just in case
-	if ( FrameSubType == FrameSubTypeMap["FrameSubTypeERROR"] ){	print "Error: in " FNR ": " " unknown FrameSubTypeString: " FrameSubTypeString": " $0> "/dev/stderr";}
+	if ( FrameSubType == FrameSubTypeMap["FrameSubTypeERROR"] ){	ignoreLine("unknown FrameSubTypeString: " FrameSubTypeString);}
 
-	dstMacInt = hexaMacToInt($77);
-	srcMacInt = hexaMacToInt($78);
-	bssidInt = hexaMacToInt($79);
+	Addr1 = hexaMacToInt($77);
+	Addr2 = hexaMacToInt($78);
+	Addr3 = hexaMacToInt($79);
 	
 	# at this point we just scan the last columns for the following entries
 	# ssid: -1 (none) -> might be hidden
@@ -370,35 +321,28 @@ BEGIN {
 
     } else {
     	# add array entry used["SSID"] = 1 -> the ssid "SSID" has index 1
-    	used[ssidStr] = length(used)-4;
+    	used[ssidStr] = usedSize-4;
+    	usedSize++; # bug workoutround instead lenght()
     }	  
 	ssidInt = used[ssidStr];
 	
 	while ( i <= NF ){
 		
-		switch ($i){
-			case "seq:":
+		if ($i == "seq:" ){
 				i++;
 				seq = $i;
-				break;
-			case "IBSS":
+		} else if ( $i == "IBSS") {
 				IBSS = 1;
-				break;
-			case "ESS":
+		} else if ( $i == "ESS" ) {
 				ESS = 1;
-				break;
-			case "PRIVACY":
+		} else if ( $i == "PRIVACY") {
 				PRIVACY = 1;
-				break;
-			case "CF_POLLABLE":
+		} else if ( $i == "CF_POLLABLE") {
 				CF_POLLABLE = 1;
-				break;
-			case "CF_POLLREQ":
+		} else if ( $i == "CF_POLLREQ") {
 				CF_POLLREQ = 1;
-				break;
-			case "retry":
+		} else if ( $i == "retry" ) {
 				Retry = 1;
-				break;
 		}
 		
 		i++;
@@ -409,7 +353,7 @@ BEGIN {
 	printf  "\t" ant "\t" done "\t" CRCerr "\t" decryptCRC "\t" SEClen "\t" ts "\t" SECstatus "\t" SECrate "\t" SECrssi >> dataDat;
 	printf  "\t" SECant "\t" noise "\t" hosttime "\t" mactime "\t" channel "\t" channelUtil "\t" driverFlags "\t" Flags "\t" phyErr "\t" phyErrStr >> dataDat;
 	printf  "\t" SECmore "\t" keyix "\t" packetLabelnum "\t" time "\t" sizebytes >> dataDat; 
-	printf "\t" THRDRate "\t" THRDrssi "\t" THRDnoise "\t" FrameType "\t" FrameSubType "\t" dstMacInt "\t" srcMacInt "\t" bssidInt "\t" packetChan >> dataDat;
+	printf "\t" THRDRate "\t" THRDrssi "\t" THRDnoise "\t" FrameType "\t" FrameSubType "\t" Addr1 "\t" Addr2 "\t" Addr3 "\t" packetChan >> dataDat;
 	printf "\t" ssidInt "\t" seq "\t" IBSS "\t" ESS "\t" PRIVACY "\t" CF_POLLABLE "\t" CF_POLLREQ "\t" Retry >> dataDat; 
 	printf "\n" >> dataDat;
 
@@ -482,14 +426,11 @@ END {
 	function ignoreLine(errmsg){
 		
 		#print "Ignored line: " FNR " reason:" errmsg "  see: " ignoredLinesLog >> "/dev/stderr";
-		print $0 >> ignoredLinesLog; 
+		print "Reason: " errmsg ": " $0 >> ignoredLinesLog; 
 		next;
 	
 	}
     
-    
-    
-
 # evaluation/bin/start_evaluation.sh                 |   20 +++++++++-
 # evaluation/scenarios/basic/eval.sh                 |   11 +++---> sucht *.dumps -> fromdump all.dat
 # evaluation/scenarios/matlab/eval.sh                |   40 ++++++++++++++++++++ ----> nutzt all.dat macht tomatlab.sh
