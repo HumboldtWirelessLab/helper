@@ -191,7 +191,7 @@ BEGIN {
 		packetLabelnum = PacketLabelMap[packetLabel];
 	# either we know it 
 	}else if ( packetLabel in PacketLabelMap ){
-		packetLabelnum = PacketLabelMap[phyErrStr];
+		packetLabelnum = PacketLabelMap[packetLabel];
 	# or we don't
 	} else {
 		packetLabelnum = PacketLabelMap["PacketLabelERROR"];
