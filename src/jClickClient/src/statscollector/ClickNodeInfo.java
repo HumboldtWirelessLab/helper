@@ -27,7 +27,7 @@ class ClickNodeInfo extends Thread {
         lastValues[i] = readInfo(st.element, st.handler);
       }
       try {
-        sleep(50);
+        sleep(100);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }

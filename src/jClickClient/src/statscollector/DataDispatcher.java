@@ -134,12 +134,12 @@ public class DataDispatcher extends Thread {
     double fps = 1000.0;
     fps /= (double)diff;
     if (true) {
-      System.out.print("new data: " + lastUpdate + " " + fps + " ");
+      //System.out.print("new data: " + lastUpdate + " " + fps + " ");
       for (int j = 0; j < mssg.length; j++) {
         byte b = mssg[j];
-        System.out.print(b + " ");
+        //System.out.print(b + " ");
       }
-      System.out.println();
+      //System.out.println();
     }
   }
 
