@@ -1,0 +1,24 @@
+NAME=queue_ctrl
+SIMULATOR=ns2
+RADIO=shadowing11b
+FORGEINNODES=no
+
+TIME=60
+
+NODEPLACEMENTFILE=placement.default
+NODETABLE=queue_ctrl.mes
+NODEPLACEMENT=grid
+FIELDSIZE=100
+
+LOGDIR=WORKDIR
+LOGFILE=measurement.log
+
+RESULTDIR=WORKDIR
+EVALUATIONSDIR=WORKDIR/evaluation
+#EVALUATION="basic standard"
+
+GPS=no
+NOTICE=no
+LOS=no
+
+CONTROLSOCKET=yes
