@@ -20,7 +20,8 @@ esac
 
 add_include() {
   echo "#include \"brn/helper.inc\""
-  cat <&0 
+  cat <&0
+  echo ""
   echo "#include \"brn/helper_tools.inc\""  
 }
 
@@ -90,7 +91,13 @@ case "$1" in
                 CPPOPTS="$CPPOPTS -DDEBUGLEVEL=$DEBUG"
                 CPPOPTS="$CPPOPTS -DSIMULATION"
                 CPPOPTS="$CPPOPTS -DWIFITYPE=806"
-                
+		
+		NODEID_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "BRN2NodeIdentity" | wc -l)`
+		
+		if [ $NODEID_INC -gt 0 ]; then
+		     CPPOPTS="$CPPOPTS -DNODEID_NAME"
+		fi
+
                 ( cd $CONFIGDIR; cat $CLICK | add_include | cpp -I$DIR/../../measurement/etc/click $CPPOPTS | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" | grep -v "^#" > $CLICKFINALNAME )
                 
                 if [ "x$HANDLERSCRIPT" != "x" ]; then
