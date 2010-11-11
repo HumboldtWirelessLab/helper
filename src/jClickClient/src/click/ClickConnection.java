@@ -43,7 +43,10 @@ public class ClickConnection {
     char[] resultchar;
 
     try {
-      resultchar = cliccs.read(element, handler);
+      if (cliccs != null)
+	  resultchar = cliccs.read(element, handler);
+      else
+	  return null;
     } catch ( Exception e) {
       e.printStackTrace();
       return null;
