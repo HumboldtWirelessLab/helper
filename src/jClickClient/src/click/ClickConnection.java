@@ -45,7 +45,9 @@ public class ClickConnection {
     try {
       resultchar = cliccs.read(element, handler);
     } catch ( Exception e) {
-      e.printStackTrace();
+      openClickConnection();
+      System.out.println("Lost click connection");
+      //e.printStackTrace();
       return null;
     }
 
