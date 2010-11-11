@@ -48,7 +48,9 @@ public class ClickConnection {
       else
 	  return null;
     } catch ( Exception e) {
-      e.printStackTrace();
+      openClickConnection();
+      System.out.println("Lost click connection");
+      //e.printStackTrace();
       return null;
     }
 
