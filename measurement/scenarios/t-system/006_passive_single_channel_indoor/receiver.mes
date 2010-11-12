@@ -1,0 +1,2 @@
+#NODE		DEVICE	MODULSDIR                                        MODOPTIONS WIFICONFIG        CLICKMODDIR                                      CLICKSCRIPT     CLICKLOGFILE                   APPLICATION APPLICATIONLOGFILE
+group:indoor       ath0    BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel.nc -           receiver.click  LOGDIR/NODENAME.NODEDEVICE.log -              -
