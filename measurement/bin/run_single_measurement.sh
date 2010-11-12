@@ -564,8 +564,8 @@ echo "Finished setup of nodes and screen-session"
 
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
-	  #add 5 second extra to make sure that we are not faster than the devices (click,application)
-	  WAITTIME=`expr $TIME + 5`
+	  #add 10 second extra to make sure that we are not faster than the devices (click,application)
+	  WAITTIME=`expr $TIME + 10`
 	  echo "Wait for $WAITTIME sec"
 
 	  # Countdown
