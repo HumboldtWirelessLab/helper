@@ -11,8 +11,8 @@ ps::BRN2PacketSource(SIZE 1450, INTERVAL 15, MAXSEQ 500000, BURST 1, ACTIVE true
   -> wlan_out::SetTXPower(15);
 
 wlan_out
+  -> SetPacketAnno(TOS 3)
   -> __WIFIENCAP__
-  -> Ath2SetFlags(QUEUE 1)
   -> rawouttee :: Tee()
   -> NotifierQueue(30)
   -> outct::Counter()
