@@ -19,10 +19,13 @@ public class ClickConnection {
   int clickport;
   ControlSocket cliccs;
 
+  int noConnectionCount;
+
   public ClickConnection(InetAddress clickipaddr, int clickport) {
     this.clickipaddr = clickipaddr;
     this.clickport = clickport;
     this.cliccs = null;
+    this.noConnectionCount = 0;
   }
 
   public void openClickConnection() {
@@ -34,8 +37,9 @@ public class ClickConnection {
      try {
        cliccs = new ControlSocket(clickipaddr, clickport);
      } catch ( IOException e) {
+       cliccs = null;
        System.out.println("Unable to connect to AP");
-       e.printStackTrace();
+       //e.printStackTrace();
      }
   }
 
@@ -44,13 +48,13 @@ public class ClickConnection {
 
     try {
       if (cliccs != null)
-	  resultchar = cliccs.read(element, handler);
-      else
-	  return null;
+          resultchar = cliccs.read(element, handler);
+      else {
+          connectionFailed();
+          return null;
+      }
     } catch ( Exception e) {
-      openClickConnection();
-      System.out.println("Lost click connection");
-      //e.printStackTrace();
+      connectionFailed();
       return null;
     }
 
@@ -71,5 +75,16 @@ public class ClickConnection {
   public int closeClickConnection() {
     cliccs.close();
     return 0;
+  }
+
+  private void connectionFailed() {
+    noConnectionCount++;
+    if ( noConnectionCount > 10 ) {
+      System.out.print("Lost click connection. Reconnect ... ");
+      openClickConnection();
+      if ( cliccs == null ) System.out.println("Failed.");
+      else System.out.println("OK.");
+      noConnectionCount=0;
+    }
   }
 }

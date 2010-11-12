@@ -167,11 +167,12 @@ BEGIN {
 		phyErrStr = PhyerrStrMap[phyErrStr];
 	# or we don't
 	} else {
+		old = phyErrStr;
 		phyErrStr = PhyerrStrMap["PyherrStrERROR"];
 	}
 	
 	# just in case
-	if ( phyErrStr == PhyerrStrMap["PyherrStrERROR"] ){	ignoreLine("unknown PhyerrStr"); }
+	if ( phyErrStr == PhyerrStrMap["PyherrStrERROR"] ){	ignoreLine("unknown PhyerrStr" old ":"); }
 	
 	SECmore=$65; keyix=$67; packetLabel=$68; time=$69; 
 	
@@ -311,6 +312,7 @@ BEGIN {
 		i++;
 	}
 	
+	packetChan = -1;
 	if ( $i == "channel:" ) {
 		packetChan = $(i + 1);
 	}
