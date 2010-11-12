@@ -22,12 +22,19 @@ class ClickNodeInfo extends Thread {
 
   public void run() {
     while (true) {
+      boolean read_error = false;
       for( int i = 0; i < statsInfo.getSize(); i++) {
         StatsInfo.SingleStat st = statsInfo.getByIndex(i);
         lastValues[i] = readInfo(st.element, st.handler);
+        read_error |= lastValues[i] == null;
       }
+
       try {
-        sleep(50);
+        if ( read_error ) {
+          sleep(3000);
+        } else {
+          sleep(100);
+        }
       } catch (InterruptedException e) {
         e.printStackTrace();
       }

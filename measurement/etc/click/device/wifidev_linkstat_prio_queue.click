@@ -32,11 +32,13 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
                             RT           proberates);
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
   wifidevice::WIFIDEV(DEVNAME $devname, DEVICE $device);
-
+  x_prio_q::PrioSched();
+ 
 
   input[0]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> wifioutq::NotifierQueue(50)
+  -> [1]x_prio_q
   -> wifidevice
   -> filter_tx :: FilterTX()
   -> error_clf :: WifiErrorClassifier()
@@ -70,5 +72,8 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   input[1] -> Discard;
   
+  input[2]
+  -> x_brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  -> [0]x_prio_q;
 } 
 
