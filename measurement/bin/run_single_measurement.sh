@@ -153,6 +153,10 @@ abort_measurement() {
 	
   echo "Abort Measurement" >&6
 
+  if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
+    echo "0" > status/master_click_abort.state
+  fi  
+
   echo "0" > status/master_abort.state
 	
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
@@ -570,9 +574,20 @@ echo "Finished setup of nodes and screen-session"
 
 	  # Countdown
 	  echo -n -e "Wait... \033[1G" >&6
-	  for ((i = $WAITTIME; i > 0; i--)); do echo -n -e "Wait... $i \033[1G" >&6 ; sleep 1; done
-	  echo -n -e "                 \033[1G" >&6
-
+	  for ((i = $WAITTIME; i > 0; i--)); do
+	    echo -n -e "Wait... $i \033[1G" >&6 ; sleep 1;
+	    
+	    if [ -f status/master_abort.state ]; then
+	      break;
+	    fi
+    done
+	  
+    if [ -f status/master_abort.state ]; then
+	    echo -n -e "ABORT MEASUREMENT                 \033[1G" >&6
+    else
+	    echo -n -e "                 \033[1G" >&6
+    fi
+    
 	  #Normal wait
 	  #sleep $WAITTIME
 
