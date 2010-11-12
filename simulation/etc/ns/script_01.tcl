@@ -62,11 +62,12 @@ set prop_ [new $netprop]
 # per node in this case. Also note that this scheme only works for
 # fewer than 255 nodes, and we aren't worrying about subnet masks.
 #
-set iptemplate "10.0.0.%d"
-set mactemplate "00:00:00:00:00:%0x"
+
+set iptemplate "10.0.%d.%d"
+set mactemplate "00:00:00:00:%0x:%0x"
 for {set i 0} {$i < $nodecount} {incr i} {
-    set node_ip($i) [format $iptemplate [expr $i+1]]
-    set node_mac($i) [format $mactemplate [expr $i+1]]
+    set node_ip($i) [format $iptemplate [expr ($i+1)/256] [expr ($i+1)%256] ]
+    set node_mac($i) [format $mactemplate [expr ($i+1)/256] [expr ($i+1)%256] ]
 }
 
 #
