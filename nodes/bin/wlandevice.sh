@@ -303,8 +303,14 @@ case "$1" in
 			    echo "sysctl -w dev.$PHYDEV.cutil_pkt_threshold=$CUTIL_PACKET_THRESHOLD"
 			    sysctl -w dev.$PHYDEV.cutil_pkt_threshold=$CUTIL_PACKET_THRESHOLD
 			fi
-			
-
+			if [ "x$CUTIL_UPDATE_MODE" != "x" ]; then
+			    echo "sysctl -w dev.$PHYDEV.cu_update_mode=$CUTIL_UPDATE_MODE"
+			    sysctl -w dev.$PHYDEV.cu_update_mode=$CUTIL_UPDATE_MODE
+			fi
+			if [ "x$CUTIL_ANNO_MODE" != "x" ]; then
+			    echo "sysctl -w dev.$PHYDEV.cu_anno_mode=$CUTIL_ANNO_MODE"
+			    sysctl -w dev.$PHYDEV.cu_anno_mode=$CUTIL_ANNO_MODE
+			fi
 	    fi
 
 	    if [ "x$DISABLECCA" = "x" ]; then
@@ -313,9 +319,33 @@ case "$1" in
 	    echo "sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA"
 	    sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA
 
-	    if [ "x$CCA_THRESHOLD" = "x" ]; then
+	    if [ "x$CCA_THRESHOLD" != "x" ]; then
 		    echo "sysctl -w dev.$PHYDEV.cca_thresh=$CCA_THRESHOLD"
 		    sysctl -w dev.$PHYDEV.cca_thresh=$CCA_THRESHOLD
+	    fi
+	
+	    if [ "x$CWMIN" != "x" ]; then
+		QUEUE=0
+		for c in $CWMIN; do
+		    ${IWPRIV} $DEVICE cwmin $QUEUE 0 $c
+		    QUEUE=`expr $QUEUE + 1`
+		done
+	    fi
+
+	    if [ "x$CWMAX" != "x" ]; then
+		QUEUE=0
+		for c in $CWMAX; do
+		    ${IWPRIV} $DEVICE cwmax $QUEUE 0 $c
+		    QUEUE=`expr $QUEUE + 1`
+		done
+	    fi
+
+	    if [ "x$AIFS" != "x" ]; then
+		QUEUE=0
+		for c in $AIFS; do
+		    ${IWPRIV} $DEVICE aifs $QUEUE 0 $c
+		    QUEUE=`expr $QUEUE + 1`
+		done
 	    fi
 
 	    echo "Finished device config"
@@ -339,6 +369,9 @@ case "$1" in
             sysctl dev.$PHYDEV.disable_cca
             sysctl dev.$PHYDEV.cca_thresh
             ${IWPRIV} $DEVICE get_macclone
+            sysctl dev.$PHYDEV.cutil_pkt_threshold
+            sysctl dev.$PHYDEV.cu_update_mode
+            sysctl dev.$PHYDEV.cu_anno_mode
             ;;
         *)
             ;;

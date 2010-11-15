@@ -1,14 +1,12 @@
-NAME=queue_ctrl
+NAME=passive_sc
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=30
+TIME=86400
 
+NODETABLE=receiver.mes
 NODEPLACEMENTFILE=placement.default
-NODETABLE=queue_ctrl.mes
-NODEPLACEMENT=grid
-FIELDSIZE=100
 
 LOGDIR=WORKDIR
 LOGFILE=measurement.log
@@ -21,4 +19,11 @@ GPS=no
 NOTICE=no
 LOS=no
 
-CONTROLSOCKET=yes
+CONTROLSOCKET=no
+
+CLICKMODE=userlevel
+REMOTEDUMP=yes
+DUMPIP=192.168.3.2
+DUMPMAC=00:11:11:d1:dd:8c
+
+LOCALPROCESS=CONFIGDIR/sync_dumps.sh

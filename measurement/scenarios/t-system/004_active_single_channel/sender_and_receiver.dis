@@ -1,4 +1,4 @@
-NAME=receiver
+NAME=sender_receiver
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
