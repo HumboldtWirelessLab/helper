@@ -142,6 +142,7 @@ BEGIN {
 
 	# minimum of 72 entries needed, sometimes lower entries(fault) occur
 	check(16, "Not enough entries");
+	next;
 	
 	lat = $2; long = $4; alt = $6; speed = $8;
 
@@ -151,10 +152,11 @@ BEGIN {
 	# ignore tx printouts
 	} else if ( $10 == "(TX)" ){
 		ath = 1;
-		ignoreLine("(TX)");
+		ignoreLine("(TX)");next;
 	# ingore dumperrors
 	} else if ( $9 == "DumpError:" ) {
 		ignoreLine("DumpError");
+		next;
 	}
 	
 
@@ -172,7 +174,7 @@ BEGIN {
 	}
 	
 	# just in case
-	if ( phyErrStr == PhyerrStrMap["PyherrStrERROR"] ){	ignoreLine("unknown PhyerrStr" old ":"); }
+	if ( phyErrStr == PhyerrStrMap["PyherrStrERROR"] ){	ignoreLine("unknown PhyerrStr" old ":"); next;}
 	
 	SECmore=$65; keyix=$67; packetLabel=$68; time=$69; 
 	
@@ -183,12 +185,15 @@ BEGIN {
 	# ignore "ATHOPERATION:" and "PHY_TO_SHORTerror: and ZeroRateError
 	if ( packetLabel == "ATHOPERATION:"){
 		ignoreLine("ATHOPERATION"); # ignore
+		next;
 		packetLabelnum = PacketLabelMap[packetLabel];
 	} else if (packetLabel == "PHY_TO_SHORTerror:"){
 		ignoreLine("PHY_TO_SHORTerror"); #ingore
+		next;
 		packetLabelnum = PacketLabelMap[packetLabel];
 	} else if ( packetLabel == "ZeroRateError:" ) {
 		ignoreLine("ZeroRateError");#ignore
+		next;
 		packetLabelnum = PacketLabelMap[packetLabel];
 	# either we know it 
 	}else if ( packetLabel in PacketLabelMap ){
@@ -201,7 +206,7 @@ BEGIN {
 		
 	
 	# just in case
-	if ( packetLabelnum == PacketLabelMap["PacketLabelERROR"] ){ignoreLine("unknown PacketLabel: " packetLabel);}
+	if ( packetLabelnum == PacketLabelMap["PacketLabelERROR"] ){ignoreLine("unknown PacketLabel: " packetLabel);next;}
 	
 	#1286360669.405125:  140 |  1Mb +11/-96 |
 	#time sizebytes | rate rssi/noise
@@ -235,7 +240,7 @@ BEGIN {
 	}
 	
 	# just in case
-	if ( FrameType == FrameTypeMap["FrameTypeERROR"] ){	ignoreLine("unknown FrameType: " FrameTypeString);}
+	if ( FrameType == FrameTypeMap["FrameTypeERROR"] ){	ignoreLine("unknown FrameType: " FrameTypeString);next;}
 	
 	FrameSubTypeString = $76;
 	
@@ -254,7 +259,7 @@ BEGIN {
 	}
 	
 	# just in case
-	if ( FrameSubType == FrameSubTypeMap["FrameSubTypeERROR"] ){	ignoreLine("unknown FrameSubTypeString: " FrameSubTypeString);}
+	if ( FrameSubType == FrameSubTypeMap["FrameSubTypeERROR"] ){	ignoreLine("unknown FrameSubTypeString: " FrameSubTypeString);next;}
 
 	Addr1 = hexaMacToInt($77);
 	Addr2 = hexaMacToInt($78);
@@ -382,6 +387,9 @@ END {
 	}
 	printf "\n";
 	
+	# move the files from tmp
+	#printf("mv %s %s\n", StringMap, PREFIX.) | "sh"
+	
 }
 
 	function check(i, errmsg){
@@ -429,7 +437,7 @@ END {
 		
 		#print "Ignored line: " FNR " reason:" errmsg "  see: " ignoredLinesLog >> "/dev/stderr";
 		print "Reason: " errmsg ": " $0 >> ignoredLinesLog; 
-		next;
+		#next;
 	
 	}
     
