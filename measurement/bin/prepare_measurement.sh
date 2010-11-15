@@ -39,6 +39,7 @@ add_include() {
     echo "#include \"brn/helper.inc\""
   fi
   cat <&0 
+  echo ""
   echo "#include \"brn/helper_tools.inc\""  
 }
 
@@ -195,6 +196,12 @@ case "$1" in
                 fi
                 
                 HELPER_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "helper.inc" | wc -l)`
+
+                NODEID_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "BRN2NodeIdentity" | wc -l)`
+		
+		if [ $NODEID_INC -gt 0 ]; then
+                     CPPOPTS="$CPPOPTS -DNODEID_NAME"		  
+		fi
                 
                 if [ $HELPER_INC -gt 0 ]; then
                   ( cd $CONFIGDIR; cat $CLICK | add_include no | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v "^#" >> $CLICKFINALNAME )

@@ -13,7 +13,7 @@ ps::BRN2PacketSource(SIZE 1450, INTERVAL 25, MAXSEQ 500000, BURST 1, ACTIVE fals
 wlan_out
   -> __WIFIENCAP__
   -> rawouttee :: Tee()
-  -> NotifierQueue(500)
+  -> NotifierQueue(30)
   -> outct::Counter()
   -> TORAWDEVICE(NODEDEVICE);
 

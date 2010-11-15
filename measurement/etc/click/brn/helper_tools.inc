@@ -25,3 +25,7 @@ Script(wait TIME, stop);
 
 #endif
 
+#ifdef NODEID_NAME
+Script( write id.nodename NODENAME );
+#endif
+
