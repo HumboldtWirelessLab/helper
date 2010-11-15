@@ -6,7 +6,11 @@
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef CST
+#ifdef CST_PROCFILE
+  cst::ChannelStats(MAX_AGE 100, PROCFILE CST_PROCFILE, PROCINTERVAL 100);
+#else
   cst::ChannelStats(MAX_AGE 100);
+#endif
 #endif
 
   rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);
