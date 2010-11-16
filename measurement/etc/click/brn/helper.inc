@@ -91,7 +91,7 @@ BRNAddressInfo(ipdev eth0:ip);
 /* USERLEVEL stuff */
 
 #ifdef USERLEVEL
-#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false/*, CAPTURE PCAP*/)
+#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false/*, CAPTURE PCAP, ENCAP 802_11*/)
 #define TORAWDEVICE(x) ToDevice(x)
 
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__

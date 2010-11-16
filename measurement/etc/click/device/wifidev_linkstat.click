@@ -16,8 +16,8 @@
 
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
 
-  nblist::BRN2NBList();  //stores all neighbors (known (friend) and unknown (foreign))
-  nbdetect::NeighborDetect(NBLIST nblist, DEVICE $device);
+//  nblist::BRN2NBList();  //stores all neighbors (known (friend) and unknown (foreign))
+//  nbdetect::NeighborDetect(NBLIST nblist, DEVICE $device);
   rates::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
   proberates::AvailableRates(DEFAULT 2 12 22 108);
   etx_metric :: BRN2ETXMetric($lt);
@@ -56,7 +56,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   wififrame_clf[2]
     -> WifiDecap()
-    -> nbdetect
+//    -> nbdetect
     //-> Print("Data")
     -> brn_ether_clf :: Classifier( 12/8086, - )
     -> lp_clf :: Classifier( 14/BRN_PORT_LINK_PROBE, - )
@@ -67,7 +67,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
     -> brnwifi;
 
   brn_ether_clf[1]                         //no brn
-   -> Print()
+// -> Print()
    -> Discard;
 
   lp_clf[1]                               //brn, but no lp
