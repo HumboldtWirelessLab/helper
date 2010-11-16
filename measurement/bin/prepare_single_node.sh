@@ -23,6 +23,8 @@ esac
 #TODO NExt Var looks old and is not used
 RUN_CLICK_APPLICATION=0
 
+MEASUREMENT_ABORT=0
+
 ##############################
 ###### SYNC - stuff ##########
 ##############################
@@ -39,6 +41,7 @@ wait_for_master_state() {
     fi
     if [ -f status/master_abort.state ]; then
       echo "got status/master_abort.state" >> $DEBUGFILE
+      MEASUREMENT_ABORT=1    
     fi
     
     echo "wait for master" >> $DEBUGFILE
@@ -47,7 +50,9 @@ wait_for_master_state() {
   
   if [ -f status/master_abort.state ]; then
     echo "0" > status/$2\_abort.state
-    exit 0;
+    if [ CRUNMODE -lt 6 ]; then
+      exit 0;
+    fi
   fi
   
   cat status/master_$1.state | awk '{print $1}'
@@ -140,6 +145,7 @@ echo "check node $NODELIST" >> status/$LOGMARKER\_reboot.log
 NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodes >> status/$LOGMARKER\_reboot.log 2>&1
 
 if [ $RUNMODENUM -eq 0 ]; then
+    CRUNMODENUM=0
     echo -n "Check marker ($MARKER): " >> status/$LOGMARKER\_reboot.log 2>&1
     CHECKNODESTATUS=`get_node_status`
     echo "$CHECKNODESTATUS" >> status/$LOGMARKER\_reboot.log 2>&1
@@ -155,6 +161,7 @@ fi
 ###############################################
 
 if [ $RUNMODENUM -le 1 ]; then
+    CRUNMODENUM=1
     echo "Reboot node $NODELIST" >> status/$LOGMARKER\_reboot.log 2>&1
     NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot >> status/$LOGMARKER\_reboot.log 2>&1
      
@@ -178,6 +185,7 @@ NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmark
 ###################################
 
 if [ $RUNMODENUM -le 2 ]; then
+    CRUNMODENUM=2
     echo "Setup environment $NODELIST" > status/$LOGMARKER\_environment.log 2>&1
     NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mount >> status/$LOGMARKER\_environment.log 2>&1
     NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh extramount >> status/$LOGMARKER\_environment.log 2>&1
@@ -191,6 +199,7 @@ echo "0" > status/$LOGMARKER\_environment.state
 ##################################
 
 if [ $RUNMODENUM -le 3 ]; then
+    CRUNMODENUM=3
 
     echo "Load Modules" > status/$LOGMARKER\_wifimodules.log 2>&1
     CURRENTMODE="LOAD MODULES"
@@ -231,6 +240,7 @@ echo "0" > status/$LOGMARKER\_wifimodules.state
 ############################
 
 if [ $RUNMODENUM -le 4 ]; then
+  CRUNMODENUM=4
 
   echo "Setup Wifi" > status/$LOGMARKER\_wificonfig.log 2>&1
   CURRENTMODE="CREATE WIFI"
@@ -303,6 +313,7 @@ echo "0" > status/$LOGMARKER\_wificonfig.state
 #TODO: rename nodelist
 
 if [ $RUNMODENUM -le 5 ]; then
+  CRUNMODENUM=5
 
   echo "Get Wifiinfo" >> status/$LOGMARKER\_wifiinfo.log 2>&1
 
@@ -333,6 +344,8 @@ echo "0" > status/$LOGMARKER\_wifiinfo.state
 
 CURRENTMODE="LOAD CLICKMOD" > status/$LOGMARKER\_clickmodule.log 2>&1
 LOADCLICKMOD=0
+CRUNMODENUM=6
+
 
 for node in $NODELIST; do
 
@@ -355,6 +368,9 @@ echo "0" > status/$LOGMARKER\_clickmodule.state
 ########################################################
 
 NODEBINDIR="$DIR/../../nodes/bin"
+CURRENTMODE="PRELOAD CLICK"
+CRUNMODENUM=7
+
 
 for node in $NODELIST; do
   NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
@@ -393,9 +409,14 @@ echo "0" > status/$LOGMARKER\_preload.state
 ######### WAIT FOR CLICK FINISHED ###########
 #############################################
 
+CURRENTMODE="RUN CLICK"
+CRUNMODENUM=8
+
 wait_for_master_state measurement $LOGMARKER
 
 ############ Kill everything ################
+
+  CRUNMODENUM=9
 
   echo "Kill Click on Nodes:" >> status/$LOGMARKER\_killclick.log 2>&1
   for node in $NODELIST; do

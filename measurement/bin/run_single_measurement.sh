@@ -29,6 +29,8 @@ MSCREENFILENAME=measurementscreenmap
 
 CURRENTMODE="START"
 
+MEASUREMENT_ABORT=0
+
 ##############################
 ###### NODE Checker ##########
 ##############################
@@ -158,95 +160,9 @@ abort_measurement() {
   fi  
 
   echo "0" > status/master_abort.state
-	
-  if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
-  echo "Kill Click: " >&6
-  for node in $NODELIST; do
-    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+  MEASUREMENT_ABORT=1
 
-    echo "$node" >&6
-	
-    for nodedevice in $NODEDEVICELIST; do
-	CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
-	CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
-	CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
-	if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
-    	    TAILPID=`run_on_node $node "pidof cat" "/" $DIR/../../host/etc/keys/id_dsa`
-    	    run_on_node $node "kill $TAILPID" "/" $DIR/../../host/etc/keys/id_dsa
-	else
-	    if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-		NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
-		CLICKPID=`run_on_node $node "pidof click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa`
-		if [ "x$CLICKPID" != "x" ]; then
-		  for cpid in $CLICKPID; do
-                    run_on_node $node "kill $cpid" "/" $DIR/../../host/etc/keys/id_dsa
-		  done
-		fi
-	    fi
-        fi
-		
-	APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
-		
-      if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-	run_on_node $node "$APPLICATION  stop" "/" $DIR/../../host/etc/keys/id_dsa
-      fi
-
-    done
-  done
-
-  fi
-
-  echo "Kill Click done" >&6
-
-  echo -n "Kill node ctrl ..." >&6
-  for c in `ls status/*nodectrl.pid 2> /dev/null`; do
-    CPID=`cat $c`
-    kill $CPID
-  done
-  echo " done" >&6
-
-  echo -n "Wait for all nodes..." >&6
-
-  SYNCSTATE=`wait_for_nodes "$NODELIST" _abort.state 30`
-
-  echo "done" >&6
-
-  echo -n "Killall screens..." >&6
-  if [ -f $MSCREENFILENAME ]; then
-    MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | uniq`
-    for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
-      echo "Close screen $MEASUREMENTSCREENNAME"
-      screen -S $MEASUREMENTSCREENNAME -X quit
-    done
-  fi
-
-  if [ -f $NODESCREENFILENAME ]; then
-    NODESCREENNAMES=`cat $NODESCREENFILENAME | awk '{print $2}' | uniq`
-    for NODESCREENNAME in $NODESCREENNAMES; do
-      echo "Close screen $NODESCREENNAME"
-      screen -S $NODESCREENNAME -X quit
-    done
-  fi
-  echo "done" >&6
-
-  echo -n "Kill local screen..." >&6
-  if [ "x$LOCALSCREENNAME" != "x" ]; then
-    screen -S $LOCALSCREENNAME -X quit
-  fi
-  echo "done" >&6
-
-  echo -n "Check nodes ... " >&6
-  if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
-      check_nodes
-  fi
-  echo "done" >&6
-
-  echo "abort" 1>&$STATUSFD
-
-  echo "Finished measurement. Status: abort."
-
-  exit 0
 }
 
 #########################################################
@@ -306,7 +222,7 @@ esac
 ### Create screen for all nodes ####
 ####################################
 
-echo -n "Start screen seesion to setup all nodes ... " >&6
+echo -n "Start screen session to setup all nodes ... " >&6
 
 SCREENNUMBER=1
 NODE_IN_SCREEN=1
@@ -512,6 +428,8 @@ done
 ####### Start Local Click- & Application-Stuff ##########
 #########################################################
 
+if [ MEASUREMENT_ABORT -eq 0 ]; then
+
     echo -n "Start local application and remote dump ... " >&6
     LOCALSCREENNAME="local_$ID"
 
@@ -542,10 +460,11 @@ done
     fi
 
     echo "done." >&6
-
+fi
 ###################################################
 ####### Start Click- & Application-Stuff ##########
 ###################################################
+if [ MEASUREMENT_ABORT -eq 0 ]; then
 
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
@@ -581,10 +500,11 @@ done
       done
       echo "done." >&6    
     fi
-
+fi
 ###################################################
 ################# Wait and Stop ###################
 ###################################################
+if [ MEASUREMENT_ABORT -eq 0 ]; then
 
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
@@ -612,10 +532,11 @@ done
 	  #sleep $WAITTIME
 
   fi
-
+fi
 ###################################################
 ##### Kill progs for logfile for kclick  ##########
 ###################################################
+if [ MEASUREMENT_ABORT -eq 0 ]; then
 
   set_master_state 0 measurement
 
@@ -630,7 +551,7 @@ done
   fi
 
   echo "done." >&6
-
+fi
 #######################################
 ##### Check Nodes and finish ##########
 #######################################
