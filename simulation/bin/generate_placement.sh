@@ -64,6 +64,20 @@ case "$1" in
 	  NPART_DIR="$DIR/../../src/Npart"
 	  java -classpath $NPART_DIR/classes/production/Npart:$NPART_DIR/lib/jargs.jar:$NPART_DIR/lib/mantissa-7.2.jar NPART.TopologyGenerator -n $NODECOUNT -r 80 -d 0.8 -o ts -p 5 -c 1 -t 150 -a distroL | sed $REPLACE | sed "s#;# #g"
 	  ;;
+    "string")
+          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | sort -u`
+          NODECOUNT=`echo $NODES | wc -w`
+	  NODEN=0
+	  SIDESTEP=`expr $3 / \( $NODECOUNT - 1 \)`
+
+	  Y=`expr $3 / 2`
+
+	  for n in $NODES; do
+	    X=`expr $NODEN \* $SIDESTEP`
+	    echo "$n $X $Y 0"
+	    NODEN=`expr $NODEN + 1`
+	  done	  
+	  ;;
        *)
           echo "Use $0 random|grid|npart nodefile fieldsize (distance)"
           ;;
