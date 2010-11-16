@@ -96,7 +96,7 @@ case "$1" in
 		  FIELDSIZE=1000
 		fi
 		
-                if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ]; then
+                if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ] || [ "x$NODEPLACEMENT" = "xstring" ]; then
 #		  echo "Gen Placement: $NODEPLACEMENT"
 		  $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
 		  FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
