@@ -38,7 +38,7 @@ case "$1" in
 		    
 		    if [ ! "x$NFSHOME" = "x" ]; then
 			if [ "x$NFSOPTIONS" = "x" ]; then
-			  NFSOPTIONS="nolock,soft,vers=2,noacl,proto=udp,wsize=16384,rsize=16384"
+			  NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
 			fi
 			run_on_node $node "mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME" "/" $DIR/../etc/keys/id_dsa
 		    else
@@ -59,7 +59,7 @@ case "$1" in
 			run_on_node $node "mkdir $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
 
 			if [ "x$NFSOPTIONS" = "x" ]; then
-			  NFSOPTIONS="nolock,soft,vers=2,noacl,proto=udp,wsize=16384,rsize=16384"
+			  NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
 			fi
 			run_on_node $node "mount -t nfs -o NFSOPTIONS $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
 		    else
