@@ -141,8 +141,9 @@ BEGIN {
 	printf  "\x0d" "\tline: " FNR; 
 
 	# minimum of 72 entries needed, sometimes lower entries(fault) occur
-	check(16, "Not enough entries");
-	next;
+	if ( check(16, "Not enough entries") == 0 ){
+		next;
+	}
 	
 	lat = $2; long = $4; alt = $6; speed = $8;
 
@@ -275,7 +276,7 @@ BEGIN {
 	
 	# defaults
 	ssidStr = "notFound";
-	ssidInt;
+	#ssidInt;
 	seq = -1;
 	IBSS = 0;
 	ESS = 0;
@@ -387,6 +388,10 @@ END {
 	}
 	printf "\n";
 	
+	close(SSIDMap);
+	close(StringMap);
+	close(dataDat);
+	close(ignoredLinesLog);
 	# move the files from tmp
 	#printf("mv %s %s\n", StringMap, PREFIX.) | "sh"
 	
@@ -437,6 +442,7 @@ END {
 		
 		#print "Ignored line: " FNR " reason:" errmsg "  see: " ignoredLinesLog >> "/dev/stderr";
 		print "Reason: " errmsg ": " $0 >> ignoredLinesLog; 
+		return;
 		#next;
 	
 	}
