@@ -140,6 +140,13 @@ main(int argc, char **argv)
 
   cout << endl;
   cout << "Read/Write handler test: ";
+
+  string data3 = "1234567891abcdefghij";
+
+  err = cs.read("sys_info", "systeminfo", data3);
+  cout << "read: " << err << endl;
+
+
   string data = "1234567891abcdefghij";
   /*
    * NB: to place spaces in this handler's data requires that the
@@ -148,10 +155,12 @@ main(int argc, char **argv)
    * exactly match the write value.  to avoid, we don't use spaces....
    */
   err = cs.write("InfiniteSource@1", "data", data);
-  ok(err);
+  cout << "wrote: " << err << endl;
+//  ok(err);
   string data2;
   err = cs.read("InfiniteSource@1", "data", data2);
-  ok(err);
+  cout << "read: " << err << endl;
+//  ok(err);
 
   if (data2 != data)
     cout << "FAIL (wanted ``" << data << "'', but got ``" << data2 << "'')";
