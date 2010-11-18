@@ -7,7 +7,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef CST
 #ifdef CST_PROCFILE
-  cst::ChannelStats(MAX_AGE 1000, PROCFILE CST_PROCFILE, PROCINTERVAL 100, RSSI_PER_NEIGHBOUR true);
+  cst::ChannelStats(MAX_AGE 1000, PROCFILE CST_PROCFILE, PROCINTERVAL 1000, RSSI_PER_NEIGHBOUR true);
 #else
   cst::ChannelStats(MAX_AGE 1000, RSSI_PER_NEIGHBOUR true);
 #endif

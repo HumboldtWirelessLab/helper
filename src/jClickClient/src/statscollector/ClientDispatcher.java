@@ -42,7 +42,7 @@ public class ClientDispatcher extends Thread {
         } else {
           // no new data available
         }
-        sleep(100); // wait for new data to become available
+        sleep(1000); // wait for new data to become available
       } catch (Exception e) {
         //e.printStackTrace();
         System.err.println("Network error; close connection");
