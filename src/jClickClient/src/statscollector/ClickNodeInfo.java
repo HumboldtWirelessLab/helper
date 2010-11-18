@@ -33,7 +33,7 @@ class ClickNodeInfo extends Thread {
         if ( read_error ) {
           sleep(3000);
         } else {
-          sleep(100);
+          sleep(1000);
         }
       } catch (InterruptedException e) {
         e.printStackTrace();
