@@ -1,4 +1,4 @@
-#include "wifidev.click"
+#include "rawwifidev.click"
 
 //output:
 //  0: To me and BRN
@@ -13,6 +13,8 @@
 //input::
 //  0: brn
 //  1: client
+//  2: high priority stuff ( higher than linkprobes)
+
 
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
 
@@ -32,11 +34,14 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
                             RT           proberates);
 
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
-  wifidevice::WIFIDEV(DEVNAME $devname, DEVICE $device);
+  wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> wifioutq::NotifierQueue(50)
+#ifdef PRIO_QUEUE
+  -> [1]x_prio_q::PrioSched();
+#endif
   -> wifidevice
   -> filter_tx :: FilterTX()
 #if WIFITYPE == 805
@@ -80,4 +85,9 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   input[1] -> Discard;
 
+#ifdef PRIO_QUEUE
+  input[2]
+  -> x_brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  -> [0]x_prio_q;
+#endif
 }

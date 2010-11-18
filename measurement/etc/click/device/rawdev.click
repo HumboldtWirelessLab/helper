@@ -9,6 +9,9 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 
   FROMRAWDEVICE($devname)
 //-> Print("From Device")
+#ifdef SIMULATION
+  -> SetTimestamp()
+#endif
   -> BRN2SetDeviceAnno(DEVICE $device)
   -> [0]output;
 }
