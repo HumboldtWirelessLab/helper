@@ -118,7 +118,7 @@ public class DataDispatcher extends Thread {
     try {
       while (true) {
         setNewData(nextSample());
-        Thread.sleep(50); // emulates new data
+        Thread.sleep(500); // emulates new data
       }
     } catch (InterruptedException e) {
       e.printStackTrace();
