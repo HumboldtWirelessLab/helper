@@ -180,7 +180,7 @@ case "$1" in
                 fi
                   
                 #echo "SED: $DUMPSEDARG"
-                CPPOPTS="$CPPOPTS -DDEBUG=$DEBUG"
+                CPPOPTS="$CPPOPTS -DDEBUGLEVEL=$DEBUG"
                 DIRSEDARG="-e s#NODEDEVICE#$CDEV#g -e s#NODENAME#$CNODE#g -e s#RESULTDIR#$RESULTDIR#g -e s#WORKDIR#$WORKDIR#g -e s#BASEDIR#$BASEDIR#g"
 
                 if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserlevel" ]; then
