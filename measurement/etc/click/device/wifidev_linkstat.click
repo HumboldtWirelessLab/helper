@@ -49,6 +49,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #else
   -> error_clf :: FilterPhyErr()
 #endif
+  -> WifiDupeFilter()
   -> wififrame_clf :: Classifier( 1/40%40,  // wep frames
                                   0/00%0f,  // management frames
                                       - );
