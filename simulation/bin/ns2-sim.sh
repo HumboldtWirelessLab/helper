@@ -168,12 +168,27 @@ case "$1" in
 		cat $DIR/../etc/ns/script_01.tcl | sed -e "s#NAME#$NAME#g" -e "s#RESULTDIR#$RESULTDIR#g" >> $TCLFILE
 		
 		i=0
+		echo -n "" > $FINALRESULTDIR/nodes.mac
+
 		for node in $NODELIST; do
 		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		    for nodedevice in $NODEDEVICELIST; do		    
 			    CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
 			    echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
                             i=`expr $i + 1`
+
+			    m1=`expr $i / 256`
+			    m2=`expr $i % 256`
+			    m1h=$(echo "obase=16; $m1" | bc | tr [A-F] [a-f])
+			    m2h=$(echo "obase=16; $m2" | bc | tr [A-F] [a-f])
+			    if [ $m1 -lt 16 ]; then
+			      m1h="0$m1h"
+			    fi
+			    if [ $m2 -lt 16 ]; then
+			      m2h="0$m2h"
+			    fi
+			    echo "$node $nodedevice 00:00:00:00:$m1h:$m2h $i" >> $FINALRESULTDIR/nodes.mac
+
 		    done
 		done
 		
@@ -183,7 +198,6 @@ case "$1" in
 		
 		i=0
 
-		echo -n "" > $FINALRESULTDIR/nodes.mac
 		for node in $NODELIST; do
                     POS_X=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		    POS_Y=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
@@ -199,11 +213,27 @@ case "$1" in
 			
       			POS_X=`expr $POS_X + 1`
 			i=`expr $i + 1`
-			echo "$node $nodedevice $i" >> $FINALRESULTDIR/nodes.mac
 		    done
 		done
 
 		cat $DIR/../etc/ns/script_02.tcl >> $TCLFILE
+
+		if [ "x$CONTROLFILE" != "x" ]; then
+		    while read line; do
+		        ISCOMMENT=`echo $line | grep "#" | wc -l`
+		        if [ $ISCOMMENT -eq 0 ]; then
+			    TIME==`echo $line | awk '{print $1}'`
+			    NODENAME=`echo $line | awk '{print $2}'`
+			    NODEDEVICE=`echo $line | awk '{print $3}'`
+			    MODE=`echo $line | awk '{print $3}'`
+			    
+			    
+									                      
+			fi
+		    done < $CONTROLFILE
+		fi
+
+		cat $DIR/../etc/ns/script_03.tcl >> $TCLFILE
 	
 		if [ ! -e $LOGDIR ]; then
 		    echo "Create $LOGDIR"

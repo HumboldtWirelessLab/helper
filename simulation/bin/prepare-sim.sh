@@ -48,27 +48,27 @@ case "$1" in
 		    ISCOMMENT=`echo $line | grep "#" | wc -l`
 		    if [ $ISCOMMENT -eq 0 ]; then
 		    
-          read CNODE CDEV CMODDIR CMODOPT WIFICONFIG CCMODDIR CLICK CCLOG CAPP CAPPL <<< $line
+	              read CNODE CDEV CMODDIR CMODOPT WIFICONFIG CCMODDIR CLICK CCLOG CAPP CAPPL <<< $line
 			
-          ISGROUP=`echo $CNODE | grep "group:" | wc -l`
+	              ISGROUP=`echo $CNODE | grep "group:" | wc -l`
 			      
 		      if [ "x$ISGROUP" = "x1" ]; then
 		        GROUP=`echo $CNODE | sed "s#group:##g"`
 		        CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#"`
 		        #echo "NODES: $CNODE"
 		      else
-            CNODES=$CNODE
-          fi
+        		CNODES=$CNODE
+        	      fi
 																					     
 		      for CNODE in $CNODES; do
 
-            #TODO: replace eth0 by CDEV
+        		#TODO: replace eth0 by CDEV
 		        NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$CNODE[[:space:]]*eth0" | wc -l`
 			
-            if [ $NODEINFILE -ne 0 ]; then
-              #echo "Found node $CNODE with device $CDEV. Step over"  
+        		if [ $NODEINFILE -ne 0 ]; then
+            		    #echo "Found node $CNODE with device $CDEV. Step over"  
 			        continue
-			      fi
+			fi
 		      
 		        CDEV=eth0
 		        
