@@ -19,23 +19,23 @@ elementclass DSR {$ID, $LT, $RC |
 
   input[0]
 #ifdef DEBUG_DSR
-  -> Print("RouteQuery")
+  -> Print("NODENAME: RouteQuery")
 #endif
   -> querier[0]
 #ifdef DEBUG_DSR
-  -> Print("DSR: querie",100)
+  -> Print("NODENAME: DSR: querie",100)
 #endif
   -> [1]output;                                             // rreq packets (broadcast)
   
   querier[1] 
 #ifdef DEBUG_DSR
-  -> Print("DSR: src_forwarder", 100)
+  -> Print("NODENAME: DSR: src_forwarder", 100)
 #endif
   -> [0]src_forwarder;                                      // src routed packets (unicast)
 
   src_forwarder[0]
 #ifdef DEBUG_DSR
-  -> Print("Forward",100)
+  -> Print("NODENAME: Forward",100)
 #endif
   -> routing_peek
   -> BRN2EtherEncap(USEANNO true)
@@ -44,13 +44,13 @@ elementclass DSR {$ID, $LT, $RC |
 
   src_forwarder[1]
 #ifdef DEBUG_DSR
-  -> Print("Final dest", 100)
+  -> Print("NODENAME: Final dest", 100)
 #endif
   -> [0]output;
 
   src_forwarder[2]
 #ifdef DEBUG_DSR
-  -> Print("Error")
+  -> Print("NODENAME: Error")
 #endif
   -> tee_to_err_fwd :: Tee()
   -> Discard;                                                  //is for BRNiapp
@@ -70,24 +70,24 @@ elementclass DSR {$ID, $LT, $RC |
 
   dsrclf[0]
 #ifdef DEBUG_DSR
-  -> Print("Req_fwd_in")
+  -> Print("NODENAME: Req_fwd_in")
 #endif
   -> req_forwarder[0]
 #ifdef DEBUG_DSR
-  -> Print("Req_fwd_out")
+  -> Print("NODENAME: Req_fwd_out")
 #endif
   -> [1]output;
 
   req_forwarder[1]
 #ifdef DEBUG_DSR
-  -> Print("Target! now send reply")
+  -> Print("NODENAME: Target! now send reply")
 #endif
   -> [0]rep_forwarder
   -> [1]output;
 
   dsrclf[1] 
 #ifdef DEBUG_DSR
-  -> Print("Route Reply")
+  -> Print("NODENAME: Route Reply")
 #endif
   -> [1]rep_forwarder;
 
@@ -97,7 +97,7 @@ elementclass DSR {$ID, $LT, $RC |
 
   dsrclf[3]
 #ifdef DEBUG_DSR
-  -> Print("SRCFWD")
+  -> Print("NODENAME: SRCFWD")
 #endif
   -> [1]src_forwarder;
 
