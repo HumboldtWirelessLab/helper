@@ -29,14 +29,20 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
                             PERIOD             6000,
                             TAU              200000,
                             ETX          etx_metric,
+#ifdef SIMULATION
+                            PROBES  "2 200",
+#else
                             PROBES  "2 100 4 100 11 100 12 100 22 100 18 100 24 100 36 100 48 100 72 100 96 100 108 100",
-  //                        PROBES  "2 100",
+                            //PROBES  "2 100",
+#endif
                             RT           proberates);
 
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
+  -> SetTXPower(15)
+  -> SetTXRate(RATE 2, TRIES 7)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> wifioutq::NotifierQueue(50)
 #ifdef PRIO_QUEUE
@@ -53,6 +59,12 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> wififrame_clf :: Classifier( 1/40%40,  // wep frames
                                   0/00%0f,  // management frames
                                       - );
+
+  filter_tx[1]
+#ifdef WIFIDEV_LINKSTAT_DEBUG
+  -> PrintWifi()
+#endif
+  -> Discard;
 
   wififrame_clf[0]
     -> Discard;
