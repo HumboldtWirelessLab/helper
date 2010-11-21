@@ -26,11 +26,11 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   link_stat :: BRN2LinkStat(ETHTYPE          0x0a04,
                             DEVICE          $device,
-                            PERIOD             5000,
-                            TAU              100000,
+                            PERIOD             6000,
+                            TAU              200000,
                             ETX          etx_metric,
-                            PROBES  "2 100 12 100 22 100 108 100",
-  //                        PROBES  "2 250",
+                            PROBES  "2 100 4 100 11 100 12 100 22 100 18 100 24 100 36 100 48 100 72 100 96 100 108 100",
+  //                        PROBES  "2 100",
                             RT           proberates);
 
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
