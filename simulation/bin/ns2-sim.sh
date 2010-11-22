@@ -242,7 +242,7 @@ case "$1" in
 			    if [ "x$TIME" != "x" ]; then
     				if [ "x$MODE" = "xwrite" ]; then
 				    VALUE=`get_params $line | sed $NODEMAC_SEDARG`
-				    echo "\$ns_ at $TIME \"puts \\\"\\[\\[\$node_($NODENUM) entry\\] writehandler $ELEMENT $HANDLER \\\"$VALUE\\\" \\]\\\"\"" >> $TCLFILE
+				    echo "\$ns_ at $TIME \"set result \\[\\[\$node_($NODENUM) entry\\] writehandler $ELEMENT $HANDLER \\\"$VALUE\\\" \\]\"" >> $TCLFILE
 				else
 				    echo "\$ns_ at $TIME \"puts \\\"\\[\\[\$node_($NODENUM) entry\\] readhandler $ELEMENT $HANDLER \\]\\\"\"" >> $TCLFILE
 				fi
