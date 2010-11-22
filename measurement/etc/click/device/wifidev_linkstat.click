@@ -42,7 +42,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   input[0]
   -> SetTXPower(15)
-  -> SetTXRate(RATE 2, TRIES 7)
+  -> SetTXRate(RATE 2, TRIES 14)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> wifioutq::NotifierQueue(50)
 #ifdef PRIO_QUEUE
@@ -62,7 +62,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   filter_tx[1]
 #ifdef WIFIDEV_LINKSTAT_DEBUG
-  -> PrintWifi()
+  -> PrintWifi("NODENAME:NODEDEVICE ", TIMESTAMP true)
 #endif
   -> Discard;
 
