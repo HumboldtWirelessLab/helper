@@ -16,6 +16,9 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
+#ifdef SIMULATION
+  -> WifiSeq()
+#endif
   -> __WIFIENCAP__
   -> rawdev;
 
