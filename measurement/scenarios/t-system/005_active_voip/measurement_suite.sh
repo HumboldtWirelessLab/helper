@@ -51,7 +51,7 @@ fi
 
 CONFIGFILE=$2
 
-CONFIGS=`cat $CONFIGFILE | grep -v "#" | awk '{print $1}' | sort -u`
+CONFIGS=`cat $CONFIGFILE | grep -v "#" | awk '{print $1}' | uniq`
 
 for i in $CONFIGS; do
     LINE=`cat $CONFIGFILE | grep -v "#" | grep $i | head -n 1`
