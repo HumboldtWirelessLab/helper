@@ -20,7 +20,7 @@ esac
 
 . $DIR/../../host/bin/functions.sh
 
-NODELIST=`cat $CONFIGFILE | grep -v "#" | awk '{print $1}' | sort -u`
+NODELIST=`cat $CONFIGFILE | grep -v "#" | awk '{print $1}' | uniq`
 
 RUN_CLICK_APPLICATION=0
 
@@ -214,7 +214,7 @@ abort_measurement() {
 
   echo -n "Killall screens..." >&6
   if [ -f $MSCREENFILENAME ]; then
-    MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | sort -u`
+    MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | uniq`
     for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
       echo "Close screen $MEASUREMENTSCREENNAME"
       screen -S $MEASUREMENTSCREENNAME -X quit
@@ -222,7 +222,7 @@ abort_measurement() {
   fi
 
   if [ -f $NODESCREENFILENAME ]; then
-    NODESCREENNAMES=`cat $NODESCREENFILENAME | awk '{print $2}' | sort -u`
+    NODESCREENNAMES=`cat $NODESCREENFILENAME | awk '{print $2}' | uniq`
     for NODESCREENNAME in $NODESCREENNAMES; do
       echo "Close screen $NODESCREENNAME"
       screen -S $NODESCREENNAME -X quit
@@ -635,7 +635,7 @@ echo "Finished setup of nodes and screen-session"
       screen -S $LOCALSCREENNAME -X quit
     fi
 
-    MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | sort -u`
+    MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | uniq`
     for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
       screen -S $MEASUREMENTSCREENNAME -X quit
     done

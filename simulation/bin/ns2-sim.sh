@@ -18,6 +18,12 @@ case "$SIGN" in
 	;;
 esac
 
+#Function used to get params for control part TODO: try to use arrays
+function get_params() {
+  shift 6
+  echo $@
+}
+
 if [ ! "x$1" = "xrun" ]; then
 	echo "Use $0 run dis-file"
 	exit 0
@@ -84,7 +90,7 @@ case "$1" in
 		SIMDIS=$FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
 		. $SIMDIS
 		TCLFILE="$FINALRESULTDIR/$NAME.tcl"
-		NODELIST=`cat $NODETABLE | grep -v "#" | awk '{print $1}' | sort -u`
+		NODELIST=`cat $NODETABLE | grep -v "#" | awk '{print $1}' | uniq`
 		NODECOUNT=`cat $NODETABLE | grep -v "#" | wc -l`
 		cat $DIR/../etc/ns/radio/$RADIO\.tcl > $TCLFILE
 
@@ -170,15 +176,16 @@ case "$1" in
 		i=0
 		echo -n "" > $FINALRESULTDIR/nodes.mac
 
+		NODEMAC_SEDARG=""	
 		for node in $NODELIST; do
 		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		    for nodedevice in $NODEDEVICELIST; do		    
 			    CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
 			    echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
-                            i=`expr $i + 1`
 
-			    m1=`expr $i / 256`
-			    m2=`expr $i % 256`
+			    mac_raw=`expr $i + 1`
+			    m1=`expr $mac_raw / 256`
+			    m2=`expr $mac_raw % 256`
 			    m1h=$(echo "obase=16; $m1" | bc | tr [A-F] [a-f])
 			    m2h=$(echo "obase=16; $m2" | bc | tr [A-F] [a-f])
 			    if [ $m1 -lt 16 ]; then
@@ -188,7 +195,9 @@ case "$1" in
 			      m2h="0$m2h"
 			    fi
 			    echo "$node $nodedevice 00:00:00:00:$m1h:$m2h $i" >> $FINALRESULTDIR/nodes.mac
-
+			    NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#$node:eth#00:00:00:00:$m1h:$m2h#g"
+			    
+                            i=$mac_raw
 		    done
 		done
 		
@@ -222,13 +231,22 @@ case "$1" in
 		    while read line; do
 		        ISCOMMENT=`echo $line | grep "#" | wc -l`
 		        if [ $ISCOMMENT -eq 0 ]; then
-			    TIME==`echo $line | awk '{print $1}'`
+			    TIME=`echo $line | awk '{print $1}'`
 			    NODENAME=`echo $line | awk '{print $2}'`
 			    NODEDEVICE=`echo $line | awk '{print $3}'`
-			    MODE=`echo $line | awk '{print $3}'`
+			    MODE=`echo $line | awk '{print $4}'`
+			    ELEMENT=`echo $line | awk '{print $5}'`
+			    HANDLER=`echo $line | awk '{print $6}'`
+			    NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$NODENAME[[:space:]]" | awk '{print $4}'`
 			    
-			    
-									                      
+			    if [ "x$TIME" != "x" ]; then
+    				if [ "x$MODE" = "xwrite" ]; then
+				    VALUE=`get_params $line | sed $NODEMAC_SEDARG`
+				    echo "\$ns_ at $TIME \"set result \\[\\[\$node_($NODENUM) entry\\] writehandler $ELEMENT $HANDLER \\\"$VALUE\\\" \\]\"" >> $TCLFILE
+				else
+				    echo "\$ns_ at $TIME \"puts \\\"\\[\\[\$node_($NODENUM) entry\\] readhandler $ELEMENT $HANDLER \\]\\\"\"" >> $TCLFILE
+				fi
+			    fi
 			fi
 		    done < $CONTROLFILE
 		fi

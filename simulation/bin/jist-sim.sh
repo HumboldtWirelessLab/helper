@@ -47,7 +47,7 @@ case "$1" in
 		SIMDIS=$FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
 		. $SIMDIS
 		TCLFILE="$FINALRESULTDIR/$NAME.tcl"
-		NODELIST=`cat $NODETABLE | grep -v "#" | awk '{print $1}' | sort -u`
+		NODELIST=`cat $NODETABLE | grep -v "#" | awk '{print $1}' | uniq`
 		NODECOUNT=`cat $NODETABLE | grep -v "#" | wc -l`
 		cat $DIR/../etc/ns/radio/$RADIO\.tcl > $TCLFILE
 
