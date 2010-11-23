@@ -23,7 +23,7 @@ esac
 
 case "$1" in
     "random")
-          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | sort -u`
+          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
           NODECOUNT=`echo $NODES | wc -w`
           for n in $NODES; do
 	    N=`head -1 /dev/urandom | od -N 2 -t uL | head -n 1 | awk '{print $2}'`
@@ -34,7 +34,7 @@ case "$1" in
 	  done
 	  ;;
     "grid")
-          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | sort -u`
+          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
           NODECOUNT=`echo $NODES | wc -w`
           SIDELEN=`echo "sqrt($NODECOUNT)" | bc`
 	  SLSQR=`expr $SIDELEN \* $SIDELEN`
@@ -56,7 +56,7 @@ case "$1" in
 	  done
           ;;
     "npart")
-	  NODES=`cat $2 | grep -v "#" | awk '{print $1"\n"}' | sort -u`
+	  NODES=`cat $2 | grep -v "#" | awk '{print $1"\n"}' | uniq`
           NODECOUNT=`echo $NODES | wc -w`
 	  REPLACE=`cat $2 | grep -v "#" | awk '{print " -e s#node_" NR - 1 "[[:space:]]#"$1";#g"}' | sed 's/$/ /' | tr -d '\n'`
 	  #REPLACE=`cat $2 | grep -v "#" | awk '{print " \"s#node_" NR - 1 " #"$1" #g\""}'`
@@ -65,7 +65,7 @@ case "$1" in
 	  java -classpath $NPART_DIR/classes/production/Npart:$NPART_DIR/lib/jargs.jar:$NPART_DIR/lib/mantissa-7.2.jar NPART.TopologyGenerator -n $NODECOUNT -r 80 -d 0.8 -o ts -p 5 -c 1 -t 150 -a distroL | sed $REPLACE | sed "s#;# #g"
 	  ;;
     "string")
-          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | sort -u`
+          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
           NODECOUNT=`echo $NODES | wc -w`
 	  NODEN=0
 	  SIDESTEP=`expr $3 / \( $NODECOUNT - 1 \)`

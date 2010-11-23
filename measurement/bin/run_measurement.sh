@@ -70,7 +70,7 @@ fi
 mkdir $FINALRESULTDIR
 chmod 777 $FINALRESULTDIR
 
-NODELIST=`cat $CONFIGDIR/$NODETABLE | grep -v "^#" | awk '{print $1}' | sort -u`
+NODELIST=`cat $CONFIGDIR/$NODETABLE | grep -v "^#" | awk '{print $1}' | uniq`
 
 if [ "x$GPS" = "xyes" ] || [ "x$GPS" = "xsingle" ] || [ "x$LOS" = "xyes" ]; then
   if [ "x$GPS" = "xyes" ] || [ "x$GPS" = "xsingle" ]; then
@@ -161,7 +161,7 @@ for node in $NODELIST; do
 	#echo $node $NODEDEVICELIST
 	for nodedevice in $NODEDEVICELIST; do
 
-		WIFICONFIG=`cat $NODETABLE | awk '{print $1" "$2" "$5}' | egrep "^$node $nodedevice" | awk '{print $3}' | sort -u`
+		WIFICONFIG=`cat $NODETABLE | awk '{print $1" "$2" "$5}' | egrep "^$node $nodedevice" | awk '{print $3}' | uniq`
 
 #		echo $node $nodedevice
 		for wificonfig_ac in $WIFICONFIG; do
