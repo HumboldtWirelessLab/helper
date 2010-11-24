@@ -46,7 +46,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> wifioutq::NotifierQueue(50)
 #ifdef PRIO_QUEUE
-  -> [1]x_prio_q::PrioSched();
+  -> [1]x_prio_q::PrioSched()
 #endif
   -> wifidevice
   -> filter_tx :: FilterTX()
