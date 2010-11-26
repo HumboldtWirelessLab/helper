@@ -365,7 +365,10 @@ case "$1" in
             ;;
     "getiwconfig")
             PHYDEV=`get_phy_dev $DEVICE`
+            echo "iwconfig"
             ${IWCONFIG} $DEVICE
+            echo "ifconfig"
+            ${IFCONFIG} $DEVICE
             sysctl dev.$PHYDEV.disable_cca
             sysctl dev.$PHYDEV.cca_thresh
             ${IWPRIV} $DEVICE get_macclone

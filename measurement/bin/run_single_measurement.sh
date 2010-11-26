@@ -488,6 +488,26 @@ done
 
 echo "Finished setup of nodes and screen-session"
 
+#########################################
+####### CREATE NODES-MAC FILE  ##########
+#########################################
+
+echo -n "" > nodes.mac
+NODENUM=1
+
+for node in $NODELIST; do
+      NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+
+      for nodedevice in $NODEDEVICELIST; do
+        if [ -f status/$node\_wifiinfo.log ]; then
+          MAC=`cat status/$node\_wifiinfo.log | grep $nodedevice | grep Link | grep -v "ESSID" | grep -v "Warni" | sed -e "s#^.*dr[a-z]*[[:space:]]##g" | cut -b 1-17`
+          echo "$node $nodedevice $MAC $NODENUM" >> nodes.mac
+          NODENUM=`expr $NODENUM + 1`
+        fi
+      done
+done
+
+
 #########################################################
 ####### Start Local Click- & Application-Stuff ##########
 #########################################################
