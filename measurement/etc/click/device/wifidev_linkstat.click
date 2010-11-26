@@ -26,14 +26,14 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   link_stat :: BRN2LinkStat(ETHTYPE          0x0a04,
                             DEVICE          $device,
-                            PERIOD             6000,
-                            TAU              200000,
+                            PERIOD             2000,
+                            TAU              100000,
                             ETX          etx_metric,
 #ifdef SIMULATION
                             PROBES  "2 200",
 #else
-                            PROBES  "2 100 4 100 11 100 12 100 22 100 18 100 24 100 36 100 48 100 72 100 96 100 108 100",
-                            //PROBES  "2 100",
+//                            PROBES  "2 100 4 100 11 100 12 100 22 100 18 100 24 100 36 100 48 100 72 100 96 100 108 100",
+                            PROBES  "2 1400",
 #endif
                             RT           proberates);
 
