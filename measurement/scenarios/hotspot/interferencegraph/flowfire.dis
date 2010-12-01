@@ -1,9 +1,9 @@
-NAME=simple_flow
+NAME=flowfire
 SIMULATOR=ns2
 RADIO=shadowing11b
 FORGEINNODES=no
 
-TIME=1200
+TIME=120
 
 #CLICKMODE=kernel | userlevel | both
 CLICKMODE=userlevel
@@ -20,7 +20,7 @@ EVALUATIONSDIRPOSTFIX=_evaluation
 
 LOCALPROCESS=CONFIGDIR/flowfirectrl.sh
 
-WANTNODELIST=yes
+#WANTNODELIST=yes
 
 GPS=no
 NOTICE=no
