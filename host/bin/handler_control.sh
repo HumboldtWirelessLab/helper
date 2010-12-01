@@ -47,16 +47,16 @@ while read line; do
     if [ "x$MODE" = "xwrite" ]; then
       VALUE=`get_params $line | sed $NODEMAC_SEDARG`
     fi
-    
+
     if [ "x$TIME" != "x" ]; then
       DIFF_TIME=`expr $TIME - $AC_TIME`
       sleep $DIFF_TIME
-    
+
       if [ "x$MODE" = "xwrite" ]; then
-        echo "clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER \"$VALUE\""
+        #echo "clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER \"$VALUE\""
         clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER "$VALUE"
       else
-        echo "clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER"
+        #echo "clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER"
         clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER
       fi
       AC_TIME=$TIME

@@ -1,8 +1,7 @@
 BRNAddressInfo(my_wlan NODEDEVICE:eth);
 q::NotifierQueue(500)
 
-FROMDEVICE
- -> SetTimestamp()
+FROMRAWDEVICE(NODEDEVICE)
  -> Discard;
 
 qc::BRN2PacketQueueControl(QUEUESIZEHANDLER q.length, QUEUERESETHANDLER q.reset, MINP 100 , MAXP 500)
@@ -12,9 +11,7 @@ qc::BRN2PacketQueueControl(QUEUESIZEHANDLER q.length, QUEUERESETHANDLER q.reset,
  -> SetTXRate(2)
  -> SetTXPower(15)
  -> q
- -> TODEVICE;
-
-Script(
-  wait RUNTIME,
-  stop
-);
+ -> SetTimestamp()
+ -> Print(TIMESTAMP true)
+ -> cnt::Counter()
+ -> TODEVICE(NODEDEVICE);
