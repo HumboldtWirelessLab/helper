@@ -36,6 +36,12 @@ public class ClientDispatcher extends Thread {
         if (lastRead < dataDispatcher.lastUpdate) {
           lastRead = dataDispatcher.lastUpdate;
           byte[] mssg = dataDispatcher.getNewData();
+/*          System.out.print("tx: ");
+          for (int j = 0; j < mssg.length; j++) {
+            byte b = mssg[j];
+            System.out.print(b + " ");
+          }
+          System.out.println();*/
           out.write(mssg);
           //System.out.println("Send data");
           out.flush();
