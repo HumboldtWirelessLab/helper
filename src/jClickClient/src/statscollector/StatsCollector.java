@@ -24,7 +24,7 @@ public class StatsCollector {
         client = server.accept();
         client.setTrafficClass(0x10);
         client.setTcpNoDelay(true);
-      
+
         ClientDispatcher cd = new ClientDispatcher(client, dataDispatcher);
         cd.start();
       }
@@ -42,16 +42,16 @@ public class StatsCollector {
       socket.setReuseAddress(true);
 
       byte[] mssg;
-    
+
       for (;;) {
         mssg = dataDispatcher.getData();
-        //System.out.print("tx: ");
+    /*    System.out.print("tx: ");
         for (int j = 0; j < mssg.length; j++) {
           byte b = mssg[j];
-          //System.out.print(b + " ");
+          System.out.print(b + " ");
         }
-        //System.out.println();
-
+        System.out.println();
+      */
         DatagramPacket packet = new DatagramPacket(mssg, mssg.length, addr, port);
         socket.send(packet);
         Thread.sleep(1000);

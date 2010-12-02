@@ -31,7 +31,7 @@ public class DataDispatcher extends Thread {
     printList();
     openNodes();
     startNodes();
-    mssg = new byte[1 + nodes.size() * statsInfo.getSize() + 1];
+    mssg = new byte[1 + nodes.size() * (statsInfo.getSize() + 1) + 1];
   }
 
   void loadNodes(String filename) {
@@ -96,7 +96,7 @@ public class DataDispatcher extends Thread {
   }
 
   byte[] getData() {
-    byte[] result = new byte[1 + nodes.size() * statsInfo.getSize() + 1];
+    byte[] result = new byte[1 + nodes.size() * (statsInfo.getSize() + 1) + 1];
 
     result[0] = (byte)nodes.size();
     for ( int i = 0; i < nodes.size(); i++) {
@@ -109,7 +109,12 @@ public class DataDispatcher extends Thread {
       }
     }
 
-    result[1 + nodes.size() * statsInfo.getSize()] = 127;
+    for ( int i = 0; i < nodes.size(); i++) {
+      ClickNodeInfo cni = nodes.get(i);
+      result[1 + nodes.size() * statsInfo.getSize() + i] = cni.ip.getAddress()[3];
+    }
+
+    result[1 + nodes.size() * (statsInfo.getSize()+1)] = 127;
 
     return result;
   }

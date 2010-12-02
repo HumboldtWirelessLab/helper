@@ -9,7 +9,7 @@ class ClickNodeInfo extends Thread {
   String nodeName;
 
   ClickConnection cc = null;
-  InetAddress ip = null;
+  public InetAddress ip = null;
   int port;
 
   StatsInfo statsInfo;
