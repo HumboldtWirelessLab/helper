@@ -10,7 +10,8 @@ wireless::BRN2Device(DEVICENAME "NODEDEVICE", ETHERADDRESS deviceaddress, DEVICE
 
 rawdevice::RAWDEV(DEVNAME NODEDEVICE, DEVICE wireless);
 
-cst::ChannelStats(MAX_AGE 100);
+//cst::ChannelStats(MAX_AGE 100);
+cst::ChannelStats(STATS_DURATION 1000, SAVE_DURATION 1000, RSSI_PER_NEIGHBOUR true, STATS_TIMER true, FAST_MODE true);
 
 rawdevice
 //  -> t::Tee()
