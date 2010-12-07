@@ -23,10 +23,12 @@ class ClickNodeInfo extends Thread {
   public void run() {
     while (true) {
       boolean read_error = false;
-      for( int i = 0; i < statsInfo.getSize(); i++) {
-        StatsInfo.SingleStat st = statsInfo.getByIndex(i);
-        lastValues[i] = readInfo(st.element, st.handler);
-        read_error |= (lastValues[i] == null);
+      synchronized(this) {
+        for( int i = 0; i < statsInfo.getSize(); i++) {
+          StatsInfo.SingleStat st = statsInfo.getByIndex(i);
+          lastValues[i] = readInfo(st.element, st.handler);
+          read_error |= (lastValues[i] == null);
+        }
       }
 
       try {
@@ -63,7 +65,7 @@ class ClickNodeInfo extends Thread {
     }
   }
 
-  public String[] getInfo() {
+  public synchronized String[] getInfo() {
     return lastValues;
   }
 
