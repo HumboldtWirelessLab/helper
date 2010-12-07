@@ -26,7 +26,7 @@ class ClickNodeInfo extends Thread {
       for( int i = 0; i < statsInfo.getSize(); i++) {
         StatsInfo.SingleStat st = statsInfo.getByIndex(i);
         lastValues[i] = readInfo(st.element, st.handler);
-        read_error |= lastValues[i] == null;
+        read_error |= (lastValues[i] == null);
       }
 
       try {
