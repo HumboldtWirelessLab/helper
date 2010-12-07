@@ -7,7 +7,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef CST
 #ifdef CST_PROCFILE
-  cst::ChannelStats(STATS_DURATION 1000, SAVE_DURATION 1000, PROCFILE CST_PROCFILE, PROCINTERVAL 1000, RSSI_PER_NEIGHBOUR true, STATS_TIMER true, FAST_MODE true);
+  cst::ChannelStats(STATS_DURATION 1000, SAVE_DURATION 1000, PROCFILE CST_PROCFILE, PROCINTERVAL 1000, RSSI_PER_NEIGHBOUR true, STATS_TIMER true, SMALL_STATS true);
 #else
   cst::ChannelStats(STATS_DURATION 1000, SAVE_DURATION 1000, RSSI_PER_NEIGHBOUR true, STATS_TIMER true);
 #endif
@@ -33,6 +33,12 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   Idle
   -> sc::BRN2SetChannel(CHANNEL 0)
   -> Discard;
+#endif
+
+#if WIFITYPE == 805
+  Idle
+  -> ath_op::Ath2Operation()
+  -> rawdev;
 #endif
 
 }
