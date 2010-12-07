@@ -6,9 +6,9 @@
 
 elementclass BATMAN {$ID, $LT |
 
-  brt::BatmanRoutingTable( NODEID $ID);
+  brt::BatmanRoutingTable( NODEID $ID, LINKTABLE $LT);
 
-  bos::BatmanOriginatorSource( NODEID $ID, INTERVAL 2000);
+  bos::BatmanOriginatorSource( BATMANTABLE brt, NODEID $ID, INTERVAL 5000);
   bofwd::BatmanOriginatorForwarder( NODEID $ID, BATMANTABLE brt)
 
   bf::BatmanForwarder( NODEID $ID, BATMANTABLE brt);
@@ -16,7 +16,7 @@ elementclass BATMAN {$ID, $LT |
   
   input[1]
   -> BRN2Decap()
-//-> Print("BATMAN")
+//-> Print("NODENAME: BATMAN", TIMESTAMP true)
   -> bc::Classifier( 0/01,  //originator
                      0/02   //routingfwd
                   );
@@ -31,18 +31,18 @@ elementclass BATMAN {$ID, $LT |
   -> brnee;
 
   bc[1]
-  //-> Print("Routing FWD")
+//-> Print("NODENAME: Routing FWD", TIMESTAMP true)
   -> bf;
 
   bf[0]
   -> [0]output;
 
   bf[1] 
-//-> Print("Fwd to next hop") 
+//-> Print("Fwd to next hop", TIMESTAMP true) 
   -> brnee;
   
   bf[2] 
-//-> Print("RouteError")
+  -> Print("RouteError")
   -> Discard;
 
   input[0]
@@ -53,7 +53,7 @@ elementclass BATMAN {$ID, $LT |
   -> [0]output;
 
   br[1] 
-//-> Print("On Route")
+//-> Print("NODEDEVICE: On Route", TIMESTAMP true)
   -> brnee;
   
   br[2]
