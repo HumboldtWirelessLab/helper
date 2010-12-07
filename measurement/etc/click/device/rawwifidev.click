@@ -29,6 +29,12 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
   -> [0]output;
 
+#ifdef SETCHANNEL
+  Idle
+  -> sc::BRN2SetChannel(CHANNEL 0)
+  -> Discard;
+#endif
+
 }
 
 #endif
