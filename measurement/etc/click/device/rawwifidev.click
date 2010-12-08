@@ -20,6 +20,20 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> WifiSeq()
 #endif
   -> __WIFIENCAP__
+
+#if WIFITYPE == 805
+  -> [1]op_prio_q::PrioSched();
+
+  ath_op::Ath2Operation();
+
+  ath_op[1] -> Discard;
+
+  Idle
+  -> ath_op
+  -> ath_op_q::NotifierQueue(10)
+  -> op_prio_q
+#endif
+
   -> rawdev;
 
   rawdev
@@ -33,12 +47,6 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   Idle
   -> sc::BRN2SetChannel(CHANNEL 0)
   -> Discard;
-#endif
-
-#if WIFITYPE == 805
-  Idle
-  -> ath_op::Ath2Operation()
-  -> rawdev;
 #endif
 
 }
