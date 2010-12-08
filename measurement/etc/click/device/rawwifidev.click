@@ -17,31 +17,40 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
   input[0]
 #ifdef SIMULATION
-  -> WifiSeq()
+  -> WifiSeq()                      // Set sequencenumber for simulation
 #endif
   -> __WIFIENCAP__
 
-#if WIFITYPE == 805
-  -> [1]op_prio_q::PrioSched();
-
-  ath_op::Ath2Operation();
-
-  ath_op[1] -> Discard;
-
-  Idle
-  -> ath_op
-  -> ath_op_q::NotifierQueue(10)
-  -> op_prio_q
-#endif
+#if WIFITYPE == 805                 /***  for ath2 add priority scheduler to prefer operation packet ***/
+  -> [1]op_prio_q::PrioSched();     /**/
+                                    /**/ 
+  ath_op::Ath2Operation();          /**/
+                                    /**/
+  ath_op[1] -> Discard;             /**/
+                                    /**/
+  ath_op                            /**/   
+  -> ath_op_q::NotifierQueue(10)    /**/
+  -> op_prio_q                      /**/
+#endif                              /***  end of ath2                                                **/
 
   -> rawdev;
 
   rawdev
-  -> __WIFIDECAP__
+  -> dev_decap::__WIFIDECAP__
 #ifdef CST
-  -> cst
+  -> cst                            //add channel stats if requested
 #endif
   -> [0]output;
+
+
+#if WIFITYPE == 805
+  dev_decap[1]
+  -> too_small_cnt::Counter
+  -> Discard;
+  
+  dev_decap[2]
+  -> ath_op;
+#endif
 
 #ifdef SETCHANNEL
   Idle
