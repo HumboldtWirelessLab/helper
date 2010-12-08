@@ -29,13 +29,13 @@ class ClickNodeInfo extends Thread {
           StatsInfo.SingleStat st = statsInfo.getByIndex(i);
           lastValues[i] = readInfo(st.element, st.handler);
 
-	Integer value = new Integer(lastValues[i]);
-	if( ( i < 2 && value < 0 ) ||  ( i == 2 && value > 0 ) || ( i == 3 && value != -1 ) || ( i == 4 && value <= 0 ) ){
-	  System.out.println("Error: Handler: " + st.element+ " " +  st.handler +" " + ip + " " + i + " "+ value);
-	  throw new RuntimeException();
-	}
+/*        Integer value = new Integer(lastValues[i]);
+          if( ( i < 2 && value < 0 ) ||  ( i == 2 && value > 0 ) || ( i == 3 && value != -1 ) || ( i == 4 && value <= 0 ) ){
+            System.out.println("Error: Handler: " + st.element+ " " +  st.handler +" " + ip + " " + i + " "+ value);
+            throw new RuntimeException();
+          }*/
 
-          read_error |= lastValues[i] == null;
+          read_error |= (lastValues[i] == null);
         }
       }
 

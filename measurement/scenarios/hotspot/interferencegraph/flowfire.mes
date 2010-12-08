@@ -1,2 +1,2 @@
 #NODE		DEVICE	MODULSDIR						MODOPTIONS	WIFICONFIG	CLICKMODDIR	CLICKSCRIPT	LOGFILE				APP	APPLOGFILE
-group:nodes	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION	-		monitor.cfg	-		flowfire.click	LOGDIR/NODENAME.NODEDEVICE.log	-	-
+group:nodes.sim	ath0	BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION	-		monitor.cfg	-		flowfire.click	LOGDIR/NODENAME.NODEDEVICE.log	-	-

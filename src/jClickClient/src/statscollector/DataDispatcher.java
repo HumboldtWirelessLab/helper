@@ -106,6 +106,8 @@ public class DataDispatcher extends Thread {
       for ( int j = 0; j < statsInfo.getSize(); j++) {
         if (l[j] != null)
           result[1 + ((j * nodes.size()) + i)] = (new Integer(l[j])).byteValue();
+        else
+          result[1 + ((j * nodes.size()) + i)] = 0;          
       }
     }
 
