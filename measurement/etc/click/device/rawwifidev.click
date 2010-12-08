@@ -35,6 +35,12 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> Discard;
 #endif
 
+#if WIFITYPE == 805
+  Idle
+  -> ath_op::Ath2Operation()
+  -> rawdev;
+#endif
+
 }
 
 #endif

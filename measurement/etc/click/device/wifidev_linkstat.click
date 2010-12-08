@@ -26,11 +26,16 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   link_stat :: BRN2LinkStat(ETHTYPE          0x0a04,
                             DEVICE          $device,
+#ifdef SIMULATION			    
+                            PERIOD             2000,
+                            TAU               30000,
+#else
                             PERIOD             5000,
                             TAU              100000,
+#endif
                             ETX          etx_metric,
 #ifdef SIMULATION
-                            PROBES  "2 200",
+                            PROBES  "2 300",
 #else
 //                          PROBES  "2 100 4 100 11 100 12 100 22 100 18 100 24 100 36 100 48 100 72 100 96 100 108 100",
                             PROBES  "2 200",
@@ -92,7 +97,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 //-> Print("Data, no LP")
   -> brnToMe;
 
-  brnToMe[0] -> /*Print("wifi0") ->*/ [0]output;
+  brnToMe[0] -> /*Print("NODENAME: wifi0", TIMESTAMP true) ->*/ [0]output;
   brnToMe[1] -> /*Print("wifi1") ->*/ [1]output;
   brnToMe[2] -> /*Print("wifi2") ->*/ [2]output;
 
