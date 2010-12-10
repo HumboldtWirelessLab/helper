@@ -72,6 +72,10 @@ public class ClickConnection {
     return 0;
   }
 
+  public int skipIn(int n) {
+    return cliccs.skipIn(n);
+  }
+
   public int closeClickConnection() {
     cliccs.close();
     return 0;

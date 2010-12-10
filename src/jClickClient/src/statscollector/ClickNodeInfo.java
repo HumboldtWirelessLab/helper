@@ -22,18 +22,31 @@ class ClickNodeInfo extends Thread {
   }
 
   public void run() {
+    boolean read_error = false;
     while (true) {
-      boolean read_error = false;
+      if ( read_error) cc.skipIn(10);
+
+      read_error = false;
       synchronized(semaphore) {
         for( int i = 0; i < statsInfo.getSize(); i++) {
           StatsInfo.SingleStat st = statsInfo.getByIndex(i);
           lastValues[i] = readInfo(st.element, st.handler);
 
-/*        Integer value = new Integer(lastValues[i]);
-          if( ( i < 2 && value < 0 ) ||  ( i == 2 && value > 0 ) || ( i == 3 && value != -1 ) || ( i == 4 && value <= 0 ) ){
-            System.out.println("Error: Handler: " + st.element+ " " +  st.handler +" " + ip + " " + i + " "+ value);
-            throw new RuntimeException();
-          }*/
+          if (lastValues[i] != null ) {
+            Integer value = new Integer(lastValues[i]);
+            if( ( i < 2 && value < 0 ) ||  ( i == 2 && value > 0 ) || ( i == 3 && value != -1 ) || ( i == 4 && value <= 0 ) ){
+              System.out.println("Error: Handler (" + i + "): " + st.element+ " " +  st.handler +" " + ip + " " + i + " "+ value);
+              //throw new RuntimeException();
+              lastValues[i] = null;
+            }
+          } else {
+            try {
+              sleep(100);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+            cc.skipIn(10);
+          }
 
           read_error |= (lastValues[i] == null);
         }
