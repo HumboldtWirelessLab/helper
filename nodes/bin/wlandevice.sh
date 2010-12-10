@@ -358,6 +358,15 @@ case "$1" in
 
 	    echo "$IFCONFIG $DEVICE up"
 	    ${IFCONFIG} $DEVICE up
+
+	    if [ "x$MTU" = "x" ]; then
+		MTU=2346
+	    fi
+
+	    #TODO: add something like prestart_config
+	    #TODO: set mtu depending on WIFITYPE
+	    echo "$IFCONFIG $DEVICE mtu $MTU"
+	    ${IFCONFIG} $DEVICE mtu $MTU
 	    ;;
     "getmac")
             MADDR=`$IFCONFIG $DEVICE | grep HWaddr | awk '{print $5}' | sed -e "s#-# #g" -e "s#:# #g" | awk '{print $1":"$2":"$3":"$4":"$5":"$6}'`
