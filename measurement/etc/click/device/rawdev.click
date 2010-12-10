@@ -4,11 +4,15 @@
 elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 
   input[0]
-//-> Print("To Device")
+#ifdef RAWDEV_DEBUG
+  -> Print("To Device")
+#endif
   -> TORAWDEVICE($devname);
 
   FROMRAWDEVICE($devname)
-//-> Print("From Device")
+#ifdef RAWDEV_DEBUG
+  -> Print("From Device")
+#endif
 #ifdef SIMULATION
   -> SetTimestamp()
 #endif
