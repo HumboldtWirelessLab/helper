@@ -204,8 +204,8 @@ abort_measurement() {
     CPID=`cat $c`
     kill $CPID
   done
-  echo " done"
-  
+  echo " done" >&6
+
   echo -n "Wait for all nodes..." >&6
 
   SYNCSTATE=`wait_for_nodes "$NODELIST" _abort.state 30`
