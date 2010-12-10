@@ -199,7 +199,7 @@ abort_measurement() {
 
   echo "Kill Click done" >&6
 
-  echo -n"Kill node ctrl ..." >&6
+  echo -n "Kill node ctrl ..." >&6
   for c in `ls status/*nodectrl.pid 2> /dev/null`; do
     CPID=`cat $c`
     kill $CPID
@@ -391,7 +391,7 @@ for state in  $STATES; do
   fi
 
   if [ "x$state" = "xclickmodule" ]; then
-    echo -n "State: Prestart local process ... " >&6
+    echo -n "State: Configure Clickmodule (if needed) and start measurement sessions ... " >&6
 
     #################################################
     ###### Start Measurement Screensession ##########
@@ -401,11 +401,11 @@ for state in  $STATES; do
     MEASUREMENTSCREENNAME=measurement_$ID\_$MSCREENNUM
 
     CURRENTMSCREENNUM=1
-    
+
     screen -d -m -S $MEASUREMENTSCREENNAME
 
     NODEBINDIR="$DIR/../../nodes/bin"
-    
+
     ########################################################
     ###### Setup Click-, Log- & Application-Stuff ##########
     ########################################################
@@ -419,9 +419,9 @@ for state in  $STATES; do
 
     for node in $NODELIST; do
       NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-	
+
       NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
-	
+
       for nodedevice in $NODEDEVICELIST; do
         CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
 
@@ -432,19 +432,19 @@ for state in  $STATES; do
         echo "$node $nodedevice $MEASUREMENTSCREENNAME" >> $MSCREENFILENAME
 
         if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-			
+
           RUN_CLICK_APPLICATION=1
-			
-          SCREENT="$node\_$nodedevice\_click"	
+
+          SCREENT="$node\_$nodedevice\_click"
           screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
           CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
-   	  sleep 0.1
+          sleep 0.1
 			
-		  	if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
+			if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
 			    CLICKWAITTIME=`expr $TIME + 2`
 			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export CLICKPATH=$NODEBINDIR/../etc/click;CLICKPATH=$NODEBINDIR/../etc/click $NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT > /tmp/click/config; sleep $CLICKWAITTIME; echo "" > /tmp/click/config\""
 
- 			    sleep 0.1
+			    sleep 0.1
 			    SCREENT="$node\_$nodedevice\_kcm"	
 			    screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
                             CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
@@ -465,7 +465,7 @@ for state in  $STATES; do
 			  SCREENT="$node\_$nodedevice\_app"	
 			  screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
 			  CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
-   		  sleep 0.1
+		  sleep 0.1
 			  screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export FINALRESULTDIR=$FINALRESULTDIR; $APPLICATION start > $APPLOGFILE 2>&1\""
 		  fi
 		  	
@@ -474,14 +474,14 @@ for state in  $STATES; do
           MEASUREMENTSCREENNAME=measurement_$ID\_$MSCREENNUM
 
           CURRENTMSCREENNUM=1
-    
+
           screen -d -m -S $MEASUREMENTSCREENNAME
         fi
       done
     done
-    
+
     echo "done." >&6
- 
+
   fi
 
 done

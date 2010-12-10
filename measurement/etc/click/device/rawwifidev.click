@@ -24,7 +24,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #if WIFITYPE == 805                 /***  for ath2 add priority scheduler to prefer operation packet ***/
   -> [1]op_prio_q::PrioSched();     /**/
                                     /**/
-  ath_op::Ath2Operation(DEBUG 4);   /**/
+  ath_op::Ath2Operation(READCONFIG false, DEBUG 4);   /**/
                                     /**/
 //ath_op[1] -> Discard;             /**/
                                     /**/
@@ -36,9 +36,9 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> rawdev;
 
   rawdev
-  -> Print("Pre encap",TIMESTAMP true)
+//-> Print("Pre encap",TIMESTAMP true)
   -> dev_decap::__WIFIDECAP__
-  -> Print("Post encap",TIMESTAMP true)
+//-> Print("Post encap",TIMESTAMP true)
 #ifdef CST
   -> cst                            //add channel stats if requested
 #endif
@@ -47,12 +47,12 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #if WIFITYPE == 805
   dev_decap[1]
-  -> Print("Post encap too small",TIMESTAMP true)
+//-> Print("Post encap too small",TIMESTAMP true)
   -> too_small_cnt::Counter
   -> Discard;
 
   dev_decap[2]
-  -> Print("Post encap operation",TIMESTAMP true)
+//-> Print("Post encap operation",TIMESTAMP true)
   -> ath_op;
 #endif
 
