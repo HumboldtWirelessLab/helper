@@ -8,7 +8,7 @@ elementclass BATMAN {$ID, $LT |
 
   brt::BatmanRoutingTable( NODEID $ID, LINKTABLE $LT);
 
-  bos::BatmanOriginatorSource( BATMANTABLE brt, NODEID $ID, INTERVAL 5000);
+  bos::BatmanOriginatorSource( BATMANTABLE brt, NODEID $ID, INTERVAL 2000);
   bofwd::BatmanOriginatorForwarder( NODEID $ID, BATMANTABLE brt)
 
   bf::BatmanForwarder( NODEID $ID, BATMANTABLE brt);

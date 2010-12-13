@@ -1,3 +1,16 @@
+#ifndef __ACCESS_POINT_CLICK__
+#define __ACCESS_POINT_CLICK__
+
+//output:
+//  0: mgt
+//  1: data received
+//  2: data send
+//
+//input::
+//  0: mgt
+//  1: data received
+//  2: data send
+
 elementclass ACCESS_POINT { DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid, CHANNEL $channel,
 #ifdef VLAN_ENABLE
                            BEACON_INTERVAL $beacon_interval, LT $link_table, RATES $rates, VLANTABLE $vlt |
@@ -64,4 +77,22 @@ elementclass ACCESS_POINT { DEVICE $device, ETHERADDRESS $etheraddress, SSID $ss
     mgt_cl[7]
 //  -> Print("Unknow Managmentframe",10)
     -> Discard;
+    
+    input[1]          //from client, check whether it is a client , set VLAN, ....
+    -> WifiDecap()
+    -> [1]output;
+    
+    input[2]          //to client, use right encap, check whether it is a client, check VLAN, ....
+     -> fromNodetoStation::BRN2ToStations(ASSOCLIST assoclist);
+
+    fromNodetoStation[0]  //For Station
+    -> clientwifi::WifiEncap(0x02, WIRELESS_INFO winfo)
+    -> [2]output;
+
+    fromNodetoStation[1]  //Broadcast
+    -> clientwifi;
+    
+    fromNodetoStation[2]  //For Unknown
+    -> Discard;
+
 }
