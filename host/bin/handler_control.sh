@@ -54,10 +54,10 @@ while read line; do
 
       if [ "x$MODE" = "xwrite" ]; then
         #echo "clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER \"$VALUE\""
-        clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER "$VALUE"
+        $DIR/clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER "$VALUE"
       else
         #echo "clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER"
-        clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER
+        $DIR/clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER
       fi
       AC_TIME=$TIME
     fi
