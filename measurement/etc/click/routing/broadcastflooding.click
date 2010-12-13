@@ -4,10 +4,10 @@
 //[0]output: Local copy (broadcast)
 //[1]output: To other brn nodes
 
-elementclass BROADCASTFLOODING {$ID, $ADDRESS, $LST |
+elementclass BROADCASTFLOODING {$ID, $ADDRESS, $LT |
 
   flp::SimpleFlooding();
-//flp::ProbabilityFlooding(LINKSTAT $LST);
+//flp::ProbabilityFlooding(LINKSTAT $LT);
   sfl::Flooding(FLOODINGPOLICY flp, ETHERADDRESS $ADDRESS);
   
   input[0]
