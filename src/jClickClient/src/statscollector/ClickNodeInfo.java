@@ -34,7 +34,7 @@ class ClickNodeInfo extends Thread {
 
           if (lastValues[i] != null ) {
             Integer value = new Integer(lastValues[i]);
-            if( ( i < 2 && value < 0 ) ||  ( i == 2 && value > 0 ) || ( i == 3 && value != -1 ) || ( i == 4 && value <= 0 ) ){
+            if( ( i < 2 && value < 0 ) ||  ( i == 2 && value > 0 ) || ( i == 3 && value < 0 ) || ( i == 4 && value <= 0 ) ){
               System.out.println("Error: Handler (" + i + "): " + st.element+ " " +  st.handler +" " + ip + " " + i + " "+ value);
               //throw new RuntimeException();
               lastValues[i] = null;

@@ -73,6 +73,7 @@ public class ClickConnection {
   }
 
   public int skipIn(int n) {
+    if (cliccs == null) return 0;
     return cliccs.skipIn(n);
   }
 

@@ -135,7 +135,7 @@ public class ControlSocket {
     _sock_timeout *= 2;
     try {
       _sock.setSoTimeout(_sock_timeout);
-    } catch (SocketException se) {
+    } catch ( Exception se) {
     }
   }
 
