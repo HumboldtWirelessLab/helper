@@ -56,8 +56,8 @@ while read line; do
         #echo "clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER \"$VALUE\""
         $DIR/clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER "$VALUE"
       else
-        #echo "clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER"
-        $DIR/clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER
+        #echo "clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER" >&2
+        VERSION="java" $DIR/clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER
       fi
       AC_TIME=$TIME
     fi
