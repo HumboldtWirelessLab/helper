@@ -8,24 +8,24 @@ elementclass BROADCASTFLOODING {$ID, $ADDRESS, $LT |
 
   flp::SimpleFlooding();
 //flp::ProbabilityFlooding(LINKSTAT $LT);
-  sfl::Flooding(FLOODINGPOLICY flp, ETHERADDRESS $ADDRESS);
-  
+  fl::Flooding(FLOODINGPOLICY flp, ETHERADDRESS $ADDRESS);
+
   input[0]
-  -> [0]sfl;
-  
+  -> [0]fl;
+
   input[1]
   -> BRN2Decap()
-  -> [1]sfl;
-  
+  -> [1]fl;
+
   input[2]
   -> Discard;
-  
-  sfl[0]
+
+  fl[0]
   -> [0]output;
 
-  sfl[1] 
+  fl[1]
   -> BRN2EtherEncap(USEANNO true) 
 //-> Print("SimpleFlood-Ether-OUT")
   -> [1]output;
-  
+
 }
