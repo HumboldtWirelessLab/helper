@@ -23,35 +23,13 @@ esac
 NODELIST=`cat $CONFIGFILE | grep -v "#" | awk '{print $1}' | uniq`
 
 RUN_CLICK_APPLICATION=0
+CURRENTMODE="START"
+MEASUREMENT_ABORT=0
+
+MEASUREMENT_ID=$ID\_$RANDOM
 
 NODESCREENFILENAME=nodescreenmap
 MSCREENFILENAME=measurementscreenmap
-
-CURRENTMODE="START"
-
-MEASUREMENT_ABORT=0
-
-##############################
-###### NODE Checker ##########
-##############################
-
-check_nodes() {
-
-    NODESTATUS=`NODELIST=$NODELIST MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh statusmarker`
-
-    if [ ! "x$NODESTATUS" = "xok" ]; then
-      echo "Nodestatus: $NODESTATUS"
-      echo "WHHHHOOOOO: LOOKS LIKE RESTART! GOD SAVE THE WATCHDOG"
-      echo "Current Mode: $CURRENTMODE"
-      echo "Nodes: $NODELIST"
-      exit 0
-    fi
-}
-
-get_node_status()  {
-    NODESTATUS=`NODELIST=$NODELIST MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh statusmarker`
-    echo "$NODESTATUS"
-}
 
 ##############################
 ###### SYNC - stuff ##########
@@ -102,7 +80,7 @@ wait_for_nodes() {
       ROUND=`expr $ROUND + 1`
       if [ $ROUND -gt $3 ]; then
         FORCE_ABORT=1
-	echo "Stop waiting....!" >&6
+        echo "Stop waiting....!" >&6
       fi
     fi
 
@@ -144,15 +122,15 @@ set_master_state() {
   echo "$1" >  status/master_$2.state
 }
 
-#########################################################
-############ Clean up after abort #######################
-#########################################################
+######################################################
+############ Abort measurement #######################
+######################################################
 
 trap abort_measurement 1 2 3 6
 
 #TODO
 abort_measurement() {
-	
+
   echo "Abort Measurement" >&6
 
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
@@ -231,7 +209,7 @@ MAX_NODE_PER_SCREEN=30
 for node in $NODELIST; do
 
   if [ $NODE_IN_SCREEN -eq 1 ]; then
-    SCREENNAME=nodes_$MARKER\_$SCREENNUMBER
+    SCREENNAME=nodes_$MEASUREMENT_ID\_$SCREENNUMBER
     screen -d -m -S $SCREENNAME      
   fi
 
@@ -254,7 +232,7 @@ echo "done." >&6
 ######### STATUSDIR ###########
 ###############################
 
-rm -rf 
+rm -rf status
 mkdir status
 
 ###############################
@@ -263,7 +241,7 @@ mkdir status
 
 echo "Start node setup"
 for node in $NODELIST; do
-  run_command_for_node $node "FINALRESULTDIR=$FINALRESULTDIR RUNMODE=$RUNMODE NODELIST=\"$node\" $DIR/prepare_single_node.sh"
+  run_command_for_node $node "MARKER=$ID FINALRESULTDIR=$FINALRESULTDIR RUNMODE=$RUNMODE NODELIST=\"$node\" $DIR/prepare_single_node.sh"
 done
 
 #### STATES ####
@@ -314,7 +292,7 @@ for state in  $STATES; do
     #################################################
 
     MSCREENNUM=1
-    MEASUREMENTSCREENNAME=measurement_$ID\_$MSCREENNUM
+    MEASUREMENTSCREENNAME=measurement_$MEASUREMENT_ID\_$MSCREENNUM
 
     CURRENTMSCREENNUM=1
 
@@ -387,7 +365,7 @@ for state in  $STATES; do
 		  	
 		  if [ $CURRENTMSCREENNUM -gt 25 ]; then
 		    MSCREENNUM=`expr $MSCREENNUM + 1`
-          MEASUREMENTSCREENNAME=measurement_$ID\_$MSCREENNUM
+          MEASUREMENTSCREENNAME=measurement_$MEASUREMENT_ID\_$MSCREENNUM
 
           CURRENTMSCREENNUM=1
 
@@ -431,7 +409,7 @@ done
 if [ MEASUREMENT_ABORT -eq 0 ]; then
 
     echo -n "Start local application and remote dump ... " >&6
-    LOCALSCREENNAME="local_$ID"
+    LOCALSCREENNAME="local_$MEASUREMENT_ID"
 
     echo "check fo localstuff: $REMOTEDUMP ; $LOCALPROCESS" >> $FINALRESULTDIR/remotedump.log 2>&1 
     if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
@@ -572,14 +550,14 @@ fi
 ##### Close Screen-Session ##########
 #####################################
 
-    if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
-      screen -S $LOCALSCREENNAME -X quit
-    fi
+  if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
+    screen -S $LOCALSCREENNAME -X quit
+  fi
 
-    MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | uniq`
-    for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
-      screen -S $MEASUREMENTSCREENNAME -X quit
-    done
+  MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | uniq`
+  for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
+    screen -S $MEASUREMENTSCREENNAME -X quit
+  done
 
 #################################################
 #### Kill screen for all nodes (controller) #####
@@ -591,7 +569,7 @@ MAX_NODE_PER_SCREEN=30
 
 for node in $NODELIST; do
 
-  SCREENNAME=nodes_$MARKER\_$SCREENNUMBER
+  SCREENNAME=nodes_$MEASUREMENT_ID\_$SCREENNUMBER
 
   screen -S $SCREENNAME -p $node -X stuff "exit" > /dev/null 2>&1
   sleep 0.5;
