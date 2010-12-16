@@ -46,8 +46,8 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
-  -> SetTXPower(15)
-  -> SetTXRate(RATE 2, TRIES 14)
+  -> data_power :: SetTXPower(15)
+  -> data_rate :: SetTXRate(RATE 2, TRIES 14)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> wifioutq::NotifierQueue(50)
 #ifdef PRIO_QUEUE

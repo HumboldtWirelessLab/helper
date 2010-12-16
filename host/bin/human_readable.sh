@@ -41,6 +41,4 @@ if [ "x$FILE" != "x" ]; then
   done < $FILE
 fi
 
-while read line; do
-  echo $line | sed $NODEMAC_SEDARG
-done <&0
+sed $NODEMAC_SEDARG

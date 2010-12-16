@@ -49,4 +49,6 @@ wgt80 ath0 06-0F-B5-97-35-E1 48
 wgt81 ath0 06-0F-B5-3F-57-43 49
 wgt82 ath0 06-0F-B5-97-25-42 50
 wgt201 ath0 06-0F-B5-97-25-82 51
-roofnode1 ath0 06-0E-8E-01-A6-8B 52
+roofnode85 ath0 06-0E-8E-01-A6-8B 52
+roofnode86 ath0 06-0C-42-0C-74-38 53
+roofnode86 ath0 06-0C-42-0C-85-D3 54
