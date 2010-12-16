@@ -31,7 +31,7 @@ elementclass BROADCASTFLOODING {$ID, $ADDRESS, $LT |
   fl[0]
   -> [0]output;
 
-  fl[1]
+  fl[1] 
   -> BRN2EtherEncap(USEANNO true) 
 //-> Print("SimpleFlood-Ether-OUT")
 #ifdef BCAST2UNIC

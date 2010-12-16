@@ -20,10 +20,9 @@ esac
 
 . $DIR/../../host/bin/functions.sh
 
-#TODO NExt Var looks old and is not used
-RUN_CLICK_APPLICATION=0
-
 MEASUREMENT_ABORT=0
+CRUNMODENUM=1
+CURRENTMODE="START"
 
 ##############################
 ###### SYNC - stuff ##########
@@ -66,8 +65,6 @@ set_node_state() {
 ###### Functions to check the nodes ##########
 ##############################################
 
-CURRENTMODE="START"
-
 check_nodes() {
 
     NODESTATUS=`NODELIST=$NODELIST MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh statusmarker`
@@ -80,7 +77,7 @@ check_nodes() {
 	    echo "reboot the node" >> status/$NODELIST\_error.log 2>&1
 	    NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot >> status/$NODELIST\_error.log 2>&1
 
-	    echo "wait for all nodes" >> status/$NODELIST\_error.log 2>&1
+	    echo "wait for the node" >> status/$NODELIST\_error.log 2>&1
 	    sleep 20
 	    echo "error" >> status/$NODELIST\_error.log 2>&1
 	
@@ -138,11 +135,14 @@ echo $PPID > status/$LOGMARKER\_nodectrl.pid
 ###############################
 ###### Wait for node ##########
 ###############################
+CRUNMODENUM=1
 
 echo "$NODELIST" > status/$LOGMARKER\_reboot.log 2>&1
 
 echo "check node $NODELIST" >> status/$LOGMARKER\_reboot.log
 NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodes >> status/$LOGMARKER\_reboot.log 2>&1
+
+# Chack state of node: reboot requiered ??
 
 if [ $RUNMODENUM -eq 0 ]; then
     CRUNMODENUM=0
@@ -161,7 +161,6 @@ fi
 ###############################################
 
 if [ $RUNMODENUM -le 1 ]; then
-    CRUNMODENUM=1
     echo "Reboot node $NODELIST" >> status/$LOGMARKER\_reboot.log 2>&1
     NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot >> status/$LOGMARKER\_reboot.log 2>&1
      
@@ -183,9 +182,9 @@ NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmark
 ###################################
 ###### Setup Environment ##########
 ###################################
+CRUNMODENUM=2
 
 if [ $RUNMODENUM -le 2 ]; then
-    CRUNMODENUM=2
     echo "Setup environment $NODELIST" > status/$LOGMARKER\_environment.log 2>&1
     NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mount >> status/$LOGMARKER\_environment.log 2>&1
     NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh extramount >> status/$LOGMARKER\_environment.log 2>&1
@@ -197,15 +196,16 @@ echo "0" > status/$LOGMARKER\_environment.state
 ##################################
 ###### Load Wifi-Moduls ##########
 ##################################
+CRUNMODENUM=3
 
 if [ $RUNMODENUM -le 3 ]; then
-    CRUNMODENUM=3
 
     echo "Load Modules" > status/$LOGMARKER\_wifimodules.log 2>&1
     CURRENTMODE="LOAD MODULES"
     LOADMODULES=0
 
     for node in $NODELIST; do
+
     MODULSDIR=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $3}' | tail -n 1`
     MODOPTIONS=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $4}' | tail -n 1`
     CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $5}' | tail -n 1`
@@ -238,9 +238,9 @@ echo "0" > status/$LOGMARKER\_wifimodules.state
 ############################
 ###### Setup Wifi ##########
 ############################
+CRUNMODENUM=4
 
 if [ $RUNMODENUM -le 4 ]; then
-  CRUNMODENUM=4
 
   echo "Setup Wifi" > status/$LOGMARKER\_wificonfig.log 2>&1
   CURRENTMODE="CREATE WIFI"
@@ -311,9 +311,9 @@ echo "0" > status/$LOGMARKER\_wificonfig.state
 ###### Get Wifiinfo ##########
 ##############################
 #TODO: rename nodelist
+CRUNMODENUM=5
 
 if [ $RUNMODENUM -le 5 ]; then
-  CRUNMODENUM=5
 
   echo "Get Wifiinfo" >> status/$LOGMARKER\_wifiinfo.log 2>&1
 
@@ -342,10 +342,9 @@ echo "0" > status/$LOGMARKER\_wifiinfo.state
 ###### Setup Clickmodule ##########
 ###################################
 
+CRUNMODENUM=6
 CURRENTMODE="LOAD CLICKMOD" > status/$LOGMARKER\_clickmodule.log 2>&1
 LOADCLICKMOD=0
-CRUNMODENUM=6
-
 
 for node in $NODELIST; do
 
@@ -367,10 +366,9 @@ echo "0" > status/$LOGMARKER\_clickmodule.state
 ###### Preload Click-, Log- & Application-Stuff ########
 ########################################################
 
+CRUNMODENUM=7
 NODEBINDIR="$DIR/../../nodes/bin"
 CURRENTMODE="PRELOAD CLICK"
-CRUNMODENUM=7
-
 
 for node in $NODELIST; do
   NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
@@ -393,7 +391,7 @@ for node in $NODELIST; do
 
     if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
       echo "Application preload on $node" >> status/$LOGMARKER\_preload.log
-          run_on_node $node "cat $APPLICATION > /dev/null" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
+      run_on_node $node "cat $APPLICATION > /dev/null" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
     fi
   done
 
@@ -409,55 +407,57 @@ echo "0" > status/$LOGMARKER\_preload.state
 ######### WAIT FOR CLICK FINISHED ###########
 #############################################
 
-CURRENTMODE="RUN CLICK"
 CRUNMODENUM=8
+CURRENTMODE="RUN CLICK"
 
 wait_for_master_state measurement $LOGMARKER
 
 ############ Kill everything ################
 
-  CRUNMODENUM=9
+CRUNMODENUM=9
 
-  echo "Kill Click on Nodes:" >> status/$LOGMARKER\_killclick.log 2>&1
-  for node in $NODELIST; do
-    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+echo "Kill Click and stop application on Nodes:" >> status/$LOGMARKER\_killclick.log 2>&1
+for node in $NODELIST; do
+  NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
-    for nodedevice in $NODEDEVICELIST; do
-      echo "$node" >> status/$LOGMARKER\_killclick.log
+  for nodedevice in $NODEDEVICELIST; do
+    echo "$node" >> status/$LOGMARKER\_killclick.log
 
-      CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
-      CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
-      CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
-      if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
-        NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh kclick_stop >> status/$LOGMARKER\_killclick.log 2>&1
-        NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh rmmod >> status/$LOGMARKER\_killclick.log 2>&1
-      else
-        if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-          NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
-          CLICKPID=`run_on_node $node "pidof click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa`
-          if [ "x$CLICKPID" != "x" ]; then
-            for cpid in $CLICKPID; do
-              echo -n "PID: $CLICKPID !" >> status/$LOGMARKER\_killclick.log
-              run_on_node $node "kill $cpid" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_killclick.log 2>&1
-            done 
-          fi
+    CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
+    CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
+    CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
+    if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
+      NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh kclick_stop >> status/$LOGMARKER\_killclick.log 2>&1
+      NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh rmmod >> status/$LOGMARKER\_killclick.log 2>&1
+    else
+      if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
+        NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
+        CLICKPID=`run_on_node $node "pidof click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa`
+        if [ "x$CLICKPID" != "x" ]; then
+          for cpid in $CLICKPID; do
+            echo -n "PID: $CLICKPID !" >> status/$LOGMARKER\_killclick.log
+            run_on_node $node "kill $cpid" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_killclick.log 2>&1
+          done 
         fi
       fi
+    fi
 
-      APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
+    APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
 
-      if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-        run_on_node $node "$APPLICATION  stop" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_killclick.log 2>&1
-      fi
-      echo " done" >> status/$LOGMARKER\_killclick.log 2>&1
-    done
+    if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
+      run_on_node $node "$APPLICATION  stop" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_killclick.log 2>&1
+    fi
+    echo " done" >> status/$LOGMARKER\_killclick.log 2>&1
   done
+done
 
 echo "0" > status/$LOGMARKER\_killclick.state
   
 #######################################
 ##### Check Nodes and finish ##########
 #######################################
+
+CRUNMODENUM=10
 
 wait_for_master_state killmeasurement $LOGMARKER
 
