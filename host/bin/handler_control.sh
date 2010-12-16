@@ -46,6 +46,11 @@ while read line; do
     NODENUM=`cat $2 | egrep "^$NODENAME[[:space:]]" | awk '{print $4}'`
     if [ "x$MODE" = "xwrite" ]; then
       VALUE=`get_params $line | sed $NODEMAC_SEDARG`
+    else
+      OUTFILE=`echo $line | awk '{print $7}'`
+      if [ "x$OUTFILE" = "x" ]; then
+         OUTFILE="-"
+      fi
     fi
 
     if [ "x$TIME" != "x" ]; then
@@ -56,8 +61,12 @@ while read line; do
         #echo "clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER \"$VALUE\""
         $DIR/clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER "$VALUE"
       else
-        #echo "clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER" >&2
-        VERSION="java" $DIR/clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER
+        if [ "$OUTFILE" = "-" ]; then
+          #echo "clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER" >&2
+          VERSION="java" $DIR/clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER
+        else
+          VERSION="java" $DIR/clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER >> $OUTFILE
+        fi
       fi
       AC_TIME=$TIME
     fi
