@@ -46,10 +46,11 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
-  -> data_power :: SetTXPower(15)
-  -> data_rate :: SetTXRate(RATE 2, TRIES 14)
+  -> data_power::SetTXPower(15)
+  -> data_rate::SetTXRate(RATE 2, TRIES 14)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> data_queue::NotifierQueue(100)
+  -> data_suppressor::Suppressor()
   -> [1]lp_data_scheduler::PrioSched()
 #ifdef PRIO_QUEUE
   -> [1]x_prio_q::PrioSched()
@@ -98,6 +99,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   lp_clf[1]                               //brn, but no lp
 //-> Print("Data, no LP")
+  -> [1]data_suppressor[1]
   -> brnToMe;
 
   brnToMe[0] -> /*Print("NODENAME: wifi0", TIMESTAMP true) ->*/ [0]output;
