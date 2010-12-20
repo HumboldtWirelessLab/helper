@@ -311,7 +311,17 @@ case "$1" in
 			    echo "sysctl -w dev.$PHYDEV.cu_anno_mode=$CUTIL_ANNO_MODE"
 			    sysctl -w dev.$PHYDEV.cu_anno_mode=$CUTIL_ANNO_MODE
 			fi
+			if [ "x$TXQUEUE_LEN" = "x" ]; then
+			    TXQUEUE_LEN=$DEFAULT_MONITOR_TXQUEUE_LEN
+			fi
+			
+	    else
+			if [ "x$TXQUEUE_LEN" = "x" ]; then
+			    TXQUEUE_LEN=$DEFAULT_TXQUEUE_LEN
+			fi
 	    fi
+	    
+	    
 
 	    if [ "x$DISABLECCA" = "x" ]; then
 			DISABLECCA=$DEFAULT_DISABLECCA
@@ -352,10 +362,9 @@ case "$1" in
 		MTU=2290
 	    fi
 
-	    #TODO: add something like prestart_config
 	    #TODO: set mtu depending on WIFITYPE
-	    echo "$IFCONFIG $DEVICE mtu $MTU"
-	    ${IFCONFIG} $DEVICE mtu $MTU
+	    echo "$IFCONFIG $DEVICE mtu $MTU txqueuelen $TXQUEUE_LEN"
+	    ${IFCONFIG} $DEVICE mtu $MTU txqueuelen $TXQUEUE_LEN
 
 	    echo "Finished device config"
 	    ;;
