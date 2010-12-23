@@ -24,6 +24,8 @@ if [ "x$VERSION" = "x" ]; then
   VERSION="c"
 fi
 
+#echo -n "$@ " >> /tmp/result.log
+
 case "$VERSION" in
   "c")
     IP=$2
@@ -64,4 +66,7 @@ case "$VERSION" in
   ;;
 esac
 
-exit $?
+RESULT=$?
+
+#echo $RESULT >> /tmp/result.log
+exit $RESULT
