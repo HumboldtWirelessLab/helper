@@ -37,14 +37,14 @@ case "$VERSION" in
     shift 5
 
     if [ "x$1" = "xwrite" ]; then
-	$DIR/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" & 2> /dev/null
+	$DIR/../lib/clickctrl/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" & 2> /dev/null
     else
-	$DIR/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" 2> /dev/null
+	$DIR/../lib/clickctrl/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" 2> /dev/null
     fi
 
   ;;
   "java")
-    java -jar $DIR/JClickClient.jar $@ 2> /dev/null
+    java -jar $DIR/../lib/clickctrl/JClickClient.jar $@ 2> /dev/null
   ;;
   "shell")
     #TODO: Timeout of 1 sec is used. Try to remove

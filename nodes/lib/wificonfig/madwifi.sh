@@ -23,6 +23,10 @@ get_phy_dev() {
     echo "wifi$NUMBER"
 }
 
+get_arch() {
+    $DIR/../../bin/system.sh get_arch
+}
+
 if [ -e /usr/sbin/iwconfig ]; then
     IWCONFIG=/usr/sbin/iwconfig
 else
@@ -60,39 +64,17 @@ else
 fi
 
 case "$1" in
-    "help")
-		echo "Use $0 create | delete | config"
-		exit 0;
-	;;
+    "responsible")
+	    DEV_PREFIX=`echo $DEVICE | cut -b 1-3`
+	    if [ "x$DEV_PREFIX" = "xath" ]; then
+	      exit 0
+	    else
+	      exit 1
+	    fi     
     "create")
 	    if [ "x$CONFIG" = "x" ]; then
 		echo "Use CONFIG to set the config"
 		exit 0
-	    fi
-
-	    #############################
-	    #      WLAN DEV STUFF       #
-	    #############################
-	    WLANDEV=`echo $DEVICE | grep "wlan" | wc -l`
-	    if [ "x$WLANDEV" = "x1" ]; then
-	      if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
-		. $DIR/../../nodes/etc/wifi/$CONFIG
-	      else
-		. $CONFIG
-	      fi
-
-	      . $DIR/../../nodes/etc/wifi/default
-
-
-	      if [ "x$MODE" = "x" ]; then
-	        MODE=$DEFAULT_MODE
-	      fi
-
-	      ${IFCONFIG} $DEVICE down
-	      echo "iwconfig $DEVICE mode $MODE"
-	      ${IWCONFIG} $DEVICE mode $MODE
-	      ${IFCONFIG} $DEVICE up
-	      exit 0
 	    fi
 
 	    PHYDEV=`get_phy_dev $DEVICE`
@@ -125,6 +107,7 @@ case "$1" in
 	    fi
 
 	    PHYDEV=`get_phy_dev $DEVICE`
+	    ARCH=`get_arch`
 
 	    if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
 			. $DIR/../../nodes/etc/wifi/$CONFIG
@@ -180,14 +163,6 @@ case "$1" in
 		    ${IWCONFIG} $DEVICE key $WEPKEY key $WEPMODE
 		    sleep 1
 		fi
-	    fi
-
-	    #############################
-	    #      WLAN DEV STUFF       #
-	    #############################
-	    WLANDEV=`echo $DEVICE | grep "wlan" | wc -l`
-	    if [ "x$WLANDEV" = "x1" ]; then
-	      exit 0
 	    fi
 
 	    if [ "x$MODE_ABG" != "x" ]; then
@@ -363,15 +338,6 @@ case "$1" in
 
 	    echo "Finished device config"
 	    ;;
-    "start")
-	    echo "$IFCONFIG $DEVICE up"
-	    ${IFCONFIG} $DEVICE up
-
-	    ;;
-    "getmac")
-            MADDR=`$IFCONFIG $DEVICE | grep HWaddr | awk '{print $5}' | sed -e "s#-# #g" -e "s#:# #g" | awk '{print $1":"$2":"$3":"$4":"$5":"$6}'`
-            echo $MADDR
-            ;;
     "getiwconfig")
             PHYDEV=`get_phy_dev $DEVICE`
             echo "iwconfig"
