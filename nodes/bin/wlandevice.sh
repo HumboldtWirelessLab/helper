@@ -23,10 +23,6 @@ get_phy_dev() {
     echo "wifi$NUMBER"
 }
 
-get_arch() {
-    uname -m
-}
-
 if [ -e /usr/sbin/iwconfig ]; then
     IWCONFIG=/usr/sbin/iwconfig
 else
@@ -129,7 +125,6 @@ case "$1" in
 	    fi
 
 	    PHYDEV=`get_phy_dev $DEVICE`
-	    ARCH=`get_arch`
 
 	    if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
 			. $DIR/../../nodes/etc/wifi/$CONFIG
