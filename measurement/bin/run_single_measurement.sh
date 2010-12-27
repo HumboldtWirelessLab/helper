@@ -420,7 +420,7 @@ for state in  $STATES; do
     for node in $NODELIST; do
       NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
-      NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
+      NODEARCH=`NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh "$NODEBINDIR/system.sh get_arch"`
 
       for nodedevice in $NODEDEVICELIST; do
         CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
@@ -518,15 +518,15 @@ done
     echo "check fo localstuff: $REMOTEDUMP ; $LOCALPROCESS" >> $FINALRESULTDIR/remotedump.log 2>&1 
     if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
       screen -d -m -S $LOCALSCREENNAME
-      echo "check fo remote Dump: $REMOTEDUMP" >> $FINALRESULTDIR/remotedump.log 2>&1 
-      
+      echo "check fo remote Dump: $REMOTEDUMP" >> $FINALRESULTDIR/remotedump.log 2>&1
+
       sleep 0.3
       if [ "x$REMOTEDUMP" = "xyes" ]; then
         echo "Start remotedump" >> $FINALRESULTDIR/remotedump.log 2>&1
         screen -S $LOCALSCREENNAME -X screen -t remotedump                                                                                                                                                                                                                          
-        sleep 0.3                                                                                                                                                                                                                                                                     
+        sleep 0.3
 	screen -S $LOCALSCREENNAME -p remotedump -X stuff "(cd $FINALRESULTDIR/;export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-i586 $FINALRESULTDIR/remotedump.click >> $FINALRESULTDIR/remotedump.log 2>&1)"
-        sleep 0.5                                                                                                                                                                                                                                                                     
+        sleep 0.5
 	screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n' 
       fi
       
@@ -568,18 +568,18 @@ done
             if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
               SCREENT="$node\_$nodedevice\_kcm"
               screen -S $CMEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
-	          fi
+            fi
           fi
 
-	        APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
+          APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
 
           if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-		        SCREENT="$node\_$nodedevice\_app"	
+            SCREENT="$node\_$nodedevice\_app"
             screen -S $CMEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
-		      fi
-	      done
-	    done
-	echo "done." >&6    
+          fi
+        done
+      done
+      echo "done." >&6    
     fi
 
 ###################################################

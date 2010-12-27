@@ -6,11 +6,11 @@
 //[0]output: Local copy (broadcast)
 //[1]output: To other brn nodes
 
-elementclass BROADCASTROUTING {$ID, $ADDRESS, $LST |
+elementclass BROADCASTROUTING {$ID, $LST |
 
   flp::SimpleFlooding();
 //flp::ProbabilityFlooding(LINKSTAT $LST);
-  sfl::Flooding(FLOODINGPOLICY flp, ETHERADDRESS $ADDRESS);
+  sfl::Flooding(FLOODINGPOLICY flp);
   
   bcr::BROADCASTROUTINGCORE(id,deviceaddress);
   

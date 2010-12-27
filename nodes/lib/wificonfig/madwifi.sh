@@ -70,7 +70,8 @@ case "$1" in
 	      exit 0
 	    else
 	      exit 1
-	    fi     
+	    fi
+	    ;;
     "create")
 	    if [ "x$CONFIG" = "x" ]; then
 		echo "Use CONFIG to set the config"
@@ -79,13 +80,13 @@ case "$1" in
 
 	    PHYDEV=`get_phy_dev $DEVICE`
 
-	    if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
-			. $DIR/../../nodes/etc/wifi/$CONFIG
+	    if [ -f  $DIR/../../etc/wifi/$CONFIG ]; then
+			. $DIR/../../etc/wifi/$CONFIG
 	    else
 			. $CONFIG
 	    fi
 
-	    . $DIR/../../nodes/etc/wifi/default
+	    . $DIR/../../etc/wifi/default
 
 	    if [ "x$MODE" = "x" ]; then
 		MODE=$DEFAULT_MODE
@@ -109,13 +110,13 @@ case "$1" in
 	    PHYDEV=`get_phy_dev $DEVICE`
 	    ARCH=`get_arch`
 
-	    if [ -f  $DIR/../../nodes/etc/wifi/$CONFIG ]; then
-			. $DIR/../../nodes/etc/wifi/$CONFIG
+	    if [ -f  $DIR/../../etc/wifi/$CONFIG ]; then
+			. $DIR/../../etc/wifi/$CONFIG
 	    else
 			. $CONFIG
 	    fi
 
-	    . $DIR/../../nodes/etc/wifi/default
+	    . $DIR/../../etc/wifi/default
 
 
 	    if [ "x$MODE" = "x" ]; then

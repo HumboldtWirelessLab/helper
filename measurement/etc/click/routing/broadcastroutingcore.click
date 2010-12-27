@@ -4,10 +4,10 @@
 // [0]output - ethernet (802.3) frames to external nodes/clients or me (no BRN protocol)
 // [1]output - BRN DSR packets to internal nodes (BRN DSR protocol)
 
-elementclass BROADCASTROUTINGCORE {$ID, $ADDRESS |
+elementclass BROADCASTROUTINGCORE {$ID |
 
-  bcr::BrnBroadcastRouting(NODEIDENTITY $ID, SOURCEADDRESS $ADDRESS);
- 
+  bcr::BrnBroadcastRouting(NODEIDENTITY $ID);
+
   input[0]
   -> [0]bcr;
 

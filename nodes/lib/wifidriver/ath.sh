@@ -25,13 +25,15 @@ case "$1" in
                 NODEARCH=`$DIR/../../bin/system.sh get_arch`
 		
                 FINMODULSDIR=`echo $MODULSDIR | sed -e "s#KERNELVERSION#$KERNELVERSION#g" -e "s#NODEARCH#$NODEARCH#g"`
+#                echo "$MODULSDIR <--> $FINMODULSDIR"
 		if [ -f ${FINMODULSDIR}/ath9k.ko ] || [ -f ${FINMODULSDIR}/ath5k.ko ]; then
+#		    echo "i'm resp"
 		    exit 0
 		else
+#		    echo "i'm not resp"
 		    exit 1
 		fi
 		;;
-		
     "install")
                 . $DIR/../../etc/wifi/default
 
@@ -57,9 +59,9 @@ case "$1" in
                 NODEARCH=`$DIR/../../bin/system.sh get_arch`
 		
                 FINMODULSDIR=`echo $MODULSDIR | sed -e "s#KERNELVERSION#$KERNELVERSION#g" -e "s#NODEARCH#$NODEARCH#g"`
-                echo "Use $FINMODULSDIR"
+#                echo "Use $FINMODULSDIR"
 			
-		MODLIST="ath9k.ko ath5k.ko"
+		MODLIST="cfg80211.ko mac80211.ko ath.ko ath9k_hw.ko ath9k_common.ko ath9k.ko ath5k.ko"
 		for mod in $MODLIST
 		do
 			if [ -f ${FINMODULSDIR}/$mod ]; then
@@ -69,7 +71,7 @@ case "$1" in
 		done
 		;;
     "uninstall")
-		MODLIST="ath9k ath5k mac80211 cfg80211 wlan_xauth wlan_wep wlan_tkip wlan_scan_ap wlan_scan_sta wlan_ccmp wlan_acl ath_pci ath_rate_sample ath_rate_minstrel wlan ath_hal hostap_pci hostap ieee80211_crypt "
+		MODLIST="ath9k ath5k ath9k_common ath9k_hw ath mac80211 cfg80211 wlan_xauth wlan_wep wlan_tkip wlan_scan_ap wlan_scan_sta wlan_ccmp wlan_acl ath_pci ath_rate_sample ath_rate_minstrel wlan ath_hal hostap_pci hostap ieee80211_crypt "
 		
 		for mod in $MODLIST
 		do

@@ -1,7 +1,10 @@
 #NODE	  DEVICE MODULSDIR                                        MODOPTIONS WIFICONFIG         CLICKMODDIR CLICKSCRIPT	LOGFILE			             APP	           APPLOGFILE
-jayto102  ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
-foobar103 ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
-tpsi      ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel.nc  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
-tdojo     ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
-tchi      ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
-pc113     ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
+#jayto102  ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
+#foobar103 ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
+#tpsi      ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel.nc  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
+#tdojo     ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
+#tchi      ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
+#pc113     ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
+#wndr210    wlan0  BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.wndr       -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
+#pc114      ath0   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.b.channel  -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
+wrt14      eth1   BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION -          monitor.wrt        -	    -		LOGDIR/reset_NODENAME.NODEDEVICE.log -                     -
