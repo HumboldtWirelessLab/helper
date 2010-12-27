@@ -22,7 +22,7 @@ case "$1" in
 	"get_arch")
 		WNDR=`cat /proc/cpuinfo | grep "WNDR" | wc -l`
 		if [ $WNDR -gt 0 ]; then
-		  echo "mips-wdnr3700"
+		  echo "mips-wndr3700"
 		else
 		  uname -m
 		fi

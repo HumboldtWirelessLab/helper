@@ -96,7 +96,7 @@ BRNAddressInfo(ipdev eth0:ip);
 #else
 #define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false/*, CAPTURE PCAP, ENCAP 802_11*/)
 #endif
-#define TORAWDEVICE(x) ToDevice(x)
+#define TORAWDEVICE(x) ToDevice(x, DEBUG false)
 
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)

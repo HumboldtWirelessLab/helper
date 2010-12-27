@@ -8,7 +8,7 @@ SIGN=`echo $dir | cut -b 1`
 case "$SIGN" in
     "/")
         DIR=$dir
-	;;
+        ;;
     ".")
         DIR=$pwd/$dir
         ;;
@@ -18,61 +18,40 @@ case "$SIGN" in
         ;;
 esac
 
+export PATH=$PATH:/sbin:/usr/sbin/
+
+echo "Check responsible for $1"
+
+RESPONSIBLE=""
+
+for s in `ls $DIR/../lib/wifidriver/`; do
+  echo "Check $DIR/../lib/wifidriver/$s"
+  export MODOPTIONS=$MODOPTIONS
+  export MODULSDIR=$MODULSDIR
+  $DIR/../lib/wifidriver/$s responsible
+  RESULT=$?
+  if [ $RESULT -eq 0 ]; then
+    RESPONSIBLE=$DIR/../lib/wifidriver/$s
+    break
+  fi
+done
+
 case "$1" in
     "install")
-                . $DIR/../../nodes/etc/wifi/default
-
-		if [ "x$MODOPTIONS" = "x" ]; then
-			MODOPTIONS=$DEFAULT_RECOMMENDMODOPTIONS
+		if [ "x$RESPONSIBLE" != "x" ]; then
+		    echo "$RESPONSIBLE is responsible"
+		    MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $RESPONSIBLE install
+		    exit 0
 		fi
-		if [ "x$MODOPTIONS" = "x" ]; then
-			. ../etc/madwifi/modoptions.default
-		else
-			if [ -e $MODOPTIONS ]; then
-			. $MODOPTIONS
-			else
-			if [ -e ../etc/madwifi/$MODOPTIONS ]; then
-			  . ../etc/madwifi/$MODOPTIONS
-			else
-				echo "Modoptionsfile $MODOPTIONS doesn't exist ! Use default"
-				. ../etc/madwifi/modoptions.default
-			fi
-			fi
-		fi
-		
-                KERNELVERSION=`uname -r`
-                NODEARCH=`uname -m`
-		
-                FINMODULSDIR=`echo $MODULSDIR | sed -e "s#KERNELVERSION#$KERNELVERSION#g" -e "s#NODEARCH#$NODEARCH#g"`
-                echo "Use $FINMODULSDIR"
-			
-		MODLIST="ath_hal.ko wlan.ko ath_rate_sample.ko wlan_acl.ko wlan_ccmp.ko wlan_scan_ap.ko wlan_scan_sta.ko wlan_tkip.ko wlan_wep.ko wlan_xauth.ko"
-		for mod in $MODLIST
-		do
-			if [ -f ${FINMODULSDIR}/$mod ]; then
-			echo "insmod $mod"
-			insmod ${FINMODULSDIR}/$mod
-			fi
-		done
-
-		echo "insmod ath_pci $ATH_PCI"
-		insmod ${FINMODULSDIR}/ath_pci.ko $ATH_PCI 
 		;;
     "uninstall")
-		MODLIST="ath9k ath5k wlan_xauth wlan_wep wlan_tkip wlan_scan_ap wlan_scan_sta wlan_ccmp wlan_acl ath_pci ath_rate_sample ath_rate_minstrel wlan ath_hal hostap_pci hostap ieee80211_crypt "
-		
-		for mod in $MODLIST
-		do
-			MOD_EX=`lsmod | grep $mod | wc -l`
-
-			if [ ! $MOD_EX = 0 ]; then
-			echo "rmmod $mod"
-			rmmod $mod
-			fi
-
-		done
+		if [ "x$RESPONSIBLE" != "x" ]; then
+		    echo "$RESPONSIBLE is responsible"
+		    MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $RESPONSIBLE uninstall
+		    exit 0
+		fi
 		;;
-    *)
+              *)
 		echo "unknown options"
 		;;
 esac

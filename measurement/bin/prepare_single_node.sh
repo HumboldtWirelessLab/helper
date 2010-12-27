@@ -196,12 +196,10 @@ if [ $RUNMODENUM -le 3 ]; then
     CURRENTMODE="LOAD MODULES"
     LOADMODULES=0
 
-    NODELIST="$NODELIST" $DIR/../../host/bin/wlanmodules.sh rmmod >> status/$LOGMARKER\_wifimodules.log 2>&1
-
     for node in $NODELIST; do
     MODULSDIR=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $3}' | tail -n 1`
-	  MODOPTIONS=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $4}' | tail -n 1`
-  	CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $5}' | tail -n 1`
+    MODOPTIONS=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $4}' | tail -n 1`
+    CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $5}' | tail -n 1`
 
       if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
           if [ "x$MODOPTIONS" = "x" ] || [ "x$MODOPTIONS" = "x-" ]; then
@@ -211,8 +209,9 @@ if [ $RUNMODENUM -le 3 ]; then
             else
               MODOPTIONS=modoptions.default
             fi
-          fi	
+          fi
 
+          NODELIST="$node" MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../host/bin/wlanmodules.sh rmmod >> status/$LOGMARKER\_wifimodules.log 2>&1
           NODELIST="$node" MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../host/bin/wlanmodules.sh insmod >> status/$LOGMARKER\_wifimodules.log 2>&1
           LOADMODULES=1
       fi
@@ -375,16 +374,16 @@ for node in $NODELIST; do
 
     APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
     APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $10}'`
-  
+
     if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
       echo "Application preload on $node" >> status/$LOGMARKER\_preload.log
           run_on_node $node "cat $APPLICATION > /dev/null" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
     fi
   done
-    
+
   if [ "x$LOADCLICK" = "x1" ]; then
     echo "Click preload on $node" >> status/$LOGMARKER\_preload.log
-    run_on_node $node "export CLICKPATH=$NODEBINDIR/../etc/click;echo \"Script(wait 0,stop);\" | $NODEBINDIR/click-align-$NODEARCH | $NODEBINDIR/click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
+#    run_on_node $node "export CLICKPATH=$NODEBINDIR/../etc/click;echo \"Script(wait 0,stop);\" | $NODEBINDIR/click-align-$NODEARCH | $NODEBINDIR/click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
   fi
 done
 

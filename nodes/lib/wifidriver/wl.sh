@@ -25,13 +25,15 @@ case "$1" in
                 NODEARCH=`$DIR/../../bin/system.sh get_arch`
 		
                 FINMODULSDIR=`echo $MODULSDIR | sed -e "s#KERNELVERSION#$KERNELVERSION#g" -e "s#NODEARCH#$NODEARCH#g"`
+#                echo "$MODULSDIR <--> $FINMODULSDIR"
 		if [ -f ${FINMODULSDIR}/wl.o ]; then
+#		    echo "i'm resp"
 		    exit 0
 		else
+#		    echo "i'm not resp"
 		    exit 1
 		fi
 		;;
-		
     "install")
                 . $DIR/../../etc/wifi/default
 
@@ -57,7 +59,7 @@ case "$1" in
                 NODEARCH=`$DIR/../../bin/system.sh get_arch`
 		
                 FINMODULSDIR=`echo $MODULSDIR | sed -e "s#KERNELVERSION#$KERNELVERSION#g" -e "s#NODEARCH#$NODEARCH#g"`
-                echo "Use $FINMODULSDIR"
+#                echo "Use $FINMODULSDIR"
 			
 		MODLIST="wl.o"
 		for mod in $MODLIST

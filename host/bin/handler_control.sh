@@ -24,6 +24,11 @@ function get_params() {
   echo $@
 }
 
+if [ "x$1" = "xhelp" ] || [ "x$2" = "x" ]; then
+  echo "Use $0 crtl-file node-file"
+  exit 0
+fi
+
 AC_TIME=0
 NODEMAC_SEDARG=""
 

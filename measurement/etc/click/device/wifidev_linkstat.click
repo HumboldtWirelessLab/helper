@@ -47,7 +47,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   input[0]
   -> data_power::SetTXPower(15)
-  -> data_rate::SetTXRate(RATE 2, TRIES 14)
+  -> data_rate::SetTXRate(RATE 2, TRIES 11)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> data_queue::NotifierQueue(100)
   -> data_suppressor::Suppressor()
@@ -90,7 +90,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
     -> EtherEncap(0x8086, deviceaddress, ff:ff:ff:ff:ff:ff)
     -> power::SetTXPower(19)
     -> lp_wifiencap::WifiEncap(0x00, 0:0:0:0:0:0)
-    -> lp_queue::NotifierQueue(10)
+    -> lp_queue::FrontDropQueue(2)
     -> [0]lp_data_scheduler;
 
   brn_ether_clf[1]                         //no brn
