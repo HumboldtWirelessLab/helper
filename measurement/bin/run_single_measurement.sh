@@ -123,6 +123,83 @@ set_master_state() {
 }
 
 ######################################################
+############ Finish measurement ######################
+######################################################
+
+kill_prog_and_logfiles() {
+
+ set_master_state 0 measurement
+
+  echo -n "State: killclick ... " >&6
+
+  echo "Wait for nodes"
+  SYNCSTATE=`wait_for_nodes "$NODELIST" _killclick.state`
+  echo "all nodes ready"
+
+  if [ "x$LOCALPROCESS" != "x" ]; then
+    PATH=$DIR/../../host/bin:$PATH;RESULTDIR=$FINALRESULTDIR NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
+  fi
+
+  echo "done." >&6
+}
+
+check_nodes() {
+
+  set_master_state 0 killmeasurement
+
+  echo -n "State: Check nodes ... " >&6
+
+  echo "Wait for nodes"
+  SYNCSTATE=`wait_for_nodes "$NODELIST" _finalnodecheck.state`
+  echo "all nodes ready"
+
+  echo "done." >&6
+
+  echo "ok" 1>&$STATUSFD
+}
+
+close_measurement_screen() {
+  if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
+    screen -S $LOCALSCREENNAME -X quit
+  fi
+
+  MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | uniq`
+  for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
+    screen -S $MEASUREMENTSCREENNAME -X quit
+  done
+}
+
+close_node_screen() {
+
+SCREENNUMBER=1
+NODE_IN_SCREEN=1
+MAX_NODE_PER_SCREEN=30
+
+for node in $NODELIST; do
+
+  SCREENNAME=nodes_$MEASUREMENT_ID\_$SCREENNUMBER
+
+  screen -S $SCREENNAME -p $node -X stuff "exit" > /dev/null 2>&1
+  sleep 0.5;
+  screen -S $SCREENNAME -p $node -X stuff $'\n' > /dev/null 2>&1
+
+  NODE_IN_SCREEN=`expr $NODE_IN_SCREEN + 1`
+
+  if [ $NODE_IN_SCREEN -gt $MAX_NODE_PER_SCREEN ]; then
+    screen -S $SCREENNAME -X quit
+    NODE_IN_SCREEN=1
+    SCREENNUMBER=`expr $SCREENNUMBER + 1`
+  fi
+
+done
+
+if [ $NODE_IN_SCREEN -gt 1 ]; then 
+  screen -S $SCREENNAME -X quit
+fi
+
+}
+
+######################################################
 ############ Abort measurement #######################
 ######################################################
 
@@ -140,6 +217,18 @@ abort_measurement() {
   echo "0" > status/master_abort.state
 
   MEASUREMENT_ABORT=1
+  
+  for p in `ls status/*nodectrl.pid`; do
+    PID=`cat $p`
+    kill $PID
+  done
+  
+  sleep 2
+  
+  kill_prog_and_logfiles
+  check_nodes
+  close_measurement_screen
+  close_node_screen
 
 }
 
@@ -421,9 +510,9 @@ if [ MEASUREMENT_ABORT -eq 0 ]; then
         echo "Start remotedump" >> $FINALRESULTDIR/remotedump.log 2>&1
         screen -S $LOCALSCREENNAME -X screen -t remotedump                                                                                                                                                                                                                          
         sleep 0.3
-	screen -S $LOCALSCREENNAME -p remotedump -X stuff "(cd $FINALRESULTDIR/;export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-i586 $FINALRESULTDIR/remotedump.click >> $FINALRESULTDIR/remotedump.log 2>&1)"
+        screen -S $LOCALSCREENNAME -p remotedump -X stuff "(cd $FINALRESULTDIR/;export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-i586 $FINALRESULTDIR/remotedump.click >> $FINALRESULTDIR/remotedump.log 2>&1)"
         sleep 0.5
-	screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n' 
+        screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n' 
       fi
       
       if [ "x$LOCALPROCESS" != "x" ]; then
@@ -494,100 +583,35 @@ if [ MEASUREMENT_ABORT -eq 0 ]; then
 	  echo -n -e "Wait... \033[1G" >&6
 	  for ((i = $WAITTIME; i > 0; i--)); do
 	    echo -n -e "Wait... $i \033[1G" >&6 ; sleep 1;
-	    
-	    if [ -f status/master_abort.state ]; then
-	      break;
-	    fi
     done
 	  
-    if [ -f status/master_abort.state ]; then
-	    echo -n -e "ABORT MEASUREMENT                 \033[1G" >&6
-    else
-	    echo -n -e "                 \033[1G" >&6
-    fi
-    
-	  #Normal wait
-	  #sleep $WAITTIME
+	  echo -n -e "                 \033[1G" >&6
 
   fi
 fi
 ###################################################
 ##### Kill progs for logfile for kclick  ##########
 ###################################################
-if [ MEASUREMENT_ABORT -eq 0 ]; then
 
-  set_master_state 0 measurement
+kill_prog_and_logfiles
 
-  echo -n "State: killclick ... " >&6
-
-  echo "Wait for nodes"
-  SYNCSTATE=`wait_for_nodes "$NODELIST" _killclick.state`
-  echo "all nodes ready"
-
-  if [ "x$LOCALPROCESS" != "x" ]; then
-    PATH=$DIR/../../host/bin:$PATH;RESULTDIR=$FINALRESULTDIR NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
-  fi
-
-  echo "done." >&6
-fi
 #######################################
 ##### Check Nodes and finish ##########
 #######################################
 
-  set_master_state 0 killmeasurement
-
-  echo -n "State: Check nodes ... " >&6
-
-  echo "Wait for nodes"
-  SYNCSTATE=`wait_for_nodes "$NODELIST" _finalnodecheck.state`
-  echo "all nodes ready"
-
-  echo "done." >&6
-
-  echo "ok" 1>&$STATUSFD
+check_nodes
 
 #####################################
 ##### Close Screen-Session ##########
 #####################################
 
-  if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
-    screen -S $LOCALSCREENNAME -X quit
-  fi
-
-  MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | uniq`
-  for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
-    screen -S $MEASUREMENTSCREENNAME -X quit
-  done
+close_measurement_screen
 
 #################################################
 #### Kill screen for all nodes (controller) #####
 #################################################
 
-SCREENNUMBER=1
-NODE_IN_SCREEN=1
-MAX_NODE_PER_SCREEN=30
-
-for node in $NODELIST; do
-
-  SCREENNAME=nodes_$MEASUREMENT_ID\_$SCREENNUMBER
-
-  screen -S $SCREENNAME -p $node -X stuff "exit" > /dev/null 2>&1
-  sleep 0.5;
-  screen -S $SCREENNAME -p $node -X stuff $'\n' > /dev/null 2>&1
-
-  NODE_IN_SCREEN=`expr $NODE_IN_SCREEN + 1`
-
-  if [ $NODE_IN_SCREEN -gt $MAX_NODE_PER_SCREEN ]; then
-    screen -S $SCREENNAME -X quit
-    NODE_IN_SCREEN=1
-    SCREENNUMBER=`expr $SCREENNUMBER + 1`
-  fi
-
-done
-
-if [ $NODE_IN_SCREEN -gt 1 ]; then 
-  screen -S $SCREENNAME -X quit
-fi
+close_node_screen
 
 #######################################
 ##### Poststop local process ##########
