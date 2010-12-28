@@ -52,14 +52,14 @@ wait_for_nodes() {
     NO_NODES=0
     STATE_NODES=0;
     OK_NODES=0;
-    
+
     for n in $NODES; do
-    
+
       STATEFILE="status/$n$2"
-      
+
       echo "looking for $STATEFILE" >> $DEBUGFILE
       NO_NODES=`expr $NO_NODES + 1`
-      
+
       if [ -f $STATEFILE ]; then
         echo "  OK" >> $DEBUGFILE
         STATE_NODES=`expr $STATE_NODES + 1`
@@ -69,13 +69,13 @@ wait_for_nodes() {
         fi
       fi
     done
-    
+
     echo "RESULT: $NO_NODES $OK_NODES" >> $DEBUGFILE
-    
+
     if [ $NO_NODES -eq $STATE_NODES ]; then
       ALL=1;
     fi
-    
+
     if [ "x$3" != "x" ]; then
       ROUND=`expr $ROUND + 1`
       if [ $ROUND -gt $3 ]; then
@@ -87,9 +87,9 @@ wait_for_nodes() {
     if [ $FORCE_ABORT -eq 0 ]; then
       sleep 1
     fi
-    
+
   done
-  
+
   if [ $NO_NODES -eq $OK_NODES ]; then
     echo "0"
   else
@@ -100,13 +100,13 @@ wait_for_nodes() {
 
 get_nodes_ok() {
   NODES=$1
-  
+
   OK_NODES=""
 
   for n in $NODES; do
-     
+
     STATEFILE="status/$n$2"
-      
+
     if [ -f $STATEFILE ]; then
       NSTATE=`cat $STATEFILE | awk '{print $1}'`
       if [ "x$NSTATE" = "x0" ]; then
@@ -114,7 +114,7 @@ get_nodes_ok() {
       fi
     fi
   done
-    
+
   echo "$OK_NODES"
 }
 
@@ -159,6 +159,9 @@ check_nodes() {
 }
 
 close_measurement_screen() {
+
+  echo -n "State: Close screen sessions (measurement) ... " >&6
+
   if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
     screen -S $LOCALSCREENNAME -X quit
   fi
@@ -167,6 +170,8 @@ close_measurement_screen() {
   for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
     screen -S $MEASUREMENTSCREENNAME -X quit
   done
+
+  echo "done." >&6
 }
 
 close_node_screen() {
@@ -175,12 +180,14 @@ SCREENNUMBER=1
 NODE_IN_SCREEN=1
 MAX_NODE_PER_SCREEN=30
 
+echo -n "State: Close screen sessions (node ctrl) ... " >&6
+
 for node in $NODELIST; do
 
   SCREENNAME=nodes_$MEASUREMENT_ID\_$SCREENNUMBER
 
   screen -S $SCREENNAME -p $node -X stuff "exit" > /dev/null 2>&1
-  sleep 0.5;
+  sleep 0.2;
   screen -S $SCREENNAME -p $node -X stuff $'\n' > /dev/null 2>&1
 
   NODE_IN_SCREEN=`expr $NODE_IN_SCREEN + 1`
@@ -197,38 +204,49 @@ if [ $NODE_IN_SCREEN -gt 1 ]; then
   screen -S $SCREENNAME -X quit
 fi
 
+echo "done." >&6
+
 }
 
 ######################################################
 ############ Abort measurement #######################
 ######################################################
 
-trap abort_measurement 1 2 3 6
+trap abort_measurement 1 2 3 6 15
 
 #TODO
 abort_measurement() {
 
+  echo "" >&6
   echo "Abort Measurement" >&6
 
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
     echo "0" > status/master_click_abort.state
-  fi  
+  fi
 
   echo "0" > status/master_abort.state
 
   MEASUREMENT_ABORT=1
-  
+
   for p in `ls status/*nodectrl.pid`; do
-    PID=`cat $p`
-    kill $PID
+    NCTRL_PID=`cat $p`
+    kill $NCTRL_PID >> status/killnodectrl.log
+    echo "kill $NCTRL_PID" >> status/killnodectrl.log
   done
-  
+
   sleep 2
-  
+
   kill_prog_and_logfiles
   check_nodes
   close_measurement_screen
   close_node_screen
+
+  if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
+    echo "Stop local process"
+    RESULTDIR=$FINALRESULTDIR $LOCALPROCESS poststop >> $FINALRESULTDIR/localapp.log
+  fi
+
+  exit 0
 
 }
 
@@ -247,7 +265,7 @@ run_command_for_node() {
 
   #echo "Debug: $SCREENNAME" >&5
   screen -S $SCREENNAME -p $1 -X stuff "LOGMARKER=$1 $2"
-  sleep 0.3
+  sleep 0.1
   screen -S $SCREENNAME -p $1 -X stuff $'\n'
 
 }
@@ -282,8 +300,7 @@ case "$RUNMODE" in
 	*)
 			RUNMODENUM=0
 			;;
-esac				
-
+esac
 
 ####################################
 ### Create screen for all nodes ####
@@ -299,11 +316,12 @@ for node in $NODELIST; do
 
   if [ $NODE_IN_SCREEN -eq 1 ]; then
     SCREENNAME=nodes_$MEASUREMENT_ID\_$SCREENNUMBER
-    screen -d -m -S $SCREENNAME      
+    screen -d -m -S $SCREENNAME
+    sleep 0.3
   fi
 
-  sleep 0.5;
-  screen -S $SCREENNAME -X screen -t $node 
+  #sleep 0.1;
+  screen -S $SCREENNAME -X screen -t $node
   echo "$node $SCREENNAME" >> $NODESCREENFILENAME
 
   NODE_IN_SCREEN=`expr $NODE_IN_SCREEN + 1`
@@ -353,10 +371,10 @@ STATES="reboot environment wifimodules wificonfig wifiinfo clickmodule preload"
 
 for state in  $STATES; do
   echo -n "State: $state ... " >&6
-  
+
   SYNCSTATE=`wait_for_nodes "$NODELIST" _$state.state`
   set_master_state 0 $state
-  
+
   NODES_OK=`get_nodes_ok "$NODELIST" _$state.state`
   COUNT_NODES_ALL=`echo $NODELIST | wc -w`
   COUNT_NODES_OK=`echo $NODES_OK | wc -w`
@@ -365,10 +383,10 @@ for state in  $STATES; do
   if [ "x$state" = "xenvironment" ]; then
     if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
       echo -n "State: Prestart local process ... " >&6
-      
+
       echo "Local process: prestart"
       RESULTDIR=$FINALRESULTDIR $LOCALPROCESS prestart >> $FINALRESULTDIR/localapp.log
-    
+
       echo "done." >&6
     fi
   fi
@@ -384,8 +402,6 @@ for state in  $STATES; do
     MEASUREMENTSCREENNAME=measurement_$MEASUREMENT_ID\_$MSCREENNUM
 
     CURRENTMSCREENNUM=1
-
-    screen -d -m -S $MEASUREMENTSCREENNAME
 
     NODEBINDIR="$DIR/../../nodes/bin"
 
@@ -411,6 +427,10 @@ for state in  $STATES; do
         CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
         CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
         LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
+
+        if [ $CURRENTMSCREENNUM -eq 1 ]; then
+          screen -d -m -S $MEASUREMENTSCREENNAME
+        fi
 
         echo "$node $nodedevice $MEASUREMENTSCREENNAME" >> $MSCREENFILENAME
 
@@ -448,18 +468,16 @@ for state in  $STATES; do
 			  SCREENT="$node\_$nodedevice\_app"	
 			  screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
 			  CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
-		  sleep 0.1
+			  sleep 0.1
 			  screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export FINALRESULTDIR=$FINALRESULTDIR; $APPLICATION start > $APPLOGFILE 2>&1\""
 		  fi
-		  	
+
 		  if [ $CURRENTMSCREENNUM -gt 25 ]; then
 		    MSCREENNUM=`expr $MSCREENNUM + 1`
-          MEASUREMENTSCREENNAME=measurement_$MEASUREMENT_ID\_$MSCREENNUM
+        	    MEASUREMENTSCREENNAME=measurement_$MEASUREMENT_ID\_$MSCREENNUM
 
-          CURRENTMSCREENNUM=1
-
-          screen -d -m -S $MEASUREMENTSCREENNAME
-        fi
+        	    CURRENTMSCREENNUM=1
+    		  fi
       done
     done
 
@@ -495,7 +513,7 @@ done
 ####### Start Local Click- & Application-Stuff ##########
 #########################################################
 
-if [ MEASUREMENT_ABORT -eq 0 ]; then
+if [ $MEASUREMENT_ABORT -eq 0 ]; then
 
     echo -n "Start local application and remote dump ... " >&6
     LOCALSCREENNAME="local_$MEASUREMENT_ID"
@@ -505,16 +523,16 @@ if [ MEASUREMENT_ABORT -eq 0 ]; then
       screen -d -m -S $LOCALSCREENNAME
       echo "check fo remote Dump: $REMOTEDUMP" >> $FINALRESULTDIR/remotedump.log 2>&1
 
-      sleep 0.3
+      sleep 0.2
       if [ "x$REMOTEDUMP" = "xyes" ]; then
         echo "Start remotedump" >> $FINALRESULTDIR/remotedump.log 2>&1
-        screen -S $LOCALSCREENNAME -X screen -t remotedump                                                                                                                                                                                                                          
+        screen -S $LOCALSCREENNAME -X screen -t remotedump
         sleep 0.3
         screen -S $LOCALSCREENNAME -p remotedump -X stuff "(cd $FINALRESULTDIR/;export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-i586 $FINALRESULTDIR/remotedump.click >> $FINALRESULTDIR/remotedump.log 2>&1)"
         sleep 0.5
-        screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n' 
+        screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n'
       fi
-      
+
       if [ "x$LOCALPROCESS" != "x" ]; then
         #echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
         screen -S $LOCALSCREENNAME -X screen -t localprocess
@@ -531,7 +549,7 @@ fi
 ###################################################
 ####### Start Click- & Application-Stuff ##########
 ###################################################
-if [ MEASUREMENT_ABORT -eq 0 ]; then
+if [ $MEASUREMENT_ABORT -eq 0 ]; then
 
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
@@ -565,13 +583,13 @@ if [ MEASUREMENT_ABORT -eq 0 ]; then
           fi
         done
       done
-      echo "done." >&6    
+      echo "done." >&6
     fi
 fi
 ###################################################
 ################# Wait and Stop ###################
 ###################################################
-if [ MEASUREMENT_ABORT -eq 0 ]; then
+if [ $MEASUREMENT_ABORT -eq 0 ]; then
 
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
@@ -584,9 +602,7 @@ if [ MEASUREMENT_ABORT -eq 0 ]; then
 	  for ((i = $WAITTIME; i > 0; i--)); do
 	    echo -n -e "Wait... $i \033[1G" >&6 ; sleep 1;
     done
-	  
 	  echo -n -e "                 \033[1G" >&6
-
   fi
 fi
 ###################################################
