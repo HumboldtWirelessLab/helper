@@ -18,6 +18,17 @@ case "$SIGN" in
       ;;
 esac
 
+############################
+###### Leave pid  ##########
+############################
+LOGMARKER=$NODELIST
+
+echo $$ > status/$LOGMARKER\_nodectrl.pid
+
+############################
+###### Start node setup ####
+############################
+
 . $DIR/../../host/bin/functions.sh
 
 MEASUREMENT_ABORT=0
@@ -33,27 +44,16 @@ wait_for_master_state() {
 #  DEBUGFILE=/dev/null
 
   echo "wait for master" >> $DEBUGFILE
-  
+
   while [ ! -f status/master_$1.state ] && [ ! -f status/master_abort.state ]; do
     if [ -f status/master_$1.state ]; then
       echo "got status/master_$1.state" >> $DEBUGFILE
     fi
-    if [ -f status/master_abort.state ]; then
-      echo "got status/master_abort.state" >> $DEBUGFILE
-      MEASUREMENT_ABORT=1    
-    fi
-    
+
     echo "wait for master" >> $DEBUGFILE
     sleep 1
   done
-  
-  if [ -f status/master_abort.state ]; then
-    echo "0" > status/$2\_abort.state
-    if [ CRUNMODE -lt 6 ]; then
-      exit 0;
-    fi
-  fi
-  
+
   cat status/master_$1.state | awk '{print $1}'
 }
 
@@ -145,7 +145,7 @@ echo "0" > status/$LOGMARKER\_killclick.state
 #######################################
 
 final_node_check() {
-  
+
 CRUNMODENUM=10
 
 wait_for_master_state killmeasurement $LOGMARKER
@@ -162,23 +162,25 @@ echo "0" > status/$LOGMARKER\_finalnodecheck.state
 ############ Abort measurement #######################
 ######################################################
 
-trap abort_measurement 1 2 3 6
 
-#TODO
 abort_measurement() {
 
-  echo "Abort Measurement" > status/$LOGMARKER\_abort_measurement.log
+  echo "Abort Measurement" >> status/$LOGMARKER\_abort_measurement.log
 
-  if [ CRUNMODENUM -ge 8 ]; then
+  if [ $CRUNMODENUM -ge 8 ]; then
     kill_everything
   else
     echo "0" > status/$LOGMARKER\_killclick.state
-  fi  
+  fi
 
   final_node_check
 
   exit 0
 }
+
+trap abort_measurement 2 15 1 3 4 5 6 7 8 9 10 11 12 13 14
+
+echo "Register trap" > status/$LOGMARKER\_abort_measurement.log
 
 #########################################################
 ###### Check RUNMODE. What do you want to do ? ##########
@@ -210,15 +212,9 @@ case "$RUNMODE" in
 	*)
 			RUNMODENUM=0
 			;;
-esac				
+esac
 
 
-############################
-###### Leave pid  ##########
-############################
-LOGMARKER=$NODELIST
-
-echo $PPID > status/$LOGMARKER\_nodectrl.pid
 
 ###############################
 ###### Wait for node ##########
@@ -251,9 +247,11 @@ fi
 if [ $RUNMODENUM -le 1 ]; then
     echo "Reboot node $NODELIST" >> status/$LOGMARKER\_reboot.log 2>&1
     NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot >> status/$LOGMARKER\_reboot.log 2>&1
-     
+
     echo "Wait for node $NODELIST" >> status/$LOGMARKER\_reboot.log 2>&1
-    sleep 30
+    for s in `seq 1 30`; do
+      sleep 1
+    done
     NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodesandssh >> status/$LOGMARKER\_reboot.log 2>&1
 fi
 
@@ -411,14 +409,14 @@ if [ $RUNMODENUM -le 5 ]; then
       CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
 	    echo "Deviceconfig for $node:$nodedevice" >> status/$LOGMARKER\_wifiinfo.log 2>&1
 	    if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
-        NODE=$node DEVICES=$nodedevice $DIR/../../host/bin/wlandevices.sh getiwconfig >> status/$LOGMARKER\_wifiinfo.log 2>&1
+               NODE=$node DEVICES=$nodedevice $DIR/../../host/bin/wlandevices.sh getiwconfig >> status/$LOGMARKER\_wifiinfo.log 2>&1
 	    fi
-	    
+
 	    if [ "x$WANTNODELIST" = "xyes" ]; then
 	      MADDR=`run_on_node $node "DEVICE=$nodedevice $DIR/../../nodes/bin/wlandevice.sh getmac" "/" $DIR/../../host/etc/keys/id_dsa`
 	      echo "$node $nodedevice $MADDR" >> $FINALRESULTDIR/nodelist_$NODELIST
 	    fi
-	    
+
 	  done
   done
 
