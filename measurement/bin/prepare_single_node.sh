@@ -83,8 +83,6 @@ check_nodes() {
 	    echo "error" >> status/$NODELIST\_error.log 2>&1
 	
 	    (echo "1" > $1)
-	
-	    exit 0
     fi
 }
 
@@ -173,7 +171,10 @@ abort_measurement() {
     echo "0" > status/$LOGMARKER\_killclick.state
   fi
 
-  final_node_check
+  wait_for_master_state killmeasurement $LOGMARKER
+  echo "Check nodes" >> status/$LOGMARKER\_finalnodecheck.log 2>&1
+  echo "0" > status/$LOGMARKER\_finalnodecheck.state
+# final_node_check
 
   exit 0
 }

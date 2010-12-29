@@ -228,16 +228,30 @@ abort_measurement() {
 
   MEASUREMENT_ABORT=1
 
+  NODECTRL_CNT=0
+  NEW_NODELIST=""
+
   for p in `ls status/*nodectrl.pid`; do
     NCTRL_PID=`cat $p`
     kill $NCTRL_PID >> status/killnodectrl.log
     echo "kill $NCTRL_PID" >> status/killnodectrl.log
+    CURRENT_NODE=`echo $p | sed "s#status/##g" | sed "s#_nodectrl.pid##g"`
+    NEW_NODELIST="$NEW_NODELIST $CURRENT_NODE"
+    NODECTRL_CNT=`expr $NODECTRL_CNT + 1`
   done
+
+  echo "New nodelist: $NEW_NODELIST" >> status/master_abort.log
 
   sleep 2
 
+  OLD_NODELIST=$NODELIST
+  NODELIST=$NEW_NODELIST
+
   kill_prog_and_logfiles
   check_nodes
+
+  NODELIST=$OLD_NODELIST
+
   close_measurement_screen
   close_node_screen
 
