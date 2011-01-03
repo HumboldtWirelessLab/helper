@@ -62,18 +62,31 @@ while read line; do
       DIFF_TIME=`expr $TIME - $AC_TIME`
       sleep $DIFF_TIME
 
-      if [ "x$MODE" = "xwrite" ]; then
-        #echo "clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER \"$VALUE\""
-        $DIR/clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER "$VALUE"
-      else
-        if [ "$OUTFILE" = "-" ]; then
-          #echo "clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER" >&2
-          VERSION="java" $DIR/clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER
+      RESULT=1
+      RETRY=0
+
+      while [ $RESULT != 0 ] && [ $RETRY -lt 5 ]; do
+
+        RETRY=`expr $RETRY + 1`
+
+        if [ "x$MODE" = "xwrite" ]; then
+          #echo "clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER \"$VALUE\""
+          $DIR/clickctrl.sh write $NODENAME 7777 $ELEMENT $HANDLER "$VALUE"
         else
-          VERSION="java" $DIR/clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER >> $OUTFILE
+          if [ "$OUTFILE" = "-" ]; then
+            #echo "clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER" >&2
+            VERSION="java" $DIR/clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER
+          else
+            VERSION="java" $DIR/clickctrl.sh read $NODENAME 7777 $ELEMENT $HANDLER >> $OUTFILE
+          fi
         fi
-      fi
+
+        RESULT=$?
+
+      done
+
       AC_TIME=$TIME
+
     fi
   fi
 done < $1
