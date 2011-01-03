@@ -89,6 +89,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
     -> power::SetTXPower(19)
     -> lp_wifiencap::WifiEncap(0x00, 0:0:0:0:0:0)
     -> lp_queue::FrontDropQueue(2)
+    -> linkprobe_suppressor::Suppressor()
     -> [0]lp_data_scheduler;
 
   brn_ether_clf[1]                         //no brn

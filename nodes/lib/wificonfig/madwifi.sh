@@ -335,7 +335,10 @@ case "$1" in
 
 	    #TODO: set mtu depending on WIFITYPE
 	    echo "$IFCONFIG $DEVICE mtu $MTU txqueuelen $TXQUEUE_LEN"
+	    #txqueuelen: queuelen of ath is not relevant ( queuelen(ath0)==0 is no problem)
+	    #            queuelen of wifi is relevant ( queuelen(wifi0)==0 results in disabling transmission)
 	    ${IFCONFIG} $DEVICE mtu $MTU txqueuelen $TXQUEUE_LEN
+	    ${IFCONFIG} $PHYDEV mtu $MTU txqueuelen $TXQUEUE_LEN
 
 	    echo "Finished device config"
 	    ;;
