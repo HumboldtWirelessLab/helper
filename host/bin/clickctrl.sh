@@ -37,9 +37,9 @@ case "$VERSION" in
     shift 5
 
     if [ "x$1" = "xwrite" ]; then
-	$DIR/../lib/clickctrl/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" & 2> /dev/null
+      $DIR/../lib/clickctrl/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" & 2> /dev/null
     else
-	$DIR/../lib/clickctrl/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" 2> /dev/null
+      $DIR/../lib/clickctrl/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" 2> /dev/null
     fi
 
   ;;

@@ -38,7 +38,7 @@ public class ClickConnection {
        cliccs = new ControlSocket(clickipaddr, clickport);
      } catch ( IOException e) {
        cliccs = null;
-       System.out.println("Unable to connect to AP (" + clickipaddr + ")");
+       //System.out.println("Unable to connect to AP (" + clickipaddr + ")");
        //e.printStackTrace();
      }
   }

@@ -14,44 +14,50 @@ import java.net.UnknownHostException;
 public class ClickClient {
 
   private static void printHelp(String[] args) {
-    System.out.println("Use: java ClickClient read|write ip port element handler [data]");
-    return;
+    System.err.println("Use: java ClickClient read|write ip port element handler [data]");
   }
 
   public static void main(String[] args) {
     if ( args.length < 1 ) {
       printHelp(args);
-      return;
+      System.exit(1);
     }
 
     if ( args[0].equalsIgnoreCase("read") ) {
       if ( args.length < 5 ) {
         printHelp(args);
-        return;
+        System.exit(1);
       }
 
-      InetAddress ip;
+      InetAddress ip = null;
       try {
         ip = InetAddress.getByName(args[1]);
       } catch(UnknownHostException e) {
-        System.out.println("Unknown Host");
-        return;
+        System.err.println("Unknown Host");
+        System.exit(1);
       }
 
       Integer p = new Integer(args[2]);
       ClickConnection cc = new ClickConnection(ip, p.intValue());
       cc.openClickConnection();
       String result = cc.readHandler(args[3], args[4]);
-      System.out.println(result);
+      if ( result != null )
+        System.out.println(result);
+      else {
+        cc.closeClickConnection();
+//        System.err.println("Error");
+        System.exit(1);
+      }
+
       cc.closeClickConnection();
     }
     else if ( args[0].equalsIgnoreCase("write") ) {
       if ( args.length < 6 ) {
         printHelp(args);
-        return;
+        System.exit(1);
       }
 
-      InetAddress ip;
+      InetAddress ip = null;
       String command;
       command = args[5];
       for ( int i = 6; i < args.length; i++) command = command + " " + args[i];
@@ -60,8 +66,8 @@ public class ClickClient {
       try {
         ip = InetAddress.getByName(args[1]);
       } catch(UnknownHostException e) {
-        System.out.println("Unknown Host");
-        return;
+        System.err.println("Unknown Host");
+        System.exit(1);
       }
 
       Integer p = new Integer(args[2]);
@@ -70,9 +76,12 @@ public class ClickClient {
       int result = cc.writeHandler(args[3], args[4], command);
       cc.closeClickConnection();
 
+      if ( result != 0 ) System.exit(1);
+
     } else {
       System.out.println("Unknown option: " + args[0] + " !");
       printHelp(args);
+      System.exit(1);
     }
   }
 
