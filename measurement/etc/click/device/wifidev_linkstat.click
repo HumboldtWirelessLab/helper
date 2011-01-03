@@ -18,8 +18,6 @@
 
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
 
-//  nblist::BRN2NBList();  //stores all neighbors (known (friend) and unknown (foreign))
-//  nbdetect::NeighborDetect(NBLIST nblist, DEVICE $device);
   rates::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
   proberates::AvailableRates(DEFAULT 2 12 22 108);
   etx_metric :: BRN2ETXMetric($lt);
@@ -53,7 +51,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> data_suppressor::Suppressor()
   -> [1]lp_data_scheduler::PrioSched()
 #ifdef PRIO_QUEUE
-  -> [1]x_prio_q::PrioSched()
+  -> [2]x_prio_q::PrioSched()
 #endif
   -> wifidevice
   -> filter_tx :: FilterTX()
@@ -109,8 +107,23 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   input[1] -> Discard;
 
 #ifdef PRIO_QUEUE
+
   input[2]
   -> x_brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  -> [1]x_prio_q;
+  
+  qc_q::NotifierQueue(500)
+  
+  qc::BRN2PacketQueueControl(QUEUESIZEHANDLER qc_q.length, QUEUERESETHANDLER qc_q.reset, MINP 100 , MAXP 500)
+  -> EtherEncap(0x8888, $etheraddress , ff:ff:ff:ff:ff:ff)
+  -> WifiEncap(0x00, 0:0:0:0:0:0)
+  -> SetTXRate(2)
+  -> SetTXPower(15)
+  -> SetTimestamp()
+  -> qc_q
+  -> qc_suppressor::Suppressor()
   -> [0]x_prio_q;
+
 #endif
+
 }
