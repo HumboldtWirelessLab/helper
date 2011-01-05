@@ -49,7 +49,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> Discard;
 
   dev_decap[2]
-//-> Print("Post encap operation",TIMESTAMP true)
+  //-> Print("Post encap operation",TIMESTAMP true)
   -> ath_op;
 #endif
 

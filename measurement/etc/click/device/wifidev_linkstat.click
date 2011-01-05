@@ -15,7 +15,6 @@
 //  1: client
 //  2: high priority stuff ( higher than linkprobes)
 
-
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
 
   rates::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
@@ -79,25 +78,24 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   wififrame_clf[2]
     -> WifiDecap()
-//    -> nbdetect
     //-> Print("Data")
-    -> brn_ether_clf :: Classifier( 12/8086, - )
+    -> brn_ether_clf :: Classifier( 12/BRN_ETHERTYPE, - )
     -> lp_clf :: Classifier( 14/BRN_PORT_LINK_PROBE, - )
     -> BRN2EtherDecap()
     -> link_stat
-    -> EtherEncap(0x8086, deviceaddress, ff:ff:ff:ff:ff:ff)
-    -> power::SetTXPower(19)
+    -> lp_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
+    -> lp_power::SetTXPower(19)
     -> lp_wifiencap::WifiEncap(0x00, 0:0:0:0:0:0)
     -> lp_queue::FrontDropQueue(2)
-    -> linkprobe_suppressor::Suppressor()
+    -> lp_suppressor::Suppressor()
     -> [0]lp_data_scheduler;
 
   brn_ether_clf[1]                         //no brn
-// -> Print()
+   // -> Print()
    -> Discard;
 
   lp_clf[1]                               //brn, but no lp
-//-> Print("Data, no LP")
+  //-> Print("Data, no LP")
   -> [1]data_suppressor[1]
   -> brnToMe;
 

@@ -1,27 +1,31 @@
+#ifndef __BROADCASTFLOODING_CLICK__
+#define __BROADCASTFLOODING_CLICK__
+
 //input[0]: From Src (who wants to send a broadcats), i.e. the originator of the flooding
 //input[1]: Received from other brn node
 //input[2]: Errors (not used)
+//input[3]: Passiv (overhear/monitor)
 //[0]output: Local copy (broadcast)
 //[1]output: To other brn nodes
 
-elementclass BROADCASTFLOODING {$ID, $ADDRESS, $LT |
+elementclass BROADCASTFLOODING {ID $id, LT $lt |
 
+#ifdef PRO_FL
+  flp::ProbabilityFlooding(NODEIDENTITY $id, LINKTABLE $lt, MAXNBMETRIC 200);
+#else
   flp::SimpleFlooding();
-//flp::ProbabilityFlooding(LINKSTAT $LT);
-  fl::Flooding(FLOODINGPOLICY flp, ETHERADDRESS $ADDRESS);
+#endif
+  
+  fl::Flooding(FLOODINGPOLICY flp);
 
 #ifdef BCAST2UNIC
-  ucastrw :: UnicastFlooding(NODEIDENTITY me, LINKSTAT $LT, MAXNBMETRIC 200, CANDSELECTIONSTRATEGY 1, DEBUG 4);
+  unicfl :: UnicastFlooding(NODEIDENTITY $id, LINKTABLE $lt, MAXNBMETRIC 200, CANDSELECTIONSTRATEGY 1, DEBUG 2);
 #endif
 
   input[0]
   -> [0]fl;
 
   input[1]
-#ifdef BCAST2UNIC
-  // received from other brn node
-  [0]ucastrw
-#endif
   -> BRN2Decap()
   -> [1]fl;
 
@@ -32,12 +36,18 @@ elementclass BROADCASTFLOODING {$ID, $ADDRESS, $LT |
   -> [0]output;
 
   fl[1] 
+  -> BroadcastMultiplexer(NODEIDENTITY $id, USEANNO true)
   -> BRN2EtherEncap(USEANNO true) 
-//-> Print("SimpleFlood-Ether-OUT")
+  //-> Print("BroadcastMultiplexer out")
 #ifdef BCAST2UNIC
-  // transmit to other brn nodes
-  [0]ucastrw
+  -> unicfl                                                // transmit to other brn nodes
 #endif
   -> [1]output;
 
+  input[3]
+  -> BRN2Decap()
+  -> [1]fl;
+
 }
+
+#endif
