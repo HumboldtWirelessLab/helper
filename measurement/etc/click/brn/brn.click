@@ -6,6 +6,10 @@
 #endif
 
 
+#define BRN_ETHERTYPE                 8086
+#define BRN_ETHERTYPE_HEX             0x8086
+
+
 /*Basics and Services*/
 #define BRN_PORT_LINK_PROBE           01
 #define BRN_PORT_IAPP                 02
