@@ -1,5 +1,0 @@
-MODE=monitor
-CHANNEL=3
-POWER=15
-WIFITYPE=805
-RECOMMENDMODOPTIONS=modoptions.nocountry
