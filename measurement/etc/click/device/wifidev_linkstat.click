@@ -110,17 +110,18 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   input[2]
   -> x_brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> [1]x_prio_q;
-  
-  qc_q::NotifierQueue(500)
-  
-  qc::BRN2PacketQueueControl(QUEUESIZEHANDLER qc_q.length, QUEUERESETHANDLER qc_q.reset, MINP 100 , MAXP 500)
+
+  qc_q::NotifierQueue(500);
+  qc_suppressor::Suppressor();
+
+  qc::BRN2PacketQueueControl(QUEUESIZEHANDLER qc_q.length, QUEUERESETHANDLER qc_q.reset, SUPPRESSORHANDLER qc_suppressor.active0, MINP 200 , MAXP 500)
   -> EtherEncap(0x8888, $etheraddress , ff:ff:ff:ff:ff:ff)
   -> WifiEncap(0x00, 0:0:0:0:0:0)
   -> SetTXRate(2)
   -> SetTXPower(15)
   -> SetTimestamp()
   -> qc_q
-  -> qc_suppressor::Suppressor()
+  -> qc_suppressor
   -> [0]x_prio_q;
 
 #endif
