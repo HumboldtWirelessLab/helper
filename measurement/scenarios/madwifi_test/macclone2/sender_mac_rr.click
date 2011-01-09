@@ -22,14 +22,17 @@ dev_decap[1]
  -> rawwifidev_too_small_cnt::Counter
  -> Discard;
 
-BRN2PacketSource(SIZE 100, INTERVAL 100, MAXSEQ 500000, BURST 1, ACTIVE true)
+ps::BRN2PacketSource(SIZE 100, INTERVAL 100, MAXSEQ 500000, BURST 1, ACTIVE false)
  -> rrs :: RoundRobinSwitch()
  -> sender_suppressor::Suppressor()
- -> EtherEncap(0x8088, dst, dst)
+ -> ee::EtherEncap(0x8088, my_wlan, dst)
+// -> EtherEncap(0x8088, dst, dst)
 // -> EtherEncap(0x8088, 00:0c:0c:0c:0c:03, dst)
  -> wifienc :: WifiEncap(0x00, 0:0:0:0:0:0)
- -> SetTXRate(2)
+ -> data_rate::SetTXRate(RATE 12, TRIES 7)
+// -> SetTXRate(12)
  -> wlan_out_queue :: NotifierQueue(100)
+ -> queue_suppressor::Suppressor()
  -> SetTXPower(15)
  -> Print("Out")
  -> __WIFIENCAP__
