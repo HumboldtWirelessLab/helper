@@ -19,5 +19,7 @@ BRN2PacketSource(SIZE 100, INTERVAL 100, MAXSEQ 500000, BURST 1, ACTIVE true)
  -> TODEVICE(NODEDEVICE);
 
 rrs[1]
- -> EtherEncap(0x8088, 00:0c:0c:0c:0c:04, dst)
+ -> EtherEncap(0x8088, dst, dst)  //sk111
+// -> EtherEncap(0x8088, 06:0B:6B:09:ED:73, dst)  //sk110
+// -> EtherEncap(0x8088, 00:0c:0c:0c:0c:04, dst)
  -> wifienc;

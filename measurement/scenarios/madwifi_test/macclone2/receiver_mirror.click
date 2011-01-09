@@ -20,7 +20,8 @@ FROMRAWDEVICE(NODEDEVICE)
   -> Discard;
   Idle
   -> wifienc :: WifiEncap(0x00, 0:0:0:0:0:0)
-  -> SetTXRate(2)
+  -> data_rate::SetTXRate(RATE 12, TRIES 11)
+//  -> SetTXRate(2)
   -> SetTXPower(15)
   -> __WIFIENCAP__
   -> wlan_out_queue :: NotifierQueue(100)
