@@ -1,3 +1,0 @@
-#NODE	DEVICE	MODULSDIR			                 MODOPTIONS WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	   LOGFILE			APP	APPLOGFILE
-wgt80   ath0    BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test -          monitor.b.channel    -               receiver_4.click    LOGDIR/NODENAME.NODEDEVICE.log       -	-
-wgt81   ath0    BASEDIR/nodes/lib/modules/NODEARCH/KERNELVERSION-test -          monitor.b.channel    -               receiver_4.click    LOGDIR/NODENAME.NODEDEVICE.log       -	-
