@@ -263,7 +263,16 @@ case "$1" in
 		    mkdir -p $RESULTDIR
 		fi
 
-		( cd $FINALRESULTDIR; ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+		which valgrind > /dev/null
+		if [ $? -ne 0 ]; then
+		    VALGRIND=0
+		fi
+		if [ "x$VALGRIND" = "x1" ]; then
+		    NS_FULL_PATH=`which ns`
+		    ( cd $FINALRESULTDIR; valgrind --leak-check=full --leak-resolution=high --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
+		else
+		    ( cd $FINALRESULTDIR; ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+		fi
 		
 		if [ $? -eq 0 ]; then
 		  MODE=sim SIM=ns2 CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh
