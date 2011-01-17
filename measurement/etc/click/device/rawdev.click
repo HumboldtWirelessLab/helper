@@ -13,11 +13,20 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 #ifdef RAWDEV_DEBUG
   -> Print("From Device")
 #endif
+#ifdef RAWDUMP
+  -> raw_dump_tee :: Tee()
+#endif
 #ifdef SIMULATION
   -> SetTimestamp()
 #endif
   -> BRN2SetDeviceAnno(DEVICE $device)
   -> [0]output;
+
+#ifdef RAWDUMP
+   raw_dump_tee[1]
+   -> TODUMP("RESULTDIR/NODENAME.NODEDEVICE.raw.dump");
+#endif
+
 }
 
 #endif
