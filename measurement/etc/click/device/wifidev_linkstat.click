@@ -59,7 +59,9 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #else
   -> error_clf :: FilterPhyErr()
 #endif
+#ifndef DISABLE_WIFIDUBFILTER
   -> WifiDupeFilter()
+#endif
   -> wififrame_clf :: Classifier( 1/40%40,  // wep frames
                                   0/00%0f,  // management frames
                                       - );
@@ -117,8 +119,8 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   qc::BRN2PacketQueueControl(QUEUESIZEHANDLER qc_q.length, QUEUERESETHANDLER qc_q.reset, SUPPRESSORHANDLER qc_suppressor.active0, MINP 200 , MAXP 500, DISABLE_QUEUE_RESET false, DEBUG 2)
   -> EtherEncap(0x8888, $etheraddress , ff:ff:ff:ff:ff:ff)
   -> WifiEncap(0x00, 0:0:0:0:0:0)
-  -> SetTXRate(2)
-  -> SetTXPower(15)
+  -> qc_rate :: SetTXRate(2)
+  -> qc_power :: SetTXPower(15)
   -> SetTimestamp()
   -> qc_q
   -> qc_suppressor
