@@ -23,12 +23,12 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   link_stat :: BRN2LinkStat(ETHTYPE          0x0a04,
                             DEVICE          $device,
-#ifdef SIMULATION			    
+#ifdef SIMULATION
                             PERIOD             2000,
                             TAU               30000,
 #else
-                            PERIOD             1000,
-                            TAU              100000,
+                            PERIOD             1000, //1000   200
+                            TAU              100000, //100000 10000
 #endif
                             ETX          etx_metric,
 #ifdef SIMULATION
@@ -70,6 +70,11 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #ifdef WIFIDEV_LINKSTAT_DEBUG
   -> PrintWifi("NODENAME:NODEDEVICE ", TIMESTAMP true)
 #endif
+#ifdef PRIO_QUEUE
+  -> WifiDecap()
+  -> ig_feedback_clf :: Classifier( 12/8888, - );
+  ig_feedback_clf[1]
+#endif
   -> Discard;
 
   wififrame_clf[0]
@@ -92,9 +97,9 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
     -> lp_suppressor::Suppressor()
     -> [0]lp_data_scheduler;
 
-  brn_ether_clf[1]                         //no brn
-   // -> Print()
-   -> Discard;
+  brn_ether_clf[1]                         //no brn no interference stuff
+  //-> Print()
+  -> Discard;
 
   lp_clf[1]                               //brn, but no lp
   //-> Print("Data, no LP")
@@ -116,8 +121,9 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   qc_q::NotifierQueue(500);
   qc_suppressor::Suppressor();
 
-  qc::BRN2PacketQueueControl(QUEUESIZEHANDLER qc_q.length, QUEUERESETHANDLER qc_q.reset, SUPPRESSORHANDLER qc_suppressor.active0, MINP 200 , MAXP 500, DISABLE_QUEUE_RESET false, DEBUG 2)
-  -> EtherEncap(0x8888, $etheraddress , ff:ff:ff:ff:ff:ff)
+  ig_feedback_clf[0]
+  -> qc::BRN2PacketQueueControl(QUEUESIZEHANDLER qc_q.length, QUEUERESETHANDLER qc_q.reset, MINP 200, MAXP 500, SUPPRESSORHANDLER qc_suppressor.active0, DISABLE_QUEUE_RESET false, TXFEEDBACK_REUSE true, DEBUG 2)
+  -> EtherEncap(0x8888, $etheraddress, ff:ff:ff:ff:ff:ff)
   -> WifiEncap(0x00, 0:0:0:0:0:0)
   -> qc_rate :: SetTXRate(2)
   -> qc_power :: SetTXPower(15)
@@ -134,7 +140,6 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> Print(TIMESTAMP true)
   -> Discard;
 */
-
 #endif
 
 }
