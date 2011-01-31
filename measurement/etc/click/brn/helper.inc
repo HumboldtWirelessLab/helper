@@ -12,7 +12,7 @@
 #endif
 
 #if WIFITYPE == 802
-#define __WIFIENCAP__ RadiotapEncap()
+#define __WIFIENCAP__ BrnRadiotapEncap()
 #define __WIFIDECAP__ RadiotapDecap()
 #endif
 
