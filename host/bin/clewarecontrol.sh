@@ -20,10 +20,10 @@ esac
 
 case "$1" in
 	"off")
-		$DIR/clewarecontrol -c 1 -as 0 0
+		$DIR/../lib/clewarecontrol/clewarecontrol -c 1 -as 0 0
 		;;
 	"on")
-		$DIR/clewarecontrol -c 1 -as 0 1
+		$DIR/../lib/clewarecontrol/clewarecontrol -c 1 -as 0 1
 		;;
 	*)
 		echo "Use $0 on|off"
