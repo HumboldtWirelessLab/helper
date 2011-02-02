@@ -399,7 +399,7 @@ for state in  $STATES; do
       echo -n "State: Prestart local process ... " >&6
 
       echo "Local process: prestart"
-      RESULTDIR=$FINALRESULTDIR $LOCALPROCESS prestart >> $FINALRESULTDIR/localapp.log
+      RESULTDIR=$FINALRESULTDIR NODELIST="$NODELIST" $LOCALPROCESS prestart >> $FINALRESULTDIR/localapp.log
 
       echo "done." >&6
     fi
