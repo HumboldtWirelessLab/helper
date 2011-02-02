@@ -27,15 +27,15 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
                             PERIOD             2000,
                             TAU               30000,
 #else
-                            PERIOD             1000, //1000   200
+                            PERIOD             2000, //1000   200
                             TAU              100000, //100000 10000
 #endif
                             ETX          etx_metric,
 #ifdef SIMULATION
                             PROBES  "2 300",
 #else
-//                          PROBES  "2 100 4 100 11 100 12 100 22 100 18 100 24 100 36 100 48 100 72 100 96 100 108 100",
-                            PROBES  "2 200 12 200",
+                            PROBES  "2 100 4 100 11 100 12 100 22 100 18 100 24 100 36 100 48 100 72 100 96 100 108 100",
+//                            PROBES  "2 200 12 200",
 #endif
                             RT           proberates);
 
