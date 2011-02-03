@@ -34,8 +34,8 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #ifdef SIMULATION
                             PROBES  "2 300",
 #else
-                            PROBES  "2 100 4 100 11 100 12 100 22 100 18 100 24 100 36 100 48 100 72 100 96 100 108 100",
-//                            PROBES  "2 200 12 200",
+//                          PROBES  "2 100 4 100 11 100 12 100 22 100 18 100 24 100 36 100 48 100 72 100 96 100 108 100",
+                            PROBES  "2 300 12 300",
 #endif
                             RT           proberates);
 
@@ -85,10 +85,11 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   wififrame_clf[2]
     -> WifiDecap()
-    //-> Print("Data")
+//    -> Print("Data")
     -> brn_ether_clf :: Classifier( 12/BRN_ETHERTYPE, - )
     -> lp_clf :: Classifier( 14/BRN_PORT_LINK_PROBE, - )
     -> BRN2EtherDecap()
+//    -> Print("Linkprobe")
     -> link_stat
     -> lp_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
     -> lp_power::SetTXPower(19)
