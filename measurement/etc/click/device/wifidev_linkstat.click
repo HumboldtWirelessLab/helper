@@ -21,23 +21,23 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   proberates::AvailableRates(DEFAULT 2 12 22 108);
   etx_metric :: BRN2ETXMetric($lt);
 
-  link_stat :: BRN2LinkStat(ETHTYPE          0x0a04,
-                            DEVICE          $device,
+  link_stat :: BRN2LinkStat(DEVICE     $device,
 #ifdef SIMULATION
-                            PERIOD             2000,
-                            TAU               30000,
+                            PERIOD        2000,
+                            TAU          30000,
 #else
-                            PERIOD             2000, //1000   200
-                            TAU              100000, //100000 10000
+                            PERIOD        2000, //1000   200
+                            TAU         100000, //100000 10000
 #endif
-                            ETX          etx_metric,
+                            ETX     etx_metric,
 #ifdef SIMULATION
-                            PROBES  "2 300",
+                            PROBES     "2 300",
 #else
 //                          PROBES  "2 100 4 100 11 100 12 100 22 100 18 100 24 100 36 100 48 100 72 100 96 100 108 100",
                             PROBES  "2 300 12 300",
 #endif
-                            RT           proberates);
+                            RT      proberates,
+			    DEBUG	2);
 
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
