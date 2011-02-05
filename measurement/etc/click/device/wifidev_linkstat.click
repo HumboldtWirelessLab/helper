@@ -85,12 +85,13 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   wififrame_clf[2]
     -> WifiDecap()
-//    -> Print("Data")
+//  -> Print("Data")
     -> brn_ether_clf :: Classifier( 12/BRN_ETHERTYPE, - )
     -> lp_clf :: Classifier( 14/BRN_PORT_LINK_PROBE, - )
     -> BRN2EtherDecap()
-//    -> Print("Linkprobe")
+//  -> Print("Linkprobe",320)
     -> link_stat
+//  -> Print("Linkprobe_out",320)
     -> lp_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
     -> lp_power::SetTXPower(19)
     -> lp_wifiencap::WifiEncap(0x00, 0:0:0:0:0:0)
