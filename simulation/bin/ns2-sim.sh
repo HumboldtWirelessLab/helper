@@ -271,7 +271,11 @@ case "$1" in
 		    NS_FULL_PATH=`which ns`
 		    ( cd $FINALRESULTDIR; valgrind --leak-check=full --leak-resolution=high --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
 		else
-		    ( cd $FINALRESULTDIR; ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+		    if [ "x$PROFILE" = "x1" ]; then
+			( cd $FINALRESULTDIR; ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+		    else
+			( cd $FINALRESULTDIR; ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+		    fi
 		fi
 		
 		if [ $? -eq 0 ]; then

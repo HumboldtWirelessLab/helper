@@ -188,30 +188,45 @@ case "$1" in
 	      # no multimedia
 	      echo "iwpriv $DEVICE wmm $WMM"
 	      ${IWPRIV} $DEVICE wmm $WMM
+	    else
+	      echo "iwpriv $DEVICE wmm 0"
+	      ${IWPRIV} $DEVICE wmm 0
 	    fi
 
 	    if [ "x$AR" != "x" ]; then
 	      # no adaptive radio
 	      echo "iwpriv $DEVICE ar $AR"
 	      ${IWPRIV} $DEVICE ar $AR
+	    else
+	      echo "iwpriv $DEVICE ar 0"
+	      ${IWPRIV} $DEVICE ar 0
 	    fi
 
 	    if [ "x$BURST" != "x" ]; then
 	      # no burst
 	      echo "iwpriv $DEVICE burst $BURST"
 	      ${IWPRIV} $DEVICE burst $BURST
+	    else
+	      echo "iwpriv $DEVICE burst 0"
+	      ${IWPRIV} $DEVICE burst 0
 	    fi
 
 	    if [ "x$FAST_FRAME" != "x" ]; then
 	      # no fast frame
 	      echo "iwpriv $DEVICE ff $FAST_FRAME"
 	      ${IWPRIV} $DEVICE ff $FAST_FRAME
+	    else
+	      echo "iwpriv $DEVICE ff 0"
+	      ${IWPRIV} $DEVICE ff 0
 	    fi
 
 	    if [ "x$ABOLT" != "x" ]; then
 	      # no atheros proprietary in general
 	      echo "iwpriv $DEVICE abolt $ABOLT"
 	      ${IWPRIV} $DEVICE abolt $ABOLT
+	    else
+	      echo "iwpriv $DEVICE abolt 0"
+	      ${IWPRIV} $DEVICE abolt 0
 	    fi
 
 	    if [ "x$DIVERSITY" = "x" ]; then
@@ -348,12 +363,34 @@ case "$1" in
             ${IWCONFIG} $DEVICE
             echo "ifconfig"
             ${IFCONFIG} $DEVICE
+            ${IWPRIV} $DEVICE get_mode
+	    ${IWPRIV} $DEVICE get_inact_init
+	    ${IWPRIV} $DEVICE get_dtim_period
+	    ${IWPRIV} $DEVICE get_doth
+	    ${IWPRIV} $DEVICE get_driver_caps
+	    ${IWPRIV} $DEVICE get_txoplimit
+	    ${IWPRIV} $DEVICE get_xr
+	    ${IWPRIV} $DEVICE get_pureg
+	    ${IWPRIV} $DEVICE get_coveragecls
+	    ${IWPRIV} $DEVICE get_regclass
+	    ${IWPRIV} $DEVICE get_turbo
+	    ${IWPRIV} $DEVICE get_rssi11a
+	    ${IWPRIV} $DEVICE get_rssi11b
+	    ${IWPRIV} $DEVICE get_rssi11g
+	    ${IWPRIV} $DEVICE get_uapsd
+	    ${IWPRIV} $DEVICE get_markdfs
+            ${IWPRIV} $DEVICE get_wmm
+            ${IWPRIV} $DEVICE get_ar
+            ${IWPRIV} $DEVICE get_burst
+            ${IWPRIV} $DEVICE get_ff
+            ${IWPRIV} $DEVICE get_abolt
             sysctl dev.$PHYDEV.disable_cca
             sysctl dev.$PHYDEV.cca_thresh
             ${IWPRIV} $DEVICE get_macclone
             sysctl dev.$PHYDEV.cutil_pkt_threshold
             sysctl dev.$PHYDEV.cu_update_mode
             sysctl dev.$PHYDEV.cu_anno_mode
+	    
             ;;
         *)
             ;;
