@@ -57,11 +57,10 @@ case "$1" in
 		
                 KERNELVERSION=`uname -r`
                 NODEARCH=`$DIR/../../bin/system.sh get_arch`
-		
+
                 FINMODULSDIR=`echo $MODULSDIR | sed -e "s#KERNELVERSION#$KERNELVERSION#g" -e "s#NODEARCH#$NODEARCH#g"`
-#                echo "Use $FINMODULSDIR"
-			
-		MODLIST="cfg80211.ko mac80211.ko ath.ko ath9k_hw.ko ath9k_common.ko ath9k.ko ath5k.ko"
+#               echo "Use $FINMODULSDIR"
+		MODLIST="compat.ko compat_firmware_class.ko rfkill.ko led-class.ko lib80211.ko lib80211_crypt_ccmp.ko lib80211_crypt_wep.ko lib80211_crypt_tkip.ko cfg80211.ko mac80211.ko ath.ko ath9k_hw.ko ath9k_common.ko ath9k.ko ath5k.ko"
 		for mod in $MODLIST
 		do
 			if [ -f ${FINMODULSDIR}/$mod ]; then
@@ -71,8 +70,8 @@ case "$1" in
 		done
 		;;
     "uninstall")
-		MODLIST="ath9k ath5k ath9k_common ath9k_hw ath mac80211 cfg80211 wlan_xauth wlan_wep wlan_tkip wlan_scan_ap wlan_scan_sta wlan_ccmp wlan_acl ath_pci ath_rate_sample ath_rate_minstrel wlan ath_hal hostap_pci hostap ieee80211_crypt "
-		
+		MODLIST="ath9k ath5k ath9k_common ath9k_hw ath mac80211 cfg80211 wlan_xauth wlan_wep wlan_tkip wlan_scan_ap wlan_scan_sta wlan_ccmp wlan_acl ath_pci ath_rate_sample ath_rate_minstrel wlan ath_hal hostap_pci hostap ieee80211_crypt lib80211_crypt_tkip lib80211_crypt_wep lib80211_crypt_ccmp lib80211 led-class rfkill compat_firmware_class compat"
+
 		for mod in $MODLIST
 		do
 			MOD_EX=`lsmod | grep $mod | wc -l`

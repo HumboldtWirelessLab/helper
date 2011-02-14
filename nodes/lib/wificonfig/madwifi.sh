@@ -166,6 +166,8 @@ case "$1" in
 		fi
 	    fi
 
+	    ${IFCONFIG} $DEVICE up
+
 	    if [ "x$MODE_ABG" != "x" ]; then
 	      # 802.11b/802.11g/802.11a
 	      echo "iwpriv $DEVICE mode $MODE_ABG"

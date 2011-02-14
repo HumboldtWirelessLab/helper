@@ -30,6 +30,8 @@ else
     fi
 fi
 
+IW=none
+
 if [ -e /usr/sbin/iw ]; then
     IW=/usr/sbin/iw
 else
@@ -110,7 +112,9 @@ case "$1" in
 	    fi
 	    echo "$IWCONFIG $DEVICE channel $CHANNEL"
 	    ${IWCONFIG} $DEVICE channel $CHANNEL
-	    ${IW} $DEVICE set channel $CHANNEL
+	    if [ "x$IW" != "xnone" ]; then
+		${IW} $DEVICE set channel $CHANNEL
+	    fi
 
 	    if [ "x$POWER" = "x" ]; then
 		POWER=$DEFAULT_POWER
