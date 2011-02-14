@@ -20,6 +20,6 @@ Script(wait TIME, stop);
 #endif
 
 #ifdef NODEID_NAME
-#warning Deprecated: Please use NAME in Nodeidentity.
+//#warning Deprecated: Please use NAME in Nodeidentity.
 Script( write id.nodename NODENAME );
 #endif
