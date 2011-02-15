@@ -25,25 +25,26 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #ifdef SIMULATION
                             PERIOD        2000,
                             TAU          30000,
+                            PROBES     "2 300",
 #else
                             PERIOD        2000, //1000   200
                             TAU         100000, //100000 10000
-#endif
-                            ETX     etx_metric,
-#ifdef SIMULATION
-                            PROBES     "2 300",
-#else
 //                          PROBES  "2 100 4 100 11 100 12 100 22 100 18 100 24 100 36 100 48 100 72 100 96 100 108 100",
-                            PROBES  "2 300 12 300",
+                            PROBES  "2 500",
 #endif
                             RT      proberates,
-			    DEBUG	2);
+                            ETX     etx_metric,
+                            DEBUG            2 );
 
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
-  -> data_power::SetTXPower(15)
+#if WIFITYPE == 805
+  -> data_power::SetTXPower(61)
+#else
+  -> data_power::SetTXPower(16)
+#endif
   -> data_rate::SetTXRate(RATE 2, TRIES 11)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> data_queue::NotifierQueue(100)
@@ -53,6 +54,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> [2]x_prio_q::PrioSched()
 #endif
   -> wifidevice
+//-> PrintWifi("Fromdev", TIMESTAMP true)
   -> filter_tx :: FilterTX()
 #if WIFITYPE == 805
   -> error_clf :: WifiErrorClassifier()
@@ -93,7 +95,11 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
     -> link_stat
 //  -> Print("Linkprobe_out",320)
     -> lp_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
-    -> lp_power::SetTXPower(19)
+#if WIFITYPE == 805
+    -> lp_power::SetTXPower(61)
+#else
+    -> lp_power::SetTXPower(16)
+#endif
     -> lp_wifiencap::WifiEncap(0x00, 0:0:0:0:0:0)
     -> lp_queue::FrontDropQueue(2)
     -> lp_suppressor::Suppressor()
@@ -128,7 +134,11 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> EtherEncap(0x8888, $etheraddress, ff:ff:ff:ff:ff:ff)
   -> WifiEncap(0x00, 0:0:0:0:0:0)
   -> qc_rate :: SetTXRate(2)
-  -> qc_power :: SetTXPower(15)
+#if WIFITYPE == 805
+  -> qc_power :: SetTXPower(61)
+#else
+  -> qc_power :: SetTXPower(16)
+#endif
   -> SetTimestamp()
   -> qc_q
   -> qc_suppressor
@@ -144,4 +154,11 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 */
 #endif
 
+/*
+  link_stat[1]
+  -> BRN2EtherEncap()
+  -> WifiEncap(0x00, 0:0:0:0:0:0)
+  -> RadiotapEncap()
+  -> ToDump("RESULTDIR/linkstat_error.NODENAME.NODEDEVICE.dump");
+*/
 }

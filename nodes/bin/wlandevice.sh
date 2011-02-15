@@ -75,6 +75,7 @@ case "$1" in
 	  CONFIG="$CONFIG" DEVICE="$DEVICE" $RESPONSIBLE start
 	  exit 0
 	fi
+	;;
     "config_post_start")
 	if [ "x$RESPONSIBLE" != "x" ]; then
 	  echo "$RESPONSIBLE is responsible"
