@@ -62,16 +62,25 @@ case "$1" in
 	  exit 0
 	fi
 	;;
-    "config")
+    "config_pre_start")
 	if [ "x$RESPONSIBLE" != "x" ]; then
 	  echo "$RESPONSIBLE is responsible"
-	  CONFIG="$CONFIG" DEVICE="$DEVICE" $RESPONSIBLE config
+	  CONFIG="$CONFIG" DEVICE="$DEVICE" $RESPONSIBLE config_pre_start
 	  exit 0
 	fi
 	;;
     "start")
-	    echo "$IFCONFIG $DEVICE up"
-	#    ${IFCONFIG} $DEVICE up
+	if [ "x$RESPONSIBLE" != "x" ]; then
+	  echo "$RESPONSIBLE is responsible"
+	  CONFIG="$CONFIG" DEVICE="$DEVICE" $RESPONSIBLE start
+	  exit 0
+	fi
+    "config_post_start")
+	if [ "x$RESPONSIBLE" != "x" ]; then
+	  echo "$RESPONSIBLE is responsible"
+	  CONFIG="$CONFIG" DEVICE="$DEVICE" $RESPONSIBLE config_post_start
+	  exit 0
+	fi
 	;;
     "getmac")
             MADDR=`$IFCONFIG $DEVICE | grep HWaddr | awk '{print $5}' | sed -e "s#-# #g" -e "s#:# #g" | awk '{print $1":"$2":"$3":"$4":"$5":"$6}'`

@@ -71,8 +71,8 @@ case "$1" in
 	    echo "$IFCONFIG $DEVICE down"
 	    ${IFCONFIG} $DEVICE down
 	;;
-    "config")
-	    echo "Start device config"
+    "config_pre_start")
+	    echo "Device config pre start"
 	    if [ "x$CONFIG" = "x" ]; then
 		echo "Use CONFIG to set the config"
 		exit 0
@@ -91,12 +91,31 @@ case "$1" in
 	    if [ "x$MODE" = "x" ]; then
 	    	MODE=$DEFAULT_MODE
 	    fi
-	    ${IFCONFIG} $DEVICE down
 
 	    echo "$IWCONFIG $DEVICE mode $MODE"
 	    ${IWCONFIG} $DEVICE mode $MODE
 
+	    ;;
+    "start")
 	    ${IFCONFIG} $DEVICE up
+	    ;;
+    "config_post_start")
+
+	    echo "Device config post start"
+	    if [ "x$CONFIG" = "x" ]; then
+		echo "Use CONFIG to set the config"
+		exit 0
+	    fi
+
+	    ARCH=`get_arch`
+
+	    if [ -f  $DIR/../../etc/wifi/$CONFIG ]; then
+			. $DIR/../../etc/wifi/$CONFIG
+	    else
+			. $CONFIG
+	    fi
+
+	    . $DIR/../../etc/wifi/default
 
 	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ] || [ "$MODE" = "ahdemo" ]; then
 			if [ ! "x$SSID" = "x" ]; then
@@ -148,12 +167,9 @@ case "$1" in
 	    fi
 
 	    if [ "x$MTU" = "x" ]; then
-		#TODO: mtu depends on wifitype
-		MTU=2290  #madwifi
-		MTU=2272  #ath
+		MTU=2272
 	    fi
 
-	    #TODO: set mtu depending on WIFITYPE
 	    echo "$IFCONFIG $DEVICE mtu $MTU txqueuelen $TXQUEUE_LEN"
 	    ${IFCONFIG} $DEVICE mtu $MTU txqueuelen $TXQUEUE_LEN
 

@@ -345,15 +345,27 @@ if [ $RUNMODENUM -le 4 ]; then
   done
 
   if [ $CREATEWIFI -eq 1 ]; then
-    #check nodes and sleep if device should be created
+          #check nodes and sleep if device should be created
 	  check_nodes status/$LOGMARKER\_wificonfig.state >> status/$LOGMARKER\_wificonfig.log 2>&1
 	  sleep 1
 	  #extra sleep for WGTs
 	  sleep 2
   fi
 
-  CURRENTMODE="START WIFI"
+  CURRENTMODE="CONFIG WIFI PRE START"
   STARTWIFI=0
+
+  for node in $NODELIST; do
+	  NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+	  for nodedevice in $NODEDEVICELIST; do
+	    CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
+	    if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
+		    NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/../../host/bin/wlandevices.sh config_pre_start >> status/$LOGMARKER\_wificonfig.log 2>&1
+	    fi
+	  done
+  done
+
+  CURRENTMODE="START WIFI"
 
   for node in $NODELIST; do
     NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
@@ -371,7 +383,7 @@ if [ $RUNMODENUM -le 4 ]; then
     sleep 1
   fi
 
-  CURRENTMODE="CONFIG WIFI"
+  CURRENTMODE="CONFIG WIFI POST START"
   CONFIGWIFI=0
 
   for node in $NODELIST; do
@@ -379,7 +391,7 @@ if [ $RUNMODENUM -le 4 ]; then
 	  for nodedevice in $NODEDEVICELIST; do
 	    CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $5}'`
 	    if [ ! "x$CONFIG" = "x" ] && [ ! "x$CONFIG" = "x-" ]; then
-		    NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/../../host/bin/wlandevices.sh config >> status/$LOGMARKER\_wificonfig.log 2>&1
+		    NODE=$node DEVICES=$nodedevice CONFIG="$CONFIG" $DIR/../../host/bin/wlandevices.sh config_post_start >> status/$LOGMARKER\_wificonfig.log 2>&1
 		    CONFIGWIFI=1
 	    fi
 	  done
