@@ -72,12 +72,12 @@ case "$1" in
 	    fi
 	    ;;
     "create")
-	;;
+	    ;;
     "delete")
 	    echo "$IFCONFIG $DEVICE down"
 	    ${IFCONFIG} $DEVICE down
-	;;
-    "config")
+	    ;;
+    "config_pre_start")
 	    echo "Start device config"
 	    if [ "x$CONFIG" = "x" ]; then
 		echo "Use CONFIG to set the config"
@@ -128,6 +128,10 @@ case "$1" in
 	    ${IFCONFIG} $DEVICE mtu $MTU txqueuelen $TXQUEUE_LEN
 
 	    echo "Finished device config"
+	    ;;
+    "start")
+	    ;;
+    "config_post_start")
 	    ;;
     "getiwconfig")
             echo "iwconfig"

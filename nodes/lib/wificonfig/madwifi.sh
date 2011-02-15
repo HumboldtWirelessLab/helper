@@ -63,6 +63,11 @@ else
     fi
 fi
 
+
+POST_START_SLEEP=1
+START_SLEEP=1
+PRE_START_SLEEP=1
+
 case "$1" in
     "responsible")
 	    DEV_PREFIX=`echo $DEVICE | cut -b 1-3`
@@ -100,8 +105,95 @@ case "$1" in
 	    echo "$WLANCONFIG $DEVICE destroy"
 	    ${WLANCONFIG} $DEVICE destroy
 	;;
-    "config")
-	    echo "Start device config"
+    "config_pre_start")
+	    echo "Config device (pre_start)"
+	    if [ "x$CONFIG" = "x" ]; then
+		echo "Use CONFIG to set the config"
+		exit 0
+	    fi
+
+	    PHYDEV=`get_phy_dev $DEVICE`
+	    ARCH=`get_arch`
+
+	    if [ -f  $DIR/../../etc/wifi/$CONFIG ]; then
+			. $DIR/../../etc/wifi/$CONFIG
+	    else
+			. $CONFIG
+	    fi
+
+	    . $DIR/../../etc/wifi/default
+
+
+	    if [ "x$MODE" = "x" ]; then
+	    	MODE=$DEFAULT_MODE
+	    fi
+	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ] || [ "$MODE" = "ahdemo" ]; then
+			if [ ! "x$SSID" = "x" ]; then
+		    	    echo "$IWCONFIG $DEVICE essid $SSID" 
+		    	    ${IWCONFIG} $DEVICE essid $SSID 
+			    sleep 1
+			fi
+	    fi
+	    
+	    if [ "$MODE" = "ahdemo" ]; then
+		if [ "x$BSSID" = "x" ]; then
+			BSSID=$DEFAULT_BSSID
+		fi
+		echo "$IWCONFIG $DEVICE ap $BSSID"
+		${IWCONFIG} $DEVICE ap $BSSID
+		
+		sleep $PRE_START_SLEEP
+	    fi
+
+	    if [ "x$CHANNEL" = "x" ]; then
+		CHANNEL=$DEFAULT_CHANNEL
+	    fi
+	    echo "$IWCONFIG $DEVICE channel $CHANNEL"
+	    ${IWCONFIG} $DEVICE channel $CHANNEL
+	    
+	    sleep $PRE_START_SLEEP
+
+	    if [ "x$POWER" = "x" ]; then
+		POWER=$DEFAULT_POWER
+	    fi
+	    echo "$IWCONFIG $DEVICE txpower $POWER"
+	    ${IWCONFIG} $DEVICE txpower $POWER
+
+	    sleep $PRE_START_SLEEP
+
+	    if [ ! "x$RATE" = "x" ]; then
+			if [ $RATE -gt 0 ]; then
+		    	echo "$IWCONFIG $DEVICE rate $RATE"
+		    	${IWCONFIG} $DEVICE rate $RATE
+			
+			sleep $PRE_START_SLEEP
+			fi
+	    fi
+
+	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ] || [ "$MODE" = "ahdemo" ]; then
+		if [ ! "x$WEPKEY" = "x" ] && [ ! "x$WEPMODE" = "x" ]; then
+		    echo "$IWCONFIG $DEVICE key $WEPKEY key $WEPMODE" 
+		    ${IWCONFIG} $DEVICE key $WEPKEY key $WEPMODE
+		    sleep 1
+		    sleep $PRE_START_SLEEP
+		fi
+	    fi
+
+	;;
+    "start")
+
+	    sleep $START_SLEEP
+
+	    echo "Start Device"
+	    ${IFCONFIG} $DEVICE up
+	    
+	    sleep $START_SLEEP
+	    
+	;;
+    "config_post_start")
+
+	    echo "Device config (post_start)"
+
 	    if [ "x$CONFIG" = "x" ]; then
 		echo "Use CONFIG to set the config"
 		exit 0
@@ -128,62 +220,32 @@ case "$1" in
 		    	    echo "$IWCONFIG $DEVICE essid $SSID" 
 		    	    ${IWCONFIG} $DEVICE essid $SSID 
 			    sleep 1
+			    sleep $POST_START_SLEEP
 			fi
 	    fi
-	    
-	    if [ "$MODE" = "ahdemo" ]; then
-		if [ "x$BSSID" = "x" ]; then
-			BSSID=$DEFAULT_BSSID
-		fi
-		echo "$IWCONFIG $DEVICE ap $BSSID"
-		${IWCONFIG} $DEVICE ap $BSSID
-	    fi
-
-	    if [ "x$CHANNEL" = "x" ]; then
-		CHANNEL=$DEFAULT_CHANNEL
-	    fi
-	    echo "$IWCONFIG $DEVICE channel $CHANNEL"
-	    ${IWCONFIG} $DEVICE channel $CHANNEL
-
-	    if [ "x$POWER" = "x" ]; then
-		POWER=$DEFAULT_POWER
-	    fi
-	    echo "$IWCONFIG $DEVICE txpower $POWER"
-	    ${IWCONFIG} $DEVICE txpower $POWER
-
-	    if [ ! "x$RATE" = "x" ]; then
-			if [ $RATE -gt 0 ]; then
-		    	echo "$IWCONFIG $DEVICE rate $RATE"
-		    	${IWCONFIG} $DEVICE rate $RATE
-			fi
-	    fi
-
-	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ] || [ "$MODE" = "ahdemo" ]; then
-		if [ ! "x$WEPKEY" = "x" ] && [ ! "x$WEPMODE" = "x" ]; then
-		    echo "$IWCONFIG $DEVICE key $WEPKEY key $WEPMODE" 
-		    ${IWCONFIG} $DEVICE key $WEPKEY key $WEPMODE
-		    sleep 1
-		fi
-	    fi
-
-	    ${IFCONFIG} $DEVICE up
-
+    
 	    if [ "x$MODE_ABG" != "x" ]; then
 	      # 802.11b/802.11g/802.11a
 	      echo "iwpriv $DEVICE mode $MODE_ABG"
 	      ${IWPRIV} $DEVICE mode $MODE_ABG
+	      
+	      sleep $POST_START_SLEEP
 	    fi
 
 	    if [ "x$PUREG" != "x" ]; then
 	      # disable/enable b
 	      echo "iwpriv $DEVICE pureg $PUREG"
 	      ${IWPRIV} $DEVICE pureg $PUREG
+	      
+	      sleep $POST_START_SLEEP
 	    fi
 
 	    if [ "x$PROTMODE" != "x" ]; then
 	      # no ofdm protection
 	      echo "iwpriv $DEVICE protmode $PROTMODE"
 	      ${IWPRIV} $DEVICE protmode $PROTMODE
+	      
+	      sleep $POST_START_SLEEP
 	    fi
 
 	    if [ "x$WMM" != "x" ]; then
@@ -194,6 +256,8 @@ case "$1" in
 	      echo "iwpriv $DEVICE wmm 0"
 	      ${IWPRIV} $DEVICE wmm 0
 	    fi
+	    
+	    sleep $POST_START_SLEEP
 
 	    if [ "x$AR" != "x" ]; then
 	      # no adaptive radio
@@ -204,6 +268,8 @@ case "$1" in
 	      ${IWPRIV} $DEVICE ar 0
 	    fi
 
+	    sleep $POST_START_SLEEP
+	    
 	    if [ "x$BURST" != "x" ]; then
 	      # no burst
 	      echo "iwpriv $DEVICE burst $BURST"
@@ -213,6 +279,8 @@ case "$1" in
 	      ${IWPRIV} $DEVICE burst 0
 	    fi
 
+	    sleep $POST_START_SLEEP
+	    
 	    if [ "x$FAST_FRAME" != "x" ]; then
 	      # no fast frame
 	      echo "iwpriv $DEVICE ff $FAST_FRAME"
@@ -221,6 +289,8 @@ case "$1" in
 	      echo "iwpriv $DEVICE ff 0"
 	      ${IWPRIV} $DEVICE ff 0
 	    fi
+	    
+	    sleep $POST_START_SLEEP
 
 	    if [ "x$ABOLT" != "x" ]; then
 	      # no atheros proprietary in general
@@ -231,11 +301,15 @@ case "$1" in
 	      ${IWPRIV} $DEVICE abolt 0
 	    fi
 
+	    sleep $POST_START_SLEEP
+	    
 	    if [ "x$DIVERSITY" = "x" ]; then
 		DIVERSITY=$DEFAULT_DIVERSITY
 	    fi
 	    echo "sysctl -w dev.$PHYDEV.diversity=$DIVERSITY"
 	    sysctl -w dev.$PHYDEV.diversity=$DIVERSITY
+
+	    sleep $POST_START_SLEEP
 
 	    if [ "x$TXANTENNA" = "x" ]; then
 		TXANTENNA=$DEFAULT_TXANTENNA
@@ -243,17 +317,23 @@ case "$1" in
 	    echo "sysctl -w dev.$PHYDEV.txantenna=$TXANTENNA"
 	    sysctl -w dev.$PHYDEV.txantenna=$TXANTENNA
 
+	    sleep $POST_START_SLEEP
+
 	    if [ "x$RXANTENNA" = "x" ]; then
 		RXANTENNA=$DEFAULT_RXANTENNA
 	    fi
 	    echo "sysctl -w dev.$PHYDEV.rxantenna=$RXANTENNA"
 	    sysctl -w dev.$PHYDEV.rxantenna=$RXANTENNA
 
+	    sleep $POST_START_SLEEP
+
 	    if [ "x$INTMIT" = "x" ]; then
 		INTMIT=$DEFAULT_INTMIT
 	    fi
 	    echo "sysctl -w dev.$PHYDEV.intmit=$INTMIT"
 	    sysctl -w dev.$PHYDEV.intmit=$INTMIT
+
+	    sleep $POST_START_SLEEP
 
 	    if [ "$MODE" = "monitor" ]; then
 			
@@ -263,11 +343,15 @@ case "$1" in
 			echo "echo $WIFITYPE > /proc/sys/net/$DEVICE/dev_type"
 			echo $WIFITYPE > /proc/sys/net/$DEVICE/dev_type
 
+			sleep $POST_START_SLEEP
+
 			if [ "x$CRCERROR" = "x" ]; then
 				CRCERROR=$DEFAULT_CRCERROR
 			fi
 			echo "echo \"$CRCERROR\" > /proc/sys/net/$DEVICE/monitor_crc_errors"
 			echo "$CRCERROR" > /proc/sys/net/$DEVICE/monitor_crc_errors
+
+			sleep $POST_START_SLEEP
 
 			if [ "x$PHYERROR" = "x" ]; then
 				PHYERROR=$DEFAULT_PHYERROR
@@ -275,11 +359,15 @@ case "$1" in
 			echo "echo \"$PHYERROR\" > /proc/sys/net/$DEVICE/monitor_phy_errors"
 			echo "$PHYERROR" > /proc/sys/net/$DEVICE/monitor_phy_errors
 			
+			sleep $POST_START_SLEEP
+			
 			if [ "x$MACCLONE" = "x" ]; then
 				MACCLONE=$DEFAULT_MACCLONE
 			fi
 			echo "$IWPRIV $DEVICE macclone $MACCLONE"
 			${IWPRIV} $DEVICE macclone $MACCLONE
+
+			sleep $POST_START_SLEEP
 
 			if [ "x$CHANNELSWITCH" = "x" ]; then
 				CHANNELSWITCH=$DEFAULT_CHANNELSWITCH
@@ -287,18 +375,27 @@ case "$1" in
 			echo "$IWPRIV $DEVICE channelswitch $CHANNELSWITCH"
 			${IWPRIV} $DEVICE channelswitch $CHANNELSWITCH
 			
+			sleep $POST_START_SLEEP
+			
 			if [ "x$CUTIL_PACKET_THRESHOLD" != "x" ]; then
 			    echo "sysctl -w dev.$PHYDEV.cutil_pkt_threshold=$CUTIL_PACKET_THRESHOLD"
 			    sysctl -w dev.$PHYDEV.cutil_pkt_threshold=$CUTIL_PACKET_THRESHOLD
+			    sleep $POST_START_SLEEP
 			fi
+			
+			
 			if [ "x$CUTIL_UPDATE_MODE" != "x" ]; then
 			    echo "sysctl -w dev.$PHYDEV.cu_update_mode=$CUTIL_UPDATE_MODE"
 			    sysctl -w dev.$PHYDEV.cu_update_mode=$CUTIL_UPDATE_MODE
+			    sleep $POST_START_SLEEP
 			fi
+			
 			if [ "x$CUTIL_ANNO_MODE" != "x" ]; then
 			    echo "sysctl -w dev.$PHYDEV.cu_anno_mode=$CUTIL_ANNO_MODE"
 			    sysctl -w dev.$PHYDEV.cu_anno_mode=$CUTIL_ANNO_MODE
+			    sleep $POST_START_SLEEP
 			fi
+			
 			if [ "x$TXQUEUE_LEN" = "x" ]; then
 			    TXQUEUE_LEN=$DEFAULT_MONITOR_TXQUEUE_LEN
 			fi
@@ -316,10 +413,12 @@ case "$1" in
 	    fi
 	    echo "sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA"
 	    sysctl -w dev.$PHYDEV.disable_cca=$DISABLECCA
+	    sleep $POST_START_SLEEP
 
 	    if [ "x$CCA_THRESHOLD" != "x" ]; then
 		    echo "sysctl -w dev.$PHYDEV.cca_thresh=$CCA_THRESHOLD"
 		    sysctl -w dev.$PHYDEV.cca_thresh=$CCA_THRESHOLD
+	            sleep $POST_START_SLEEP
 	    fi
 	
 	    if [ "x$CWMIN" != "x" ]; then
@@ -327,6 +426,7 @@ case "$1" in
 		for c in $CWMIN; do
 		    ${IWPRIV} $DEVICE cwmin $QUEUE 0 $c
 		    QUEUE=`expr $QUEUE + 1`
+		    sleep $POST_START_SLEEP
 		done
 	    fi
 
@@ -335,6 +435,7 @@ case "$1" in
 		for c in $CWMAX; do
 		    ${IWPRIV} $DEVICE cwmax $QUEUE 0 $c
 		    QUEUE=`expr $QUEUE + 1`
+		    sleep $POST_START_SLEEP
 		done
 	    fi
 
@@ -343,6 +444,7 @@ case "$1" in
 		for c in $AIFS; do
 		    ${IWPRIV} $DEVICE aifs $QUEUE 0 $c
 		    QUEUE=`expr $QUEUE + 1`
+		    sleep $POST_START_SLEEP
 		done
 	    fi
 
@@ -355,8 +457,9 @@ case "$1" in
 	    #txqueuelen: queuelen of ath is not relevant ( queuelen(ath0)==0 is no problem)
 	    #            queuelen of wifi is relevant ( queuelen(wifi0)==0 results in disabling transmission)
 	    ${IFCONFIG} $DEVICE mtu $MTU txqueuelen $TXQUEUE_LEN
+	    sleep $POST_START_SLEEP
 	    ${IFCONFIG} $PHYDEV mtu $MTU txqueuelen $TXQUEUE_LEN
-
+	    sleep $POST_START_SLEEP
 	    echo "Finished device config"
 	    ;;
     "getiwconfig")
