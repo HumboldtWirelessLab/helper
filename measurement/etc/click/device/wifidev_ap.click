@@ -39,16 +39,15 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 //                          PROBES  "2 250 22 1000",
                             PROBES  "2 250",
                             RT           proberates);
-                            
 #endif
 
 #ifdef VLAN_ENABLE
   ap::ACCESS_POINT(DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid, CHANNEL $channel, BEACON_INTERVAL 100, LT $lt, RATES rates, VLAN_TABLE $vlt);
 #else
   ap::ACCESS_POINT(DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid, CHANNEL $channel, BEACON_INTERVAL 100, LT $lt, RATES rates);
-#endif  
-                   
-  toStation::BRN2ToStations(ASSOCLIST ap/assoclist);               
+#endif
+
+  toStation::BRN2ToStations(ASSOCLIST ap/assoclist);
   toMe::BRN2ToThisNode(NODEIDENTITY id);
 
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
@@ -57,9 +56,9 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 #ifdef IG_ENABLE
   prios::PrioSched()
   -> wifidevice;
-  
+
   q::NotifierQueue(500)
-  
+
   qc::BRN2PacketQueueControl(QUEUESIZEHANDLER q.length, QUEUERESETHANDLER q.reset, MINP 100 , MAXP 500)
   -> EtherEncap(0x0800, $etheraddress , ff:ff:ff:ff:ff:ff)
   -> WifiEncap(0x00, 0:0:0:0:0:0)
@@ -67,9 +66,9 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   -> SetTXPower(15)
   -> SetTimestamp()
   -> q
-  
+
 #ifdef PQUEUE_ENABLE
-  -> [1]prios;       
+  -> [1]prios;
 
   input[2]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
@@ -78,12 +77,12 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   wifioutq
   -> [2]prios;
 #else
-  -> [0]prios;       
+  -> [0]prios;
 
   wifioutq
   -> [1]prios;
 #endif
-       
+
 #else
 
 #ifdef PQUEUE_ENABLE
