@@ -59,7 +59,8 @@ case "$1" in
                 FINMODULSDIR=`echo $MODULSDIR | sed -e "s#KERNELVERSION#$KERNELVERSION#g" -e "s#NODEARCH#$NODEARCH#g"`
                 echo "Use $FINMODULSDIR"
 			
-		MODLIST="wlan.ko ath_hal.ko ath_rate_sample.ko wlan_acl.ko wlan_ccmp.ko wlan_scan_ap.ko wlan_scan_sta.ko wlan_tkip.ko wlan_wep.ko wlan_xauth.ko"
+#		MODLIST="wlan.ko ath_hal.ko ath_rate_sample.ko wlan_acl.ko wlan_ccmp.ko wlan_scan_ap.ko wlan_scan_sta.ko wlan_tkip.ko wlan_wep.ko wlan_xauth.ko"
+		MODLIST="ath_hal.ko wlan.ko ath_rate_sample.ko"
 		for mod in $MODLIST
 		do
 			if [ -f ${FINMODULSDIR}/$mod ]; then
