@@ -55,13 +55,6 @@ case "$1" in
 	  exit 0
 	fi
 	;;
-    "delete")
-	if [ "x$RESPONSIBLE" != "x" ]; then
-	  echo "$RESPONSIBLE is responsible"
-	  CONFIG="$CONFIG" DEVICE="$DEVICE" $RESPONSIBLE delete
-	  exit 0
-	fi
-	;;
     "config_pre_start")
 	if [ "x$RESPONSIBLE" != "x" ]; then
 	  echo "$RESPONSIBLE is responsible"
@@ -93,6 +86,14 @@ case "$1" in
 	  exit 0
 	fi
         ;;
+    "delete")
+	if [ "x$RESPONSIBLE" != "x" ]; then
+	  echo "$RESPONSIBLE is responsible"
+	  CONFIG="$CONFIG" DEVICE="$DEVICE" $RESPONSIBLE delete
+	  exit 0
+	fi
+	;;
+
     *)
         ;;
 esac
