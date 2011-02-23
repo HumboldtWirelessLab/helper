@@ -136,13 +136,12 @@ case "$1" in
 	    fi
 	    
 	    if [ "$MODE" = "ahdemo" ]; then
-		if [ "x$BSSID" = "x" ]; then
-			BSSID=$DEFAULT_BSSID
+		if [ "x$BSSID" = "x" ]; then BSSID=$DEFAULT_BSSID; fi
+		if [ "x$BSSID" != "x" ]; then
+		  echo "$IWCONFIG $DEVICE ap $BSSID"
+		  ${IWCONFIG} $DEVICE ap $BSSID
+		  sleep $PRE_START_SLEEP
 		fi
-		echo "$IWCONFIG $DEVICE ap $BSSID"
-		${IWCONFIG} $DEVICE ap $BSSID
-		
-		sleep $PRE_START_SLEEP
 	    fi
 
 	    if [ "x$CHANNEL" = "x" ]; then
@@ -281,36 +280,29 @@ case "$1" in
 
 	    sleep $POST_START_SLEEP
 	    
+	    if [ "x$FAST_FRAME" = "x" }; then FAST_FRAME=$DEFAULT_FAST_FRAME ; fi
 	    if [ "x$FAST_FRAME" != "x" ]; then
 	      # no fast frame
 	      echo "iwpriv $DEVICE ff $FAST_FRAME"
 	      ${IWPRIV} $DEVICE ff $FAST_FRAME
-	    else
-	      echo "iwpriv $DEVICE ff 0"
-	      ${IWPRIV} $DEVICE ff 0
+	      sleep $POST_START_SLEEP
 	    fi
-	    
-	    sleep $POST_START_SLEEP
 
+	    if [ "x$ABOLT" = "x" }; then ABOLT=$DEFAULT_ABOLT ; fi
 	    if [ "x$ABOLT" != "x" ]; then
 	      # no atheros proprietary in general
 	      echo "iwpriv $DEVICE abolt $ABOLT"
 	      ${IWPRIV} $DEVICE abolt $ABOLT
-	    else
-	      echo "iwpriv $DEVICE abolt 0"
-	      ${IWPRIV} $DEVICE abolt 0
+	      sleep $POST_START_SLEEP
 	    fi
-
-	    sleep $POST_START_SLEEP
 	    
-	    if [ "x$DIVERSITY" = "x" ]; then
-		DIVERSITY=$DEFAULT_DIVERSITY
-	    fi
-	    echo "sysctl -w dev.$PHYDEV.diversity=$DIVERSITY"
-	    sysctl -w dev.$PHYDEV.diversity=$DIVERSITY
-
-	    sleep $POST_START_SLEEP
-
+	    if [ "x$DIVERSITY" = "x" ]; then DIVERSITY=$DEFAULT_DIVERSITY ;  fi
+	    if [ "x$DIVERSITY" != "x" ]; then 
+	      echo "sysctl -w dev.$PHYDEV.diversity=$DIVERSITY"
+	      sysctl -w dev.$PHYDEV.diversity=$DIVERSITY
+	      sleep $POST_START_SLEEP
+            fi
+	    
 	    if [ "x$TXANTENNA" = "x" ]; then
 		TXANTENNA=$DEFAULT_TXANTENNA
 	    fi
