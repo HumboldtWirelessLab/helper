@@ -128,26 +128,26 @@ case "$1" in
 	    . $DIR/../../etc/wifi/default
 
 
-#	    if [ "x$MODE" = "x" ]; then	MODE=$DEFAULT_MODE; fi
-#           if [ "x$MODE" = "x" ]; then echo "No mode. Can not create dev."; exit 0; fi
-#
-#	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ] || [ "$MODE" = "ahdemo" ]; then
-#		if [ ! "x$SSID" = "x" ]; then
-#			echo "$IWCONFIG $DEVICE essid $SSID" 
-#			${IWCONFIG} $DEVICE essid $SSID 
-#			sleep 1
-#		fi
-#	    fi
-#
-#	    if [ "$MODE" = "ahdemo" ]; then
-#		if [ "x$BSSID" = "x" ]; then
-#			BSSID=$DEFAULT_BSSID
-#		fi
-#		echo "$IWCONFIG $DEVICE ap $BSSID"
-#		${IWCONFIG} $DEVICE ap $BSSID
-#
-#		sleep $PRE_START_SLEEP
-#	    fi
+            if [ "x$MODE" = "x" ]; then	MODE=$DEFAULT_MODE; fi
+            if [ "x$MODE" = "x" ]; then echo "No mode. Can not create dev."; exit 0; fi
+
+	    if [ "$MODE" = "sta" ] || [ "$MODE" = "ap" ] || [ "$MODE" = "adhoc" ] || [ "$MODE" = "ahdemo" ]; then
+		if [ ! "x$SSID" = "x" ]; then
+			echo "$IWCONFIG $DEVICE essid $SSID" 
+			${IWCONFIG} $DEVICE essid $SSID 
+			sleep 1
+		fi
+	    fi
+
+	    if [ "$MODE" = "ahdemo" ]; then
+		if [ "x$BSSID" = "x" ]; then
+			BSSID=$DEFAULT_BSSID
+		fi
+		echo "$IWCONFIG $DEVICE ap $BSSID"
+		${IWCONFIG} $DEVICE ap $BSSID
+
+		sleep $PRE_START_SLEEP
+	    fi
 
 	    if [ "x$WIFITYPE" = "x" ]; then
 		WIFITYPE=$DEFAULT_WIFITYPE
@@ -186,15 +186,6 @@ case "$1" in
 #		fi
 #	    fi
 
-	    if [ "x$CHANNEL" = "x" ]; then
-		CHANNEL=$DEFAULT_CHANNEL
-	    fi
-
-	    echo "$IWCONFIG $DEVICE channel $CHANNEL"
-	    ${IWCONFIG} $DEVICE channel $CHANNEL
-
-	    sleep $PRE_START_SLEEP
-
 	    if [ "$MODE" = "monitor" ]; then
 		if [ "x$TXQUEUE_LEN" = "x" ]; then
 		    TXQUEUE_LEN=$DEFAULT_MONITOR_TXQUEUE_LEN
@@ -219,12 +210,24 @@ case "$1" in
 
 	    sleep $PRE_START_SLEEP
 
-#	    if [ "x$INTMIT" = "x" ]; then
-#		INTMIT=$DEFAULT_INTMIT
-#	    fi
+	    if [ "x$INTMIT" = "x" ]; then
+		INTMIT=$DEFAULT_INTMIT
+	    fi
 
-#	    echo "sysctl -w dev.$PHYDEV.intmit = $INTMIT"
-#	    sysctl -w dev.$PHYDEV.intmit=$INTMIT
+	    echo "sysctl -w dev.$PHYDEV.intmit = $INTMIT"
+	    sysctl -w dev.$PHYDEV.intmit=$INTMIT
+
+	    sleep $PRE_START_SLEEP
+
+	    if [ "x$CHANNEL" = "x" ]; then
+		CHANNEL=$DEFAULT_CHANNEL
+	    fi
+
+	    echo "$IWCONFIG $DEVICE channel $CHANNEL"
+	    ${IWCONFIG} $DEVICE channel $CHANNEL
+
+	    sleep $PRE_START_SLEEP
+
 	;;
     "start")
 	    sleep $START_SLEEP
@@ -289,9 +292,6 @@ case "$1" in
 #	      sleep $POST_START_SLEEP
 #	    fi
 
-
-            if [ "x" = "Y" ]; then
-
 	    if [ "x$BURST" != "x" ]; then
 	      # no burst
 	      echo "iwpriv $DEVICE burst $BURST"
@@ -336,16 +336,14 @@ case "$1" in
 
 	    sleep $POST_START_SLEEP
 
-		fi
+	    if [ "x$INTMIT" = "x" ]; then
+		INTMIT=$DEFAULT_INTMIT
+	    fi
 
-#	    if [ "x$INTMIT" = "x" ]; then
-#		INTMIT=$DEFAULT_INTMIT
-#	    fi
+	    echo "sysctl -w dev.$PHYDEV.intmit = $INTMIT"
+	    sysctl -w dev.$PHYDEV.intmit=$INTMIT
 
-#	    echo "sysctl -w dev.$PHYDEV.intmit = $INTMIT"
-#	    sysctl -w dev.$PHYDEV.intmit=$INTMIT
-
-#	    sleep $POST_START_SLEEP
+	    sleep $POST_START_SLEEP
 
 #	    if [ "x$FAST_FRAME" != "x" ]; then
 #	      # no fast frame
@@ -363,8 +361,6 @@ case "$1" in
 	    fi
 	    echo "sysctl -w dev.$PHYDEV.diversity=$DIVERSITY"
 	    sysctl -w dev.$PHYDEV.diversity=$DIVERSITY
-
-	    sleep $POST_START_SLEEP
 
 	    if [ "x$TXANTENNA" = "x" ]; then
 		TXANTENNA=$DEFAULT_TXANTENNA
