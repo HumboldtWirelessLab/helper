@@ -126,7 +126,7 @@ BRNAddressInfo(ipdev eth0:ip);
 #ifdef SIMULATION
 
 #define FROMRAWDEVICE(x) FromSimDevice(x,4096)
-#define TORAWDEVICE(x) ToSimDevice(x)
+#define TORAWDEVICE(x) ToSimDevice(x, ENCAP UNKNOWN )
 
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
