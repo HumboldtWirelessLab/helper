@@ -24,8 +24,8 @@ function get_params() {
   echo $@
 }
 
-if [ ! "x$1" = "xrun" ]; then
-	echo "Use $0 run dis-file"
+if [ ! "x$1" = "xjist" ] && [ ! "x$1" = "xns" ]; then
+	echo "Use $0 [ns|jist] dis-file"
 	exit 0
 fi
 
@@ -68,8 +68,10 @@ fi
 mkdir $FINALRESULTDIR
 chmod 777 $FINALRESULTDIR
 
-case "$1" in
-	"run")
+MODE=sim
+
+case "$MODE" in
+    "sim")
 		POSTFIX=ns2
 
 		DISCRIPTIONFILENAME=`basename $DISCRIPTIONFILE`
@@ -82,7 +84,7 @@ case "$1" in
 		  cat $DISCRIPTIONFILE | sed -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
 		fi
 			    
-		CONFIGDIR=$CONFIGDIR POSTFIX=$POSTFIX $DIR/prepare-sim.sh prepare $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
+		USED_SIMULATOR=$1 CONFIGDIR=$CONFIGDIR POSTFIX=$POSTFIX $DIR/prepare-sim.sh prepare $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
 
 		mv $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp
 		cat $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp | sed -e "s#$NODETABLE#$FINALRESULTDIR/$NODETABLE.$POSTFIX#g" > $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
@@ -263,30 +265,29 @@ case "$1" in
 		    mkdir -p $RESULTDIR
 		fi
 
-		which valgrind > /dev/null
-		if [ $? -ne 0 ]; then
-		    VALGRIND=0
-		fi
-		if [ "x$VALGRIND" = "x1" ]; then
-		    NS_FULL_PATH=`which ns`
-		    ( cd $FINALRESULTDIR; valgrind --leak-check=full --leak-resolution=high --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
-		else
-		    if [ "x$PROFILE" = "x1" ]; then
-			( cd $FINALRESULTDIR; ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
-		    else
-			( cd $FINALRESULTDIR; ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+		if [ "x$1" = "xns" ]; then
+		    which valgrind > /dev/null
+		    if [ $? -ne 0 ]; then
+			VALGRIND=0
 		    fi
-		fi
+		    if [ "x$VALGRIND" = "x1" ]; then
+			NS_FULL_PATH=`which ns`
+			( cd $FINALRESULTDIR; valgrind --leak-check=full --leak-resolution=high --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
+		    else
+			if [ "x$PROFILE" = "x1" ]; then
+			    ( cd $FINALRESULTDIR; ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+			else
+			    ( cd $FINALRESULTDIR; ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+			fi
+		    fi
 		
-		if [ $? -eq 0 ]; then
-		  MODE=sim SIM=ns2 CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh
+		    if [ $? -eq 0 ]; then
+			MODE=sim SIM=ns2 CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh
+		    fi
+		else
+		    ( cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX > $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties )
+		    ( cd $FINALRESULTDIR; $DIR/start-jist-sim.sh $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
 		fi		
-		;;
-	"help")
-		echo "Use $0 run dis-file result-dir"
-		;;
-	*)
-		$0 help
 		;;
 esac
 
