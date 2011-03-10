@@ -91,12 +91,14 @@ BRNAddressInfo(ipdev eth0:ip);
 /* USERLEVEL stuff */
 
 #ifdef USERLEVEL
-#ifdef RECEIVE_ONLY
-#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false, CAPTURE PCAP/*, ENCAP 802_11*/)
+#ifdef USE_PCAP
+#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false, CAPTURE PCAP, ENCAP SLL) -> Strip(16)
+#define TORAWDEVICE(x) ToDevice(x, IGNOREFROMDEV true, DEBUG false)
+//#define TORAWDEVICE(x) SLLEncap(PACKETTYPE 1, HARDWARETYPE 805, PROTOCOL 25) -> ToDevice(x, DEBUG false)
 #else
-#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false/*, CAPTURE PCAP, ENCAP 802_11*/)
-#endif
+#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false)
 #define TORAWDEVICE(x) ToDevice(x, DEBUG false)
+#endif
 
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)

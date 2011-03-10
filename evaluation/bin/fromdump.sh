@@ -43,6 +43,10 @@ else
   GPSREP="//"
 fi
 
+if [ "x$WIFI" = "xraw" ]; then
+  echo "FromDump($1,STOP true) -> Print(\"\",2000) -> Discard" | click-align 2> /dev/null | click 2>&1
+  exit 0
+fi
 
 if [ "x$WIFI" = "x" ]; then
   WIFI=805
