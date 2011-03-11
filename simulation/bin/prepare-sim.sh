@@ -31,6 +31,17 @@ fi
 
 BASEDIR=$DIR/../../
 
+if [ "x$USED_SIMULATOR" = "x" ]; then
+  USED_SIMULATIOR=ns
+fi
+
+if [ "$USED_SIMULATOR" != "jist" ] && [ "$USED_SIMULATOR" != "ns" ]; then
+  echo "USED_SIMULATOR is unknown ($USED_SIMUALTOR). Use ns or jist."
+  exit 0
+fi
+
+echo "sim is $USED_SIMULATOR"
+
 case "$1" in
 	"help")
 		echo "Use $0 prepare dis-file"
@@ -48,29 +59,31 @@ case "$1" in
 		    ISCOMMENT=`echo $line | grep "#" | wc -l`
 		    if [ $ISCOMMENT -eq 0 ]; then
 		    
-          read CNODE CDEV CMODDIR CMODOPT WIFICONFIG CCMODDIR CLICK CCLOG CAPP CAPPL <<< $line
+	              read CNODE CDEV CMODDIR CMODOPT WIFICONFIG CCMODDIR CLICK CCLOG CAPP CAPPL <<< $line
 			
-          ISGROUP=`echo $CNODE | grep "group:" | wc -l`
+	              ISGROUP=`echo $CNODE | grep "group:" | wc -l`
 			      
 		      if [ "x$ISGROUP" = "x1" ]; then
 		        GROUP=`echo $CNODE | sed "s#group:##g"`
 		        CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#"`
 		        #echo "NODES: $CNODE"
 		      else
-            CNODES=$CNODE
-          fi
-																					     
+        		CNODES=$CNODE
+        	      fi
+																		     
 		      for CNODE in $CNODES; do
 
-            #TODO: replace eth0 by CDEV
-		        NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$CNODE[[:space:]]*eth0" | wc -l`
+		        if [ "x$USED_SIMULATOR" = "xns" ]; then
+			  CDEV=eth0
+			fi
 			
-            if [ $NODEINFILE -ne 0 ]; then
-              #echo "Found node $CNODE with device $CDEV. Step over"  
+		        NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$CNODE[[:space:]]*$CDEV" | wc -l`
+			
+        		if [ $NODEINFILE -ne 0 ]; then
+            		    #echo "Found node $CNODE with device $CDEV. Step over"  
 			        continue
-			      fi
+			fi
 		      
-		        CDEV=eth0
 		        
             if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
               CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`

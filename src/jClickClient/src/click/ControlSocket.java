@@ -36,6 +36,7 @@ public class ControlSocket {
   private BufferedReader _in;
   private BufferedWriter _out;
   private int _protocolMinorVersion;
+  private int _sock_timeout;
 
   private static final int CODE_OK = 200;
   private static final int CODE_OK_WARN = 220;
@@ -53,7 +54,7 @@ public class ControlSocket {
   /* XXX not sure timeout is a good idea; if we do timeout, we should
  reset the connection (close and re-open) to get rid of all old
  data... */
-  public static final int _sock_timeout = 0; // 1500; // msecs
+  public static final int DEFAULT_SOCKET_TIMEOUT = /*0;*/ 1500; // msecs
 
   /**
    * Constructs a new ControlSocket.
@@ -68,6 +69,7 @@ public class ControlSocket {
   public ControlSocket(InetAddress host, int port) throws IOException {
     _host = host;
     _port = port;
+    _sock_timeout = DEFAULT_SOCKET_TIMEOUT;
 
     /*
      * setup connection to the node's click ControlSocket
@@ -127,6 +129,27 @@ public class ControlSocket {
    */
   public String toString() {
     return _host + ":" + _port;
+  }
+
+  public void increaseSocketTimeout() {
+    _sock_timeout *= 2;
+    try {
+      _sock.setSoTimeout(_sock_timeout);
+    } catch ( Exception se) {
+    }
+  }
+
+  public int skipIn(int n) {
+    long result = -1;
+    try {
+      result = _in.skip(n);
+    } catch ( IllegalArgumentException e) {
+      result = -1;
+    } catch ( IOException e) {
+      result = -2;
+    }
+
+    return (int)result;
   }
 
 
@@ -682,7 +705,8 @@ public class ControlSocket {
     InetAddress localhost = null;
     try {
       // localhost = InetAddress.getLocalHost();
-      localhost = InetAddress.getByName("bermuda.lcs.mit.edu");
+      localhost = InetAddress.getByName("wgt201");
+      //localhost = InetAddress.getByName("bermuda.lcs.mit.edu");
     } catch (UnknownHostException ex) {
       System.out.println("Can't get localhost address");
       System.exit(-1);

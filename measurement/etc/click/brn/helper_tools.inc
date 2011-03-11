@@ -4,7 +4,7 @@
 
 #ifndef CONTROLSOCKETPORT
 #define CONTROLSOCKETPORT 7777
-#endif 
+#endif
 
 ControlSocket(tcp, CONTROLSOCKETPORT);
 #endif
@@ -16,12 +16,10 @@ ControlSocket(tcp, CONTROLSOCKETPORT);
 #endif
 
 #if TIME > 0
-
-#ifndef SIMULATION
 Script(wait TIME, stop);
-//#else
-//Script(wait TIME.001, stop);
 #endif
 
+#ifdef NODEID_NAME
+//#warning Deprecated: Please use NAME in Nodeidentity.
+Script( write id.nodename NODENAME );
 #endif
-

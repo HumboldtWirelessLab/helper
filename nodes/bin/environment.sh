@@ -23,6 +23,14 @@ case "$1" in
 	echo "Use $0"
 	exit 0;
 	;;
+    "arch")
+	WNDR=`cat /proc/cpuinfo | grep "WNDR3700" | wc -l`
+	if [ $WNDR -gt 0 ]; then
+	  echo "mips-wndr3700"
+	else
+	  uname -m
+	fi
+	;;
     *)
 	;;
 esac

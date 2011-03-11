@@ -32,12 +32,22 @@ case "$1" in
 	"mount")
 		for node in $NODELIST; do
 		    echo "$node"
-		    
+
 		    ENVIRONMENTFILE=`cat $DIR/../../nodes/etc/environment/nodesenvironment.conf | grep "^$node" | awk '{print $2}'`
-		    . $DIR/../../nodes/etc/environment/$ENVIRONMENTFILE
-		    
+		    if [ -f $DIR/../../nodes/etc/environment/$ENVIRONMENTFILE ]; then
+			. $DIR/../../nodes/etc/environment/$ENVIRONMENTFILE
+		    fi
+
+		    if [ "x$NFSOPTIONS" = "x" ]; then
+			. $DIR/../../nodes/etc/environment/default.env
+		    fi
+
 		    if [ ! "x$NFSHOME" = "x" ]; then
-			run_on_node $node "mount -t nfs -o nolock $NFSSERVER:$NFSHOME $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			if [ "x$NFSOPTIONS" = "x" ]; then
+			  NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
+			fi
+			run_on_node $node "mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME" "/" $DIR/../etc/keys/id_dsa
 		    else
 			echo "NFSHOME not set, so no mount."
 		    fi
@@ -46,15 +56,25 @@ case "$1" in
 	"extramount")
 		for node in $NODELIST; do
 		    echo "EXTRAMOUNT: $node"
-		    
+
 		    ENVIRONMENTFILE=`cat $DIR/../../nodes/etc/environment/nodesenvironment.conf | grep "^$node" | awk '{print $2}'`
-		    . $DIR/../../nodes/etc/environment/$ENVIRONMENTFILE
-		    
+		    if [ -f $DIR/../../nodes/etc/environment/$ENVIRONMENTFILE ]; then
+			. $DIR/../../nodes/etc/environment/$ENVIRONMENTFILE
+		    fi
+
+		    if [ "x$NFSOPTIONS" = "x" ]; then
+			. $DIR/../../nodes/etc/environment/default.env
+		    fi
+
 		    echo "$EXTRANFS;$EXTRANFSTARGET;$EXTRANFSSERVER"
-		    
+
 		    if [ ! "x$EXTRANFS" = "x" ] && [ ! "x$EXTRANFSTARGET" = "x" ] &&  [ ! "x$EXTRANFSSERVER" = "x" ]; then
-			run_on_node $node "mkdir $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
-       			run_on_node $node "mount -t nfs -o nolock $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
+			run_on_node $node "mkdir -p $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
+
+			if [ "x$NFSOPTIONS" = "x" ]; then
+			  NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
+			fi
+			run_on_node $node "mount -t nfs -o $NFSOPTIONS $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
 		    else
 			echo "NFSHOME not set, so no mount."
 		    fi

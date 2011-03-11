@@ -6,11 +6,16 @@
 #endif
 
 
+#define BRN_ETHERTYPE                 8086
+#define BRN_ETHERTYPE_HEX             0x8086
+
+
 /*Basics and Services*/
 #define BRN_PORT_LINK_PROBE           01
 #define BRN_PORT_IAPP                 02
 #define BRN_PORT_GATEWAY              03
 #define BRN_PORT_EVENTHANDLER         04
+#define BRN_PORT_ALARMINGPROTOCOL     05
 /*Routing*/
 #define BRN_PORT_DSR                  0a
 #define BRN_PORT_BCASTROUTING         0b
@@ -24,7 +29,9 @@
 /*Clustering*/
 #define BRN_PORT_DCLUSTER             1e
 #define BRN_PORT_NHOPCLUSTER          1f
+/*Topology*/
 #define BRN_PORT_TOPOLOGY_DETECTION   23
+#define BRN_PORT_NHOPNEIGHBOURING     24
 /*P2P*/
 #define BRN_PORT_DHTROUTING           28
 #define BRN_PORT_DHTSTORAGE           29

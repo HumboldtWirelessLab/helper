@@ -61,7 +61,7 @@ if [ "x$1" = "xall" ]; then
     N=`expr $N + 1` 
   done
 else
-  NODES=`cat $1 | grep -v "#" | awk '{print $1}' | sort -u`
+  NODES=`cat $1 | grep -v "#" | awk '{print $1}' | uniq`
   
   for i in $NODES; do
     RESULT=`ping -c 2 $i 2>&1 | grep trans | awk '{print $4}'`

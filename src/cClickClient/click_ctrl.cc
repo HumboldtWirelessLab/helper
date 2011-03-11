@@ -56,9 +56,11 @@ main(int argc, char **argv)
 
   typedef csc_t::err_t err_t;
   err_t err = cs.configure(ip, port); 
-  ok(err); 
+  if ( err != ControlSocketClient::no_err ) {
+    cerr << "No connection\n";
+    return 1;
+  }
 
-  
   if ( argc > 5 ) {
     string data = argv[5];
 

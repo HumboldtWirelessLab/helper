@@ -31,7 +31,7 @@ public class DataDispatcher extends Thread {
     printList();
     openNodes();
     startNodes();
-    mssg = new byte[1 + nodes.size() * statsInfo.getSize() + 1];
+    mssg = new byte[1 + nodes.size() * (statsInfo.getSize() + 1) + 1];
   }
 
   void loadNodes(String filename) {
@@ -96,7 +96,7 @@ public class DataDispatcher extends Thread {
   }
 
   byte[] getData() {
-    byte[] result = new byte[1 + nodes.size() * statsInfo.getSize() + 1];
+    byte[] result = new byte[1 + nodes.size() * (statsInfo.getSize() + 1) + 1];
 
     result[0] = (byte)nodes.size();
     for ( int i = 0; i < nodes.size(); i++) {
@@ -106,10 +106,17 @@ public class DataDispatcher extends Thread {
       for ( int j = 0; j < statsInfo.getSize(); j++) {
         if (l[j] != null)
           result[1 + ((j * nodes.size()) + i)] = (new Integer(l[j])).byteValue();
+        else
+          result[1 + ((j * nodes.size()) + i)] = 0;
       }
     }
 
-    result[1 + nodes.size() * statsInfo.getSize()] = 127;
+    for ( int i = 0; i < nodes.size(); i++) {
+      ClickNodeInfo cni = nodes.get(i);
+      result[1 + nodes.size() * statsInfo.getSize() + i] = cni.ip.getAddress()[3];
+    }
+
+    result[1 + nodes.size() * (statsInfo.getSize()+1)] = 127;
 
     return result;
   }
@@ -118,7 +125,7 @@ public class DataDispatcher extends Thread {
     try {
       while (true) {
         setNewData(nextSample());
-        Thread.sleep(50); // emulates new data
+        Thread.sleep(500); // emulates new data
       }
     } catch (InterruptedException e) {
       e.printStackTrace();

@@ -46,16 +46,22 @@ case "$1" in
 		    run_on_node $NODE "DEVICE=$device ./wlandevice.sh delete" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
 		done
 		;;
-	"config")
+	"config_pre_start")
 		for device in $DEVICES; do
 		    echo "config $NODE $device"
-		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh config" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
+		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh config_pre_start" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
 		done
 		;;
 	"start")
 		for device in $DEVICES; do
 		    echo "start $NODE $device"
 		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh start" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
+		done
+		;;
+	"config_post_start")
+		for device in $DEVICES; do
+		    echo "config $NODE $device"
+		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh config_post_start" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
 		done
 		;;
 	"getiwconfig")
