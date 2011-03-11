@@ -37,7 +37,8 @@ case "$1" in
 		for node in $NODELIST; do
 		    echo "$node"
 		    if [ "x$MODULSDIR" = "x" ]; then
-			ARCH=`get_arch $node $DIR/../etc/keys/id_dsa`
+			#ARCH=`get_arch $node $DIR/../etc/keys/id_dsa`
+			ARCH=`run_on_node $node "./system.sh get_arch" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa`
 			run_on_node $node "MODULSDIR=\"$DIR/../../nodes/lib/modules/$ARCH\" MODOPTIONS=\"$MODOPTIONS\" ./wlanmodules.sh install" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
 		    else
 			run_on_node $node "MODULSDIR=\"$MODULSDIR\" MODOPTIONS=\"$MODOPTIONS\" ./wlanmodules.sh install" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
@@ -47,7 +48,7 @@ case "$1" in
 	"rmmod")
 		for node in $NODELIST; do
 		    echo "$node"
-		    run_on_node $node "./wlanmodules.sh uninstall" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
+		    run_on_node $node "MODULSDIR=\"$MODULSDIR\" MODOPTIONS=\"$MODOPTIONS\" ./wlanmodules.sh uninstall" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
 		done
 		;;
 	"lsmod")

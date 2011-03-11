@@ -1,6 +1,0 @@
-#NODE	DEVICE	MODULSDIR			MODOPTIONS	WIFICONFIG		CLICKMODDIR	CLICKSCRIPT	CLICKLOGFILE		APPLICATION				APPLICATIONLOGFILE
-sk110	ath0	BASEDIR/nodes/lib/modules/i586	-		station.brn		-		-		-			CONFIGDIR/tcp_stream.sh			LOGDIR/sk110.app.log
-sk111	ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel11	-		gw.click	LOGDIR/sk111.ath0.log	CONFIGDIR/setup_gw.sh			LOGDIR/sk111.app.log
-#sk111	ath1	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel11	-		ap.click	LOGDIR/sk111.ath1.log	CONFIGDIR/setup_portforwarding.sh	LOGDIR/sk111b.app.log
-sk112	ath0	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel11	-		ap2.click	LOGDIR/sk112.ath0.log	CONFIGDIR/setup_portforwarding.sh	LOGDIR/sk112.app.log
-#sk112	ath1	BASEDIR/nodes/lib/modules/i586	-		monitor.b.channel11	-		ap3.click	LOGDIR/sk112.ath1.log	-					-

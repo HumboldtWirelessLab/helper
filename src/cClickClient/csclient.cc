@@ -56,6 +56,13 @@ ControlSocketClient::configure(unsigned int host_ip, unsigned short port)
   sa.sin_addr.s_addr = _host;
   sa.sin_port = htons(port);
 
+  struct timeval timeout;
+  timeout.tv_sec = 1;
+  timeout.tv_usec = 0;
+
+  setsockopt(_fd,SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval));
+  setsockopt(_fd,SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(struct timeval));
+
   char namebuf[32];
   snprintf(namebuf, 32, "%u.%u.%u.%u:%hu",
 	   (_host & 0xff) >> 0,

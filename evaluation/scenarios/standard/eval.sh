@@ -32,7 +32,7 @@ OUTNODES=""
 for od in $OUTDUMPS; do
   OUTNODE=`echo $od | sed "s#\.# #g" | awk '{print $1}'`
   OUTDEVICE=`echo $od | sed "s#\.# #g" | awk '{print $2}'`
-  OUTMACS=`cat $od | grep "Sequence" | awk '{print $10$11}' | cut -b 5-16  | sort -u`
+  OUTMACS=`cat $od | grep "Sequence" | awk '{print $10$11}' | cut -b 5-16  | uniq`
 
   echo -n "" > outmacs.dat
 
@@ -42,7 +42,7 @@ for od in $OUTDUMPS; do
     echo "$OUTNODE $OUTDEVICE $FORMATEDMAC" >> outmacs.dat
   done
 
-  NEWOUTNODE=`cat $od | grep "Sequence" | awk '{print $9" "$10" "$11}' | sort -u`
+  NEWOUTNODE=`cat $od | grep "Sequence" | awk '{print $9" "$10" "$11}' | uniq`
   OUTNODES="$OUTNODES $NEWOUTNODE"
 done
 
@@ -79,7 +79,7 @@ for dump in `ls *.dump.all.dat 2> /dev/null`; do
     cat $dump | grep "OKPacket:" | awk '{ print $69 "\t" $70 "\t" $72 "\t" $75}' | sed -s 's/://g' | sed -s 's/Mb//g' | sed -s 's/mgmt/0/g' | sed -s 's/cntl/1/g' | sed -s 's/data/2/g' > $BASEFILE.ok.dat
     cat $dump | grep "CRCerror:" | awk '{ print $69 "\t" $70 "\t" $72 }' | sed -s 's/://g' | sed -s 's/Mb//g' > $BASEFILE.crc.dat
     cat $dump | grep "PHYerror:" | awk '{ print $69 "\t" $70 }' | sed -s 's/://g' | sed -s 's/Mb//g' >  $BASEFILE.phy.dat
-    cat $dump | grep "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $75 }' | sort -u  >  $BASEFILE.bssid.dat
+    cat $dump | grep "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $75 }' | uniq  >  $BASEFILE.bssid.dat
     cat $BASEFILE.bssid.dat | wc -l >> all_bssid.dat
     
     if [ "x$SINGLEOUTMAC" != "x" ]; then
@@ -100,7 +100,7 @@ for dump in `ls *.dump.all.dat 2> /dev/null`; do
   fi
 done
 
-cat all_seq_no.dat.tmp | sort -u | awk '{print $1" "strtonum("0x"$2)}' > all_seq_no.dat
+cat all_seq_no.dat.tmp | uniq | awk '{print $1" "strtonum("0x"$2)}' > all_seq_no.dat
 rm -f all_seq_no.dat.tmp
 
 touch processing_done

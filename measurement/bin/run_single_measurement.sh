@@ -20,36 +20,16 @@ esac
 
 . $DIR/../../host/bin/functions.sh
 
-NODELIST=`cat $CONFIGFILE | grep -v "#" | awk '{print $1}' | sort -u`
+NODELIST=`cat $CONFIGFILE | grep -v "#" | awk '{print $1}' | uniq`
 
 RUN_CLICK_APPLICATION=0
+CURRENTMODE="START"
+MEASUREMENT_ABORT=0
+
+MEASUREMENT_ID=$ID\_$RANDOM
 
 NODESCREENFILENAME=nodescreenmap
 MSCREENFILENAME=measurementscreenmap
-
-CURRENTMODE="START"
-
-##############################
-###### NODE Checker ##########
-##############################
-
-check_nodes() {
-
-    NODESTATUS=`NODELIST=$NODELIST MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh statusmarker`
-
-    if [ ! "x$NODESTATUS" = "xok" ]; then
-      echo "Nodestatus: $NODESTATUS"
-      echo "WHHHHOOOOO: LOOKS LIKE RESTART! GOD SAVE THE WATCHDOG"
-      echo "Current Mode: $CURRENTMODE"
-      echo "Nodes: $NODELIST"
-      exit 0
-    fi
-}
-
-get_node_status()  {
-    NODESTATUS=`NODELIST=$NODELIST MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh statusmarker`
-    echo "$NODESTATUS"
-}
 
 ##############################
 ###### SYNC - stuff ##########
@@ -72,14 +52,14 @@ wait_for_nodes() {
     NO_NODES=0
     STATE_NODES=0;
     OK_NODES=0;
-    
+
     for n in $NODES; do
-    
+
       STATEFILE="status/$n$2"
-      
+
       echo "looking for $STATEFILE" >> $DEBUGFILE
       NO_NODES=`expr $NO_NODES + 1`
-      
+
       if [ -f $STATEFILE ]; then
         echo "  OK" >> $DEBUGFILE
         STATE_NODES=`expr $STATE_NODES + 1`
@@ -89,27 +69,27 @@ wait_for_nodes() {
         fi
       fi
     done
-    
+
     echo "RESULT: $NO_NODES $OK_NODES" >> $DEBUGFILE
-    
+
     if [ $NO_NODES -eq $STATE_NODES ]; then
       ALL=1;
     fi
-    
+
     if [ "x$3" != "x" ]; then
       ROUND=`expr $ROUND + 1`
       if [ $ROUND -gt $3 ]; then
         FORCE_ABORT=1
-	echo "Stop waiting....!" >&6
+        echo "Stop waiting....!" >&6
       fi
     fi
 
     if [ $FORCE_ABORT -eq 0 ]; then
       sleep 1
     fi
-    
+
   done
-  
+
   if [ $NO_NODES -eq $OK_NODES ]; then
     echo "0"
   else
@@ -120,13 +100,13 @@ wait_for_nodes() {
 
 get_nodes_ok() {
   NODES=$1
-  
+
   OK_NODES=""
 
   for n in $NODES; do
-     
+
     STATEFILE="status/$n$2"
-      
+
     if [ -f $STATEFILE ]; then
       NSTATE=`cat $STATEFILE | awk '{print $1}'`
       if [ "x$NSTATE" = "x0" ]; then
@@ -134,7 +114,7 @@ get_nodes_ok() {
       fi
     fi
   done
-    
+
   echo "$OK_NODES"
 }
 
@@ -142,107 +122,146 @@ set_master_state() {
   echo "$1" >  status/master_$2.state
 }
 
-#########################################################
-############ Clean up after abort #######################
-#########################################################
+######################################################
+############ Finish measurement ######################
+######################################################
 
-trap abort_measurement 1 2 3 6
+kill_prog_and_logfiles() {
+
+ set_master_state 0 measurement
+
+  echo -n "State: killclick ... " >&6
+
+  echo "Wait for nodes"
+  SYNCSTATE=`wait_for_nodes "$NODELIST" _killclick.state`
+  echo "all nodes ready"
+
+  if [ "x$LOCALPROCESS" != "x" ]; then
+    PATH=$DIR/../../host/bin:$PATH;RESULTDIR=$FINALRESULTDIR NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
+  fi
+
+  echo "done." >&6
+}
+
+check_nodes() {
+
+  set_master_state 0 killmeasurement
+
+  echo -n "State: Check nodes ... " >&6
+
+  echo "Wait for nodes"
+  SYNCSTATE=`wait_for_nodes "$NODELIST" _finalnodecheck.state`
+  echo "all nodes ready"
+
+  echo "done." >&6
+
+  echo "ok" 1>&$STATUSFD
+}
+
+close_measurement_screen() {
+
+  echo -n "State: Close screen sessions (measurement) ... " >&6
+
+  if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
+    screen -S $LOCALSCREENNAME -X quit
+  fi
+
+  MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | uniq`
+  for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
+    screen -S $MEASUREMENTSCREENNAME -X quit
+  done
+
+  echo "done." >&6
+}
+
+close_node_screen() {
+
+SCREENNUMBER=1
+NODE_IN_SCREEN=1
+MAX_NODE_PER_SCREEN=30
+
+echo -n "State: Close screen sessions (node ctrl) ... " >&6
+
+for node in $NODELIST; do
+
+  SCREENNAME=nodes_$MEASUREMENT_ID\_$SCREENNUMBER
+
+  screen -S $SCREENNAME -p $node -X stuff "exit" > /dev/null 2>&1
+  sleep 0.2;
+  screen -S $SCREENNAME -p $node -X stuff $'\n' > /dev/null 2>&1
+
+  NODE_IN_SCREEN=`expr $NODE_IN_SCREEN + 1`
+
+  if [ $NODE_IN_SCREEN -gt $MAX_NODE_PER_SCREEN ]; then
+    screen -S $SCREENNAME -X quit
+    NODE_IN_SCREEN=1
+    SCREENNUMBER=`expr $SCREENNUMBER + 1`
+  fi
+
+done
+
+if [ $NODE_IN_SCREEN -gt 1 ]; then 
+  screen -S $SCREENNAME -X quit
+fi
+
+echo "done." >&6
+
+}
+
+######################################################
+############ Abort measurement #######################
+######################################################
+
+trap abort_measurement 1 2 3 6 15
 
 #TODO
 abort_measurement() {
-	
+
+  echo "" >&6
   echo "Abort Measurement" >&6
 
+  if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
+    echo "0" > status/master_click_abort.state
+  fi
+
   echo "0" > status/master_abort.state
-	
-  if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
-  echo "Kill Click: " >&6
-  for node in $NODELIST; do
-    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+  MEASUREMENT_ABORT=1
 
-    echo "$node" >&6
-	
-    for nodedevice in $NODEDEVICELIST; do
-	CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
-	CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
-	CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
-	if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ] && [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
-    	    TAILPID=`run_on_node $node "pidof cat" "/" $DIR/../../host/etc/keys/id_dsa`
-    	    run_on_node $node "kill $TAILPID" "/" $DIR/../../host/etc/keys/id_dsa
-	else
-	    if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-		NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
-		CLICKPID=`run_on_node $node "pidof click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa`
-		if [ "x$CLICKPID" != "x" ]; then
-		  for cpid in $CLICKPID; do
-                    run_on_node $node "kill $cpid" "/" $DIR/../../host/etc/keys/id_dsa
-		  done
-		fi
-	    fi
-        fi
-		
-	APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
-		
-      if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-	run_on_node $node "$APPLICATION  stop" "/" $DIR/../../host/etc/keys/id_dsa
-      fi
+  NODECTRL_CNT=0
+  NEW_NODELIST=""
 
-    done
+  for p in `ls status/*nodectrl.pid`; do
+    NCTRL_PID=`cat $p`
+    kill $NCTRL_PID >> status/killnodectrl.log
+    echo "kill $NCTRL_PID" >> status/killnodectrl.log
+    CURRENT_NODE=`echo $p | sed "s#status/##g" | sed "s#_nodectrl.pid##g"`
+    NEW_NODELIST="$NEW_NODELIST $CURRENT_NODE"
+    NODECTRL_CNT=`expr $NODECTRL_CNT + 1`
   done
 
+  echo "New nodelist: $NEW_NODELIST" >> status/master_abort.log
+
+  sleep 2
+
+  OLD_NODELIST=$NODELIST
+  NODELIST=$NEW_NODELIST
+
+  kill_prog_and_logfiles
+  check_nodes
+
+  NODELIST=$OLD_NODELIST
+
+  close_measurement_screen
+  close_node_screen
+
+  if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
+    echo "Stop local process"
+    RESULTDIR=$FINALRESULTDIR $LOCALPROCESS poststop >> $FINALRESULTDIR/localapp.log
   fi
-
-  echo "Kill Click done" >&6
-
-  echo -n"Kill node ctrl ..." >&6
-  for c in `ls status/*nodectrl.pid 2> /dev/null`; do
-    CPID=`cat $c`
-    kill $CPID
-  done
-  echo " done"
-  
-  echo -n "Wait for all nodes..." >&6
-
-  SYNCSTATE=`wait_for_nodes "$NODELIST" _abort.state 30`
-
-  echo "done" >&6
-
-  echo -n "Killall screens..." >&6
-  if [ -f $MSCREENFILENAME ]; then
-    MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | sort -u`
-    for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
-      echo "Close screen $MEASUREMENTSCREENNAME"
-      screen -S $MEASUREMENTSCREENNAME -X quit
-    done
-  fi
-
-  if [ -f $NODESCREENFILENAME ]; then
-    NODESCREENNAMES=`cat $NODESCREENFILENAME | awk '{print $2}' | sort -u`
-    for NODESCREENNAME in $NODESCREENNAMES; do
-      echo "Close screen $NODESCREENNAME"
-      screen -S $NODESCREENNAME -X quit
-    done
-  fi
-  echo "done" >&6
-
-  echo -n "Kill local screen..." >&6
-  if [ "x$LOCALSCREENNAME" != "x" ]; then
-    screen -S $LOCALSCREENNAME -X quit
-  fi
-  echo "done" >&6
-
-  echo -n "Check nodes ... " >&6
-  if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
-      check_nodes
-  fi
-  echo "done" >&6
-
-  echo "abort" 1>&$STATUSFD
-
-  echo "Finished measurement. Status: abort."
 
   exit 0
+
 }
 
 #########################################################
@@ -260,7 +279,7 @@ run_command_for_node() {
 
   #echo "Debug: $SCREENNAME" >&5
   screen -S $SCREENNAME -p $1 -X stuff "LOGMARKER=$1 $2"
-  sleep 0.3
+  sleep 0.1
   screen -S $SCREENNAME -p $1 -X stuff $'\n'
 
 }
@@ -295,14 +314,13 @@ case "$RUNMODE" in
 	*)
 			RUNMODENUM=0
 			;;
-esac				
-
+esac
 
 ####################################
 ### Create screen for all nodes ####
 ####################################
 
-echo -n "Start screen seesion to setup all nodes ... " >&6
+echo -n "Start screen session to setup all nodes ... " >&6
 
 SCREENNUMBER=1
 NODE_IN_SCREEN=1
@@ -311,12 +329,13 @@ MAX_NODE_PER_SCREEN=30
 for node in $NODELIST; do
 
   if [ $NODE_IN_SCREEN -eq 1 ]; then
-    SCREENNAME=nodes_$MARKER\_$SCREENNUMBER
-    screen -d -m -S $SCREENNAME      
+    SCREENNAME=nodes_$MEASUREMENT_ID\_$SCREENNUMBER
+    screen -d -m -S $SCREENNAME
+    sleep 0.3
   fi
 
-  sleep 0.5;
-  screen -S $SCREENNAME -X screen -t $node 
+  #sleep 0.1;
+  screen -S $SCREENNAME -X screen -t $node
   echo "$node $SCREENNAME" >> $NODESCREENFILENAME
 
   NODE_IN_SCREEN=`expr $NODE_IN_SCREEN + 1`
@@ -334,7 +353,7 @@ echo "done." >&6
 ######### STATUSDIR ###########
 ###############################
 
-rm -rf 
+rm -rf status
 mkdir status
 
 ###############################
@@ -343,7 +362,7 @@ mkdir status
 
 echo "Start node setup"
 for node in $NODELIST; do
-  run_command_for_node $node "FINALRESULTDIR=$FINALRESULTDIR RUNMODE=$RUNMODE NODELIST=\"$node\" $DIR/prepare_single_node.sh"
+  run_command_for_node $node "MARKER=$ID FINALRESULTDIR=$FINALRESULTDIR RUNMODE=$RUNMODE NODELIST=\"$node\" $DIR/prepare_single_node.sh"
 done
 
 #### STATES ####
@@ -366,10 +385,10 @@ STATES="reboot environment wifimodules wificonfig wifiinfo clickmodule preload"
 
 for state in  $STATES; do
   echo -n "State: $state ... " >&6
-  
+
   SYNCSTATE=`wait_for_nodes "$NODELIST" _$state.state`
   set_master_state 0 $state
-  
+
   NODES_OK=`get_nodes_ok "$NODELIST" _$state.state`
   COUNT_NODES_ALL=`echo $NODELIST | wc -w`
   COUNT_NODES_OK=`echo $NODES_OK | wc -w`
@@ -378,30 +397,28 @@ for state in  $STATES; do
   if [ "x$state" = "xenvironment" ]; then
     if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
       echo -n "State: Prestart local process ... " >&6
-      
+
       echo "Local process: prestart"
-      RESULTDIR=$FINALRESULTDIR $LOCALPROCESS prestart >> $FINALRESULTDIR/localapp.log
-    
+      RESULTDIR=$FINALRESULTDIR NODELIST="$NODELIST" $LOCALPROCESS prestart >> $FINALRESULTDIR/localapp.log
+
       echo "done." >&6
     fi
   fi
 
   if [ "x$state" = "xclickmodule" ]; then
-    echo -n "State: Prestart local process ... " >&6
+    echo -n "State: Configure Clickmodule (if needed) and start measurement sessions ... " >&6
 
     #################################################
     ###### Start Measurement Screensession ##########
     #################################################
 
     MSCREENNUM=1
-    MEASUREMENTSCREENNAME=measurement_$ID\_$MSCREENNUM
+    MEASUREMENTSCREENNAME=measurement_$MEASUREMENT_ID\_$MSCREENNUM
 
     CURRENTMSCREENNUM=1
-    
-    screen -d -m -S $MEASUREMENTSCREENNAME
 
     NODEBINDIR="$DIR/../../nodes/bin"
-    
+
     ########################################################
     ###### Setup Click-, Log- & Application-Stuff ##########
     ########################################################
@@ -415,9 +432,9 @@ for state in  $STATES; do
 
     for node in $NODELIST; do
       NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-	
-      NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
-	
+
+      NODEARCH=`NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh "$NODEBINDIR/system.sh get_arch"`
+
       for nodedevice in $NODEDEVICELIST; do
         CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
 
@@ -425,22 +442,26 @@ for state in  $STATES; do
         CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
         LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
 
+        if [ $CURRENTMSCREENNUM -eq 1 ]; then
+          screen -d -m -S $MEASUREMENTSCREENNAME
+        fi
+
         echo "$node $nodedevice $MEASUREMENTSCREENNAME" >> $MSCREENFILENAME
 
         if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-			
+
           RUN_CLICK_APPLICATION=1
-			
-          SCREENT="$node\_$nodedevice\_click"	
+
+          SCREENT="$node\_$nodedevice\_click"
           screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
           CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
-   	  sleep 0.1
+          sleep 0.1
 			
-		  	if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
+			if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
 			    CLICKWAITTIME=`expr $TIME + 2`
 			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export CLICKPATH=$NODEBINDIR/../etc/click;CLICKPATH=$NODEBINDIR/../etc/click $NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT > /tmp/click/config; sleep $CLICKWAITTIME; echo "" > /tmp/click/config\""
 
- 			    sleep 0.1
+			    sleep 0.1
 			    SCREENT="$node\_$nodedevice\_kcm"	
 			    screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
                             CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
@@ -461,51 +482,71 @@ for state in  $STATES; do
 			  SCREENT="$node\_$nodedevice\_app"	
 			  screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
 			  CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
-   		  sleep 0.1
+			  sleep 0.1
 			  screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export FINALRESULTDIR=$FINALRESULTDIR; $APPLICATION start > $APPLOGFILE 2>&1\""
 		  fi
-		  	
+
 		  if [ $CURRENTMSCREENNUM -gt 25 ]; then
 		    MSCREENNUM=`expr $MSCREENNUM + 1`
-          MEASUREMENTSCREENNAME=measurement_$ID\_$MSCREENNUM
+        	    MEASUREMENTSCREENNAME=measurement_$MEASUREMENT_ID\_$MSCREENNUM
 
-          CURRENTMSCREENNUM=1
-    
-          screen -d -m -S $MEASUREMENTSCREENNAME
-        fi
+        	    CURRENTMSCREENNUM=1
+    		  fi
       done
     done
-    
+
     echo "done." >&6
- 
+
   fi
 
 done
 
 echo "Finished setup of nodes and screen-session"
 
+#########################################
+####### CREATE NODES-MAC FILE  ##########
+#########################################
+
+echo -n "" > nodes.mac
+NODENUM=1
+
+for node in $NODELIST; do
+      NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+
+      for nodedevice in $NODEDEVICELIST; do
+        if [ -f status/$node\_wifiinfo.log ]; then
+          MAC=`cat status/$node\_wifiinfo.log | grep $nodedevice | grep Link | grep -v "ESSID" | grep -v "Warni" | sed -e "s#^.*dr[a-z]*[[:space:]]##g" | cut -b 1-17`
+          echo "$node $nodedevice $MAC $NODENUM" >> nodes.mac
+          NODENUM=`expr $NODENUM + 1`
+        fi
+      done
+done
+
+
 #########################################################
 ####### Start Local Click- & Application-Stuff ##########
 #########################################################
 
+if [ $MEASUREMENT_ABORT -eq 0 ]; then
+
     echo -n "Start local application and remote dump ... " >&6
-    LOCALSCREENNAME="local_$ID"
+    LOCALSCREENNAME="local_$MEASUREMENT_ID"
 
     echo "check fo localstuff: $REMOTEDUMP ; $LOCALPROCESS" >> $FINALRESULTDIR/remotedump.log 2>&1 
     if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
       screen -d -m -S $LOCALSCREENNAME
-      echo "check fo remote Dump: $REMOTEDUMP" >> $FINALRESULTDIR/remotedump.log 2>&1 
-      
-      sleep 0.3
+      echo "check fo remote Dump: $REMOTEDUMP" >> $FINALRESULTDIR/remotedump.log 2>&1
+
+      sleep 0.2
       if [ "x$REMOTEDUMP" = "xyes" ]; then
         echo "Start remotedump" >> $FINALRESULTDIR/remotedump.log 2>&1
-        screen -S $LOCALSCREENNAME -X screen -t remotedump                                                                                                                                                                                                                          
-        sleep 0.3                                                                                                                                                                                                                                                                     
-	screen -S $LOCALSCREENNAME -p remotedump -X stuff "(cd $FINALRESULTDIR/;export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-i586 $FINALRESULTDIR/remotedump.click >> $FINALRESULTDIR/remotedump.log 2>&1)"
-        sleep 0.5                                                                                                                                                                                                                                                                     
-	screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n' 
+        screen -S $LOCALSCREENNAME -X screen -t remotedump
+        sleep 0.3
+        screen -S $LOCALSCREENNAME -p remotedump -X stuff "(cd $FINALRESULTDIR/;export CLICKPATH=$NODEBINDIR/../etc/click;$NODEBINDIR/click-i586 $FINALRESULTDIR/remotedump.click >> $FINALRESULTDIR/remotedump.log 2>&1)"
+        sleep 0.5
+        screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n'
       fi
-      
+
       if [ "x$LOCALPROCESS" != "x" ]; then
         #echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
         screen -S $LOCALSCREENNAME -X screen -t localprocess
@@ -518,10 +559,11 @@ echo "Finished setup of nodes and screen-session"
     fi
 
     echo "done." >&6
-
+fi
 ###################################################
 ####### Start Click- & Application-Stuff ##########
 ###################################################
+if [ $MEASUREMENT_ABORT -eq 0 ]; then
 
     if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
@@ -544,23 +586,24 @@ echo "Finished setup of nodes and screen-session"
             if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
               SCREENT="$node\_$nodedevice\_kcm"
               screen -S $CMEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
-	          fi
+            fi
           fi
 
-	        APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
+          APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
 
           if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-		        SCREENT="$node\_$nodedevice\_app"	
+            SCREENT="$node\_$nodedevice\_app"
             screen -S $CMEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
-		      fi
-	      done
-	    done
-	echo "done." >&6    
+          fi
+        done
+      done
+      echo "done." >&6
     fi
-
+fi
 ###################################################
 ################# Wait and Stop ###################
 ###################################################
+if [ $MEASUREMENT_ABORT -eq 0 ]; then
 
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
@@ -570,90 +613,35 @@ echo "Finished setup of nodes and screen-session"
 
 	  # Countdown
 	  echo -n -e "Wait... \033[1G" >&6
-	  for ((i = $WAITTIME; i > 0; i--)); do echo -n -e "Wait... $i \033[1G" >&6 ; sleep 1; done
+	  for ((i = $WAITTIME; i > 0; i--)); do
+	    echo -n -e "Wait... $i \033[1G" >&6 ; sleep 1;
+    done
 	  echo -n -e "                 \033[1G" >&6
-
-	  #Normal wait
-	  #sleep $WAITTIME
-
   fi
-
+fi
 ###################################################
 ##### Kill progs for logfile for kclick  ##########
 ###################################################
 
-  set_master_state 0 measurement
-
-  echo -n "State: killclick ... " >&6
-
-  echo "Wait for nodes"
-  SYNCSTATE=`wait_for_nodes "$NODELIST" _killclick.state`
-  echo "all nodes ready"
-
-  if [ "x$LOCALPROCESS" != "x" ]; then
-    PATH=$DIR/../../host/bin:$PATH;RESULTDIR=$FINALRESULTDIR NODELIST=\"$NODELIST\" $LOCALPROCESS stop >> $FINALRESULTDIR/localapp.log 2>&1
-  fi
-
-  echo "done." >&6
+kill_prog_and_logfiles
 
 #######################################
 ##### Check Nodes and finish ##########
 #######################################
 
-  set_master_state 0 killmeasurement
-
-  echo -n "State: Check nodes ... " >&6
-
-  echo "Wait for nodes"
-  SYNCSTATE=`wait_for_nodes "$NODELIST" _finalnodecheck.state`
-  echo "all nodes ready"
-
-  echo "done." >&6
-
-  echo "ok" 1>&$STATUSFD
+check_nodes
 
 #####################################
 ##### Close Screen-Session ##########
 #####################################
 
-    if [ "x$LOCALPROCESS" != "x" ] || [ "x$REMOTEDUMP" = "xyes" ]; then
-      screen -S $LOCALSCREENNAME -X quit
-    fi
-
-    MSCREENNAMES=`cat $MSCREENFILENAME | awk '{print $3}' | sort -u`
-    for MEASUREMENTSCREENNAME in $MSCREENNAMES; do
-      screen -S $MEASUREMENTSCREENNAME -X quit
-    done
+close_measurement_screen
 
 #################################################
 #### Kill screen for all nodes (controller) #####
 #################################################
 
-SCREENNUMBER=1
-NODE_IN_SCREEN=1
-MAX_NODE_PER_SCREEN=30
-
-for node in $NODELIST; do
-
-  SCREENNAME=nodes_$MARKER\_$SCREENNUMBER
-
-  screen -S $SCREENNAME -p $node -X stuff "exit" > /dev/null 2>&1
-  sleep 0.5;
-  screen -S $SCREENNAME -p $node -X stuff $'\n' > /dev/null 2>&1
-
-  NODE_IN_SCREEN=`expr $NODE_IN_SCREEN + 1`
-
-  if [ $NODE_IN_SCREEN -gt $MAX_NODE_PER_SCREEN ]; then
-    screen -S $SCREENNAME -X quit
-    NODE_IN_SCREEN=1
-    SCREENNUMBER=`expr $SCREENNUMBER + 1`
-  fi
-
-done
-
-if [ $NODE_IN_SCREEN -gt 1 ]; then 
-  screen -S $SCREENNAME -X quit
-fi
+close_node_screen
 
 #######################################
 ##### Poststop local process ##########

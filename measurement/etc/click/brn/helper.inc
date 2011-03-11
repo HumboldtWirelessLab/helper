@@ -12,7 +12,7 @@
 #endif
 
 #if WIFITYPE == 802
-#define __WIFIENCAP__ RadiotapEncap()
+#define __WIFIENCAP__ BrnRadiotapEncap()
 #define __WIFIDECAP__ RadiotapDecap()
 #endif
 
@@ -91,8 +91,14 @@ BRNAddressInfo(ipdev eth0:ip);
 /* USERLEVEL stuff */
 
 #ifdef USERLEVEL
-#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false/*, CAPTURE PCAP*/)
-#define TORAWDEVICE(x) ToDevice(x)
+#ifdef USE_PCAP
+#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false, CAPTURE PCAP, ENCAP SLL) -> Strip(16)
+#define TORAWDEVICE(x) ToDevice(x, IGNOREFROMDEV true, DEBUG false)
+//#define TORAWDEVICE(x) SLLEncap(PACKETTYPE 1, HARDWARETYPE 805, PROTOCOL 25) -> ToDevice(x, DEBUG false)
+#else
+#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false)
+#define TORAWDEVICE(x) ToDevice(x, DEBUG false)
+#endif
 
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
@@ -122,7 +128,7 @@ BRNAddressInfo(ipdev eth0:ip);
 #ifdef SIMULATION
 
 #define FROMRAWDEVICE(x) FromSimDevice(x,4096)
-#define TORAWDEVICE(x) ToSimDevice(x)
+#define TORAWDEVICE(x) ToSimDevice(x, ENCAP UNKNOWN )
 
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__

@@ -1,4 +1,4 @@
-#include "wifidev.click"
+#include "rawwifidev.click"
 #include "wifi/access_point.click"
 
 //output:
@@ -15,11 +15,19 @@
 //  0: brn
 //  1: client
 
-elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid, CHANNEL $channel, LT $lt |
+elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid,
+#ifdef VLAN_ENABLE
+                          CHANNEL $channel, LT $lt, VLANTABLE $vlt |
+#else
+                          CHANNEL $channel, LT $lt |
+#endif
 
   nblist::BRN2NBList();  //stores all neighbors (known (friend) and unknown (foreign))
   nbdetect::NeighborDetect(NBLIST nblist, DEVICE $device);
+  
   rates::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
+
+#ifdef LINKSTAT_ENABLE
   proberates::AvailableRates(DEFAULT 2 22);
   etx_metric :: BRN2ETXMetric($lt);
   
@@ -31,29 +39,92 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 //                          PROBES  "2 250 22 1000",
                             PROBES  "2 250",
                             RT           proberates);
-                            
-  ap::ACCESS_POINT(DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid,
-                   CHANNEL $channel, BEACON_INTERVAL 100, LT $lt, RATES rates);
-                   
-  toStation::BRN2ToStations(ASSOCLIST ap/assoclist);               
+#endif
+
+#ifdef VLAN_ENABLE
+  ap::ACCESS_POINT(DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid, CHANNEL $channel, BEACON_INTERVAL 100, LT $lt, RATES rates, VLAN_TABLE $vlt);
+#else
+  ap::ACCESS_POINT(DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid, CHANNEL $channel, BEACON_INTERVAL 100, LT $lt, RATES rates);
+#endif
+
+  toStation::BRN2ToStations(ASSOCLIST ap/assoclist);
   toMe::BRN2ToThisNode(NODEIDENTITY id);
 
-  wifidevice::WIFIDEV(DEVNAME $devname, DEVICE $device);
+  wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
+  wifioutq::NotifierQueue(50);
 
+#ifdef IG_ENABLE
+  prios::PrioSched()
+  -> wifidevice;
+
+  q::NotifierQueue(500)
+
+  qc::BRN2PacketQueueControl(QUEUESIZEHANDLER q.length, QUEUERESETHANDLER q.reset, MINP 100 , MAXP 500)
+  -> EtherEncap(0x0800, $etheraddress , ff:ff:ff:ff:ff:ff)
+  -> WifiEncap(0x00, 0:0:0:0:0:0)
+  -> SetTXRate(2)
+  -> SetTXPower(15)
+  -> SetTimestamp()
+  -> q
+
+#ifdef PQUEUE_ENABLE
+  -> [1]prios;
+
+  input[2]
+  -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  -> [0]prios;
+
+  wifioutq
+  -> [2]prios;
+#else
+  -> [0]prios;
+
+  wifioutq
+  -> [1]prios;
+#endif
+
+#else
+
+#ifdef PQUEUE_ENABLE
+  prios::PrioSched()
+  -> wifidevice;
+
+  input[2]
+  -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  -> [0]prios;
+
+  wifioutq
+  -> [1]prios;
+#else
+  wifioutq
+  -> wifidevice; 
+#endif
+
+#endif
 
   input[0] 
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
-  -> wifioutq::NotifierQueue(50)
-  -> wifidevice
-  -> wififrame_clf :: Classifier( 0/00%0f,  // management frames
-                                      - ); 
+  -> wifioutq;
+  
+  wifidevice[0]
+  -> filter_tx :: FilterTX()
+#if WIFITYPE == 805
+  -> error_clf :: WifiErrorClassifier()
+#else
+  -> error_clf :: FilterPhyErr()
+#endif
+  -> wififrame_clf :: Classifier( 1/40%40,  // wep frames
+                                  0/00%0f,  // management frames
+                                      - );
 
   wififrame_clf[0]
-  -> ap
-//  -> SetTXRate(RATE 2, TRIES 1)
-  -> wifioutq;
+    -> Discard;
 
   wififrame_clf[1]
+    -> ap
+    -> wifioutq;
+
+  wififrame_clf[2]
     -> WifiDecap()
     -> nbdetect
 //  -> Print("Data")
@@ -63,11 +134,15 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     
   brn_ether_clf[0]
     -> lp_clf :: Classifier( 14/BRN_PORT_LINK_PROBE, - )
+#ifdef LINKSTAT_ENABLE
     -> BRN2EtherDecap()
     -> link_stat
     -> EtherEncap(0x8086, deviceaddress, ff:ff:ff:ff:ff:ff)
-//    -> SetTXRate(RATE 2, TRIES 1)
+    -> power::SetTXPower(15)
     -> brnwifi;
+#else
+    -> Discard;
+#endif
 
   toStation[0]
   //-> Print("For a Station")
@@ -107,15 +182,15 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   //-> Print("For a foreign station")
   -> [5]output;
                             
-  input[1] -> fromDSRtoStation::BRN2ToStations(ASSOCLIST ap/assoclist);
+  input[1] -> fromNodetoStation::BRN2ToStations(ASSOCLIST ap/assoclist);
   
-  fromDSRtoStation[0]  //For Station
+  fromNodetoStation[0]  //For Station
   -> clientwifi;
   
-  fromDSRtoStation[1]  //Broadcast
+  fromNodetoStation[1]  //Broadcast
   -> clientwifi;
   
-  fromDSRtoStation[2]  //For Unknown
+  fromNodetoStation[2]  //For Unknown
   -> Discard;
  
 } 

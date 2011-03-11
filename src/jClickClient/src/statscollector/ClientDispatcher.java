@@ -36,13 +36,19 @@ public class ClientDispatcher extends Thread {
         if (lastRead < dataDispatcher.lastUpdate) {
           lastRead = dataDispatcher.lastUpdate;
           byte[] mssg = dataDispatcher.getNewData();
+/*          System.out.print("tx: ");
+          for (int j = 0; j < mssg.length; j++) {
+            byte b = mssg[j];
+            System.out.print(b + " ");
+          }
+          System.out.println();*/
           out.write(mssg);
           //System.out.println("Send data");
           out.flush();
         } else {
           // no new data available
         }
-        sleep(100); // wait for new data to become available
+        sleep(1000); // wait for new data to become available
       } catch (Exception e) {
         //e.printStackTrace();
         System.err.println("Network error; close connection");

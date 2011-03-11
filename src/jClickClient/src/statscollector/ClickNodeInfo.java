@@ -6,10 +6,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 class ClickNodeInfo extends Thread {
+  Boolean semaphore = Boolean.TRUE;
   String nodeName;
 
   ClickConnection cc = null;
-  InetAddress ip = null;
+  public InetAddress ip = null;
   int port;
 
   StatsInfo statsInfo;
@@ -21,19 +22,41 @@ class ClickNodeInfo extends Thread {
   }
 
   public void run() {
+    boolean read_error = false;
     while (true) {
-      boolean read_error = false;
-      for( int i = 0; i < statsInfo.getSize(); i++) {
-        StatsInfo.SingleStat st = statsInfo.getByIndex(i);
-        lastValues[i] = readInfo(st.element, st.handler);
-        read_error |= lastValues[i] == null;
+      if ( read_error) cc.skipIn(10);
+
+      read_error = false;
+      synchronized(semaphore) {
+        for( int i = 0; i < statsInfo.getSize(); i++) {
+          StatsInfo.SingleStat st = statsInfo.getByIndex(i);
+          lastValues[i] = readInfo(st.element, st.handler);
+
+          if (lastValues[i] != null ) {
+            Integer value = new Integer(lastValues[i]);
+            if( ( i < 2 && value < 0 ) ||  ( i == 2 && value > 0 ) || ( i == 3 && value < 0 ) || ( i == 4 && value <= 0 ) ){
+              System.out.println("Error: Handler (" + i + "): " + st.element+ " " +  st.handler +" " + ip + " " + i + " "+ value);
+              //throw new RuntimeException();
+              lastValues[i] = null;
+            }
+          } else {
+            try {
+              sleep(100);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+            cc.skipIn(10);
+          }
+
+          read_error |= (lastValues[i] == null);
+        }
       }
 
       try {
         if ( read_error ) {
           sleep(3000);
         } else {
-          sleep(100);
+          sleep(1000);
         }
       } catch (InterruptedException e) {
         e.printStackTrace();
@@ -64,7 +87,9 @@ class ClickNodeInfo extends Thread {
   }
 
   public String[] getInfo() {
-    return lastValues;
+	synchronized(semaphore) {
+	    return lastValues;
+	}
   }
 
   private String readInfo(String element, String handler) {

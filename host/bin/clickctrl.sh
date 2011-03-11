@@ -24,6 +24,8 @@ if [ "x$VERSION" = "x" ]; then
   VERSION="c"
 fi
 
+#echo -n "$@ " >> /tmp/result.log
+
 case "$VERSION" in
   "c")
     IP=$2
@@ -35,14 +37,14 @@ case "$VERSION" in
     shift 5
 
     if [ "x$1" = "xwrite" ]; then
-	$DIR/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" &
+      $DIR/../lib/clickctrl/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" & 2> /dev/null
     else
-	$DIR/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@"
+      $DIR/../lib/clickctrl/click_ctrl $IP $PORT $ELEMENT $HANDLER "$@" 2> /dev/null
     fi
 
   ;;
   "java")
-    java -jar $DIR/JClickClient.jar $@
+    java -jar $DIR/../lib/clickctrl/JClickClient.jar $@ 2> /dev/null
   ;;
   "shell")
     #TODO: Timeout of 1 sec is used. Try to remove
@@ -52,16 +54,19 @@ case "$VERSION" in
       ELEMENT=$4
       HANDLER=$5
       shift 5
-      echo "write $ELEMENT.$HANDLER $@" | $NETCAT | sed '1,3d'
+      echo "write $ELEMENT.$HANDLER $@" | $NETCAT | sed '1,3d' 2> /dev/null
     else
       if [ "x$1" = "xread" ]; then
-        echo "read $4.$5" | $NETCAT | sed '1,3d'
+        echo "read $4.$5" | $NETCAT | sed '1,3d' 2> /dev/null
       else
-        echo "Unknown commend"
-        exit 0
+        echo "Unknown command"
+        exit 1
       fi
     fi
   ;;
 esac
 
-exit 0
+RESULT=$?
+
+#echo $RESULT >> /tmp/result.log
+exit $RESULT
