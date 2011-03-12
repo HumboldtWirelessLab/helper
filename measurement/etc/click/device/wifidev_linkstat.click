@@ -15,22 +15,37 @@
 //  1: client
 //  2: high priority stuff ( higher than linkprobes)
 
+#ifdef SIMULATION
+#define DEFAULT_LINKPROBE_PERIOD            2000
+#define DEFAULT_LINKPROBE_TAU              30000
+#define DEFAULT_LINKPROBE_PROBES         "2 500"
+#else
+#define DEFAULT_LINKPROBE_PERIOD            1000
+#define DEFAULT_LINKPROBE_TAU             100000
+#define DEFAULT_LINKPROBE_PROBES  "2 100 2 1000"
+#endif
+
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
 
   rates::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
   proberates::AvailableRates(DEFAULT 2 12 22 108);
   etx_metric :: BRN2ETXMetric($lt);
 
-  link_stat :: BRN2LinkStat(DEVICE     $device,
-#ifdef SIMULATION
-                            PERIOD        2000,
-                            TAU          30000,
-                            PROBES     "2 300",
+  link_stat :: BRN2LinkStat(DEVICE                    $device,
+#ifdef LINKPROBE_PERIOD
+                            PERIOD           LINKPROBE_PERIOD,
 #else
-                            PERIOD        1000, //1000   200
-                            TAU         100000, //100000 10000
-//                          PROBES  "2 100 4 100 11 100 12 100 22 100 18 100 24 100 36 100 48 100 72 100 96 100 108 100",
-                            PROBES  "2 100 2 1400",
+                            PERIOD   DEFAULT_LINKPROBE_PERIOD,
+#endif
+#ifdef LINKPROBE_TAU
+                            TAU                 LINKPROBE_TAU,
+#else
+                            TAU         DEFAULT_LINKPROBE_TAU,
+#endif
+#ifdef LINKPROBE_PROBES
+                            PROBES           LINKPROBE_PROBES,
+#else
+                            PROBES   DEFAULT_LINKPROBE_PROBES,
 #endif
                             RT      proberates,
                             ETX     etx_metric,
