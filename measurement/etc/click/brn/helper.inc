@@ -91,7 +91,7 @@ BRNAddressInfo(ipdev eth0:ip);
 /* USERLEVEL stuff */
 
 #ifdef USERLEVEL
-#ifdef USE_PCAP
+#ifndef NOPCAP
 #define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false, CAPTURE PCAP, ENCAP SLL) -> Strip(16)
 #define TORAWDEVICE(x) ToDevice(x, IGNOREFROMDEV true, DEBUG false)
 //#define TORAWDEVICE(x) SLLEncap(PACKETTYPE 1, HARDWARETYPE 805, PROTOCOL 25) -> ToDevice(x, DEBUG false)
