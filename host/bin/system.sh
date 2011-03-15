@@ -73,7 +73,45 @@ case "$1" in
 		    done
 
 		done
-		;;	    
+		;;
+	"nodeinfo")	
+		for node in $NODELIST; do
+		    WNDR=`run_on_node $node "cat /proc/cpuinfo | grep 'WNDR' | wc -l" "/" $DIR/../etc/keys/id_dsa | grep "WNDR" | wc -l`
+		    if [ $WNDR -gt 0 ]; then
+		      ARCH="mips-wndr3700"
+		    else
+		      ARCH=`run_on_node $node "uname -m" "/" $DIR/../etc/keys/id_dsa`
+		    fi
+		    KERNEL=`run_on_node $node "uname -r" "/" $DIR/../etc/keys/id_dsa`
+		    echo "$node $ARCH $KERNEL"
+		done
+		;;
+	"backbone")	
+		for node in $NODELIST; do
+		    if [ "$node" = "localhost" ]; then
+		      echo "$node wired"
+		    fi
+		    
+		    DEFAULT=`run_on_node $node "/sbin/route -n 2>&1 | grep '^0.0.0.0'" "/" $DIR/../etc/keys/id_dsa | awk '{print $8}'`
+		    
+		    if [ "x$DEFAULT" = "xeth0" ]; then 
+		      echo "$node wired"
+		    else
+		      echo "$node wireless"
+		    fi
+		done
+		;;
+	"olsrbackbone")	
+		for node in $NODELIST; do
+		    OLSRD=`run_on_node $node "ps | grep olsrd | grep -v grep" "/" $DIR/../etc/keys/id_dsa | wc -l`
+		    
+		    if [ "x$OLSRD" = "x0" ]; then 
+		      echo "no"
+		    else
+		      echo "yes"
+		    fi
+		done
+		;;
 	*)
 		$0 help
 		;;

@@ -381,7 +381,7 @@ done
 ###### Wait for all nodes ##########
 ####################################
 
-STATES="reboot environment wifimodules wificonfig wifiinfo clickmodule preload"
+STATES="nodeinfo reboot environment wifimodules wificonfig wifiinfo clickmodule preload"
 
 for state in  $STATES; do
   echo -n "State: $state ... " >&6
@@ -394,6 +394,23 @@ for state in  $STATES; do
   COUNT_NODES_OK=`echo $NODES_OK | wc -w`
   echo "done. Nodes: $COUNT_NODES_OK of $COUNT_NODES_ALL." >&6
 
+  if [ "x$state" = "xnodeinfo" ]; then
+    echo -n "" > status/all_wireless_nodeinfo.log
+    for node in $NODELIST; do
+      cat status/$node\_nodeinfo.log >> status/all_wireless_nodeinfo.log
+    done
+    
+    REMOTENODECOUNT=`cat status/all_wireless_nodeinfo.log | grep -v "^$" | wc -l`
+    if [ $REMOTENODECOUNT -gt 0 ]; then
+      echo "Found $REMOTENODECOUNT wireless nodes"
+      $DIR/../lib/remote/pack_files.sh pack status/all_wireless_nodeinfo.log
+      set_master_state 0 wirelesspackage
+      #TODO
+      #wait for wireless nodes
+      set_master_state 0 wirlessfinished
+    fi
+  fi
+  
   if [ "x$state" = "xenvironment" ]; then
     if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
       echo -n "State: Prestart local process ... " >&6
