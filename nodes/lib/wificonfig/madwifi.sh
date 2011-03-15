@@ -70,6 +70,10 @@ PRE_START_SLEEP=1
 
 case "$1" in
     "responsible")
+#	    ARCH=`get_arch`
+#	    if [ "$ARCH" = "mips" ]; then
+#	      exit 1
+#	    fi
 	    DEV_PREFIX=`echo $DEVICE | cut -b 1-3`
 	    if [ "x$DEV_PREFIX" = "xath" ]; then
 #	      exit 1
