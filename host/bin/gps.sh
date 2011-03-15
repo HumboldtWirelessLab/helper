@@ -131,6 +131,16 @@ gpsd_print() {
     echo "MODE: $MODE"
 }
 
+gps_calc() {
+    PR=`echo $1 | sed "s#\.# #g" | awk '{print $1}'`
+    PO=`echo $1 | sed "s#\.# #g" | awk '{print $2}'`
+    PR1=`echo $PR | cut -b 1,2`
+    PR2=`echo $PR | cut -b 3,4`
+    #       POC=`calc $PR2$PO / 6  | sed -e "s#~##g" | awk '{print $1}' | sed "s#\.##g"`
+    POC=`echo "print ($PR2$PO / 6);" | perl | sed -e "s#~##g" | awk '{print $1}' | sed "s#\.##g" | cut -b 1-6`
+    echo "$PR1.$POC"
+}
+
 
 case "$1" in
 	"help")
@@ -330,6 +340,42 @@ case "$1" in
       echo "0.0 0.0 0.0 0.0 0.0"
     else
       echo "0.0 0.0 0.0 0.0"
+    fi
+    ;;
+  "getgpsposraw")
+    HASGPS=0
+    GPSFILE=""
+    for d in /dev/ttyUSB0 /dev/ttyACM0 /dev/ttyACM1; do
+      if [ -e $d ]; then
+        GPSFILE=$d
+      fi
+    done
+
+#   echo ">$GPSFILE<"
+    if [ "x$GPSFILE" != "x" ]; then
+      GGA=`head -n 10 $GPSFILE | grep GPGGA | tail -n 1`
+      #    echo "$1"
+      LINE=`echo "$GGA" | sed -e  "s#^.*:.G#G#g" -e "s#^.*:.PG#PG#g" -e "s#^.*:G#G#g" -e "s#\*#,#g" | sed -e "s#,,#,-,#g" -e "s#,,#,-,#g" -e "s#,# #g" `
+#    echo "$LINE"
+      TIME=`echo "$LINE" | awk '{print $2}'`
+      LATITUDE=`echo "$LINE" | awk '{print $3}' | sed "s#^[0]*##g" | sed "s#^\.#0.#g"`
+      LAT=`gps_calc $LATITUDE`
+      LONGITUDE=`echo "$LINE" | awk '{print $5}' | sed "s#^[0]*##g" | sed "s#^\.#0.#g"`
+      LONG=`gps_calc $LONGITUDE`
+      HOG=`echo "$LINE" | awk '{print $10}'`
+      SATELLITES=`echo "$LINE" | awk '{print $8}' | sed "s#^[0]*##g" | sed "s#^\.#0.#g"`
+      HDOP=`echo "$LINE" | awk '{print $9}'`
+      HGM=`echo "$LINE" | awk '{print $12}'`
+    else
+      LAT=0.0
+      LONG=0.0
+      HOG=0.0
+    fi
+
+    if [ "x$GPSTIME" = "xyes" ]; then
+      echo "$LAT $LONG $HOG 0.0 0.0"
+    else
+      echo "$LAT $LONG $HOG 0.0"
     fi
     ;;
 	"help")
