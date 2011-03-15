@@ -381,7 +381,7 @@ done
 ###### Wait for all nodes ##########
 ####################################
 
-STATES="reboot environment wifimodules wificonfig wifiinfo clickmodule preload"
+STATES="nodeinfo reboot environment wifimodules wificonfig wifiinfo clickmodule preload"
 
 for state in  $STATES; do
   echo -n "State: $state ... " >&6
@@ -394,6 +394,23 @@ for state in  $STATES; do
   COUNT_NODES_OK=`echo $NODES_OK | wc -w`
   echo "done. Nodes: $COUNT_NODES_OK of $COUNT_NODES_ALL." >&6
 
+  if [ "x$state" = "xnodeinfo" ]; then
+    echo -n "" > status/all_wireless_nodeinfo.log
+    for node in $NODELIST; do
+      cat status/$node\_nodeinfo.log >> status/all_wireless_nodeinfo.log
+    done
+    
+    REMOTENODECOUNT=`cat status/all_wireless_nodeinfo.log | grep -v "^$" | wc -l`
+    if [ $REMOTENODECOUNT -gt 0 ]; then
+      echo "Found $REMOTENODECOUNT wireless nodes"
+      $DIR/../lib/remote/pack_files.sh pack status/all_wireless_nodeinfo.log
+      set_master_state 0 wirelesspackage
+      #TODO
+      #wait for wireless nodes
+      set_master_state 0 wirlessfinished
+    fi
+  fi
+  
   if [ "x$state" = "xenvironment" ]; then
     if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
       echo -n "State: Prestart local process ... " >&6
@@ -414,6 +431,7 @@ for state in  $STATES; do
 
     MSCREENNUM=1
     MEASUREMENTSCREENNAME=measurement_$MEASUREMENT_ID\_$MSCREENNUM
+
 
     CURRENTMSCREENNUM=1
 
@@ -444,6 +462,7 @@ for state in  $STATES; do
 
         if [ $CURRENTMSCREENNUM -eq 1 ]; then
           screen -d -m -S $MEASUREMENTSCREENNAME
+          sleep 0.2
         fi
 
         echo "$node $nodedevice $MEASUREMENTSCREENNAME" >> $MSCREENFILENAME
@@ -468,7 +487,9 @@ for state in  $STATES; do
 			    sleep 0.1
 			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"LOGFILE=$LOGFILE $NODEBINDIR/click.sh kclick_start\""
 			  else
+			    sleep 0.1
 			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export CLICKPATH=$NODEBINDIR/../etc/click;CLICKPATH=$NODEBINDIR/../etc/click $NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
+			    sleep 0.1
 			  fi
 		  fi
 
@@ -547,6 +568,7 @@ if [ $MEASUREMENT_ABORT -eq 0 ]; then
         screen -S $LOCALSCREENNAME -p remotedump -X stuff $'\n'
       fi
 
+      sleep 0.2
       if [ "x$LOCALPROCESS" != "x" ]; then
         #echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
         screen -S $LOCALSCREENNAME -X screen -t localprocess

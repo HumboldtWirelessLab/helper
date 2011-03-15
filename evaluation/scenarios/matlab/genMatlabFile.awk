@@ -421,6 +421,8 @@ END {
 		
 		# replace '-'
 		gsub(/-/, "", mac);
+		gsub(/\t/, "", mac);
+		gsub(/ /, "", mac);
 	
 		#our general alphabet 
 		alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; 
@@ -432,7 +434,10 @@ END {
 	
 		#convert to decimal base 
 		for (i=1;i<=length(mac);i++) { 
-		    macinint += (index(alphabet,substr(mac,i,1))-1)*(ibase^(length(mac)-i)); 
+			val = (index(alphabet,substr(mac,i,1))-1);
+			if (val>=0){
+				macinint += (index(alphabet,substr(mac,i,1))-1)*(ibase^(length(mac)-i));
+		        }
 		} 
 		return macinint;
 	

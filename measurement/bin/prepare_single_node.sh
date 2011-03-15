@@ -227,7 +227,7 @@ echo "$NODELIST" > status/$LOGMARKER\_reboot.log 2>&1
 echo "check node $NODELIST" >> status/$LOGMARKER\_reboot.log
 NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodes >> status/$LOGMARKER\_reboot.log 2>&1
 
-# Chack state of node: reboot requiered ??
+# Check state of node: reboot requiered ??
 
 if [ $RUNMODENUM -eq 0 ]; then
     CRUNMODENUM=0
@@ -240,6 +240,36 @@ if [ $RUNMODENUM -eq 0 ]; then
 	    RUNMODENUM=5
     fi
 fi
+
+
+###############################
+###### get node info ##########
+###############################
+
+MODE=`NODELIST="$NODELIST" $DIR/../../host/bin/system.sh backbone`
+
+if [ "x$MODE" = "xwireless" ]; then
+  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh nodeinfo > status/$LOGMARKER\_nodeinfo.log 2>&1
+  OLSR="no"
+else
+  echo -n "" > status/$LOGMARKER\_nodeinfo.log 2>&1
+  OLSR=`NODELIST="$NODELIST" $DIR/../../host/bin/system.sh olsrbackbone`
+fi
+
+echo "0" > status/$LOGMARKER\_nodeinfo.state
+
+#####################################
+## Wireless nodes wait for package ##
+#####################################
+
+if [ "x$MODE" = "xwireless" ]; then
+  wait_for_master_state wirelesspackage $LOGMARKER
+  exit 0
+else
+  if [ "x$OLSR" = "xyes" ]; then
+    wait_for_master_state wirlessfinished $LOGMARKER
+  fi
+fi    
 
 ###############################################
 ###### Reboot node and wait for them ##########
