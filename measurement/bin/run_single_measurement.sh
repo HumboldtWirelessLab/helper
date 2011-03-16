@@ -395,11 +395,14 @@ for state in  $STATES; do
   echo "done. Nodes: $COUNT_NODES_OK of $COUNT_NODES_ALL." >&6
 
   if [ "x$state" = "xnodeinfo" ]; then
-    echo -n "" > status/all_wireless_nodeinfo.log
+    echo -n "" > status/all_wireless_nodeinfo.log.tmp
+    echo -n "" > status/all_wireless_nodes.log
     for node in $NODELIST; do
-      cat status/$node\_nodeinfo.log >> status/all_wireless_nodeinfo.log
+      cat status/$node\_nodeinfo.log | awk '{print $2" "$3}' >> status/all_wireless_nodeinfo.log.tmp
+      cat status/$node\_nodeinfo.log >> status/all_wireless_nodes.log
     done
-    
+    cat status/all_wireless_nodeinfo.log.tmp | sort -u > status/all_wireless_nodeinfo.log
+
     REMOTENODECOUNT=`cat status/all_wireless_nodeinfo.log | grep -v "^$" | wc -l`
     if [ $REMOTENODECOUNT -gt 0 ]; then
       echo "Found $REMOTENODECOUNT wireless nodes"

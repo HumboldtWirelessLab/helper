@@ -5,3 +5,5 @@ nodes/home
 *.ipr
 src/jClickClient/classes/*
 *.class
+nodes/bin/click-*
+nodes/bin/sync_gateway-*
