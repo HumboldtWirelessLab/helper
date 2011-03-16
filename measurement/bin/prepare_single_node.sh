@@ -246,7 +246,7 @@ fi
 ###### get node info ##########
 ###############################
 
-MODE=`NODELIST="$NODELIST" $DIR/../../host/bin/system.sh backbone`
+MODE=`NODELIST="$NODELIST" $DIR/../../host/bin/system.sh backbone | awk '{print $2}'`
 
 if [ "x$MODE" = "xwireless" ]; then
   NODELIST="$NODELIST" $DIR/../../host/bin/system.sh nodeinfo > status/$LOGMARKER\_nodeinfo.log 2>&1
@@ -264,12 +264,21 @@ echo "0" > status/$LOGMARKER\_nodeinfo.state
 
 if [ "x$MODE" = "xwireless" ]; then
   wait_for_master_state wirelesspackage $LOGMARKER
+  echo "0" > status/$LOGMARKER\_reboot.state
+  echo "0" > status/$LOGMARKER\_environment.state
+  echo "0" > status/$LOGMARKER\_wifimodules.state
+  echo "0" > status/$LOGMARKER\_wificonfig.state
+  echo "0" > status/$LOGMARKER\_wifiinfo.state
+  echo "0" > status/$LOGMARKER\_clickmodule.state
+  echo "0" > status/$LOGMARKER\_preload.state
+  echo "0" > status/$LOGMARKER\_killclick.state
+  echo "0" > status/$LOGMARKER\_finalnodecheck.state
   exit 0
 else
   if [ "x$OLSR" = "xyes" ]; then
     wait_for_master_state wirlessfinished $LOGMARKER
   fi
-fi    
+fi
 
 ###############################################
 ###### Reboot node and wait for them ##########
@@ -490,7 +499,7 @@ if [ $LOADCLICKMOD -eq 1 ]; then
 fi
 
 echo "0" > status/$LOGMARKER\_clickmodule.state
-  
+
 ########################################################
 ###### Preload Click-, Log- & Application-Stuff ########
 ########################################################
