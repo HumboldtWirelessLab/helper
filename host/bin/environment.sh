@@ -43,11 +43,17 @@ case "$1" in
 		    fi
 
 		    if [ ! "x$NFSHOME" = "x" ]; then
-			run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa
-			if [ "x$NFSOPTIONS" = "x" ]; then
-			  NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
+			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa`
+			if [ "x$ALREADY_MOUNTED" != "x0" ] ; then
+
+			    if [ "x$NFSOPTIONS" = "x" ]; then
+				NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
+			    fi
+			    run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			    run_on_node $node "mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			else
+			  echo "$NFSHOME already mounted"
 			fi
-			run_on_node $node "mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME" "/" $DIR/../etc/keys/id_dsa
 		    else
 			echo "NFSHOME not set, so no mount."
 		    fi
@@ -69,17 +75,59 @@ case "$1" in
 		    echo "$EXTRANFS;$EXTRANFSTARGET;$EXTRANFSSERVER"
 
 		    if [ ! "x$EXTRANFS" = "x" ] && [ ! "x$EXTRANFSTARGET" = "x" ] &&  [ ! "x$EXTRANFSSERVER" = "x" ]; then
-			run_on_node $node "mkdir -p $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
+		     
+		    	ALREADY_MOUNTED=`run_on_node $node "mount | grep $EXTRANFS | wc -l" "/" $DIR/../etc/keys/id_dsa`
+			if [ "x$ALREADY_MOUNTED" != "x0" ] ; then
 
-			if [ "x$NFSOPTIONS" = "x" ]; then
-			  NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
+			    if [ "x$NFSOPTIONS" = "x" ]; then
+				NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
+			    fi
+			    run_on_node $node "mkdir -p $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
+			    run_on_node $node "mount -t nfs -o $NFSOPTIONS $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
+			else
+			    echo "$EXTRANFS already mounted"
 			fi
-			run_on_node $node "mount -t nfs -o $NFSOPTIONS $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
 		    else
 			echo "NFSHOME not set, so no mount."
 		    fi
 		done
 		;;
+	"mounttmpfs")
+		for node in $NODELIST; do
+		    echo "$node"
+
+		    ENVIRONMENTFILE=`cat $DIR/../../nodes/etc/environment/nodesenvironment.conf | grep "^$node" | awk '{print $2}'`
+		    if [ -f $DIR/../../nodes/etc/environment/$ENVIRONMENTFILE ]; then
+			. $DIR/../../nodes/etc/environment/$ENVIRONMENTFILE
+		    fi
+
+		    if [ "x$NFSOPTIONS" = "x" ]; then
+			. $DIR/../../nodes/etc/environment/default.env
+		    fi
+
+		    if [ ! "x$NFSHOME" = "x" ]; then
+			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa`
+			if [ "x$ALREADY_MOUNTED" != "x0" ] ; then
+			  run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			  run_on_node $node "mount -t tmpfs none $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			else
+			  echo "$NFSHOME already mounted"
+			fi
+		    else
+			echo "TMPHOME not set, so no mount."
+		    fi
+		done
+		;;
+	"scp_remote")
+		for node in $NODELIST; do
+		    echo "$node"
+		    scp -i $DIR/../etc/keys/id_dsa $FILE $TARGETDIR 
+		done
+		;;
+	"unpack_remote")
+		FILENAME=`basename $FILE`
+		run_on_node $node "bzcat $TAGETDIR/$FILENAME | tar xvf -" "/" $DIR/../etc/keys/id_dsa
+		;;		
 	"watchdogstart")
 		for node in $NODELIST; do
 		    echo "$node"
