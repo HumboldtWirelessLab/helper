@@ -44,7 +44,7 @@ case "$1" in
 
 		    if [ ! "x$NFSHOME" = "x" ]; then
 			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa`
-			if [ "x$ALREADY_MOUNTED" != "x0" ] ; then
+			if [ "x$ALREADY_MOUNTED" = "x0" ] ; then
 
 			    if [ "x$NFSOPTIONS" = "x" ]; then
 				NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
