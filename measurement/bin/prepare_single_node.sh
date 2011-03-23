@@ -270,15 +270,20 @@ if [ "x$MODE" = "xwireless" ]; then
   #Don't reboot. just set set marker
   echo "0" > status/$LOGMARKER\_reboot.state
   echo "Handle wireless node" > status/$LOGMARKER\_environment.log 2>&1
-  echo "mount tmpfs"
+  echo "mount tmpfs"  >> status/$LOGMARKER\_environment.log 2>&1
   NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mounttmpfs >> status/$LOGMARKER\_environment.log 2>&1
-  
+
   #TODO: get name from elsewhere
-  FILENAME="status/pack_file.tar.bz2" 
-  
+  FILENAME="pack_file.tar.bz2" 
+
+  echo "copy"  >> status/$LOGMARKER\_environment.log 2>&1
   FILE="$FILENAME" TARGETDIR=/tmp NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh scp_remote >> status/$LOGMARKER\_environment.log 2>&1
+  echo "unpack"  >> status/$LOGMARKER\_environment.log 2>&1
   FILE="$FILENAME" TARGETDIR=/tmp NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh unpack_remote >> status/$LOGMARKER\_environment.log 2>&1
   echo "0" > status/$LOGMARKER\_environment.state
+  echo "0" > status/$LOGMARKER\_wirelesspackage.state
+
+  wait_for_master_state wirelessstart $LOGMARKER
 
   for node in $NODELIST; do
 
@@ -288,17 +293,21 @@ if [ "x$MODE" = "xwireless" ]; then
     NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
     for device in $NODEDEVICELIST; do
-      run_on_node $node "RUNMODE=DRIVER MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$device" "$DIR/../../nodes/lib/standalone/standalone.sh setup" $DIR/../etc/keys/id_dsa
+      run_on_node $node "RUNMODE=DRIVER MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$device $DIR/../../nodes/lib/standalone/standalone.sh setup" "/" $DIR/../etc/keys/id_dsa
     done
 
   done
-  
+
+  sleep 50
+
+  echo "0" > status/$LOGMARKER\_wirelessfinished.state
+
   echo "0" > status/$LOGMARKER\_wifimodules.state
   echo "0" > status/$LOGMARKER\_wificonfig.state
   echo "0" > status/$LOGMARKER\_wifiinfo.state
   echo "0" > status/$LOGMARKER\_clickmodule.state
   echo "0" > status/$LOGMARKER\_preload.state
-  
+
   echo "0" > status/$LOGMARKER\_killclick.state
   echo "0" > status/$LOGMARKER\_finalnodecheck.state
   exit 0

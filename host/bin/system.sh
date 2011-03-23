@@ -91,9 +91,9 @@ case "$1" in
 		    if [ "$node" = "localhost" ]; then
 		      echo "$node wired"
 		    fi
-		    
-		    DEFAULT=`run_on_node $node "/sbin/route -n 2>&1 | grep '^0.0.0.0'" "/" $DIR/../etc/keys/id_dsa | awk '{print $8}'`
-		    
+
+		    DEFAULT=`run_on_node $node "/sbin/route -n 2>&1 | grep '^0.0.0.0' | grep '192.168.3'" "/" $DIR/../etc/keys/id_dsa | awk '{print $8}'`
+
 		    if [ "x$DEFAULT" = "xeth0" ]; then 
 		      echo "$node wired"
 		    else

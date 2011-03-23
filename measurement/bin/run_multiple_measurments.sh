@@ -74,18 +74,18 @@ while [ "x$key" = "xy" ]; do
       fi
 
       NEXT=`expr $HIGHESTDIR + 1`
-      
+
       if [ $SIMULATION -eq 0 ]; then
         RUNMODE=$RUNMODE $DIR/run_measurement.sh $DISFILE $NEXT
         RUNMODE=$MULTIRUNMODE
       else
-      	$DIR/../../simulation/bin/ns2-sim.sh run $DISFILE $NEXT
+        $DIR/../../simulation/bin/ns2-sim.sh run $DISFILE $NEXT
       fi
-      
+
       if [ "$MULTIREPEAT" = "ASK" ]; then
         echo -n "Another Measurement (y/n) ? "
         read key
-      else   
+      else
         if [ $RUNNUMBER -eq $MULTIREPEAT ]; then
           key=n
         fi
