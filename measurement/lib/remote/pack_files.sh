@@ -116,7 +116,7 @@ case "$1" in
 	
 	(cd $PACK_BASEDIR/; tar cfvj ../$PACK_FILE *) > $PACK_LOG 2>&1
 	cp $PACK_BASEDIR/../$PACK_FILE .
-	#rm -rf $PACK_DIR
+	rm -rf $PACK_DIR
 
         ;;
     *)
