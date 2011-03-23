@@ -404,18 +404,30 @@ for state in  $STATES; do
     done
     cat status/all_wireless_nodeinfo.log.tmp | sort -u > status/all_wireless_nodeinfo.log
 
-    REMOTENODECOUNT=`cat status/all_wireless_nodeinfo.log | grep -v "^$" | wc -l`
+    REMOTENODECOUNT=`cat status/all_wireless_nodes.log | grep -v "^$" | wc -l`
     if [ $REMOTENODECOUNT -gt 0 ]; then
-      echo "Found $REMOTENODECOUNT wireless nodes"
-      $DIR/../lib/remote/pack_files.sh pack status/all_wireless_nodeinfo.log
+      WIRELESSNODELIST=`cat status/all_wireless_nodes.log | awk '{print $1}'`
+      echo "Found $REMOTENODECOUNT wireless nodes." >&6
+      echo "Found $REMOTENODECOUNT wireless nodes: $WIRELESSNODELIST"
+      echo "Pack files for wireless nodes." >&6
+      $DIR/../lib/remote/pack_files.sh pack status/all_wireless_nodeinfo.log status/all_wireless_nodes.log $CONFIGFILE
+      echo "finished pack. Set state to continue node setup"
+
+      echo -n "Unpack files on wireless nodes ... " >&6
       set_master_state 0 wirelesspackage
-      #TODO
+      SYNCSTATE=`wait_for_nodes "$WIRELESSNODELIST" _wirelesspackage.state`
+      echo "done." >&6
+
+      echo -n "Start wireless nodes ... " >&6
+      set_master_state 0 wirelessstart
+      SYNCSTATE=`wait_for_nodes "$WIRELESSNODELIST" _wirelessfinished.state`
+      echo "done." >&6
       #wait for wireless nodes
       set_master_state 0 wirlessfinished
     fi
   fi
   #end nodeinfostate
-  
+
   if [ "x$state" = "xenvironment" ]; then
     if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
       echo -n "State: Prestart local process ... " >&6

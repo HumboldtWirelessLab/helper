@@ -107,7 +107,7 @@ case "$1" in
 
 		    if [ ! "x$NFSHOME" = "x" ]; then
 			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa`
-			if [ "x$ALREADY_MOUNTED" != "x0" ] ; then
+			if [ "x$ALREADY_MOUNTED" = "x0" ] ; then
 			  run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa
 			  run_on_node $node "mount -t tmpfs none $NFSHOME" "/" $DIR/../etc/keys/id_dsa
 			else
@@ -121,12 +121,16 @@ case "$1" in
 	"scp_remote")
 		for node in $NODELIST; do
 		    echo "$node"
-		    scp -i $DIR/../etc/keys/id_dsa $FILE $TARGETDIR 
+		    echo "scp -i $DIR/../etc/keys/id_dsa $FILE root@$node:$TARGETDIR"
+		    scp -i $DIR/../etc/keys/id_dsa $FILE root@$node:$TARGETDIR
 		done
 		;;
 	"unpack_remote")
-		FILENAME=`basename $FILE`
-		run_on_node $node "bzcat $TAGETDIR/$FILENAME | tar xvf -" "/" $DIR/../etc/keys/id_dsa
+		for node in $NODELIST; do
+		    FILENAME=`basename $FILE`
+		    echo "bzcat $TARGETDIR/$FILENAME | tar xvf -"
+		    run_on_node $node "export PATH=\$PATH:/bin:/sbin/:/usr/bin:/usr/sbin; bzcat $TARGETDIR/$FILENAME | tar xvf -" "/" $DIR/../etc/keys/id_dsa
+		done
 		;;		
 	"watchdogstart")
 		for node in $NODELIST; do

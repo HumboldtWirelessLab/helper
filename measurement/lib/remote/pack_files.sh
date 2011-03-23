@@ -88,17 +88,21 @@ case "$1" in
 	      cp -r $BASEDIR/nodes/lib/modules/$a/$m $PACK_DIR/nodes/lib/modules/$a/
 	    done
 	done
-	
+
+	mkdir -p $PACK_DIR/measurement/bin/
+
 	if [ "x$3" != "x" ] & [ "x$4" != "x" ]; then
 
 #	    echo "pack files"
-	    mkdir -p $PACK_DIR/measurement/bin/
 
 	    NODES=`cat $3 | awk '{print $1}'`
 
+	    echo "nodes $NODES"
 	    for n in $NODES; do
 		WIFIFILE=`cat $4 | grep $n | awk '{print $5}'`
+		echo "$WIFIFILE"
 		CLICKFILE=`cat $4 | grep $n | awk '{print $7}'`
+		echo "$CLICKFILE"
 #		echo "$n $WIFIFILE $CLICKFILE"
 
 		NEXT_BASEDIR=`dirname $WIFIFILE`
@@ -110,7 +114,7 @@ case "$1" in
 		cp $CLICKFILE $PACK_BASEDIR/$CLICKFILE
 	    done
 
-	    rm -rf $PACK_DIR/measurement/
+	    #rm -rf $PACK_DIR/measurement/
 	fi
 
 	

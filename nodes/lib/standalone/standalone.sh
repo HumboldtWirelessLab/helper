@@ -34,7 +34,7 @@ case "$1" in
     "driver")
       /etc/rc.d/S42olsr_or_brn stop >> /tmp/seismo_brn.log 2>&1
       /sbin/ifconfig ath1 down >> /tmp/seismo_brn.log 2>&1
-      CONFIG=$DIR/../../etc/seismo/monitor.b.channel DEVICE="ath0" $DIR/../../bin/wlandevice.sh delete >> /tmp/seismo_brn.log 2>&1
+      CONFIG=$CONFIG DEVICE=$DEVICE $DIR/../../bin/wlandevice.sh delete >> /tmp/seismo_brn.log 2>&1
       sleep 1
       MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../bin/wlanmodules.sh uninstall >> /tmp/seismo_brn.log 2>&1
       sleep 1
@@ -43,40 +43,48 @@ case "$1" in
       /etc/rc.d/S42olsr_or_brn start >> /tmp/seismo_brn.log 2>&1
             ;;
     "brndev")
-      CONFIG=$DIR/../../etc/seismo/monitor.b.channel DEVICE="ath0" $DIR/../../bin/wlandevice.sh delete >> /tmp/seismo_brn.log 2>&1
-      CONFIG=$DIR/../../etc/seismo/monitor.b.channel DEVICE="ath0" $DIR/../../bin/wlandevice.sh create >> /tmp/seismo_brn.log 2>&1
-      CONFIG=$DIR/../../etc/seismo/monitor.b.channel DEVICE="ath0" $DIR/../../bin/wlandevice.sh config_pre_start >> /tmp/seismo_brn.log 2>&1
-      CONFIG=$DIR/../../etc/seismo/monitor.b.channel DEVICE="ath0" $DIR/../../bin/wlandevice.sh start  >> /tmp/seismo_brn.log 2>&1
-      CONFIG=$DIR/../../etc/seismo/monitor.b.channel DEVICE="ath0" $DIR/../../bin/wlandevice.sh config_post_start >> /tmp/seismo_brn.log 2>&1
+      CONFIG=$CONFIG DEVICE=$DEVICE $DIR/../../bin/wlandevice.sh delete >> /tmp/seismo_brn.log 2>&1
+      CONFIG=$CONFIG DEVICE=$DEVICE $DIR/../../bin/wlandevice.sh create >> /tmp/seismo_brn.log 2>&1
+      CONFIG=$CONFIG DEVICE=$DEVICE $DIR/../../bin/wlandevice.sh config_pre_start >> /tmp/seismo_brn.log 2>&1
+      CONFIG=$CONFIG DEVICE=$DEVICE $DIR/../../bin/wlandevice.sh start  >> /tmp/seismo_brn.log 2>&1
+      CONFIG=$CONFIG DEVICE=$DEVICE $DIR/../../bin/wlandevice.sh config_post_start >> /tmp/seismo_brn.log 2>&1
       ;;
     "click_start")
       ARCH=`$DIR/../../bin/system.sh get_arch`
-      ($DIR/../../bin/click-align-$ARCH $CLICKFILE 2> /dev/null | $DIR/../../bin/click >> /tmp/seismo_brn.log 2>&1 ) &
+      ($DIR/../../bin/click-align-$ARCH $CLICKFILE 2> /dev/null | $DIR/../../bin/click-$ARCH >> /tmp/seismo_brn.log 2>&1 ) &
       sleep 5
       ;;
     "click_stop")
+      ARCH=`$DIR/../../bin/system.sh get_arch`
       killall click > /dev/null 2>&1
+      killall click-$ARCH > /dev/null 2>&1
       ;;
     "setup")
       RUNMODE=$RUNMODE MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$DEVICE $0 delaysetup &
       ;;
     "delaysetup")
-       sleep 30
-       $0 checker &
-       
-       if [ "x$RUNMODE" = "xDRIVER"  ]; then
-         $0 driver
-         sleep 1
-       fi
-       
-       $0 brndev
        sleep 1
-       
+       $0 checker &
+
+       $0 click_stop &
+
+       if [ "x$RUNMODE" = "xDRIVER"  ]; then
+         if [ ! -f /tmp/brn_driver ]; then
+            #TODO better check for existing driver (version,...)
+            RUNMODE=$RUNMODE MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$DEVICE $0 driver
+            touch /tmp/brn_driver
+            sleep 1
+         fi
+       fi
+
+       RUNMODE=$RUNMODE MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$DEVICE $0 brndev
+       sleep 1
+
        ;;
     "checker")
        sleep 60
-       DEVICE_EX=`/sbin/ifconfig ath0 2> /dev/null | grep ath0 | wc -l`
-       
+       DEVICE_EX=`/sbin/ifconfig ath1 2> /dev/null | grep ath1 | wc -l`
+
        if [ $DEVICE_EX -eq 0 ]; then
          reboot
        else
