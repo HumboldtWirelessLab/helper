@@ -263,14 +263,42 @@ echo "0" > status/$LOGMARKER\_nodeinfo.state
 #####################################
 
 if [ "x$MODE" = "xwireless" ]; then
+   #wait for package (build by master)
   wait_for_master_state wirelesspackage $LOGMARKER
+  #package is ready. let's go
+
+  #Don't reboot. just set set marker
   echo "0" > status/$LOGMARKER\_reboot.state
+  echo "Handle wireless node" > status/$LOGMARKER\_environment.log 2>&1
+  echo "mount tmpfs"
+  NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mounttmpfs >> status/$LOGMARKER\_environment.log 2>&1
+  
+  #TODO: get name from elsewhere
+  FILENAME="status/pack_file.tar.bz2" 
+  
+  FILE="$FILENAME" TARGETDIR=/tmp NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh scp_remote >> status/$LOGMARKER\_environment.log 2>&1
+  FILE="$FILENAME" TARGETDIR=/tmp NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh unpack_remote >> status/$LOGMARKER\_environment.log 2>&1
   echo "0" > status/$LOGMARKER\_environment.state
+
+  for node in $NODELIST; do
+
+    MODULSDIR=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $3}' | tail -n 1`
+    MODOPTIONS=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $4}' | tail -n 1`
+    CONFIG=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $5}' | tail -n 1`
+    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+
+    for device in $NODEDEVICELIST; do
+      run_on_node $node "RUNMODE=DRIVER MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$device" "$DIR/../../nodes/lib/standalone/standalone.sh setup" $DIR/../etc/keys/id_dsa
+    done
+
+  done
+  
   echo "0" > status/$LOGMARKER\_wifimodules.state
   echo "0" > status/$LOGMARKER\_wificonfig.state
   echo "0" > status/$LOGMARKER\_wifiinfo.state
   echo "0" > status/$LOGMARKER\_clickmodule.state
   echo "0" > status/$LOGMARKER\_preload.state
+  
   echo "0" > status/$LOGMARKER\_killclick.state
   echo "0" > status/$LOGMARKER\_finalnodecheck.state
   exit 0
@@ -535,7 +563,7 @@ for node in $NODELIST; do
 
   if [ "x$LOADCLICK" = "x1" ]; then
     echo "Click preload on $node" >> status/$LOGMARKER\_preload.log
-#    run_on_node $node "export CLICKPATH=$NODEBINDIR/../etc/click;echo \"Script(wait 0,stop);\" | $NODEBINDIR/click-align-$NODEARCH | $NODEBINDIR/click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
+    run_on_node $node "export CLICKPATH=$NODEBINDIR/../etc/click;echo \"Script(wait 0,stop);\" | $NODEBINDIR/click-align-$NODEARCH | $NODEBINDIR/click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
   fi
 done
 

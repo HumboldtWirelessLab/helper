@@ -394,6 +394,7 @@ for state in  $STATES; do
   COUNT_NODES_OK=`echo $NODES_OK | wc -w`
   echo "done. Nodes: $COUNT_NODES_OK of $COUNT_NODES_ALL." >&6
 
+  #nodeinfostate: this includes setup wireless nodes
   if [ "x$state" = "xnodeinfo" ]; then
     echo -n "" > status/all_wireless_nodeinfo.log.tmp
     echo -n "" > status/all_wireless_nodes.log
@@ -413,6 +414,7 @@ for state in  $STATES; do
       set_master_state 0 wirlessfinished
     fi
   fi
+  #end nodeinfostate
   
   if [ "x$state" = "xenvironment" ]; then
     if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
