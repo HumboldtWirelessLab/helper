@@ -41,7 +41,7 @@ case "$1" in
       MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../bin/wlanmodules.sh install >> /tmp/seismo_brn.log 2>&1
       sleep 10
       /etc/rc.d/S42olsr_or_brn start >> /tmp/seismo_brn.log 2>&1
-            ;;
+      ;;
     "brndev")
       CONFIG=$CONFIG DEVICE=$DEVICE $DIR/../../bin/wlandevice.sh delete >> /tmp/seismo_brn.log 2>&1
       CONFIG=$CONFIG DEVICE=$DEVICE $DIR/../../bin/wlandevice.sh create >> /tmp/seismo_brn.log 2>&1
@@ -60,10 +60,10 @@ case "$1" in
       killall click-$ARCH > /dev/null 2>&1
       ;;
     "setup")
-      RUNMODE=$RUNMODE MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$DEVICE $0 delaysetup &
+      CLICKFILE=$CLICKFILE RUNMODE=$RUNMODE MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$DEVICE $0 delaysetup &
       ;;
     "delaysetup")
-       sleep 1
+       sleep 20
        $0 checker &
 
        $0 click_stop &
@@ -79,22 +79,38 @@ case "$1" in
 
        RUNMODE=$RUNMODE MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$DEVICE $0 brndev
        sleep 1
-
-       ;;
-    "checker")
-       sleep 60
-       DEVICE_EX=`/sbin/ifconfig ath1 2> /dev/null | grep ath1 | wc -l`
-
-       if [ $DEVICE_EX -eq 0 ]; then
-         reboot
-       else
-	 ROUTE_EX=`/sbin/route -n | grep "10." | wc -l`
-	 
-	 if [ $ROUTE_EX -eq 0 ]; then
-	   reboot
-	 fi
+       
+       if [ "x$CLICKFILE" != "x" ]; then
+         CLICKFILE=$CLICKFILE $0 start_click
        fi
        ;;
+    "checker")
+        sleep 60
+        DEVICE_EX=`/sbin/ifconfig ath1 2> /dev/null | grep ath1 | wc -l`
+
+        if [ $DEVICE_EX -eq 0 ]; then
+          reboot
+        else
+          ROUTE_EX=`/sbin/route -n | grep "10." | wc -l`
+
+          if [ $ROUTE_EX -eq 0 ]; then
+           reboot
+          fi
+        fi
+        ;;
+    "seismo")
+        MODULSDIR=$DIR/../modules/i586/2.6.32.25
+        MODOPTIONS=$DIR/../../etc/madwifi/modoptions.japan
+        CLICKFILE=$DIR/../../etc/seismo/testbed_long_run.click.seismo
+        CONFIG=$DIR/../../etc/seismo/monitor.b.channel
+    	  
+    	  if [ "x$DRIVERSETUP" = "xyes" ]; then
+    	    rm -f /tmp/brn_driver
+    	    RUNMODE=DRIVER
+        fi
+
+        CLICKFILE=$CLICKFILE CONFIG=$CONFIG DEVICE="ath0" RUNMODE=$RUNMODE MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS $0 setup
+        ;;
     *)
         echo "unknown options"
         ;;
