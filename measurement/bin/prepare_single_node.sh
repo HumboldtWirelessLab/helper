@@ -263,12 +263,16 @@ echo "0" > status/$LOGMARKER\_nodeinfo.state
 #####################################
 
 if [ "x$MODE" = "xwireless" ]; then
-   #wait for package (build by master)
+  #wait for package (build by master)
   wait_for_master_state wirelesspackage $LOGMARKER
+  
   #package is ready. let's go
 
+  ############### reboot ###############
   #Don't reboot. just set set marker
   echo "0" > status/$LOGMARKER\_reboot.state
+  
+  ############# environment ###############
   echo "Handle wireless node" > status/$LOGMARKER\_environment.log 2>&1
   echo "mount tmpfs"  >> status/$LOGMARKER\_environment.log 2>&1
   NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mounttmpfs >> status/$LOGMARKER\_environment.log 2>&1
@@ -283,6 +287,8 @@ if [ "x$MODE" = "xwireless" ]; then
   echo "0" > status/$LOGMARKER\_environment.state
   echo "0" > status/$LOGMARKER\_wirelesspackage.state
 
+
+  ############# wireless  ###############
   wait_for_master_state wirelessstart $LOGMARKER
 
   for node in $NODELIST; do
@@ -298,19 +304,17 @@ if [ "x$MODE" = "xwireless" ]; then
 
   done
 
-  sleep 50
+  sleep 40
 
   echo "0" > status/$LOGMARKER\_wirelessfinished.state
-
   echo "0" > status/$LOGMARKER\_wifimodules.state
   echo "0" > status/$LOGMARKER\_wificonfig.state
-  echo "0" > status/$LOGMARKER\_wifiinfo.state
-  echo "0" > status/$LOGMARKER\_clickmodule.state
-  echo "0" > status/$LOGMARKER\_preload.state
 
-  echo "0" > status/$LOGMARKER\_killclick.state
-  echo "0" > status/$LOGMARKER\_finalnodecheck.state
-  exit 0
+  #set 
+  RUNMODENUM=5
+  
+  ############ finished wireless ###########
+
 else
   if [ "x$OLSR" = "xyes" ]; then
     wait_for_master_state wirlessfinished $LOGMARKER
@@ -490,7 +494,7 @@ CRUNMODENUM=5
 
 if [ $RUNMODENUM -le 5 ]; then
 
-  echo "Get Wifiinfo" >> status/$LOGMARKER\_wifiinfo.log 2>&1
+  echo "Get Wifiinfo" > status/$LOGMARKER\_wifiinfo.log 2>&1
 
   for node in $NODELIST; do
     NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
@@ -521,19 +525,24 @@ CRUNMODENUM=6
 CURRENTMODE="LOAD CLICKMOD" > status/$LOGMARKER\_clickmodule.log 2>&1
 LOADCLICKMOD=0
 
-for node in $NODELIST; do
+if [ "x$MODE" != "xwireless" ]; then
 
-  CLICKMODDIR=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $6}' | tail -n 1`
+  for node in $NODELIST; do
 
-  if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
-    NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh reloadmod >> status/$LOGMARKER\_clickmodule.log 2>&1
-    LOADCLICKMOD=1
+    CLICKMODDIR=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $6}' | tail -n 1`
+
+    if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
+      NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh reloadmod >> status/$LOGMARKER\_clickmodule.log 2>&1
+      LOADCLICKMOD=1
+    fi
+  done
+
+  if [ $LOADCLICKMOD -eq 1 ]; then
+    check_nodes status/$LOGMARKER\_clickmodule.state >> status/$LOGMARKER\_clickmodule.log 2>&1
   fi
-done
 
-if [ $LOADCLICKMOD -eq 1 ]; then
-  check_nodes status/$LOGMARKER\_clickmodule.state >> status/$LOGMARKER\_clickmodule.log 2>&1
 fi
+#wireless node will load the module earlier
 
 echo "0" > status/$LOGMARKER\_clickmodule.state
 
@@ -545,36 +554,38 @@ CRUNMODENUM=7
 NODEBINDIR="$DIR/../../nodes/bin"
 CURRENTMODE="PRELOAD CLICK"
 
-for node in $NODELIST; do
-  NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-  NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
+if [ "x$MODE" != "xwireless" ]; then
+  for node in $NODELIST; do
+    NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+    NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
 
-  LOADCLICK=0
-  for nodedevice in $NODEDEVICELIST; do
-    CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
+    LOADCLICK=0
+    for nodedevice in $NODEDEVICELIST; do
+      CONFIGLINE=`cat $CONFIGFILE | egrep "^$node[[:space:]]+$nodedevice"`
 
-    CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
-    CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
-    LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
+      CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
+      CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
+      LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
 
-    if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-      LOADCLICK=1
-    fi
+      if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
+        LOADCLICK=1
+      fi
 
-    APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
-    APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $10}'`
+      APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
+      APPLOGFILE=`echo "$CONFIGLINE" | awk '{print $10}'`
 
-    if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-      echo "Application preload on $node" >> status/$LOGMARKER\_preload.log
-      run_on_node $node "cat $APPLICATION > /dev/null" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
+      if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
+        echo "Application preload on $node" >> status/$LOGMARKER\_preload.log
+        run_on_node $node "cat $APPLICATION > /dev/null" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
+      fi
+    done
+
+    if [ "x$LOADCLICK" = "x1" ]; then
+      echo "Click preload on $node" >> status/$LOGMARKER\_preload.log
+      run_on_node $node "export CLICKPATH=$NODEBINDIR/../etc/click;echo \"Script(wait 0,stop);\" | $NODEBINDIR/click-align-$NODEARCH | $NODEBINDIR/click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
     fi
   done
-
-  if [ "x$LOADCLICK" = "x1" ]; then
-    echo "Click preload on $node" >> status/$LOGMARKER\_preload.log
-    run_on_node $node "export CLICKPATH=$NODEBINDIR/../etc/click;echo \"Script(wait 0,stop);\" | $NODEBINDIR/click-align-$NODEARCH | $NODEBINDIR/click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
-  fi
-done
+fi
 
 echo "0" > status/$LOGMARKER\_preload.state
 
