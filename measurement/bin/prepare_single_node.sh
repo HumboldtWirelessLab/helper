@@ -492,6 +492,7 @@ echo "0" > status/$LOGMARKER\_wificonfig.state
 
 if [ "x$MODE" = "xwireless" ]; then
   #wait for own node. maybe link to wireless node is broken due to setup a gateway node
+  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodesandssh > status/$LOGMARKER\_wireless_node_test.log 2>&1
   check_nodes status/$LOGMARKER\_wireless_node.state >> status/$LOGMARKER\_wireless_node_test.log 2>&1
 fi
 
@@ -599,6 +600,7 @@ fi
 if [ "x$MODE" = "xwireless" ]; then
   #wait for own node. maybe link to wireless node is broken due to setup a gateway node
   #check here again, since next step is starting the measurement
+  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodesandssh > status/$LOGMARKER\_wireless_node_test_2.log 2>&1
   check_nodes status/$LOGMARKER\_wireless_node.state >> status/$LOGMARKER\_wireless_node_test_2.log 2>&1
 fi
 
