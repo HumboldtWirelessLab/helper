@@ -61,14 +61,21 @@ public class GeoParser {
 
   public static void main(String[] args) {
 
-    if (args.length != 4) throw new IllegalArgumentException("wrong number of arguments; required: lat1 lon1 lat2 lon2");
+    if (args.length != 4 &&  args.length != 6) throw new IllegalArgumentException("wrong number of arguments; required: lat1 lon1 lat2 lon2 [height1 height2]");
 
     String lat1 = args[0]; //"13.5291316666666000";
     String lon1 = args[1]; //"52.4303833333333000";
     String lat2 = args[2]; //"13.5310550000000000";
     String lon2 = args[3]; //"52.4296600000000000";
 
-    double d = Vincenty_Distance(lat1, lon1, lat2, lon2, false);
+	double d = Vincenty_Distance(lat1, lon1, lat2, lon2, false);
+	
+	if (args.length == 6) {
+
+		double h1 = Double.parseDouble(args[4]);
+		double h2 = Double.parseDouble(args[5]);
+		d = Math.sqrt( Math.pow(d,2) +  Math.pow(Math.abs(h1-h2),2) );// norm eines vektors im euklidischen raum
+	}
 
     System.out.println(d);
   }
