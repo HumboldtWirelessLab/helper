@@ -487,6 +487,15 @@ fi
 echo "0" > status/$LOGMARKER\_wificonfig.state
 
 ##############################
+###### Wireless nodes ########
+##############################
+
+if [ "x$MODE" = "xwireless" ]; then
+  #wait for own node. maybe link to wireless node is broken due to setup a gateway node
+  check_nodes status/$LOGMARKER\_wireless_node.state >> status/$LOGMARKER\_wireless_node_test.log 2>&1
+fi
+
+##############################
 ###### Get Wifiinfo ##########
 ##############################
 #TODO: rename nodelist
@@ -585,6 +594,12 @@ if [ "x$MODE" != "xwireless" ]; then
       run_on_node $node "export CLICKPATH=$NODEBINDIR/../etc/click;echo \"Script(wait 0,stop);\" | $NODEBINDIR/click-align-$NODEARCH | $NODEBINDIR/click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
     fi
   done
+fi
+
+if [ "x$MODE" = "xwireless" ]; then
+  #wait for own node. maybe link to wireless node is broken due to setup a gateway node
+  #check here again, since next step is starting the measurement
+  check_nodes status/$LOGMARKER\_wireless_node.state >> status/$LOGMARKER\_wireless_node_test_2.log 2>&1
 fi
 
 echo "0" > status/$LOGMARKER\_preload.state

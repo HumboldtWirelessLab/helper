@@ -260,6 +260,8 @@ abort_measurement() {
     RESULTDIR=$FINALRESULTDIR $LOCALPROCESS poststop >> $FINALRESULTDIR/localapp.log
   fi
 
+  echo "1" > status/measurement_result.state
+  
   exit 0
 
 }
@@ -315,6 +317,12 @@ case "$RUNMODE" in
 			RUNMODENUM=0
 			;;
 esac
+
+#####################
+### master stuff ####
+#####################
+
+echo $$ > status/master.pid
 
 ####################################
 ### Create screen for all nodes ####
@@ -692,6 +700,8 @@ if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
 fi
 
 echo "Finished measurement. Status: ok."
+
+echo "0" > status/measurement_result.state
 
 exit 0
 
