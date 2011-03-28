@@ -43,9 +43,9 @@ case "$1" in
 		    fi
 
 		    if [ ! "x$NFSHOME" = "x" ]; then
-			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa`
-			if [ "x$ALREADY_MOUNTED" = "x0" ] ; then
-
+			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+			echo "Check mount ($NFSHOME). Result: ->$ALREADY_MOUNTED<-"
+			if [ "x$ALREADY_MOUNTED" = "x0" ]; then
 			    if [ "x$NFSOPTIONS" = "x" ]; then
 				NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
 			    fi
@@ -75,10 +75,9 @@ case "$1" in
 		    echo "$EXTRANFS;$EXTRANFSTARGET;$EXTRANFSSERVER"
 
 		    if [ ! "x$EXTRANFS" = "x" ] && [ ! "x$EXTRANFSTARGET" = "x" ] &&  [ ! "x$EXTRANFSSERVER" = "x" ]; then
-		     
-		    	ALREADY_MOUNTED=`run_on_node $node "mount | grep $EXTRANFS | wc -l" "/" $DIR/../etc/keys/id_dsa`
-			if [ "x$ALREADY_MOUNTED" != "x0" ] ; then
 
+		    	ALREADY_MOUNTED=`run_on_node $node "mount | grep $EXTRANFS | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+			if [ "x$ALREADY_MOUNTED" = "x0" ]; then
 			    if [ "x$NFSOPTIONS" = "x" ]; then
 				NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
 			    fi
@@ -106,13 +105,16 @@ case "$1" in
 		    fi
 
 		    if [ ! "x$NFSHOME" = "x" ]; then
-			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa`
-			if [ "x$ALREADY_MOUNTED" = "x0" ] ; then
-			  run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa
-			  run_on_node $node "mount -t tmpfs none $NFSHOME" "/" $DIR/../etc/keys/id_dsa
-			else
-			  echo "$NFSHOME already mounted"
+			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+
+			if [ "x$ALREADY_MOUNTED" != "x0" ]; then
+			  echo "$NFSHOME already mounted. Umount to clean everything and to save space"
+			  run_on_node $node "umount $NFSHOME" "/" $DIR/../etc/keys/id_dsa
 			fi
+
+			run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			run_on_node $node "mount -t tmpfs none $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+
 		    else
 			echo "TMPHOME not set, so no mount."
 		    fi

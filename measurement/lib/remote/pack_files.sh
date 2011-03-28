@@ -89,6 +89,8 @@ case "$1" in
 	    done
 	done
 
+	mkdir -p $PACK_DIR/host/bin/
+	mkdir -p $PACK_DIR/host/lib/
 	mkdir -p $PACK_DIR/measurement/bin/
 
 	if [ "x$3" != "x" ] & [ "x$4" != "x" ]; then

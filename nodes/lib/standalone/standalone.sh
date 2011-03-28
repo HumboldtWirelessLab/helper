@@ -63,7 +63,7 @@ case "$1" in
       CLICKFILE=$CLICKFILE RUNMODE=$RUNMODE MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$DEVICE $0 delaysetup &
       ;;
     "delaysetup")
-       sleep 20
+       sleep 40
        $0 checker &
 
        $0 click_stop &
@@ -85,7 +85,7 @@ case "$1" in
        fi
        ;;
     "checker")
-        sleep 60
+        sleep 180
         DEVICE_EX=`/sbin/ifconfig ath1 2> /dev/null | grep ath1 | wc -l`
 
         if [ $DEVICE_EX -eq 0 ]; then

@@ -394,7 +394,10 @@ for state in  $STATES; do
   COUNT_NODES_OK=`echo $NODES_OK | wc -w`
   echo "done. Nodes: $COUNT_NODES_OK of $COUNT_NODES_ALL." >&6
 
+  ##################################################
+  ########### REMOTE ###############################
   #nodeinfostate: this includes setup wireless nodes
+
   if [ "x$state" = "xnodeinfo" ]; then
     echo -n "" > status/all_wireless_nodeinfo.log.tmp
     echo -n "" > status/all_wireless_nodes.log
@@ -422,9 +425,11 @@ for state in  $STATES; do
       set_master_state 0 wirelessstart
       SYNCSTATE=`wait_for_nodes "$WIRELESSNODELIST" _wirelessfinished.state`
       echo "done." >&6
-      #wait for wireless nodes
-      set_master_state 0 wirlessfinished
     fi
+
+    #wait for wireless nodes
+    set_master_state 0 wirlessfinished
+
   fi
   #end nodeinfostate
 

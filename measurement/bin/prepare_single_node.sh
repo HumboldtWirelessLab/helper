@@ -265,13 +265,13 @@ echo "0" > status/$LOGMARKER\_nodeinfo.state
 if [ "x$MODE" = "xwireless" ]; then
   #wait for package (build by master)
   wait_for_master_state wirelesspackage $LOGMARKER
-  
+
   #package is ready. let's go
 
   ############### reboot ###############
   #Don't reboot. just set set marker
   echo "0" > status/$LOGMARKER\_reboot.state
-  
+
   ############# environment ###############
   echo "Handle wireless node" > status/$LOGMARKER\_environment.log 2>&1
   echo "mount tmpfs"  >> status/$LOGMARKER\_environment.log 2>&1
@@ -310,14 +310,19 @@ if [ "x$MODE" = "xwireless" ]; then
   echo "0" > status/$LOGMARKER\_wifimodules.state
   echo "0" > status/$LOGMARKER\_wificonfig.state
 
-  #set 
+  #set
   RUNMODENUM=5
-  
+
   ############ finished wireless ###########
 
 else
   if [ "x$OLSR" = "xyes" ]; then
+    echo "0" > status/$LOGMARKER\_olsr.info
     wait_for_master_state wirlessfinished $LOGMARKER
+
+    if [ $RUNMODENUM -le 1 ]; then
+      RUNMODENUM=2
+    fi
   fi
 fi
 
@@ -371,6 +376,13 @@ if [ $RUNMODENUM -le 3 ]; then
     CURRENTMODE="LOAD MODULES"
     LOADMODULES=0
 
+    echo "OLSR: $OLSR" > status/$LOGMARKER\_olsr_status.log 2>&1
+    if [ "x$OLSR" = "xyes" ]; then
+      for node in $NODELIST; do
+         run_on_node $node "$DIR/../../nodes/lib/backbone/backbone.sh stop_backbone" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_olsr_status.log 2>&1
+      done
+    fi
+
     for node in $NODELIST; do
 
     MODULSDIR=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $3}' | tail -n 1`
@@ -393,11 +405,19 @@ if [ $RUNMODENUM -le 3 ]; then
       fi
     done
 
+    if [ "x$OLSR" = "xyes" ]; then
+      for node in $NODELIST; do
+         run_on_node $node "$DIR/../../nodes/lib/backbone/backbone.sh start_backbone" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_olsr_status.log 2>&1
+      done
+    fi
+
     if [ $LOADMODULES -eq 1 ]; then
 	    #check nodes and sleep, only if modules are need to load
 	    check_nodes status/$LOGMARKER\_wifimodules.state >> status/$LOGMARKER\_wifimodules.log 2>&1
 	    sleep 1
     fi
+
+
 fi
 
 echo "0" > status/$LOGMARKER\_wifimodules.state
@@ -601,6 +621,13 @@ wait_for_master_state measurement $LOGMARKER
 ############ Kill everything ################
 
 kill_everything
+
+if [ "x$MODE" = "xwireless" ]; then
+  for node in $NODELIST; do
+    scp -i $DIR/../../host/etc/keys/id_dsa -r root@$node:$FINALRESULTDIR/ $FINALRESULTDIR/../ > status/$LOGMARKER\_copy_result.log 2>&1
+    run_on_node $node "rm -rf $FINALRESULTDIR/" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_copy_result.log 2>&1
+  done
+fi
 
 ############ Final Check ################
 
