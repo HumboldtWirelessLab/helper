@@ -20,8 +20,10 @@ esac
 
 . $DIR/functions.sh
 
-if [ "x$NODELIST" = "x" ]; then
+if [ "x$1" != "xstart_node_check" ] && [ "x$1" != "xtest_node_check" ]; then
+  if [ "x$NODELIST" = "x" ]; then
     ls  $DIR/../etc/nodegroups/
+  fi
 fi
 
 case "$1" in
@@ -91,9 +93,9 @@ case "$1" in
 		    if [ "$node" = "localhost" ]; then
 		      echo "$node wired"
 		    fi
-		    
-		    DEFAULT=`run_on_node $node "/sbin/route -n 2>&1 | grep '^0.0.0.0'" "/" $DIR/../etc/keys/id_dsa | awk '{print $8}'`
-		    
+
+		    DEFAULT=`run_on_node $node "/sbin/route -n 2>&1 | grep '^0.0.0.0' | grep '192.168.3'" "/" $DIR/../etc/keys/id_dsa | awk '{print $8}'`
+
 		    if [ "x$DEFAULT" = "xeth0" ]; then 
 		      echo "$node wired"
 		    else
@@ -110,6 +112,44 @@ case "$1" in
 		    else
 		      echo "yes"
 		    fi
+		done
+		;;
+	"start_node_check")
+		if [ "x$NODELIST" = "x" ]; then
+		  if [ "x$2" = "x" ]; then
+		    exit 0
+		  else
+		    if [ ! -f $2 ]; then
+		      exit 0
+		    else
+		      NODELIST=`cat $2 | grep -v "#" | awk '{print $1}'`
+		    fi
+	          fi
+	        fi
+
+		for node in $NODELIST; do
+		    scp -i $DIR/../etc/keys/id_dsa $DIR/../../nodes/lib/standalone/node_check.sh root@$node:/tmp/
+		    START_RESULT=`run_on_node $node "./node_check.sh start &" "/tmp" $DIR/../etc/keys/id_dsa`
+		    echo "$node $START_RESULT"
+		done
+		;;
+	"test_node_check")
+		if [ "x$NODELIST" = "x" ]; then
+		  if [ "x$2" = "x" ]; then
+		    exit 0
+		  else
+		    if [ ! -f $2 ]; then
+		      exit 0
+		    else
+		      NODELIST=`cat $2 | grep -v "#" | awk '{print $1}'`
+		    fi
+	          fi
+	        fi
+
+		for node in $NODELIST; do
+		    PID_EX=`run_on_node $node "ls /tmp/run/node_check.pid 2> /dev/null | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+		    PROC_EX=`run_on_node $node "ps | grep node_check | grep -v grep 2> /dev/null | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+		    echo "$node $PID_EX $PROC_EX "
 		done
 		;;
 	*)

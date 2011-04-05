@@ -260,6 +260,8 @@ abort_measurement() {
     RESULTDIR=$FINALRESULTDIR $LOCALPROCESS poststop >> $FINALRESULTDIR/localapp.log
   fi
 
+  echo "1" > status/measurement_result.state
+  
   exit 0
 
 }
@@ -315,6 +317,12 @@ case "$RUNMODE" in
 			RUNMODENUM=0
 			;;
 esac
+
+#####################
+### master stuff ####
+#####################
+
+echo $$ > status/master.pid
 
 ####################################
 ### Create screen for all nodes ####
@@ -394,6 +402,10 @@ for state in  $STATES; do
   COUNT_NODES_OK=`echo $NODES_OK | wc -w`
   echo "done. Nodes: $COUNT_NODES_OK of $COUNT_NODES_ALL." >&6
 
+  ##################################################
+  ########### REMOTE ###############################
+  #nodeinfostate: this includes setup wireless nodes
+
   if [ "x$state" = "xnodeinfo" ]; then
     echo -n "" > status/all_wireless_nodeinfo.log.tmp
     echo -n "" > status/all_wireless_nodes.log
@@ -403,17 +415,32 @@ for state in  $STATES; do
     done
     cat status/all_wireless_nodeinfo.log.tmp | sort -u > status/all_wireless_nodeinfo.log
 
-    REMOTENODECOUNT=`cat status/all_wireless_nodeinfo.log | grep -v "^$" | wc -l`
+    REMOTENODECOUNT=`cat status/all_wireless_nodes.log | grep -v "^$" | wc -l`
     if [ $REMOTENODECOUNT -gt 0 ]; then
-      echo "Found $REMOTENODECOUNT wireless nodes"
-      $DIR/../lib/remote/pack_files.sh pack status/all_wireless_nodeinfo.log
+      WIRELESSNODELIST=`cat status/all_wireless_nodes.log | awk '{print $1}'`
+      echo "Found $REMOTENODECOUNT wireless nodes." >&6
+      echo "Found $REMOTENODECOUNT wireless nodes: $WIRELESSNODELIST"
+      echo "Pack files for wireless nodes." >&6
+      $DIR/../lib/remote/pack_files.sh pack status/all_wireless_nodeinfo.log status/all_wireless_nodes.log $CONFIGFILE
+      echo "finished pack. Set state to continue node setup"
+
+      echo -n "Unpack files on wireless nodes ... " >&6
       set_master_state 0 wirelesspackage
-      #TODO
-      #wait for wireless nodes
-      set_master_state 0 wirlessfinished
+      SYNCSTATE=`wait_for_nodes "$WIRELESSNODELIST" _wirelesspackage.state`
+      echo "done." >&6
+
+      echo -n "Start wireless nodes ... " >&6
+      set_master_state 0 wirelessstart
+      SYNCSTATE=`wait_for_nodes "$WIRELESSNODELIST" _wirelessfinished.state`
+      echo "done." >&6
     fi
+
+    #wait for wireless nodes
+    set_master_state 0 wirlessfinished
+
   fi
-  
+  #end nodeinfostate
+
   if [ "x$state" = "xenvironment" ]; then
     if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
       echo -n "State: Prestart local process ... " >&6
@@ -678,6 +705,8 @@ if [ ! "x$LOCALPROCESS" = "x" ] && [ -e $LOCALPROCESS ]; then
 fi
 
 echo "Finished measurement. Status: ok."
+
+echo "0" > status/measurement_result.state
 
 exit 0
 
