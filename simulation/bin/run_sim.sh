@@ -72,7 +72,11 @@ MODE=sim
 
 case "$MODE" in
     "sim")
-		POSTFIX=ns2
+	        if [ "x$1" = "xjist" ]; then
+		    POSTFIX=jist
+		else
+		    POSTFIX=ns2
+		fi
 
 		DISCRIPTIONFILENAME=`basename $DISCRIPTIONFILE`
 

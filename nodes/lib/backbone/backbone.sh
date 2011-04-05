@@ -18,8 +18,10 @@ case "$SIGN" in
 	;;
 esac
 
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+
 case "$1" in
-    "save_info")
+    "save_backbone_info")
 	    DEV_PREFIX=`echo $DEVICE | cut -b 1-4`
 	    if [ "x$DEV_PREFIX" = "xwlan" ]; then
 	      exit 0
@@ -27,8 +29,18 @@ case "$1" in
 	      exit 1
 	    fi
 	    ;;
-    "restore")
-	    ;;
+    "stop_backbone")
+	    if [ -f /etc/rc.d/S42olsr_or_brn ]; then
+              /etc/rc.d/S42olsr_or_brn stop 2>&1
+              /sbin/ifconfig ath1 down 2>&1
+            fi
+            ;;
+    "start_backbone")
+            if [ -f /etc/rc.d/S42olsr_or_brn ]; then
+              /etc/rc.d/S42olsr_or_brn start 2>&1
+              sleep 15;
+            fi
+            ;;
         *)
             ;;
 esac
