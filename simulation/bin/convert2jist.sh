@@ -63,6 +63,8 @@ case "$1" in
 		    fi
 		  fi
 		  
+		  . $NODECONFIG
+
 		  echo "node.$NODE.name = $NODENAME"
 		  echo "node.$NODE.device = $NODEDEVICE"
 		  echo "node.$NODE.config = $NODENAME"
