@@ -1,3 +1,6 @@
+#ifndef __HELPER_INC__
+#define __HELPER_INC__
+
 #ifndef WIFITYPE
 #warning No Wifitype. Using default (805).
 #define WIFITYPE 805
@@ -137,4 +140,5 @@ BRNAddressInfo(ipdev eth0:ip);
 
 #define SYNC Null()
 
+#endif
 #endif
