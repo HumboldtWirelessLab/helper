@@ -111,12 +111,13 @@ case "$1" in
 		  fi
 																			    
 		  . $WIFICONFIG
+		  cp $WIFICONFIG $RESULTDIR
 		  
 		  if [ "x$WIFITYPE" = "x" ]; then
 		    WIFITYPE=806
 		  fi
 		else
-		  WIITYPE=806
+		  WIFITYPE=806
 		fi																		      
               
                 CPPOPTS="-DNODENAME=$CNODE -DNODEDEVICE=$CDEV -DTIME=$TIME"
