@@ -27,7 +27,7 @@ case "$1" in
 	  
 	  NONODES=`cat $NODEPLACEMENTFILE | wc -l`
 	  
-	  echo "sim.duration = 60"
+	  echo "sim.duration = $TIME"
     echo "sim.nonodes = $NONODES"
     echo -n "radio.placementopts = ";
     NODE=1
