@@ -101,7 +101,7 @@ case "$1" in
                 fi
 	
 	        if [ "x$USED_SIMULATOR" = "xjist" ]; then	
-		  echo "$WIFICONFIG"
+		  #echo "$WIFICONFIG"
 	          if [ ! -f $WIFICONFIG ]; then
 		    if [ -f $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then
 		      WIFICONFIG="$DIR/../../nodes/etc/wifi/$WIFICONFIG"
