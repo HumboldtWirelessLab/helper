@@ -273,7 +273,9 @@ if [ "x$MODE" = "xwireless" ]; then
   echo "0" > status/$LOGMARKER\_reboot.state
 
   ############# environment ###############
-  echo "Handle wireless node" > status/$LOGMARKER\_environment.log 2>&1
+  echo "Start nodecheck" > status/$LOGMARKER\_environment.log 2>&1
+  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh start_node_check >> status/$LOGMARKER\_environment.log 2>&1
+  echo "Handle wireless node" >> status/$LOGMARKER\_environment.log 2>&1
   echo "mount tmpfs"  >> status/$LOGMARKER\_environment.log 2>&1
   NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mounttmpfs >> status/$LOGMARKER\_environment.log 2>&1
 
@@ -405,10 +407,14 @@ if [ $RUNMODENUM -le 3 ]; then
       fi
     done
 
-    if [ "x$OLSR" = "xyes" ]; then
-      for node in $NODELIST; do
-         run_on_node $node "$DIR/../../nodes/lib/backbone/backbone.sh start_backbone" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_olsr_status.log 2>&1
-      done
+    if [ "x$DISABLE_WIRELESS_BACKBONE" = "xyes" ]; then
+      echo "Disable Wireless backbone by request" >> status/$LOGMARKER\_olsr_status.log 2>&1
+    else
+      if [ "x$OLSR" = "xyes" ]; then
+        for node in $NODELIST; do
+          run_on_node $node "$DIR/../../nodes/lib/backbone/backbone.sh start_backbone" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_olsr_status.log 2>&1
+        done
+      fi
     fi
 
     if [ $LOADMODULES -eq 1 ]; then

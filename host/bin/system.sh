@@ -78,7 +78,7 @@ case "$1" in
 		;;
 	"nodeinfo")	
 		for node in $NODELIST; do
-		    WNDR=`run_on_node $node "cat /proc/cpuinfo | grep 'WNDR' | wc -l" "/" $DIR/../etc/keys/id_dsa | grep "WNDR" | wc -l`
+		    WNDR=`run_on_node $node "cat /proc/cpuinfo | grep 'WNDR' | wc -l" "/" $DIR/../etc/keys/id_dsa`
 		    if [ $WNDR -gt 0 ]; then
 		      ARCH="mips-wndr3700"
 		    else
