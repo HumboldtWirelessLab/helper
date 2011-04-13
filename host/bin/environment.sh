@@ -50,7 +50,7 @@ case "$1" in
 				NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
 			    fi
 			    run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa
-			    run_on_node $node "mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			    run_on_node $node "if [ -f /sbin/mount ]; then /sbin/mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME; else mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME; fi" "/" $DIR/../etc/keys/id_dsa
 			else
 			  echo "$NFSHOME already mounted"
 			fi
@@ -82,7 +82,7 @@ case "$1" in
 				NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
 			    fi
 			    run_on_node $node "mkdir -p $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
-			    run_on_node $node "mount -t nfs -o $NFSOPTIONS $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
+			    run_on_node $node "if [ -f /sbin/mount ]; then /sbin/mount -t nfs -o $NFSOPTIONS $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET; else mount -t nfs -o $NFSOPTIONS $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET; fi" "/" $DIR/../etc/keys/id_dsa
 			else
 			    echo "$EXTRANFS already mounted"
 			fi
