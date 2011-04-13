@@ -72,7 +72,11 @@ MODE=sim
 
 case "$MODE" in
     "sim")
-		POSTFIX=ns2
+	        if [ "x$1" = "xjist" ]; then
+		    POSTFIX=jist
+		else
+		    POSTFIX=ns2
+		fi
 
 		DISCRIPTIONFILENAME=`basename $DISCRIPTIONFILE`
 
@@ -86,17 +90,6 @@ case "$MODE" in
 			    
 		USED_SIMULATOR=$1 CONFIGDIR=$CONFIGDIR POSTFIX=$POSTFIX $DIR/prepare-sim.sh prepare $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
 
-		mv $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp
-		cat $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp | sed -e "s#$NODETABLE#$FINALRESULTDIR/$NODETABLE.$POSTFIX#g" > $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
-		rm $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp		
-
-		SIMDIS=$FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
-		. $SIMDIS
-		TCLFILE="$FINALRESULTDIR/$NAME.tcl"
-		NODELIST=`cat $NODETABLE | grep -v "#" | awk '{print $1}' | uniq`
-		NODECOUNT=`cat $NODETABLE | grep -v "#" | wc -l`
-		cat $DIR/../etc/ns/radio/$RADIO\.tcl > $TCLFILE
-
                 if [ "x$NODEPLACEMENT" = "x" ]; then
 		  echo "use default plm"
 		  NODEPLACEMENT="random"
@@ -104,12 +97,11 @@ case "$MODE" in
 		if [ "x$FIELDSIZE" = "x" ]; then
 		  FIELDSIZE=1000
 		fi
-		
+
                 if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ] || [ "x$NODEPLACEMENT" = "xstring" ]; then
-#		  echo "Gen Placement: $NODEPLACEMENT"
-		  $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
 		  FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
                 else
+		  #use Placementfile
              	  if [ -e $DIR/../etc/nodeplacement/$NODEPLACEMENTFILE ]; then
 		    FINALPLMFILE="$DIR/../etc/nodeplacement/$NODEPLACEMENTFILE"
                   else
@@ -128,6 +120,31 @@ case "$MODE" in
                     fi
                   fi
 		fi 
+
+		mv $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp
+		
+		cat $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp | grep -v "NODEPLACEMENTFILE" | sed -e "s#$NODETABLE#$FINALRESULTDIR/$NODETABLE.$POSTFIX#g" > $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
+		echo "NODEPLACEMENTFILE=$FINALPLMFILE" >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
+		
+		rm $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp		
+
+		SIMDIS=$FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
+		. $SIMDIS
+		
+		if [ "x$POSTFIX" = "xns2" ]; then
+		  TCLFILE="$FINALRESULTDIR/$NAME.tcl"
+		else
+		  TCLFILE="/dev/null"
+		fi
+		
+		NODELIST=`cat $NODETABLE | grep -v "#" | awk '{print $1}' | uniq`
+		NODECOUNT=`cat $NODETABLE | grep -v "#" | wc -l`
+		cat $DIR/../etc/ns/radio/$RADIO\.tcl > $TCLFILE
+		
+                if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ] || [ "x$NODEPLACEMENT" = "xstring" ]; then
+		  $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
+		  FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
+                fi
 		
 		POS_X_MAX=0
 		POS_Y_MAX=0

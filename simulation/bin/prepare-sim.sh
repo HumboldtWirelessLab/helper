@@ -99,11 +99,31 @@ case "$1" in
                     DEBUG=2
                   fi
                 fi
+	
+	        if [ "x$USED_SIMULATOR" = "xjist" ]; then	
+		  #echo "$WIFICONFIG"
+	          if [ ! -f $WIFICONFIG ]; then
+		    if [ -f $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then
+		      WIFICONFIG="$DIR/../../nodes/etc/wifi/$WIFICONFIG"
+		    else
+		      WIFICONFIG="$DIR/../../nodes/etc/wifi/monitor.default"
+		    fi
+		  fi
+																			    
+		  . $WIFICONFIG
+		  cp $WIFICONFIG $RESULTDIR
+		  
+		  if [ "x$WIFITYPE" = "x" ]; then
+		    WIFITYPE=806
+		  fi
+		else
+		  WIFITYPE=806
+		fi																		      
               
                 CPPOPTS="-DNODENAME=$CNODE -DNODEDEVICE=$CDEV -DTIME=$TIME"
                 CPPOPTS="$CPPOPTS -DDEBUGLEVEL=$DEBUG"
                 CPPOPTS="$CPPOPTS -DSIMULATION"
-                CPPOPTS="$CPPOPTS -DWIFITYPE=806"
+                CPPOPTS="$CPPOPTS -DWIFITYPE=$WIFITYPE"
 		
 		NODEID_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "BRN2NodeIdentity" | wc -l)`
 		

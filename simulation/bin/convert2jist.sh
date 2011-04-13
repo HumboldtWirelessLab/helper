@@ -27,7 +27,7 @@ case "$1" in
 	  
 	  NONODES=`cat $NODEPLACEMENTFILE | wc -l`
 	  
-	  echo "sim.duration = 60"
+	  echo "sim.duration = $TIME"
     echo "sim.nonodes = $NONODES"
     echo -n "radio.placementopts = ";
     NODE=1
@@ -54,10 +54,27 @@ case "$1" in
 		  NODECONFIG=`echo $line | awk '{print $5}'`
 		  NODECLICK=`echo $line | awk '{print $7}'`
 		  
+		  
+		  if [ ! -f $NODECONFIG ]; then
+		    if [ -f $DIR/../../nodes/etc/wifi/$NODECONFIG ]; then
+                      NODECONFIG="$DIR/../../nodes/etc/wifi/$NODECONFIG"
+		    else
+		      NODECONFIG="$DIR/../../nodes/etc/wifi/monitor.default"
+		    fi
+		  fi
+		  
+		  . $NODECONFIG
+
 		  echo "node.$NODE.name = $NODENAME"
 		  echo "node.$NODE.device = $NODEDEVICE"
 		  echo "node.$NODE.config = $NODENAME"
 		  echo "node.$NODE.click = $NODECLICK"
+		  
+		  if [ "x$WIFITYPE" = "x" ]; then
+		    echo "node.$NODE.wifitype = 806"
+		  else
+		    echo "node.$NODE.wifitype = $WIFITYPE"
+		  fi		     
 		  
 		  NODE=`expr $NODE + 1`
 		  
