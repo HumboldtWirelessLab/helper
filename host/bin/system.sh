@@ -68,6 +68,12 @@ case "$1" in
 			AVAILABLE=`node_available $node`
 		    done
 
+		    SSH_RUNNING=`nmap --host-timeout 2s -p22 $node 2>/dev/null | grep 22 | grep tcp | awk '{print $2}'`
+		    while [ "x$SSH_RUNNING" != "xopen" ]; do
+			sleep 5;
+			SSH_RUNNING=`nmap --host-timeout 2s -p22 $node 2>/dev/null | grep 22 | grep tcp | awk '{print $2}'`
+		    done
+
 		    ARCH=`run_on_node $node "uname -m" "/" $DIR/../etc/keys/id_dsa 2> /dev/null`
 		    while [ "x$ARCH" = "x" ]; do
  			sleep 10;
@@ -150,6 +156,23 @@ case "$1" in
 		    PID_EX=`run_on_node $node "ls /tmp/run/node_check.pid 2> /dev/null | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
 		    PROC_EX=`run_on_node $node "ps | grep node_check | grep -v grep 2> /dev/null | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
 		    echo "$node $PID_EX $PROC_EX "
+		done
+		;;
+	"reset_driver")
+		if [ "x$NODELIST" = "x" ]; then
+		  if [ "x$2" = "x" ]; then
+		    exit 0
+		  else
+		    if [ ! -f $2 ]; then
+		      exit 0
+		    else
+		      NODELIST=`cat $2 | grep -v "#" | awk '{print $1}'`
+		    fi
+	          fi
+	        fi
+
+		for node in $NODELIST; do
+		    run_on_node $node "if [ -f /tmp/brn_driver ]; then rm -f /tmp/brn_driver; fi" "/" $DIR/../etc/keys/id_dsa
 		done
 		;;
 	*)

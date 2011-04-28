@@ -37,6 +37,7 @@ case "$1" in
             ;;
     "start_backbone")
             if [ -f /etc/rc.d/S42olsr_or_brn ]; then
+              wlanconfig ath1 destroy
               /etc/rc.d/S42olsr_or_brn start 2>&1
               sleep 15;
             fi

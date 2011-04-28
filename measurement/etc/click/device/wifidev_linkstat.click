@@ -87,9 +87,11 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #ifdef WIFIDEV_LINKSTAT_DEBUG
   -> PrintWifi("NODENAME:NODEDEVICE ", TIMESTAMP true)
 #endif
+ // -> Print("RXERR")
 #ifdef PRIO_QUEUE
   -> WifiDecap()
   -> ig_feedback_clf :: Classifier( 12/8888, - );
+
   ig_feedback_clf[1]
 #endif
   -> Discard;
@@ -101,6 +103,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
     -> Discard;
 
   wififrame_clf[2]
+//  -> BRN2PrintWifi("RX")
     -> WifiDecap()
 //  -> Print("Data")
     -> brn_ether_clf :: Classifier( 12/BRN_ETHERTYPE, - )
@@ -169,11 +172,17 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 */
 #endif
 
-/*
+  error_clf[1]
+//  -> Print("RXPHYERR")
+  -> Discard;
+
+
   link_stat[1]
-  -> BRN2EtherEncap()
-  -> WifiEncap(0x00, 0:0:0:0:0:0)
-  -> RadiotapEncap()
-  -> ToDump("RESULTDIR/linkstat_error.NODENAME.NODEDEVICE.dump");
-*/
+  -> Print("Linkstat error",200)
+  -> Discard;
+//  -> BRN2EtherEncap()
+//  -> WifiEncap(0x00, 0:0:0:0:0:0)
+//  -> RadiotapEncap()
+//  -> ToDump("RESULTDIR/linkstat_error.NODENAME.NODEDEVICE.dump");
+
 }
