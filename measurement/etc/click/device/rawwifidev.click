@@ -7,16 +7,16 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef CST
 #ifdef CST_PROCFILE
-  cst::ChannelStats(DEVICE $device, STATS_DURATION 5000, PROCFILE CST_PROCFILE, PROCINTERVAL 1000, RSSI_PER_NEIGHBOUR true, FULL_STATS false, SAVE_DURATION 1000 );
+  cst::ChannelStats(DEVICE $device, STATS_DURATION 1000, PROCFILE CST_PROCFILE, PROCINTERVAL 1000, RSSI_PER_NEIGHBOUR true, FULL_STATS false, SAVE_DURATION 1000 );
 #else
-  cst::ChannelStats(DEVICE $device, STATS_DURATION 5000, PROCINTERVAL 1000, RSSI_PER_NEIGHBOUR true, FULL_STATS false, SAVE_DURATION 1000);
+  cst::ChannelStats(DEVICE $device, STATS_DURATION 1000, PROCINTERVAL 1000, RSSI_PER_NEIGHBOUR true, FULL_STATS false, SAVE_DURATION 1000);
 #endif
 #endif
 
   rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
-#ifdef SIMULATION
+#if defined(SIMULATION) || (WIFITYPE == 802)
   -> WifiSeq()                                                      // Set sequencenumber for simulation
 #endif
   -> __WIFIENCAP__

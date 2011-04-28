@@ -275,7 +275,11 @@ if [ "x$MODE" = "xwireless" ]; then
   ############# environment ###############
   echo "Start nodecheck" > status/$LOGMARKER\_environment.log 2>&1
   NODELIST="$NODELIST" $DIR/../../host/bin/system.sh start_node_check >> status/$LOGMARKER\_environment.log 2>&1
+
   echo "Handle wireless node" >> status/$LOGMARKER\_environment.log 2>&1
+  echo "Set marker for reboot-detection $NODELIST" >> status/$LOGMARKER\_environment.log 2>&1
+  NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmarker >> status/$LOGMARKER\_environment.log 2>&1
+
   echo "mount tmpfs"  >> status/$LOGMARKER\_environment.log 2>&1
   NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mounttmpfs >> status/$LOGMARKER\_environment.log 2>&1
 
@@ -306,11 +310,11 @@ if [ "x$MODE" = "xwireless" ]; then
 
   done
 
-  sleep 40
-
   echo "0" > status/$LOGMARKER\_wirelessfinished.state
   echo "0" > status/$LOGMARKER\_wifimodules.state
   echo "0" > status/$LOGMARKER\_wificonfig.state
+
+  sleep 120
 
   #set
   RUNMODENUM=5
@@ -349,9 +353,11 @@ echo "0" > status/$LOGMARKER\_reboot.state
 ####### Reboot Detection ##########
 ###################################
 
-echo "Set marker for reboot-detection $NODELIST" >> status/$LOGMARKER\_environment.log 2>&1
+if [ "x$MODE" != "xwireless" ]; then
+  echo "Set marker for reboot-detection $NODELIST" >> status/$LOGMARKER\_environment.log 2>&1
 
-NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmarker >> status/$LOGMARKER\_environment.log 2>&1
+  NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmarker >> status/$LOGMARKER\_environment.log 2>&1
+fi
 
 ###################################
 ###### Setup Environment ##########

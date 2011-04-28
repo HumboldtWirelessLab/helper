@@ -40,6 +40,8 @@ case "$1" in
       sleep 1
       MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $DIR/../../bin/wlanmodules.sh install >> /tmp/seismo_brn.log 2>&1
       sleep 10
+      CONFIG=$CONFIG DEVICE=wlan1 $DIR/../../bin/wlandevice.sh delete >> /tmp/seismo_brn.log 2>&1
+      sleep 2
       /etc/rc.d/S42olsr_or_brn start >> /tmp/seismo_brn.log 2>&1
       ;;
     "brndev")

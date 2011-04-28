@@ -7,11 +7,7 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 #ifdef RAWDEV_DEBUG
   -> Print("To Device")
 #endif
-//#if WIFITYPE == 802
-//  -> Discard();
-//#else
   -> TORAWDEVICE($devname);
-//#endif
 
   FROMRAWDEVICE($devname)
 #ifdef RAWDEV_DEBUG
