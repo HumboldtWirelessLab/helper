@@ -283,6 +283,12 @@ if [ "x$MODE" = "xwireless" ]; then
   echo "mount tmpfs"  >> status/$LOGMARKER\_environment.log 2>&1
   NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mounttmpfs >> status/$LOGMARKER\_environment.log 2>&1
 
+  echo "Start node test"  >> status/$LOGMARKER\_environment.log 2>&1
+  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh start_node_check >> status/$LOGMARKER\_environment.log 2>&1 
+
+  echo -n "Check node test: "  >> status/$LOGMARKER\_environment.log 2>&1
+  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh test_node_check >> status/$LOGMARKER\_environment.log 2>&1 
+
   #TODO: get name from elsewhere
   FILENAME="pack_file.tar.bz2" 
 
@@ -313,6 +319,9 @@ if [ "x$MODE" = "xwireless" ]; then
   echo "0" > status/$LOGMARKER\_wirelessfinished.state
   echo "0" > status/$LOGMARKER\_wifimodules.state
   echo "0" > status/$LOGMARKER\_wificonfig.state
+
+  echo "Start wifidev" > status/wireless_node_wait_$LOGMARKER\.state
+  date >> status/wireless_node_wait_$LOGMARKER\.state
 
   sleep 120
 
@@ -523,9 +532,15 @@ echo "0" > status/$LOGMARKER\_wificonfig.state
 ##############################
 
 if [ "x$MODE" = "xwireless" ]; then
+  echo "Wait for wifidev" >> status/wireless_node_wait_$LOGMARKER\.state
+  date >> status/wireless_node_wait_$LOGMARKER\.state
+
   #wait for own node. maybe link to wireless node is broken due to setup a gateway node
   NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodesandssh > status/$LOGMARKER\_wireless_node_test.log 2>&1
   check_nodes status/$LOGMARKER\_wireless_node.state >> status/$LOGMARKER\_wireless_node_test.log 2>&1
+
+  echo "wifidev is up" >> status/wireless_node_wait_$LOGMARKER\.state
+  date >> status/wireless_node_wait_$LOGMARKER\.state
 fi
 
 ##############################

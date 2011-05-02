@@ -13,7 +13,7 @@ minl
 maxl[1]
 //GPS  -> GPSPrint(NOWRAP true)
 //GPS  -> GPSDecap()
-  -> rtap_decap :: RadiotapDecap()
+  -> rtap_decap :: BrnRadiotapDecap()
   -> filter_tx :: FilterTX()
   -> ok :: Counter
   -> BRN2PrintWifi("OKPacket",TIMESTAMP true)
