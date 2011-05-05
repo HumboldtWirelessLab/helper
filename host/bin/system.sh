@@ -39,7 +39,7 @@ case "$1" in
 		      echo "Reboot not allowed !"
 		    else
 		      echo "Reboot"
-		      run_on_node $node "reboot" "/" $DIR/../etc/keys/id_dsa
+		      run_on_node $node "if [ -f /sbin/reboot ]; then /sbin/reboot; else reboot; fi" "/" $DIR/../etc/keys/id_dsa
 		    fi  
 		done
 		;;

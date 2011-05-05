@@ -88,6 +88,8 @@ case "$1" in
 
 	    . $DIR/../../etc/wifi/default
 
+	    ${IFCONFIG} $DEVICE down
+
 	    if [ "x$MODE" = "x" ]; then
 	    	MODE=$DEFAULT_MODE
 	    fi
@@ -132,7 +134,13 @@ case "$1" in
 	    echo "$IWCONFIG $DEVICE channel $CHANNEL"
 	    ${IWCONFIG} $DEVICE channel $CHANNEL
 	    if [ "x$IW" != "xnone" ]; then
-		${IW} $DEVICE set channel $CHANNEL
+		if [ "x$HTMODE" = "x" ]; then
+		    echo "${IW} $DEVICE set channel $CHANNEL"
+		    ${IW} $DEVICE set channel $CHANNEL
+		else
+		    echo "${IW} $DEVICE set channel $CHANNEL $HTMODE"
+		    ${IW} $DEVICE set channel $CHANNEL $HTMODE
+		fi
 	    fi
 
 	    if [ "x$POWER" = "x" ]; then
