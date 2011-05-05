@@ -70,7 +70,7 @@
 
 #ifdef REMOTEDUMP
 BRNAddressInfo(ethdev eth0:eth);
-BRNAddressInfo(ipdev eth0:ip);					   
+BRNAddressInfo(ipdev eth0:ip);
 #endif
 
 #define DUMPPORTBASE DUMPPORT@__LINE__
@@ -104,7 +104,7 @@ BRNAddressInfo(ipdev eth0:ip);
 #define TORAWDEVICE(x) ToDevice(x, IGNOREFROMDEV true, DEBUG false)
 //#define TORAWDEVICE(x) SLLEncap(PACKETTYPE 1, HARDWARETYPE 805, PROTOCOL 25) -> ToDevice(x, DEBUG false)
 #else
-#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false)
+#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, SNAPLEN 8190, OUTBOUND true, SNIFFER false)
 #define TORAWDEVICE(x) ToDevice(x, DEBUG false)
 #endif
 
@@ -113,7 +113,7 @@ BRNAddressInfo(ipdev eth0:ip);
 
 #ifdef REMOTEDUMP
 BRNAddressInfo(ethdev eth0:eth);
-BRNAddressInfo(ipdev eth0:ip);					   
+BRNAddressInfo(ipdev eth0:ip);
 
 #define DUMPPORTBASE DUMPPORT@__LINE__
 #define TODUMP(x) TimestampEncap() \
@@ -126,7 +126,7 @@ BRNAddressInfo(ipdev eth0:ip);
 
 #define SYNC Idle \
               ->Socket(UDP,0.0.0.0,60000) \
-	      ->Print("Sync",TIMESTAMP true)
+              ->Print("Sync",TIMESTAMP true)
 
 #endif
 
@@ -135,7 +135,7 @@ BRNAddressInfo(ipdev eth0:ip);
 
 #ifdef SIMULATION
 
-#define FROMRAWDEVICE(x) FromSimDevice(x,4096)
+#define FROMRAWDEVICE(x) FromSimDevice(x,8190)
 #define TORAWDEVICE(x) ToSimDevice(x, ENCAP UNKNOWN )
 
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
