@@ -12,13 +12,14 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
                           CHANNEL $channel, LT $lt |
 
   rates::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
-  
+
   ap::ACCESS_POINT(DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid, CHANNEL $channel, BEACON_INTERVAL 100, LT $lt, RATES rates);
 
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
   wifioutq::NotifierQueue(50);
   mgtoutq::NotifierQueue(50);
 
+  rs::MadwifiRate(RT rates);
 
   prio_s::PrioSched()
   -> wifidevice; 
@@ -29,10 +30,6 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   wifioutq
   -> [1]prio_s;
 
-  input[0] 
-  -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
-  -> wifioutq;
-  
   wifidevice[0]
   -> filter_tx :: FilterTX()
 #if WIFITYPE == 805
@@ -40,8 +37,10 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 #else
   -> error_clf :: FilterPhyErr()
 #endif
+//  -> Print("Wifi")
   -> wififrame_clf :: Classifier( 1/40%40,  // wep frames
                                   0/00%0f,  // management frames
+                                  0/08%0f,  // data
                                       - );
 
   wififrame_clf[0]
@@ -56,17 +55,31 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> WifiDecap()
     -> bc_clf::Classifier( 0/ffffffffffff,
                            0/000102030405,
-			   - );
-     
+                           - );
+
+  wififrame_clf[3]
+    -> Discard;
+
   bc_clf[0]
   -> [1]output;
 
   bc_clf[1]
   -> [0]output;
 
+  bc_clf[2]
+  -> Discard;
+
   input[0]
+  -> rs
   -> clientwifi::WifiEncap(0x02, WIRELESS_INFO ap/winfo)
-  -> wifioutq;  
- 
-} 
+  -> wifioutq;
+
+  Idle() -> [1]ap[1] -> Discard;
+  Idle() -> [2]ap[2] -> Discard;
+
+  filter_tx[1]
+  -> WifiDecap()
+  -> [1]rs;
+
+}
 
