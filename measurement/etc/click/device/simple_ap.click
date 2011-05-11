@@ -17,9 +17,17 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
   wifioutq::NotifierQueue(50);
+  mgtoutq::NotifierQueue(50);
 
-  wifioutq
+
+  prio_s::PrioSched()
   -> wifidevice; 
+
+  mgtoutq
+  -> [0]prio_s;
+  
+  wifioutq
+  -> [1]prio_s;
 
   input[0] 
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
@@ -41,7 +49,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   wififrame_clf[1]
     -> ap
-    -> wifioutq;
+    -> mgtoutq;
 
   wififrame_clf[2]
     -> FilterBSSID(ACTIVE true, DEBUG 2, WIRELESS_INFO ap/winfo)
