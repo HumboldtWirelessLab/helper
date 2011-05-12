@@ -19,7 +19,8 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   wifioutq::NotifierQueue(50);
   mgtoutq::NotifierQueue(50);
 
-  rs::MadwifiRate(RT rates);
+//rs::MadwifiRate(RT rates);
+  rs::AutoRateFallback(RT rates);
 
   prio_s::PrioSched()
   -> wifidevice; 
