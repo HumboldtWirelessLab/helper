@@ -28,7 +28,7 @@ elementclass ACCESS_POINT { DEVICE $device, ETHERADDRESS $etheraddress, SSID $ss
     beacon_src::BRN2BeaconSource( WIRELESS_INFO winfo, RT rates, ACTIVE 1, WIRELESSINFOLIST wil)
 #else
     assoc_resp::BRN2AssocResponder(DEBUG 0, DEVICE $device, WIRELESS_INFO winfo, RT rates, ASSOCLIST assoclist, RESPONSE_DELAY 0 )
-    beacon_src::BRN2BeaconSource( WIRELESS_INFO winfo, RT rates, ACTIVE 1)
+    beacon_src::BRN2BeaconSource( WIRELESS_INFO winfo, RT rates, ACTIVE 1, HEADROOM 96)
 #endif
 
     input[0]

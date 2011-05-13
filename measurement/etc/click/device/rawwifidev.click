@@ -27,7 +27,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #if WIFITYPE == 805                                                 /***  for ath2 add priority scheduler to prefer operation packet ***/
   -> [1]op_prio_s::PrioSched();                                     /**/
                                                                     /**/
-  ath_op::Ath2Operation(DEVICE $device, READCONFIG true, DEBUG 4);  /**/
+  ath_op::Ath2Operation(DEVICE $device, READCONFIG true, DEBUG 2);  /**/
                                                                     /**/
   ath_op                                                            /**/
   -> ath_op_q::NotifierQueue(10)                                    /**/
