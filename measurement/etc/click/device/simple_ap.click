@@ -27,7 +27,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   mgtoutq
   -> [0]prio_s;
-  
+
   wifioutq
   -> [1]prio_s;
 
@@ -52,7 +52,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> mgtoutq;
 
   wififrame_clf[2]
-    -> FilterBSSID(ACTIVE true, DEBUG 2, WIRELESS_INFO ap/winfo)
+    -> FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
     -> WifiDecap()
     -> bc_clf::Classifier( 0/ffffffffffff,
                            0/000102030405,
