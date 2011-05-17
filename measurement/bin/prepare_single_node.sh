@@ -171,6 +171,14 @@ abort_measurement() {
     echo "0" > status/$LOGMARKER\_killclick.state
   fi
 
+  if [ "x$MODE" = "xwireless" ]; then
+    for node in $NODELIST; do
+      scp -i $DIR/../../host/etc/keys/id_dsa -r root@$node:$FINALRESULTDIR/ $FINALRESULTDIR/../ > status/$LOGMARKER\_copy_result.log 2>&1
+      run_on_node $node "rm -rf $FINALRESULTDIR/" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_copy_result.log 2>&1
+      echo "Done" >> status/$LOGMARKER\_copy_result.log 2>&1
+    done
+  fi
+
   wait_for_master_state killmeasurement $LOGMARKER
   echo "Check nodes" >> status/$LOGMARKER\_finalnodecheck.log 2>&1
   echo "0" > status/$LOGMARKER\_finalnodecheck.state
@@ -284,16 +292,17 @@ if [ "x$MODE" = "xwireless" ]; then
   NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mounttmpfs >> status/$LOGMARKER\_environment.log 2>&1
 
   echo "Start node test"  >> status/$LOGMARKER\_environment.log 2>&1
-  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh start_node_check >> status/$LOGMARKER\_environment.log 2>&1 
+  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh start_node_check >> status/$LOGMARKER\_environment.log 2>&1
 
   echo -n "Check node test: "  >> status/$LOGMARKER\_environment.log 2>&1
-  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh test_node_check >> status/$LOGMARKER\_environment.log 2>&1 
+  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh test_node_check >> status/$LOGMARKER\_environment.log 2>&1
 
   #TODO: get name from elsewhere
   FILENAME="pack_file.tar.bz2" 
 
-  echo "copy"  >> status/$LOGMARKER\_environment.log 2>&1
+  echo "copy"  >> status/$LOGMARKER\_environment.log 2>&1 
   FILE="$FILENAME" TARGETDIR=/tmp NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh scp_remote >> status/$LOGMARKER\_environment.log 2>&1
+
   echo "unpack"  >> status/$LOGMARKER\_environment.log 2>&1
   FILE="$FILENAME" TARGETDIR=/tmp NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh unpack_remote >> status/$LOGMARKER\_environment.log 2>&1
   echo "0" > status/$LOGMARKER\_environment.state
