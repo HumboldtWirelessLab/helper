@@ -114,6 +114,13 @@ case "$1" in
 
 			run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa
 			run_on_node $node "mount -t tmpfs none $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			
+			MOUNTED_SUCC=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+
+			if [ "x$MOUNTED_SUCC" != "x0" ]; then
+			  echo "$NFSHOME mounted successfull"
+			  run_on_node $node "umount $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			fi
 
 		    else
 			echo "TMPHOME not set, so no mount."
@@ -123,9 +130,33 @@ case "$1" in
 	"scp_remote")
 		for node in $NODELIST; do
 		    echo "$node"
-		    echo "scp -i $DIR/../etc/keys/id_dsa $FILE root@$node:$TARGETDIR"
-		    scp -i $DIR/../etc/keys/id_dsa $FILE root@$node:$TARGETDIR
+		    MD5SUM=`md5sum $FILE | awk '{print $1}'`
+		    SCP_SUCC=0
+		    FILEBASENAME=`basename $FILE`
+
+		    while [ $SCP_SUCC -eq 0 ]; do
+		      echo "scp -i $DIR/../etc/keys/id_dsa $FILE root@$node:$TARGETDIR"
+		      scp -i $DIR/../etc/keys/id_dsa $FILE root@$node:$TARGETDIR
+		      sleep 1
+		      REMOTEMD5SUM=$(run_on_node $node "export PATH=\$PATH:/bin:/sbin/:/usr/bin:/usr/sbin; md5sum $TARGETDIR/$FILEBASENAME" "/" $DIR/../etc/keys/id_dsa)
+		      REMOTEMD5SUM=`echo $REMOTEMD5SUM | awk '{print $1}'`
+		      echo "MD5SUM: $MD5SUM REMOTE: $REMOTEMD5SUM"
+		      if [ "x$REMOTEMD5SUM" == "x$MD5SUM" ]; then
+		        SCP_SUCC=1
+		      fi
+		    done
 		done
+		;;
+	"scp_check")
+		RESULT=1;
+		for node in $NODELIST; do
+		    NODERESULT=`run_on_node $node "ls $TARGETDIR/$FILE 2> /dev/null" "/" $DIR/../etc/keys/id_dsa | wc -l`
+		    if [ $NODERESULT -eq 0 ]; then
+		      RESULT=`expr $RESULT + 1`
+		    fi
+		done
+		
+		echo $RESULT
 		;;
 	"unpack_remote")
 		for node in $NODELIST; do
@@ -151,4 +182,4 @@ case "$1" in
 		;;
 esac
 
-exit 0		
+exit 0
