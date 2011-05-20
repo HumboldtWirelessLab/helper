@@ -114,14 +114,7 @@ for node in $NODELIST; do
       NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh rmmod >> status/$LOGMARKER\_killclick.log 2>&1
     else
       if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-        NODEARCH=`NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh "$NODEBINDIR/system.sh get_arch"`
-        CLICKPID=`run_on_node $node "pidof click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa`
-        if [ "x$CLICKPID" != "x" ]; then
-          for cpid in $CLICKPID; do
-            echo -n "PID: $CLICKPID !" >> status/$LOGMARKER\_killclick.log
-            run_on_node $node "kill $cpid" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_killclick.log 2>&1
-          done 
-        fi
+        run_on_node $node "$DIR/../../nodes/bin/click.sh stop" "/" $DIR/../etc/keys/id_dsa
       fi
     fi
 
