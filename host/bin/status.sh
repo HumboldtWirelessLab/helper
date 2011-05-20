@@ -33,7 +33,7 @@ case "$1" in
 	"setmarker")
 		for node in $NODELIST; do
 		    echo "$node"
-		    run_on_node $node "touch $MARKER" "/" $DIR/../etc/keys/id_dsa
+		    run_on_node $node "touch $MARKER; if [ -f /usr/bin/led_ctrl.sh ]; then /usr/bin/led_ctrl.sh setup; fi" "/" $DIR/../etc/keys/id_dsa
 		done
 		;;
 	"statusmarker")	

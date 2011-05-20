@@ -16,7 +16,7 @@ maxl[1]
   -> rtap_decap :: BrnRadiotapDecap()
   -> filter_tx :: FilterTX()
   -> ok :: Counter
-  -> BRN2PrintWifi("OKPacket",TIMESTAMP true)
+  -> BRN2PrintWifi("OKPacket", PRINTHT true, TIMESTAMP true)
   -> WifiDecap()
 //SEQ  -> seq_clf :: Classifier( 12/8088, - )
 //SEQ  -> Print("ReferenceSignal", TIMESTAMP true)
