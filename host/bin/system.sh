@@ -133,10 +133,18 @@ case "$1" in
 	          fi
 	        fi
 
+		FILE=$DIR/../../nodes/lib/standalone/node_check.sh TARGETDIR=/tmp NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh scp_remote
+
 		for node in $NODELIST; do
-		    scp -i $DIR/../etc/keys/id_dsa $DIR/../../nodes/lib/standalone/node_check.sh root@$node:/tmp/
+		  
+		  START_TEST="0 0 0"
+		  
+		  while [ "$START_TEST" != "$node 1 1" ]; do
 		    START_RESULT=`run_on_node $node "./node_check.sh start &" "/tmp" $DIR/../etc/keys/id_dsa`
-		    echo "$node $START_RESULT"
+		    START_TEST=`NODELIST="$NODELIST" $0 test_node_check`
+		  done
+		    
+                  echo "$node $START_RESULT"
 		done
 		;;
 	"test_node_check")
