@@ -113,14 +113,20 @@ case "$1" in
 			fi
 
 			run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa
-			run_on_node $node "mount -t tmpfs none $NFSHOME" "/" $DIR/../etc/keys/id_dsa
 			
-			MOUNTED_SUCC=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+			MOUNTED_SUCC=0;
+			
+			while [ "x$MOUNTED_SUCC" == "x0" ]; do
 
-			if [ "x$MOUNTED_SUCC" != "x0" ]; then
-			  echo "$NFSHOME mounted successfull"
-			  run_on_node $node "umount $NFSHOME" "/" $DIR/../etc/keys/id_dsa
-			fi
+			  if [ "x$MOUNTED_SUCC" != "x0" ]; then
+			    echo "$NFSHOME mounted successfull"
+			  else
+			    run_on_node $node "mount -t tmpfs none $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			  fi
+
+			  MOUNTED_SUCC=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+
+			done
 
 		    else
 			echo "TMPHOME not set, so no mount."
@@ -159,10 +165,20 @@ case "$1" in
 		echo $RESULT
 		;;
 	"unpack_remote")
+		FINALFILE=`bzcat $TARGETDIR/$FILENAME | tar -t | tail -n 1`
+		echo "Testfile is $FINALFILE"
+ 
 		for node in $NODELIST; do
 		    FILENAME=`basename $FILE`
-		    echo "bzcat $TARGETDIR/$FILENAME | tar xvf -"
-		    run_on_node $node "export PATH=\$PATH:/bin:/sbin/:/usr/bin:/usr/sbin; bzcat $TARGETDIR/$FILENAME | tar xvf -" "/" $DIR/../etc/keys/id_dsa
+		    SUCC_UNPACK=0
+		    
+		    while [ "x$SUCC_UNPACK" == "x0" ]; do
+		      echo "bzcat $TARGETDIR/$FILENAME | tar xvf -"
+		      run_on_node $node "export PATH=\$PATH:/bin:/sbin/:/usr/bin:/usr/sbin; bzcat $TARGETDIR/$FILENAME | tar xvf -" "/" $DIR/../etc/keys/id_dsa
+		      SUCC_UNPACK=`run_on_node $node "export PATH=\$PATH:/bin:/sbin/:/usr/bin:/usr/sbin; ls $FINALFILE 2> /dev/null" "/" $DIR/../etc/keys/id_dsa`
+		      SUCC_UNPACK=`echo $SUCC_UNPACK | wc -l`
+		    done
+		    echo "Unpack successful"
 		done
 		;;		
 	"watchdogstart")
