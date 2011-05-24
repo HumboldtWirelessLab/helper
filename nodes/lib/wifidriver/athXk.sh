@@ -34,6 +34,16 @@ case "$1" in
 		    exit 1
 		fi
 		;;
+    "device_name")
+		IS_TMPL=`echo $DEVICE | grep DEV | wc -l`
+		
+		if [ $IS_TMPL -ne 0 ]; then
+		  NUM=`echo $DEVICE | sed "s#DEV##g"`
+		  echo "wlan$NUM"
+		else
+		  echo $DEVICE
+		fi
+		;;
     "install")
                 . $DIR/../../etc/wifi/default
 
