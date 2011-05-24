@@ -17,7 +17,7 @@ case "$SIGN" in
       exit -1
       ;;
 esac
-                                                                    
+
 
 case "$1" in
     "install")
@@ -43,7 +43,7 @@ case "$1" in
 	;;
     "uninstall")
 	MODLIST="click proclikefs"
-    
+
 	umount /tmp/click
 	rm -rf /tmp/click
 	
@@ -97,6 +97,33 @@ case "$1" in
           kill -9 $SC_PID
           rm /tmp/kclick_syncctrl.pid
         fi
+        ;;
+    "start")
+        ARCH=`$DIR/system.sh get_arch`
+        if [ -f /usr/bin/led_ctrl.sh ]; then
+          /usr/bin/led_ctrl.sh measurement
+        fi
+        (export CLICKPATH=$DIR/../etc/click; CLICKPATH=$DIR/../etc/click $DIR/click-align-$ARCH $2 | $DIR/click-$ARCH  > $3 2>&1 )
+        ;;
+    "stop")
+        ARCH=`$DIR/system.sh get_arch`
+
+        killall -9 click-$ARCH
+        killall -9 click
+
+        CLICKPID=`pidof click-$ARCH`
+
+        if [ "x$CLICKPID" != "x" ]; then
+          for cpid in $CLICKPID; do
+            echo -n "PID: $CLICKPID !"
+            kill $cpid
+          done
+        fi
+
+        if [ -f /usr/bin/led_ctrl.sh ]; then
+          /usr/bin/led_ctrl.sh finished
+        fi
+
         ;;
     *)
 	echo "unknown options"
