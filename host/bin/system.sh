@@ -140,10 +140,11 @@ case "$1" in
 		  START_TEST="0 0 0"
 		  
 		  while [ "$START_TEST" != "$node 1 1" ]; do
-		    START_RESULT=`run_on_node $node "./node_check.sh start &" "/tmp" $DIR/../etc/keys/id_dsa`
+		    run_on_node $node "./node_check.sh start &" "/tmp" $DIR/../etc/keys/id_dsa
 		    START_TEST=`NODELIST="$NODELIST" $0 test_node_check`
+		    echo "$START_TEST"
 		  done
-		    
+
                   echo "$node $START_RESULT"
 		done
 		;;
@@ -163,7 +164,7 @@ case "$1" in
 		for node in $NODELIST; do
 		    PID_EX=`run_on_node $node "ls /tmp/run/node_check.pid 2> /dev/null | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
 		    PROC_EX=`run_on_node $node "ps | grep node_check | grep -v grep 2> /dev/null | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
-		    echo "$node $PID_EX $PROC_EX "
+		    echo "$node $PID_EX $PROC_EX"
 		done
 		;;
 	"reset_driver")
