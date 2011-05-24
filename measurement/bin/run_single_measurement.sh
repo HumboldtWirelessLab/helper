@@ -370,7 +370,7 @@ mkdir status
 
 echo "Start node setup"
 for node in $NODELIST; do
-  run_command_for_node $node "MARKER=$ID FINALRESULTDIR=$FINALRESULTDIR RUNMODE=$RUNMODE NODELIST=\"$node\" $DIR/prepare_single_node.sh"
+  run_command_for_node $node "MARKER=$ID FINALRESULTDIR=$FINALRESULTDIR RUNMODE=$RUNMODE NODELIST=\"$node\"  DISABLE_WIRELESS_BACKBONE=$DISABLE_WIRELESS_BACKBONE $DIR/prepare_single_node.sh"
 done
 
 #### STATES ####
@@ -518,7 +518,8 @@ for state in  $STATES; do
 			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"LOGFILE=$LOGFILE $NODEBINDIR/click.sh kclick_start\""
 			  else
 			    sleep 0.1
-			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export CLICKPATH=$NODEBINDIR/../etc/click;CLICKPATH=$NODEBINDIR/../etc/click $NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
+			    #screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export CLICKPATH=$NODEBINDIR/../etc/click;CLICKPATH=$NODEBINDIR/../etc/click $NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT | $NODEBINDIR/click-$NODEARCH  > $LOGFILE 2>&1\""
+			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"$NODEBINDIR/click.sh start $CLICKSCRIPT $LOGFILE\""
 			    sleep 0.1
 			  fi
 		  fi

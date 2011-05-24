@@ -21,16 +21,16 @@ elementclass ACCESS_POINT { DEVICE $device, ETHERADDRESS $etheraddress, SSID $ss
     assoclist :: BRN2AssocList(LINKTABLE $link_table);
     winfo :: WirelessInfo(SSID $ssid, BSSID $etheraddress, CHANNEL $channel, INTERVAL $beacon_interval);
     bs :: BeaconScanner(RT rates);
-    
+
 #ifdef VLAN_ENABLE
     wil :: BRN2WirelessInfoList();
     assoc_resp::BRN2AssocResponder(DEBUG 0, DEVICE $device, WIRELESS_INFO winfo, RT rates, ASSOCLIST assoclist, RESPONSE_DELAY 0, WIRELESSINFOLIST wil, VLANTABLE $vlt )
     beacon_src::BRN2BeaconSource( WIRELESS_INFO winfo, RT rates, ACTIVE 1, WIRELESSINFOLIST wil)
 #else
     assoc_resp::BRN2AssocResponder(DEBUG 0, DEVICE $device, WIRELESS_INFO winfo, RT rates, ASSOCLIST assoclist, RESPONSE_DELAY 0 )
-    beacon_src::BRN2BeaconSource( WIRELESS_INFO winfo, RT rates, ACTIVE 1)
+    beacon_src::BRN2BeaconSource( WIRELESS_INFO winfo, RT rates, ACTIVE 1, HEADROOM 96)
 #endif
-    
+
     input[0]
     -> mgt_cl :: Classifier( 0/00%f0, //assoc req
                              0/10%f0, //assoc resp
@@ -91,8 +91,10 @@ elementclass ACCESS_POINT { DEVICE $device, ETHERADDRESS $etheraddress, SSID $ss
 
     fromNodetoStation[1]  //Broadcast
     -> clientwifi;
-    
+
     fromNodetoStation[2]  //For Unknown
     -> Discard;
 
 }
+
+#endif

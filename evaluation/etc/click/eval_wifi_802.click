@@ -13,10 +13,10 @@ minl
 maxl[1]
 //GPS  -> GPSPrint(NOWRAP true)
 //GPS  -> GPSDecap()
-  -> rtap_decap :: RadiotapDecap()
+  -> rtap_decap :: BrnRadiotapDecap()
   -> filter_tx :: FilterTX()
   -> ok :: Counter
-  -> BRN2PrintWifi("OKPacket",TIMESTAMP true)
+  -> BRN2PrintWifi("OKPacket", PRINTHT true, TIMESTAMP true)
   -> WifiDecap()
 //SEQ  -> seq_clf :: Classifier( 12/8088, - )
 //SEQ  -> Print("ReferenceSignal", TIMESTAMP true)

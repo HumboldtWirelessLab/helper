@@ -18,6 +18,10 @@ case "$SIGN" in
       ;;
 esac
 
+if [ "x$NODELIST" == "x" ]; then
+  exit 0
+fi
+
 ############################
 ###### Leave pid  ##########
 ############################
@@ -114,14 +118,7 @@ for node in $NODELIST; do
       NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh rmmod >> status/$LOGMARKER\_killclick.log 2>&1
     else
       if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-        NODEARCH=`NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh "$NODEBINDIR/system.sh get_arch"`
-        CLICKPID=`run_on_node $node "pidof click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa`
-        if [ "x$CLICKPID" != "x" ]; then
-          for cpid in $CLICKPID; do
-            echo -n "PID: $CLICKPID !" >> status/$LOGMARKER\_killclick.log
-            run_on_node $node "kill $cpid" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_killclick.log 2>&1
-          done 
-        fi
+        run_on_node $node "$DIR/../../nodes/bin/click.sh stop" "/" $DIR/../etc/keys/id_dsa
       fi
     fi
 
@@ -169,6 +166,14 @@ abort_measurement() {
     kill_everything
   else
     echo "0" > status/$LOGMARKER\_killclick.state
+  fi
+
+  if [ "x$MODE" = "xwireless" ]; then
+    for node in $NODELIST; do
+      scp -i $DIR/../../host/etc/keys/id_dsa -r root@$node:$FINALRESULTDIR/ $FINALRESULTDIR/../ > status/$LOGMARKER\_copy_result.log 2>&1
+      run_on_node $node "rm -rf $FINALRESULTDIR/" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_copy_result.log 2>&1
+      echo "Done" >> status/$LOGMARKER\_copy_result.log 2>&1
+    done
   fi
 
   wait_for_master_state killmeasurement $LOGMARKER
@@ -273,15 +278,28 @@ if [ "x$MODE" = "xwireless" ]; then
   echo "0" > status/$LOGMARKER\_reboot.state
 
   ############# environment ###############
-  echo "Handle wireless node" > status/$LOGMARKER\_environment.log 2>&1
+  echo "Start nodecheck" > status/$LOGMARKER\_environment.log 2>&1
+  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh start_node_check >> status/$LOGMARKER\_environment.log 2>&1
+
+  echo "Handle wireless node" >> status/$LOGMARKER\_environment.log 2>&1
+  echo "Set marker for reboot-detection $NODELIST" >> status/$LOGMARKER\_environment.log 2>&1
+  NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmarker >> status/$LOGMARKER\_environment.log 2>&1
+
   echo "mount tmpfs"  >> status/$LOGMARKER\_environment.log 2>&1
   NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh mounttmpfs >> status/$LOGMARKER\_environment.log 2>&1
+
+  echo "Start node test"  >> status/$LOGMARKER\_environment.log 2>&1
+  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh start_node_check >> status/$LOGMARKER\_environment.log 2>&1
+
+  echo -n "Check node test: "  >> status/$LOGMARKER\_environment.log 2>&1
+  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh test_node_check >> status/$LOGMARKER\_environment.log 2>&1
 
   #TODO: get name from elsewhere
   FILENAME="pack_file.tar.bz2" 
 
-  echo "copy"  >> status/$LOGMARKER\_environment.log 2>&1
+  echo "copy"  >> status/$LOGMARKER\_environment.log 2>&1 
   FILE="$FILENAME" TARGETDIR=/tmp NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh scp_remote >> status/$LOGMARKER\_environment.log 2>&1
+
   echo "unpack"  >> status/$LOGMARKER\_environment.log 2>&1
   FILE="$FILENAME" TARGETDIR=/tmp NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh unpack_remote >> status/$LOGMARKER\_environment.log 2>&1
   echo "0" > status/$LOGMARKER\_environment.state
@@ -304,11 +322,14 @@ if [ "x$MODE" = "xwireless" ]; then
 
   done
 
-  sleep 40
-
   echo "0" > status/$LOGMARKER\_wirelessfinished.state
   echo "0" > status/$LOGMARKER\_wifimodules.state
   echo "0" > status/$LOGMARKER\_wificonfig.state
+
+  echo "Start wifidev" > status/wireless_node_wait_$LOGMARKER\.state
+  date >> status/wireless_node_wait_$LOGMARKER\.state
+
+  sleep 120
 
   #set
   RUNMODENUM=5
@@ -347,9 +368,11 @@ echo "0" > status/$LOGMARKER\_reboot.state
 ####### Reboot Detection ##########
 ###################################
 
-echo "Set marker for reboot-detection $NODELIST" >> status/$LOGMARKER\_environment.log 2>&1
+if [ "x$MODE" != "xwireless" ]; then
+  echo "Set marker for reboot-detection $NODELIST" >> status/$LOGMARKER\_environment.log 2>&1
 
-NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmarker >> status/$LOGMARKER\_environment.log 2>&1
+  NODELIST="$NODELIST" MARKER="/tmp/$MARKER" $DIR/../../host/bin/status.sh setmarker >> status/$LOGMARKER\_environment.log 2>&1
+fi
 
 ###################################
 ###### Setup Environment ##########
@@ -405,10 +428,14 @@ if [ $RUNMODENUM -le 3 ]; then
       fi
     done
 
-    if [ "x$OLSR" = "xyes" ]; then
-      for node in $NODELIST; do
-         run_on_node $node "$DIR/../../nodes/lib/backbone/backbone.sh start_backbone" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_olsr_status.log 2>&1
-      done
+    if [ "x$DISABLE_WIRELESS_BACKBONE" = "xyes" ]; then
+      echo "Disable Wireless backbone by request" >> status/$LOGMARKER\_olsr_status.log 2>&1
+    else
+      if [ "x$OLSR" = "xyes" ]; then
+        for node in $NODELIST; do
+          run_on_node $node "$DIR/../../nodes/lib/backbone/backbone.sh start_backbone" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_olsr_status.log 2>&1
+        done
+      fi
     fi
 
     if [ $LOADMODULES -eq 1 ]; then
@@ -511,9 +538,15 @@ echo "0" > status/$LOGMARKER\_wificonfig.state
 ##############################
 
 if [ "x$MODE" = "xwireless" ]; then
+  echo "Wait for wifidev" >> status/wireless_node_wait_$LOGMARKER\.state
+  date >> status/wireless_node_wait_$LOGMARKER\.state
+
   #wait for own node. maybe link to wireless node is broken due to setup a gateway node
   NODELIST="$NODELIST" $DIR/../../host/bin/system.sh waitfornodesandssh > status/$LOGMARKER\_wireless_node_test.log 2>&1
   check_nodes status/$LOGMARKER\_wireless_node.state >> status/$LOGMARKER\_wireless_node_test.log 2>&1
+
+  echo "wifidev is up" >> status/wireless_node_wait_$LOGMARKER\.state
+  date >> status/wireless_node_wait_$LOGMARKER\.state
 fi
 
 ##############################

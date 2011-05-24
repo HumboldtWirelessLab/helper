@@ -39,7 +39,7 @@ case "$1" in
 		      echo "Reboot not allowed !"
 		    else
 		      echo "Reboot"
-		      run_on_node $node "reboot" "/" $DIR/../etc/keys/id_dsa
+		      run_on_node $node "if [ -f /sbin/reboot ]; then /sbin/reboot; else reboot; fi" "/" $DIR/../etc/keys/id_dsa
 		    fi  
 		done
 		;;
@@ -68,6 +68,12 @@ case "$1" in
 			AVAILABLE=`node_available $node`
 		    done
 
+		    SSH_RUNNING=`nmap --host-timeout 2s -p22 $node 2>/dev/null | grep 22 | grep tcp | awk '{print $2}'`
+		    while [ "x$SSH_RUNNING" != "xopen" ]; do
+			sleep 5;
+			SSH_RUNNING=`nmap --host-timeout 2s -p22 $node 2>/dev/null | grep 22 | grep tcp | awk '{print $2}'`
+		    done
+
 		    ARCH=`run_on_node $node "uname -m" "/" $DIR/../etc/keys/id_dsa 2> /dev/null`
 		    while [ "x$ARCH" = "x" ]; do
  			sleep 10;
@@ -78,7 +84,7 @@ case "$1" in
 		;;
 	"nodeinfo")	
 		for node in $NODELIST; do
-		    WNDR=`run_on_node $node "cat /proc/cpuinfo | grep 'WNDR' | wc -l" "/" $DIR/../etc/keys/id_dsa | grep "WNDR" | wc -l`
+		    WNDR=`run_on_node $node "cat /proc/cpuinfo | grep 'WNDR' | wc -l" "/" $DIR/../etc/keys/id_dsa`
 		    if [ $WNDR -gt 0 ]; then
 		      ARCH="mips-wndr3700"
 		    else
@@ -127,10 +133,18 @@ case "$1" in
 	          fi
 	        fi
 
+		FILE=$DIR/../../nodes/lib/standalone/node_check.sh TARGETDIR=/tmp NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh scp_remote
+
 		for node in $NODELIST; do
-		    scp -i $DIR/../etc/keys/id_dsa $DIR/../../nodes/lib/standalone/node_check.sh root@$node:/tmp/
+		  
+		  START_TEST="0 0 0"
+		  
+		  while [ "$START_TEST" != "$node 1 1" ]; do
 		    START_RESULT=`run_on_node $node "./node_check.sh start &" "/tmp" $DIR/../etc/keys/id_dsa`
-		    echo "$node $START_RESULT"
+		    START_TEST=`NODELIST="$NODELIST" $0 test_node_check`
+		  done
+		    
+                  echo "$node $START_RESULT"
 		done
 		;;
 	"test_node_check")
@@ -150,6 +164,23 @@ case "$1" in
 		    PID_EX=`run_on_node $node "ls /tmp/run/node_check.pid 2> /dev/null | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
 		    PROC_EX=`run_on_node $node "ps | grep node_check | grep -v grep 2> /dev/null | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
 		    echo "$node $PID_EX $PROC_EX "
+		done
+		;;
+	"reset_driver")
+		if [ "x$NODELIST" = "x" ]; then
+		  if [ "x$2" = "x" ]; then
+		    exit 0
+		  else
+		    if [ ! -f $2 ]; then
+		      exit 0
+		    else
+		      NODELIST=`cat $2 | grep -v "#" | awk '{print $1}'`
+		    fi
+	          fi
+	        fi
+
+		for node in $NODELIST; do
+		    run_on_node $node "if [ -f /tmp/brn_driver ]; then rm -f /tmp/brn_driver; fi" "/" $DIR/../etc/keys/id_dsa
 		done
 		;;
 	*)

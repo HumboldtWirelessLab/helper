@@ -39,7 +39,32 @@ case "$SIGN" in
       ;;
 esac
 
-while read line; do
+if [ "x$1" = "x" ] ; then
+  FILE=db
+else
+  FILE=$1
+fi
+
+if [ "x$FILE" = "xdb" ]; then
+  echo "Use db. Get Unused nodes ...."
+  #TODO: use file to determinate, which node needs the driver!
+  NODES=`$DIR/../../host/lib/sql/get_unused_nodes.pl | grep -v seismo`
+  echo $NODES
+  for CNODE in $NODES; do
+    echo -n "$CNODE "
+    NODELIST="$CNODE" $DIR/../../host/bin/environment.sh mount
+    NODEDEVICES=`ssh root@$CNODE "PATH=/bin/:/sbin/:/usr/bin:/usr/sbin/; iwconfig 2> /dev/null" | grep "IEEE" | awk '{print $1}'`
+    for d in $NODEDEVICES; do
+      echo -n "$d "
+      NODE=$CNODE DEVICES=$d $DIR/../../host/bin/wlandevices.sh delete
+    done
+
+    NODELIST="$CNODE" MODULSDIR=$DIR/../../nodes/lib/modules/NODEARCH/KERNELVERSION $DIR/../../host/bin/wlanmodules.sh rmmod
+    echo "rmmod"
+  done
+
+else
+  while read line; do
 	ISCOMMENT=`echo $line | grep "#" | wc -l`
 	NOSPACELINE=`echo $line | sed -e "s#[[:space:]]##g"`
 
@@ -70,6 +95,8 @@ while read line; do
 		fi
 	fi
 
-done < $1
+  done < $FILE
+
+fi
 
 exit 0
