@@ -74,8 +74,22 @@ case "$1" in
 		      for CNODE in $CNODES; do
 
 		        if [ "x$USED_SIMULATOR" = "xns" ]; then
-			  CDEV=eth0
-			fi
+			  DEVICE_TMPL=`echo $CDEV | grep "dev" | wc -l`
+			  if [ $DEVICE_TMPL -eq 0 ]; then
+			    CDEV=eth0
+			  else
+			    CDEV=`echo $CDEV | sed "s#DEV##g"`
+			    CDEV="eth$CDEV"
+			  fi
+			else
+			  DEVICE_TMPL=`echo $CDEV | grep "dev" | wc -l`
+			  if [ $DEVICE_TMPL -eq 0 ]; then
+			    CDEV=ath0
+			  else
+			    CDEV=`echo $CDEV | sed "s#DEV##g"`
+			    CDEV="ath$CDEV"
+			  fi
+                        fi
 			
 		        NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$CNODE[[:space:]]*$CDEV" | wc -l`
 			
