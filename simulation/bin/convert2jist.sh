@@ -24,9 +24,9 @@ case "$1" in
 		;;
 	"convert")
 	  . $2
-	  
+
 	  NONODES=`cat $NODEPLACEMENTFILE | wc -l`
-	  
+
 	  echo "sim.duration = $TIME"
     echo "sim.nonodes = $NONODES"
     echo -n "radio.placementopts = ";
@@ -41,20 +41,20 @@ case "$1" in
       fi
       NODE=`expr $NODE + 1`
     done < $NODEPLACEMENTFILE
-    
+
     echo ""
     FIELDSIZE=`expr $FIELDSIZE + 1`
     echo "field.size.x = $FIELDSIZE"
     echo "field.size.y = $FIELDSIZE"
-	  
+
     NODE=1
 		while read line; do
 		  NODENAME=`echo $line | awk '{print $1}'`
 		  NODEDEVICE=`echo $line | awk '{print $2}'`
 		  NODECONFIG=`echo $line | awk '{print $5}'`
 		  NODECLICK=`echo $line | awk '{print $7}'`
-		  
-		  
+
+
 		  if [ ! -f $NODECONFIG ]; then
 		    if [ -f $DIR/../../nodes/etc/wifi/$NODECONFIG ]; then
                       NODECONFIG="$DIR/../../nodes/etc/wifi/$NODECONFIG"
@@ -62,22 +62,22 @@ case "$1" in
 		      NODECONFIG="$DIR/../../nodes/etc/wifi/monitor.default"
 		    fi
 		  fi
-		  
-		  . $NODECONFIG
+
+		  . ./$NODECONFIG
 
 		  echo "node.$NODE.name = $NODENAME"
 		  echo "node.$NODE.device = $NODEDEVICE"
 		  echo "node.$NODE.config = $NODENAME"
 		  echo "node.$NODE.click = $NODECLICK"
-		  
+
 		  if [ "x$WIFITYPE" = "x" ]; then
 		    echo "node.$NODE.wifitype = 806"
 		  else
 		    echo "node.$NODE.wifitype = $WIFITYPE"
-		  fi		     
-		  
+		  fi
+
 		  NODE=`expr $NODE + 1`
-		  
+
 		done < $NODETABLE
 		;;
 	*)
@@ -85,4 +85,4 @@ case "$1" in
 		;;
 esac
 
-exit 0		
+exit 0
