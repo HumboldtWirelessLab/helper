@@ -7,7 +7,15 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 #ifdef RAWDEV_DEBUG
   -> Print("To Device")
 #endif
+#ifdef PACKET_REUSE
+  -> toraw::TORAWDEVICE($devname)
+  -> [1]output;
+
+  toraw[1]
+  -> [1]output;
+#else
   -> TORAWDEVICE($devname);
+#endif
 
   FROMRAWDEVICE($devname)
 #ifdef RAWDEV_DEBUG
