@@ -53,6 +53,11 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> ath_op;
 #endif
 
+#ifdef PACKET_REUSE
+  rawdev[1]
+  -> __WIFIDECAP__
+  -> [1]output;
+#endif
 }
 
 #endif
