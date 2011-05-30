@@ -65,6 +65,6 @@ while (@array = $query->fetchrow_array) {
 	$i++;
 }
 } else  {
-	print "0";
+	print $ARGV[0]." ".$ARGV[1]." 0\n";
 
 }
