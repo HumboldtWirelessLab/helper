@@ -180,7 +180,8 @@ case "$1" in
                 fi
                   
                 #echo "SED: $DUMPSEDARG"
-                CPPOPTS="$CPPOPTS -DDEBUGLEVEL=$DEBUG"
+                DEVICENUMBER=`echo $CDEV | sed -e 's#[a-zA-Z]*##g'`
+                CPPOPTS="$CPPOPTS -DDEBUGLEVEL=$DEBUG -DDEVICENUMBER=$DEVICENUMBER"
                 DIRSEDARG="-e s#NODEDEVICE#$CDEV#g -e s#NODENAME#$CNODE#g -e s#RESULTDIR#$RESULTDIR#g -e s#WORKDIR#$WORKDIR#g -e s#BASEDIR#$BASEDIR#g"
 
                 if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserlevel" ]; then
@@ -194,7 +195,7 @@ case "$1" in
                      CPPOPTS="$CPPOPTS -DCONTROLSOCKET"
                   fi
                 fi
-                
+
                 HELPER_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "helper.inc" | wc -l)`
 
                 NODEID_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "BRN2NodeIdentity" | wc -l)`
@@ -202,7 +203,8 @@ case "$1" in
 		if [ $NODEID_INC -gt 0 ]; then
                      CPPOPTS="$CPPOPTS -DNODEID_NAME"		  
 		fi
-                
+
+                #echo $CPPOPTS
                 if [ $HELPER_INC -gt 0 ]; then
                   ( cd $CONFIGDIR; cat $CLICK | add_include no | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v "^#" >> $CLICKFINALNAME )
                 else
