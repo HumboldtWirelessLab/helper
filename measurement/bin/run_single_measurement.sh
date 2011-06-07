@@ -294,30 +294,6 @@ if [ "x$RUNMODE" = "x" ]; then
     RUNMODE=UNKNOWN
 fi
 
-case "$RUNMODE" in
-	"REBOOT")
-			RUNMODENUM=1
-			;;
-	"ENVIRONMENT")
-			RUNMODENUM=2
-			;;
-	"DRIVER")
-			RUNMODENUM=3
-			;;
-	"CONFIG")
-			RUNMODENUM=4
-			;;
-	"CLICK")
-			RUNMODENUM=5
-			;;
-	"APPLICATION")
-			RUNMODENUM=5
-			;;
-	*)
-			RUNMODENUM=0
-			;;
-esac
-
 #####################
 ### master stuff ####
 #####################
@@ -370,7 +346,7 @@ mkdir status
 
 echo "Start node setup"
 for node in $NODELIST; do
-  run_command_for_node $node "MARKER=$ID FINALRESULTDIR=$FINALRESULTDIR RUNMODE=$RUNMODE NODELIST=\"$node\"  DISABLE_WIRELESS_BACKBONE=$DISABLE_WIRELESS_BACKBONE $DIR/prepare_single_node.sh"
+  run_command_for_node $node "MARKER=$ID FINALRESULTDIR=$FINALRESULTDIR RUNMODE=$RUNMODE NODELIST=\"$node\" DISABLE_WIRELESS_BACKBONE=$DISABLE_WIRELESS_BACKBONE $DIR/prepare_single_node.sh"
 done
 
 #### STATES ####
@@ -434,6 +410,8 @@ for state in  $STATES; do
       SYNCSTATE=`wait_for_nodes "$WIRELESSNODELIST" _wirelessfinished.state`
       echo "done." >&6
     fi
+    #
+
 
     #wait for wireless nodes
     set_master_state 0 wirlessfinished
