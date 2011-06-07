@@ -79,7 +79,7 @@ while [ "x$key" = "xy" ]; do
         RUNMODE=$RUNMODE $DIR/run_measurement.sh $DISFILE $NEXT
         RUNMODE=$MULTIRUNMODE
       else
-        $DIR/../../simulation/bin/ns2-sim.sh run $DISFILE $NEXT
+        $DIR/../../simulation/bin/run_sim.sh ns $DISFILE $NEXT
       fi
 
       if [ "$MULTIREPEAT" = "ASK" ]; then
