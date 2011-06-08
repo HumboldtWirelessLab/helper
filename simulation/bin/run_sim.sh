@@ -164,6 +164,21 @@ case "$MODE" in
 		  if [ $POS_Z -gt $POS_Z_MAX ]; then
 			    POS_Z_MAX=$POS_Z;
 		  fi
+
+                   
+ 
+                 # write position to .click file (there call a handler in Script like) 
+                 # Script (
+                 #   "write loc.cart_coord NODEPOSITIONX NODEPOSITIONY NODEPOSITIONZ,"
+                 #   ...
+                 # );
+		  NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+		  for nodedevice in $NODEDEVICELIST; do		    
+		    CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
+		    cat $CLICK | sed -e "s#NODEPOSITIONX#$POS_X#g" -e "s#NODEPOSITIONY#$POS_Y#g" -e "s#NODEPOSITIONZ#$POS_Z#g" > $CLICK.tmp
+		    mv $CLICK.tmp $CLICK
+                  done
+
 		done
     
 		POS_X_MAX=`expr $POS_X_MAX + 50`
