@@ -70,7 +70,7 @@ case "$1" in
 		      else
         		CNODES=$CNODE
         	      fi
-																		     
+
 		      for CNODE in $CNODES; do
 
 		        if [ "x$USED_SIMULATOR" = "xns" ]; then
@@ -119,11 +119,19 @@ case "$1" in
 		else
 		  WIFITYPE=806
 		fi																		      
-              
+
                 CPPOPTS="-DNODENAME=$CNODE -DNODEDEVICE=$CDEV -DTIME=$TIME"
                 CPPOPTS="$CPPOPTS -DDEBUGLEVEL=$DEBUG"
                 CPPOPTS="$CPPOPTS -DSIMULATION"
                 CPPOPTS="$CPPOPTS -DWIFITYPE=$WIFITYPE"
+
+                #echo $NODEPLACEMENTFILE
+                if [ "x$NODEPLACEMENTFILE" != "x" ] && [ -e $NODEPLACEMENTFILE ]; then
+                  XPOS=`cat $NODEPLACEMENTFILE | grep "$CNODE" | awk '{print $2}'`
+                  YPOS=`cat $NODEPLACEMENTFILE | grep "$CNODE" | awk '{print $3}'
+                  CPPOPTS="$CPPOPTS -DXPOS=$XPOS -DYPOS=$YPOS`
+                  #echo "$XPOS $YPOS"
+                fi
 		
 		NODEID_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "BRN2NodeIdentity" | wc -l)`
 		

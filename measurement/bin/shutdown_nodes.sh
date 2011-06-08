@@ -53,7 +53,8 @@ if [ "x$FILE" = "xdb" ]; then
   for CNODE in $NODES; do
     echo -n "$CNODE "
     NODELIST="$CNODE" $DIR/../../host/bin/environment.sh mount
-    NODEDEVICES=`ssh root@$CNODE "PATH=/bin/:/sbin/:/usr/bin:/usr/sbin/; iwconfig 2> /dev/null" | grep "IEEE" | awk '{print $1}'`
+    NODELIST=$CNODE $DIR/../../host/bin/click.sh stop
+    NODEDEVICES=`echo "" | ssh root@$CNODE "PATH=/bin/:/sbin/:/usr/bin:/usr/sbin/; iwconfig 2> /dev/null" | grep "IEEE" | awk '{print $1}'`
     for d in $NODEDEVICES; do
       echo -n "$d "
       NODE=$CNODE DEVICES=$d $DIR/../../host/bin/wlandevices.sh delete
@@ -87,8 +88,9 @@ else
 			fi
 
 			for CNODE in $CNODES; do
-				echo "$CNODE $CDEV $CMODDIR"  
+				echo "$CNODE $CDEV $CMODDIR"
                                 NODELIST="$CNODE" $DIR/../../host/bin/environment.sh mount 
+				NODELIST=$CNODE $DIR/../../host/bin/click.sh stop
 				NODE=$CNODE DEVICES=$CDEV $DIR/../../host/bin/wlandevices.sh delete
                                 NODELIST="$CNODE" MODULSDIR=$CMODDIR $DIR/../../host/bin/wlanmodules.sh rmmod
 			done

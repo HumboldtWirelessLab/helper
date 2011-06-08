@@ -165,13 +165,13 @@ case "$1" in
 		echo $RESULT
 		;;
 	"unpack_remote")
+		FILENAME=`basename $FILE`
 		FINALFILE=`bzcat $TARGETDIR/$FILENAME | tar -t | tail -n 1`
 		echo "Testfile is $FINALFILE"
  
 		for node in $NODELIST; do
-		    FILENAME=`basename $FILE`
 		    SUCC_UNPACK=0
-		    
+
 		    while [ "x$SUCC_UNPACK" == "x0" ]; do
 		      echo "bzcat $TARGETDIR/$FILENAME | tar xvf -"
 		      run_on_node $node "export PATH=\$PATH:/bin:/sbin/:/usr/bin:/usr/sbin; bzcat $TARGETDIR/$FILENAME | tar xvf -" "/" $DIR/../etc/keys/id_dsa
