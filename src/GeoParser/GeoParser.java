@@ -19,6 +19,8 @@ public class GeoParser {
     double lat2d = deg2rad(lat2);
     double lon2d = deg2rad(lon2);
 
+    if ( (lat1d < 0.1) || (lon1d < 0.1 ) || (lat2d < 0.1) || (lon1d < 0.1) ) return 0.0;
+
     double a = 6378137, b = 6356752.3142, f = 1 / 298.257223563;
     double L = lon2d - lon1d;
     double U1 = Math.atan((1 - f) * Math.tan(lat1d));

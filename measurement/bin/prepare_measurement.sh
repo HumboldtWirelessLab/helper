@@ -141,46 +141,49 @@ case "$1" in
 			      if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
 			        #get full path of click-file
 				      CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
-			    
-				      if [ -e $CLICK ] || [ -e $CONFIGDIR/$CLICK ]; then
+
+              #echo $CLICK
+
+              if [ -e $CLICK ] || [ -e $CONFIGDIR/$CLICK ]; then
                 CLICKBASENAME=`basename $CLICK`
-				        CLICKFINALNAME="$RESULTDIR/$CLICKBASENAME.$CNODE.$CDEV"
+                CLICKFINALNAME="$RESULTDIR/$CLICKBASENAME.$CNODE.$CDEV"
                 if [ "x$DEBUG" = "x" ]; then
-				          DEBUG=2
-				        else
-				          if [ $DEBUG -gt 4 ] || [ $DEBUG -lt 0 ]; then
-				            DEBUG=2
+                  DEBUG=2
+                else
+                  if [ $DEBUG -gt 4 ] || [ $DEBUG -lt 0 ]; then
+                    DEBUG=2
                   fi
                 fi
-				    
-				        echo -n "" > $CLICKFINALNAME
-				    
+
+                echo -n "" > $CLICKFINALNAME
+
                 ###################
                 ### Remote Dump ###
                 ###################
-		DUMPSEDARG=" -e s#-#-#g"
+                DUMPSEDARG=" -e s#-#-#g"
 
                 if [ "x$REMOTEDUMP" = "xyes" ]; then
                   CPPOPTS="$CPPOPTS -DREMOTEDUMP -DDUMPMAC=$DUMPMAC -DDUMPIP=$DUMPIP"
-                
+
                   DUMPS=`(cd $CONFIGDIR; cat $CLICK | add_include | awk '/TODUMP/ {print NR" "$0}' | grep -v "^[1-9]*[[:space:]]*//" | awk '{print $1}')`
-                                    
+
                   NODEDUMPNR=1;
-                  
+
                   for i in $DUMPS; do
                     DUMPLINE=`( cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "TODUMP" | head -n $NODEDUMPNR | tail -n 1 | sed -e "s#^.*TODUMP(##g" -e "s#).*##g" )`
                     echo "$CNODE $CDEV $NODEDUMPNR $DUMPLINE $DUMPIP $DUMPPORTBASE" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.map
-                                  
+
                     DUMPSEDARG="$DUMPSEDARG -e s#DUMPPORT@$i#$DUMPPORTBASE#g"
                     echo "Idle->Socket(UDP,$DUMPIP,$DUMPPORTBASE,$DUMPIP,$DUMPPORTBASE)->TimestampDecap()->ToDump("$DUMPLINE");" | sed -e "s#NODEDEVICE#$CDEV#g" -e "s#NODENAME#$CNODE#g" -e "s#RUNTIME#$TIME#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" >> $RESULTDIR/remotedump.click
-                    
+
                     NODEDUMPNR=`expr $NODEDUMPNR + 1`
                     DUMPPORTBASE=`expr $DUMPPORTBASE + 1`
                   done
                 fi
-                  
+
                 #echo "SED: $DUMPSEDARG"
-                CPPOPTS="$CPPOPTS -DDEBUGLEVEL=$DEBUG"
+                DEVICENUMBER=`echo $CDEV | sed -e 's#[a-zA-Z]*##g'`
+                CPPOPTS="$CPPOPTS -DDEBUGLEVEL=$DEBUG -DDEVICENUMBER=$DEVICENUMBER"
                 DIRSEDARG="-e s#NODEDEVICE#$CDEV#g -e s#NODENAME#$CNODE#g -e s#RESULTDIR#$RESULTDIR#g -e s#WORKDIR#$WORKDIR#g -e s#BASEDIR#$BASEDIR#g"
 
                 if [ "$CCMODDIR" = "-" ] || [ "x$CLICKMODE" = "xuserlevel" ]; then
@@ -194,33 +197,37 @@ case "$1" in
                      CPPOPTS="$CPPOPTS -DCONTROLSOCKET"
                   fi
                 fi
-                
+
                 HELPER_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "helper.inc" | wc -l)`
 
                 NODEID_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "BRN2NodeIdentity" | wc -l)`
-		
-		if [ $NODEID_INC -gt 0 ]; then
-                     CPPOPTS="$CPPOPTS -DNODEID_NAME"		  
-		fi
-                
+
+                if [ $NODEID_INC -gt 0 ]; then
+                     CPPOPTS="$CPPOPTS -DNODEID_NAME"
+                fi
+
+                #echo $CPPOPTS
                 if [ $HELPER_INC -gt 0 ]; then
                   ( cd $CONFIGDIR; cat $CLICK | add_include no | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v "^#" >> $CLICKFINALNAME )
                 else
                   ( cd $CONFIGDIR; cat $CLICK | add_include | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v "^#" >> $CLICKFINALNAME )
                 fi
               else
+                if [ ! -e $CLICK ]; then
+                   echo "WARNING: clickfile ($CLICK) not found."
+                fi
                 CLICKFINALNAME="-"
               fi
             else
               CLICKFINALNAME="-"
             fi
-          
+
             echo "$CNODE $CDEV $CMODDIR $CMODOPT $WIFICONFIGFINALNAME $CCMODDIR $CLICKFINALNAME $CCLOG $CAPP $CAPPL" | sed -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" -e "s#NODENAME#$CNODE#g" -e "s#NODEDEVICE#$CDEV#g" >> $RESULTDIR/$NODETABLE.$POSTFIX
 
           done
-			  fi
+        fi
       fi
-		done < $CONFIGDIR/$NODETABLE
+   done < $CONFIGDIR/$NODETABLE
 		
 		if [ "x$REMOTEDUMP" = "xyes" ]; then
 		  REMOTEDUMPTIME=`expr $TIME + 5`

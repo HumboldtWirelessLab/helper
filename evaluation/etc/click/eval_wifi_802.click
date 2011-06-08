@@ -5,18 +5,19 @@ FromDump("DUMP",STOP true)
   -> Print("Sync", TIMESTAMP true)
   -> toosmall :: Counter
   -> Discard;
-	    
+
 minl
   -> Print("DumpError", TIMESTAMP true)
   -> Discard;
-	       
+
 maxl[1]
 //GPS  -> GPSPrint(NOWRAP true)
 //GPS  -> GPSDecap()
   -> rtap_decap :: BrnRadiotapDecap()
   -> filter_tx :: FilterTX()
+  -> error_clf :: WifiErrorClassifier()
   -> ok :: Counter
-  -> BRN2PrintWifi("OKPacket", PRINTHT true, TIMESTAMP true)
+  -> BRN2PrintWifi("OKPacket", PRINTHT PARAMS_HT, PRINTRXSTATUS PARAMS_RX, PRINTEVM PARAMS_EVM, TIMESTAMP true)
   -> WifiDecap()
 //SEQ  -> seq_clf :: Classifier( 12/8088, - )
 //SEQ  -> Print("ReferenceSignal", TIMESTAMP true)
@@ -24,6 +25,12 @@ maxl[1]
 
 //SEQ seq_clf[1]
 //SEQ -> Discard;
+
+error_clf[1]
+  -> crc :: Counter
+  -> BRN2PrintWifi("CRCerror", PRINTHT PARAMS_HT, PRINTRXSTATUS PARAMS_RX, PRINTEVM PARAMS_EVM, TIMESTAMP true)
+  -> Discard;
+
 
 filter_tx[1]
   -> txpa :: Counter

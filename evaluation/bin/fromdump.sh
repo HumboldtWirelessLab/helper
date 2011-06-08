@@ -52,4 +52,16 @@ if [ "x$WIFI" = "x" ]; then
   WIFI=805
 fi
 
-cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed "s#DUMP#$1#g" | sed "s#//SEQ#$SEQREP#g" | sed "s#//ATH#$ATHREP#g" | sed "s#//GPS#$GPSREP#g" | sed "s#GPSDecap()#$GPSDECAP#g" | sed "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" | click-align 2> /dev/null | click 2>&1
+if [ "x$RX" = "x" ]; then
+  RX="false"
+fi
+
+if [ "x$HT" = "x" ]; then
+  HT="false"
+fi
+
+if [ "x$EVM" = "x" ]; then
+  EVM="false"
+fi
+
+cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed -e "s#DUMP#$1#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" | click-align 2> /dev/null | click 2>&1
