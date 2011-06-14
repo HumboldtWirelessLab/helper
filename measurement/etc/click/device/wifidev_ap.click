@@ -22,8 +22,9 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
                           CHANNEL $channel, LT $lt |
 #endif
 
-  nblist::BRN2NBList();  //stores all neighbors (known (friend) and unknown (foreign))
-  nbdetect::NeighborDetect(NBLIST nblist, DEVICE $device);
+#warning Fix NBList in wifidev_ap
+//  nblist::BRN2NBList(NODEID );  //stores all neighbors (known (friend) and unknown (foreign))
+//  nbdetect::NeighborDetect(NBLIST nblist);
   
   rates::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
 
@@ -126,7 +127,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   wififrame_clf[2]
     -> WifiDecap()
-    -> nbdetect
+//  -> nbdetect
 //  -> Print("Data")
     -> toStation[2]    //no station, no broadcast
     -> toMe[0]         //it's me
@@ -192,6 +193,9 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   
   fromNodetoStation[2]  //For Unknown
   -> Discard;
+
+  Idle -> [1]ap[1] -> Discard;
+  Idle -> [2]ap[2] -> Discard;
  
 } 
 
