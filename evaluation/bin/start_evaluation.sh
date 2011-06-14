@@ -43,7 +43,7 @@ if [ "x$EVALUATIONDIR" = "x" ]; then
   EVALUATIONDIR="$RESULTDIR/evaluation"
 fi
 
-echo "$RESULTDIR $EVALUATIONDIR"
+#echo "$RESULTDIR $EVALUATIONDIR"
 
 if [ ! -e $EVALUATIONDIR ]; then
   mkdir -p $EVALUATIONDIR

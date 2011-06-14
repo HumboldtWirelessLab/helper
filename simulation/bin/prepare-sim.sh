@@ -65,13 +65,33 @@ case "$1" in
 			      
 		      if [ "x$ISGROUP" = "x1" ]; then
 		        GROUP=`echo $CNODE | sed "s#group:##g"`
+			HASLIMIT=`echo $GROUP | grep ":" | wc -l`
+			
+			if [ $HASLIMIT -eq 1 ]; then
+			  GROUP_LIMIT=`echo $GROUP | sed -e "s#.*:##g"`
+			  GROUP=`echo $GROUP | sed -e "s#:.*##g"`
+			  #echo "$GROUP $GROUP_LIMIT"
+			else
+			  GROUP_LIMIT=0
+			fi 
+			
 		        CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#"`
 		        #echo "NODES: $CNODE"
 		      else
         		CNODES=$CNODE
+			GROUP_LIMIT=0
         	      fi
 
+                      NODES_OF_GROUP=0
+
 		      for CNODE in $CNODES; do
+
+			if [ $GROUP_LIMIT -ne 0 ]; then
+			  if [ $NODES_OF_GROUP -eq $GROUP_LIMIT ]; then
+			    #echo "Reach Nodeslimit: $NODES_OF_GROUP of $GROUP_LIMIT"
+			    break;
+			  fi
+			fi
 
 		        if [ "x$USED_SIMULATOR" = "xns" ]; then
 			  DEVICE_TMPL=`echo $CDEV | grep "dev" | wc -l`
@@ -95,7 +115,9 @@ case "$1" in
 			
         		if [ $NODEINFILE -ne 0 ]; then
             		    #echo "Found node $CNODE with device $CDEV. Step over"  
-			        continue
+			    continue
+			else
+			  NODES_OF_GROUP=`expr $NODES_OF_GROUP + 1`
 			fi
 		      
 		        
@@ -139,14 +161,6 @@ case "$1" in
                 CPPOPTS="$CPPOPTS -DSIMULATION"
                 CPPOPTS="$CPPOPTS -DWIFITYPE=$WIFITYPE"
 
-                #echo $NODEPLACEMENTFILE
-                if [ "x$NODEPLACEMENTFILE" != "x" ] && [ -e $NODEPLACEMENTFILE ]; then
-                  XPOS=`cat $NODEPLACEMENTFILE | grep "$CNODE" | awk '{print $2}'`
-                  YPOS=`cat $NODEPLACEMENTFILE | grep "$CNODE" | awk '{print $3}'
-                  CPPOPTS="$CPPOPTS -DXPOS=$XPOS -DYPOS=$YPOS`
-                  #echo "$XPOS $YPOS"
-                fi
-		
 		NODEID_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "BRN2NodeIdentity" | wc -l)`
 		
 		if [ $NODEID_INC -gt 0 ]; then

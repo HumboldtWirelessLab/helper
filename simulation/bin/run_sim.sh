@@ -175,8 +175,10 @@ case "$MODE" in
 		  NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		  for nodedevice in $NODEDEVICELIST; do		    
 		    CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
-		    cat $CLICK | sed -e "s#NODEPOSITIONX#$POS_X#g" -e "s#NODEPOSITIONY#$POS_Y#g" -e "s#NODEPOSITIONZ#$POS_Z#g" > $CLICK.tmp
-		    mv $CLICK.tmp $CLICK
+		    if [ "x$CLICK" != "x-" ] && [ -f $CLICK ]; then
+		      cat $CLICK | sed -e "s#NODEPOSITIONX#$POS_X#g" -e "s#NODEPOSITIONY#$POS_Y#g" -e "s#NODEPOSITIONZ#$POS_Z#g" > $CLICK.tmp
+		      mv $CLICK.tmp $CLICK
+		    fi
                   done
 
 		done
