@@ -15,7 +15,7 @@ int main(int argc,char* argv[])
   struct hostent *lp/*, *gethostbyname()*/;
   
   if ( argc < 3 ) {
-    printf("Use %s port sourceaddress interval\n",argv[0]);
+    printf("Use %s port sourceaddress interval (us)\n",argv[0]);
   } else {
     port = atoi(argv[1]);
     lp = gethostbyname(argv[2]);
@@ -24,6 +24,8 @@ int main(int argc,char* argv[])
     local.sin_family = AF_INET;
     local.sin_addr.s_addr = htonl(INADDR_ANY);
     bcopy ( lp->h_addr, &(local.sin_addr.s_addr), lp->h_length);
+ 
+    val = 1;
     setsockopt(sd, SOL_SOCKET, SO_BROADCAST, (char *) &val, sizeof(val));
   
     bind(sd, (struct sockaddr*)&local, sizeof(local));
@@ -40,7 +42,11 @@ int main(int argc,char* argv[])
     for (;;) {
       nseq = htonl(seq);
       sendto(sd, &nseq, sizeof(nseq), 0, (struct sockaddr*) &target, sizeof(target));
-      sleep(interval);
+      if ( interval > 0 )
+        sleep(interval);
+      else
+        usleep(0 - interval);
+
       seq++;
     }
   }
