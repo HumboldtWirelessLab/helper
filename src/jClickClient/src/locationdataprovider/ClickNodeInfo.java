@@ -72,10 +72,10 @@ class ClickNodeInfo extends Thread {
       try {
         if ( read_error ) {
           System.out.println("Read error: " + ip.getHostAddress());
-          sleep(3000);
+          sleep(1000);
         } else {
           setInfo(nextValues);
-          sleep(1000);
+          sleep(200);
         }
       } catch (InterruptedException e) {
         e.printStackTrace();

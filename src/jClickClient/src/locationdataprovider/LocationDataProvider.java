@@ -55,7 +55,7 @@ public class LocationDataProvider {
 
         DatagramPacket packet = new DatagramPacket(mssg, mssg.length, addr, port);
         socket.send(packet);
-        Thread.sleep(1000);
+        Thread.sleep(200);
       }
     } catch (Exception e) {
       e.printStackTrace();
