@@ -34,19 +34,22 @@ case "$1" in
     "create")
 	;;
     "delete")
+	killall obd-$NODEARCH
 	;;
     "config_pre_start")
 	;;
     "start")
 	NODEARCH=`$DIR/../../bin/system.sh get_arch`
 	killall obd-$NODEARCH
-	killall obd
 	
-	(export PATH=$PATH:/usr/bin:/usr/sbin:/bin:/sbin; cd $DIR/../openbeacon; ./obd-$NODEARCH &)
+	export PATH=$PATH:/usr/bin:/usr/sbin:/bin:/sbin
+	ARCH=$NODEARCH $DIR/../openbeacon/obd-$NODEARCH < /dev/null > /dev/null 2>&1 &
 	;;
     "config_post_start")
 	;;
     "getiwconfig")
+	export PATH=$PATH:/usr/bin:/usr/sbin:/bin:/sbin
+	ps
         ;;
         *)
         ;;
