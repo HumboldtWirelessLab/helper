@@ -56,7 +56,7 @@ public class XmlConverter {
 
       InputStream is = new ByteArrayInputStream(xml_string.getBytes());
 
-    	Document document = (Document) builder.build(is);
+      Document document = (Document) builder.build(is);
       if ( document == null ) return null;
 
       Element rootNode = document.getRootElement();
@@ -94,8 +94,13 @@ public class XmlConverter {
             Element c = node.getChild("rssi_extended").getChild("ctl");
             result[index+2] = new Byte(c.getAttributeValue("rssi0")).byteValue();
             result[index+3] = new Byte(c.getAttributeValue("rssi1")).byteValue();
-            result[index+4] = (byte)(new Integer(node.getAttributeValue("pkt_cnt")).intValue() / 256);
-            result[index+5] = (byte)(new Integer(node.getAttributeValue("pkt_cnt")).intValue() % 256);
+            int pkt_count = new Integer(node.getAttributeValue("pkt_cnt")).intValue();
+            if ( pkt_count > 120 ) {
+              System.out.println("pkt_count=" + pkt_count + ". Reset value to 100.");
+              pkt_count = 100;
+            }
+            result[index+4] = (byte)(pkt_count / 256);
+            result[index+5] = (byte)(pkt_count % 256);
 
             index += 6;
           }

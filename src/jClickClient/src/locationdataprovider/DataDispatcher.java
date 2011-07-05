@@ -147,7 +147,7 @@ public class DataDispatcher extends Thread {
       }
     }
 
-    result[dataIndex] = 127;
+    result[dataIndex] = (byte)127;
 
     return result;
   }
@@ -176,7 +176,7 @@ public class DataDispatcher extends Thread {
     try {
       while (true) {
         setNextData(getNextData());
-        Thread.sleep(1000); // emulates new data
+        Thread.sleep(200); // emulates new data
       }
     } catch (InterruptedException e) {
       e.printStackTrace();
