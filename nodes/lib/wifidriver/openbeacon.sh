@@ -49,6 +49,7 @@ case "$1" in
 
 		export PATH=$PATH:/usr/bin:/usr/sbin:/bin:/sbin
 		rmmod usbserial
+		rmmod cdc_acm
 		(cd $FINMODULSDIR; insmod ./usbserial.ko vendor=0x03EB product=0x6124; insmod ./cdc-acm.ko)
 		;;
     "uninstall")
