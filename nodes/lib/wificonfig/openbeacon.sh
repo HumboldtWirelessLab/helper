@@ -25,7 +25,7 @@ get_arch() {
 case "$1" in
     "responsible")
 	    DEV_PREFIX=`echo $DEVICE | cut -b 1-3`
-	    if [ "x$DEV_PREFIX" = "xodb" ]; then
+	    if [ "x$DEV_PREFIX" = "xobd" ]; then
 	      exit 0
 	    else
 	      exit 1

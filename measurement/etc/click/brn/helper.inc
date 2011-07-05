@@ -8,6 +8,7 @@
 
 #define ns 800
 #define extra 806
+#define openbeacon 807
 
 #if WIFITYPE == 801
 #define __WIFIENCAP__ Null()
@@ -18,10 +19,8 @@
 #define __WIFIENCAP__ BrnRadiotapEncap()
 #define __WIFIDECAP__ BrnRadiotapDecap(DEBUG false)
 
-#ifndef NOPCAP
-#define NOPCAP
-#endif
-
+#define PCAP_ENCAP_TYPE 802_11_RADIO
+#define PCAP_STRIP_SIZE 0
 #endif
 
 #if WIFITYPE == 803
@@ -55,8 +54,6 @@
 #define __WIFIDECAP__ ExtraDecap()
 #endif
 
-#undef ns
-#undef extra
 
 #if WIFITYPE == 807
 #ifdef RAWDEV_DEBUG
@@ -68,6 +65,19 @@
 #endif
 
 #define SOCKETDEVICE
+#endif
+
+#undef ns
+#undef extra
+#undef openbeacon
+
+
+#ifndef PCAP_ENCAP_TYPE
+#define PCAP_ENCAP_TYPE SLL
+#endif
+
+#ifndef PCAP_STRIP_SIZE
+#define PCAP_STRIP_SIZE 16
 #endif
 
 /* KERNEL stuff */
@@ -119,9 +129,14 @@ BRNAddressInfo(ipdev eth0:ip);
 #else
 
 #ifndef NOPCAP
-#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false, CAPTURE PCAP, ENCAP SLL, HEADROOM 64) -> Strip(16)
+#if PCAP_STRIP_SIZE == 0
+#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false, CAPTURE PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64)
+#define TORAWDEVICE(x) ToDevice(x, DEBUG false)
+#else
+#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false, CAPTURE PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64) -> Strip(16)
 #define TORAWDEVICE(x) ToDevice(x, IGNOREFROMDEV true, DEBUG false)
 //#define TORAWDEVICE(x) SLLEncap(PACKETTYPE 1, HARDWARETYPE 805, PROTOCOL 25) -> ToDevice(x, DEBUG false)
+#endif
 #else
 #define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, SNAPLEN 8190, OUTBOUND true, SNIFFER false, HEADROOM 64)
 #define TORAWDEVICE(x) ToDevice(x, DEBUG false)

@@ -25,7 +25,7 @@ case "$1" in
                 NODEARCH=`$DIR/../../bin/system.sh get_arch`
 		
                 FINMODULSDIR=`echo $MODULSDIR | sed -e "s#KERNELVERSION#$KERNELVERSION#g" -e "s#NODEARCH#$NODEARCH#g"`
-		if [ -f ${FINMODULSDIR}/.o ]; then
+		if [ -f ${FINMODULSDIR}/cdc-acm.ko ]; then
 		    exit 0
 		else
 		    exit 1
@@ -40,7 +40,7 @@ case "$1" in
 	        else
 	            echo $DEVICE
 	        fi
-                ;;																  
+                ;;
     "install")
                 KERNELVERSION=`uname -r`
                 NODEARCH=`$DIR/../../bin/system.sh get_arch`
@@ -49,7 +49,7 @@ case "$1" in
 
 		export PATH=$PATH:/usr/bin:/usr/sbin:/bin:/sbin
 		rmmod usbserial
-		(cd $FINMODULSDIR; insmod ./usbserial.ko vendor=0x03EB product=0x6124; insmod ./cdc_acm.ko)
+		(cd $FINMODULSDIR; insmod ./usbserial.ko vendor=0x03EB product=0x6124; insmod ./cdc-acm.ko)
 		;;
     "uninstall")
 		;;
