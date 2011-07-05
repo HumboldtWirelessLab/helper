@@ -58,6 +58,17 @@
 #undef ns
 #undef extra
 
+#if WIFITYPE == 807
+#ifdef RAWDEV_DEBUG
+#define __WIFIENCAP__ OpenBeaconEncap() -> OpenBeaconPrint()
+#define __WIFIDECAP__ OpenBeaconPrint() -> OpenBeaconDecap()
+#else
+#define __WIFIENCAP__ OpenBeaconEncap()
+#define __WIFIDECAP__ OpenBeaconDecap()
+#endif
+
+#define SOCKETDEVICE
+#endif
 
 /* KERNEL stuff */
 
@@ -99,6 +110,14 @@ BRNAddressInfo(ipdev eth0:ip);
 /* USERLEVEL stuff */
 
 #ifdef USERLEVEL
+
+#ifdef SOCKETDEVICE
+
+#define FROMRAWDEVICE(x) FromSocket("UDP", 127.0.0.1, 20000)
+#define TORAWDEVICE(x) ToSocket("UDP", 127.0.0.1, 20001);
+
+#else
+
 #ifndef NOPCAP
 #define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false, CAPTURE PCAP, ENCAP SLL, HEADROOM 64) -> Strip(16)
 #define TORAWDEVICE(x) ToDevice(x, IGNOREFROMDEV true, DEBUG false)
@@ -106,6 +125,8 @@ BRNAddressInfo(ipdev eth0:ip);
 #else
 #define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, SNAPLEN 8190, OUTBOUND true, SNIFFER false, HEADROOM 64)
 #define TORAWDEVICE(x) ToDevice(x, DEBUG false)
+#endif
+
 #endif
 
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
@@ -135,7 +156,7 @@ BRNAddressInfo(ipdev eth0:ip);
 
 #ifdef SIMULATION
 
-#define FROMRAWDEVICE(x) FromSimDevice(x, 8190)
+#define FROMRAWDEVICE(x) FromSimDevice(x, SNAPLEN 8190)
 #define TORAWDEVICE(x) ToSimDevice(x, ENCAP UNKNOWN )
 
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)

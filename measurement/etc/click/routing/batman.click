@@ -42,7 +42,7 @@ elementclass BATMAN {$ID, $LT |
   -> brnee;
   
   bf[2] 
-  -> Print("RouteError")
+  -> Print("RouteError",150)
   -> Discard;
 
   input[0]
