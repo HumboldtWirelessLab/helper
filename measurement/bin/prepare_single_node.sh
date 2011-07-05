@@ -215,7 +215,11 @@ case "$RUNMODE" in
 	"APPLICATION")
 			RUNMODENUM=5
 			;;
+	"UNKNOWN")
+			RUNMODENUM=0
+			;;
 	*)
+			echo "Unknown Runmode: Check for runmode"
 			RUNMODENUM=0
 			;;
 esac
