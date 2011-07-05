@@ -56,9 +56,9 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   input[0]
 #if WIFITYPE == 805
-  -> data_power::SetTXPower(61)
+  -> data_power::BrnSetTXPower(DEVICE $device, POWER 61)
 #else
-  -> data_power::SetTXPower(16)
+  -> data_power::BrnSetTXPower(DEVICE $device, POWER 16)
 #endif
   -> data_rate::SetTXRate(RATE 2, TRIES 11)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
@@ -114,9 +114,9 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 //  -> Print("Linkprobe_out",320)
     -> lp_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
 #if WIFITYPE == 805
-    -> lp_power::SetTXPower(61)
+    -> lp_power::BrnSetTXPower(DEVICE $device, POWER 61)
 #else
-    -> lp_power::SetTXPower(16)
+    -> lp_power::BrnSetTXPower(DEVICE $device, POWER 16)
 #endif
     -> lp_wifiencap::WifiEncap(0x00, 0:0:0:0:0:0)
     -> lp_queue::FrontDropQueue(2)
@@ -153,9 +153,9 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> WifiEncap(0x00, 0:0:0:0:0:0)
   -> qc_rate :: SetTXRate(2)
 #if WIFITYPE == 805
-  -> qc_power :: SetTXPower(61)
+  -> qc_power :: BrnSetTXPower(DEVICE $device, POWER 61)
 #else
-  -> qc_power :: SetTXPower(16)
+  -> qc_power :: BrnSetTXPower(DEVICE $device, POWER 16)
 #endif
   -> SetTimestamp()
   -> qc_q
