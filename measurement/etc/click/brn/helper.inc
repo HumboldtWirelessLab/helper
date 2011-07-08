@@ -1,6 +1,11 @@
 #ifndef __HELPER_INC__
 #define __HELPER_INC__
 
+
+#ifndef NOPCAP
+#define NOPCAP
+#endif
+
 #ifndef WIFITYPE
 #warning No Wifitype. Using default (805).
 #define WIFITYPE 805
@@ -129,20 +134,30 @@ BRNAddressInfo(ipdev eth0:ip);
 #else
 
 #ifndef NOPCAP
+
 #if PCAP_STRIP_SIZE == 0
-#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false, CAPTURE PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64)
-#define TORAWDEVICE(x) ToDevice(x, DEBUG false)
+
+#define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND true, SNIFFER false, METHOD PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64)
+#define TORAWDEVICE(x) ToDevice(DEVNAME x, DEBUG false)
+
 #else
-#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, OUTBOUND true, SNIFFER false, CAPTURE PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64) -> Strip(16)
-#define TORAWDEVICE(x) ToDevice(x, IGNOREFROMDEV true, DEBUG false)
+
+#define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND true, SNIFFER false, METHOD PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64) -> Strip(PCAP_STRIP_SIZE)
+#define TORAWDEVICE(x) ToDevice(DEVNAME x, DEBUG false)
 //#define TORAWDEVICE(x) SLLEncap(PACKETTYPE 1, HARDWARETYPE 805, PROTOCOL 25) -> ToDevice(x, DEBUG false)
+
 #endif
+
 #else
-#define FROMRAWDEVICE(x) FromDevice(x, PROMISC true, SNAPLEN 8190, OUTBOUND true, SNIFFER false, HEADROOM 64)
-#define TORAWDEVICE(x) ToDevice(x, DEBUG false)
+
+#define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND true, SNIFFER false, METHOD LINUX, HEADROOM 64)
+#define TORAWDEVICE(x) ToDevice(DEVNAME x, METHOD LINUX, DEBUG false)
+
 #endif
 
 #endif
+
+
 
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
