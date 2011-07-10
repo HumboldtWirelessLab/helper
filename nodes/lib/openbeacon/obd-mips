@@ -1,0 +1,10 @@
+#!/bin/sh
+
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+
+while true; do
+  date > /tmp/date.obd
+  sleep 1
+done
+
+exit 0
