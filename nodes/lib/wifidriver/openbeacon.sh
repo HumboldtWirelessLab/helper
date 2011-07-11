@@ -51,6 +51,7 @@ case "$1" in
 		rmmod usbserial
 		rmmod cdc_acm
 		(cd $FINMODULSDIR; insmod ./usbserial.ko vendor=0x03EB product=0x6124; insmod ./cdc-acm.ko)
+		#(cd $FINMODULSDIR; insmod ./tun.ko)
 		;;
     "uninstall")
 		;;

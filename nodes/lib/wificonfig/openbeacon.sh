@@ -33,17 +33,30 @@ case "$1" in
 	    ;;
     "create")
 	;;
-    "delete")
+    "delete" | "stop")
+	NODEARCH=`$DIR/../../bin/system.sh get_arch`    
 	killall obd-$NODEARCH
+	ifconfig $DEVICE down
+	tunctl -d $DEVICE
 	;;
     "config_pre_start")
 	;;
     "start")
-	NODEARCH=`$DIR/../../bin/system.sh get_arch`
-	killall obd-$NODEARCH
+	export PATH=$PATH:/bin/:/sbin/:/usr/bin/:/usr/sbin/
+	ifconfig eth0 |	
+	tunctl -d $DEVICE
+	tunctl -t $DEVICE
+	MADDR=`ifconfig eth0 | grep eth0 | awk '{print $6}' | sed -e "s#-# #g" -e "s#:# #g" | awk '{print"00:00:00:00:"$5":"$6}'`
+	echo "$MADDR"
+	ip link set $DEVICE address $MADDR
+	ifconfig $DEVICE up
 	
-	export PATH=$PATH:/usr/bin:/usr/sbin:/bin:/sbin
-	ARCH=$NODEARCH $DIR/../openbeacon/obd-$NODEARCH < /dev/null > /dev/null 2>&1 &
+	#NODEARCH=`$DIR/../../bin/system.sh get_arch`
+	#killall obd-$NODEARCH
+	
+	#NUM=`echo $DEVICE | sed "s#obd##g"`
+	#ARCH=$NODEARCH $DIR/../openbeacon/obd-$NODEARCH -O $NUM < /dev/null > /dev/null 2>&1 &
+	
 	;;
     "config_post_start")
 	;;
