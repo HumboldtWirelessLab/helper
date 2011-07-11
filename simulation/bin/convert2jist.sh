@@ -59,11 +59,15 @@ case "$1" in
 		    if [ -f $DIR/../../nodes/etc/wifi/$NODECONFIG ]; then
                       NODECONFIG="$DIR/../../nodes/etc/wifi/$NODECONFIG"
 		    else
-		      NODECONFIG="$DIR/../../nodes/etc/wifi/monitor.default"
+		      if [ -f ./$NODECONFIG ]; then
+		        NODECONFIG=./$NODECONFIG
+                      else
+		        NODECONFIG="$DIR/../../nodes/etc/wifi/monitor.default"
+		      fi
 		    fi
 		  fi
 
-		  . ./$NODECONFIG
+		  . $NODECONFIG
 
 		  echo "node.$NODE.name = $NODENAME"
 		  echo "node.$NODE.device = $NODEDEVICE"
