@@ -306,7 +306,7 @@ case "$MODE" in
 		    fi
 		    if [ "x$VALGRIND" = "x1" ]; then
 			NS_FULL_PATH=`which ns`
-			( cd $FINALRESULTDIR; valgrind --leak-check=full --leak-resolution=high --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
+			( cd $FINALRESULTDIR; valgrind --leak-check=full --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
 		    else
 			if [ "x$PROFILE" = "x1" ]; then
 			    ( cd $FINALRESULTDIR; ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
