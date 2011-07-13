@@ -385,9 +385,15 @@ for state in  $STATES; do
   if [ "x$state" = "xnodeinfo" ]; then
     echo -n "" > status/all_wireless_nodeinfo.log.tmp
     echo -n "" > status/all_wireless_nodes.log
+    echo -n "" > status/all_nodeinfo.log
     for node in $NODELIST; do
-      cat status/$node\_nodeinfo.log | awk '{print $2" "$3}' >> status/all_wireless_nodeinfo.log.tmp
-      cat status/$node\_nodeinfo.log >> status/all_wireless_nodes.log
+      if [ -f status/$node\_nodeinfo.log ]; then
+        cat status/$node\_nodeinfo.log  >> status/all_nodeinfo.log
+      fi    
+      if [ -f status/$node\_wifinodeinfo.log ]; then
+        cat status/$node\_wifinodeinfo.log | awk '{print $2" "$3}' >> status/all_wireless_nodeinfo.log.tmp
+      fi
+      cat status/$node\_wifinodeinfo.log >> status/all_wireless_nodes.log
     done
     cat status/all_wireless_nodeinfo.log.tmp | sort -u > status/all_wireless_nodeinfo.log
 
