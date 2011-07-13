@@ -93,6 +93,16 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> ig_feedback_clf :: Classifier( 12/8888, - );
 
   ig_feedback_clf[1]
+#else
+#ifdef BRNFEEDBACK
+  -> WifiDecap()
+#endif
+#endif
+#ifdef BRNFEEDBACK
+  -> txfb_brn_clf :: Classifier( 12/BRN_ETHERTYPE, - )
+  -> [3]output;
+  
+  txfb_brn_clf[1]
 #endif
   -> Discard;
 
@@ -124,7 +134,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
     -> [0]lp_data_scheduler;
 
   brn_ether_clf[1]                         //no brn no interference stuff
-  //-> Print()
+  //-> Print()  
   -> Discard;
 
   lp_clf[1]                               //brn, but no lp
