@@ -45,7 +45,7 @@ CURRENTMODE="START"
 
 wait_for_master_state() {
   DEBUGFILE=status/wait_$1\_$2
-#  DEBUGFILE=/dev/null
+# DEBUGFILE=/dev/null
 
   echo "wait for master" >> $DEBUGFILE
 
@@ -105,6 +105,8 @@ CRUNMODENUM=9
 
 echo "Kill Click and stop application on Nodes:" >> status/$LOGMARKER\_killclick.log 2>&1
 for node in $NODELIST; do
+
+if [ -f $CONFIGFILE ]; then
   NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
   for nodedevice in $NODEDEVICELIST; do
@@ -129,6 +131,8 @@ for node in $NODELIST; do
     fi
     echo " done" >> status/$LOGMARKER\_killclick.log 2>&1
   done
+fi
+
 done
 
 echo "0" > status/$LOGMARKER\_killclick.state
@@ -257,11 +261,13 @@ fi
 
 MODE=`NODELIST="$NODELIST" $DIR/../../host/bin/system.sh backbone | awk '{print $2}'`
 
+NODELIST="$NODELIST" $DIR/../../host/bin/system.sh nodeinfo > status/$LOGMARKER\_nodeinfo.log 2>&1
+
 if [ "x$MODE" = "xwireless" ]; then
-  NODELIST="$NODELIST" $DIR/../../host/bin/system.sh nodeinfo > status/$LOGMARKER\_nodeinfo.log 2>&1
+  cp status/$LOGMARKER\_nodeinfo.log status/$LOGMARKER\_wifinodeinfo.log
   OLSR="no"
 else
-  echo -n "" > status/$LOGMARKER\_nodeinfo.log 2>&1
+  echo -n "" > status/$LOGMARKER\_wifinodeinfo.log 2>&1
   OLSR=`NODELIST="$NODELIST" $DIR/../../host/bin/system.sh olsrbackbone`
 fi
 
