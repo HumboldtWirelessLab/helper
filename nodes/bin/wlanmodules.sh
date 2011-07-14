@@ -20,12 +20,12 @@ esac
 
 export PATH=$PATH:/sbin:/usr/sbin/
 
-echo "Check responsible for $1"
+#echo "Check responsible for $1"
 
 RESPONSIBLE=""
 
 for s in `ls $DIR/../lib/wifidriver/`; do
-  echo "Check $DIR/../lib/wifidriver/$s"
+  #echo "Check $DIR/../lib/wifidriver/$s"
   export MODOPTIONS=$MODOPTIONS
   export MODULSDIR=$MODULSDIR
   $DIR/../lib/wifidriver/$s responsible
@@ -48,6 +48,13 @@ case "$1" in
 		if [ "x$RESPONSIBLE" != "x" ]; then
 		    echo "$RESPONSIBLE is responsible"
 		    MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $RESPONSIBLE uninstall
+		    exit 0
+		fi
+		;;
+    "device_name")
+		if [ "x$RESPONSIBLE" != "x" ]; then
+		    #echo "$RESPONSIBLE is responsible"
+		    DEVICE=$DEVICE MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $RESPONSIBLE device_name
 		    exit 0
 		fi
 		;;
