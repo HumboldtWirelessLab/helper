@@ -115,11 +115,11 @@ case "$1" in
 			      fi
 			    
 			      if [ ! "x$WIFICONFIG" = "x" ] && [ ! "x$WIFICONFIG" = "x-" ]; then
-				      if [ -f  $CONFIGDIR/$WIFICONFIG ]; then                                                                                                                                                   
+				      if [ -f  $CONFIGDIR/$WIFICONFIG ]; then
 				        . $CONFIGDIR/$WIFICONFIG
 				        WIFICONFIGFINALNAME=$CONFIGDIR/$WIFICONFIG
 				      else
-				        if [ -f  $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then                                                                                                                                                   
+				        if [ -f  $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then
 					        . $DIR/../../nodes/etc/wifi/$WIFICONFIG
 					        WIFICONFIGFINALNAME="$DIR/../../nodes/etc/wifi/$WIFICONFIG"
 				        else
@@ -205,6 +205,8 @@ case "$1" in
                 if [ $NODEID_INC -gt 0 ]; then
                      CPPOPTS="$CPPOPTS -DNODEID_NAME"
                 fi
+
+                CPPOPTS="$CPPOPTS -I$CONFIGDIR"
 
                 #echo $CPPOPTS
                 if [ $HELPER_INC -gt 0 ]; then
