@@ -138,29 +138,61 @@ BRNAddressInfo(ipdev eth0:ip);
 
 #else
 
+#ifdef USEBRNDEVICE
+//brndevice
+
+#ifndef NOPCAP
+
+#if PCAP_STRIP_SIZE == 0
+
+#define FROMRAWDEVICE(x) BrnFromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, CAPTURE PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64)
+#define TORAWDEVICE(x) BrnToDevice(DEVNAME x, IGNOREFROMDEV true, DEBUG false)
+
+//pcap size
+#else
+#define FROMRAWDEVICE(x) BrnFromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, CAPTUR PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64) -> Strip(PCAP_STRIP_SIZE)
+#define TORAWDEVICE(x) BrnToDevice(DEVNAME x, IGNOREFROMDEV true, DEBUG false)
+//end pcap size
+#endif
+
+//nopcap
+#else
+
+#define FROMRAWDEVICE(x) BrnFromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, CAPTURE LINUX, HEADROOM 64)
+#define TORAWDEVICE(x) BrnToDevice(DEVNAME x, DEBUG false)
+
+//end nopcap
+#endif
+
+//nobrndevice
+#else
+
 #ifndef NOPCAP
 
 #if PCAP_STRIP_SIZE == 0
 
 #define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, METHOD PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64, BURST PACKETBURST)
 #define TORAWDEVICE(x) ToDevice(DEVNAME x, METHOD PCAP, DEBUG false, BURST PACKETBURST)
-
+//pcap size
 #else
 
 #define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, METHOD PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64, BURST PACKETBURST) -> Strip(PCAP_STRIP_SIZE)
 #define TORAWDEVICE(x) ToDevice(DEVNAME x, METHOD PCAP, DEBUG false, BURST PACKETBURST)
+//end pcap size
 #endif
-
+//nopcap
 #else
 
 #define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, METHOD LINUX, HEADROOM 64, BURST PACKETBURST)
 #define TORAWDEVICE(x) ToDevice(DEVNAME x, METHOD LINUX, DEBUG false, BURST PACKETBURST)
-
+//end no pcap
 #endif
 
+//end brn device
 #endif
 
-
+//socketdevice
+#endif
 
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
