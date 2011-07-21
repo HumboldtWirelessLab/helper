@@ -200,12 +200,6 @@ case "$1" in
 
                 HELPER_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "helper.inc" | wc -l)`
 
-                NODEID_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "BRN2NodeIdentity" | wc -l)`
-
-                if [ $NODEID_INC -gt 0 ]; then
-                     CPPOPTS="$CPPOPTS -DNODEID_NAME"
-                fi
-
                 CPPOPTS="$CPPOPTS -I$CONFIGDIR"
 
                 #echo $CPPOPTS
