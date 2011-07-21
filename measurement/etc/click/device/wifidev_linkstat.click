@@ -186,7 +186,6 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 //  -> Print("RXPHYERR")
   -> Discard;
 
-
   link_stat[1]
   -> Print("Linkstat error",200)
   -> Discard;

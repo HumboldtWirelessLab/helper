@@ -206,7 +206,7 @@ BRNAddressInfo(ipdev eth0:ip);
                   -> Socket(UDP, DUMPIP, DUMPPORTBASE, CLIENT true ) \
                   -> Discard
 #else
-#define TODUMP ToDump
+#define TODUMP(x) ToDump(FILENAME x, SNAPLEN 4000)
 #endif
 
 
@@ -227,7 +227,7 @@ BRNAddressInfo(ipdev eth0:ip);
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
 
-#define TODUMP ToDump
+#define TODUMP(x) ToDump(FILENAME x, SNAPLEN 4000)
 
 #define SYNC Null()
 
