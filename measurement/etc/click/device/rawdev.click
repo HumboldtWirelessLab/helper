@@ -1,6 +1,11 @@
 #ifndef __RAWDEV_CLICK__
 #define __RAWDEV_CLICK__
 
+
+#ifndef RAWDUMPSNAPLEN
+#define RAWDUMPSNAPLEN 8192
+#endif
+
 elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 
   input[0]
@@ -32,7 +37,7 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef RAWDUMP
    raw_dump_tee[1]
-   -> TODUMP("RESULTDIR/NODENAME.NODEDEVICE.raw.dump");
+   -> TODUMP(FILENAME "RESULTDIR/NODENAME.NODEDEVICE.raw.dump", SNAPLEN RAWDUMPSNAPLEN);
 #endif
 
 }
