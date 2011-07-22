@@ -40,7 +40,7 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 #ifdef REMOTEDUMP
   -> raw_dump_tee::Tee()
 #else
-   -> TODUMP("RESULTDIR/NODENAME.NODEDEVICE.raw.dump")
+  -> ToDump(FILENAME "RESULTDIR/NODENAME.NODEDEVICE.raw.dump", SNAPLEN RAWDUMPSNAPLEN);
 #endif
 #endif
 #ifdef SIMULATION
@@ -52,7 +52,7 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 #ifdef RAWDUMP
 #ifdef REMOTEDUMP
    raw_dump_tee[1]
-   -> TODUMP(FILENAME "RESULTDIR/NODENAME.NODEDEVICE.raw.dump", SNAPLEN RAWDUMPSNAPLEN);
+   -> TODUMP("RESULTDIR/NODENAME.NODEDEVICE.raw.dump")
 #endif
 #endif
 
