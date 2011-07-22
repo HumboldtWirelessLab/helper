@@ -265,6 +265,9 @@ case "$MODE" in
 		cat $DIR/../etc/ns/script_02.tcl >> $TCLFILE
 
 		if [ "x$CONTROLFILE" != "x" ]; then
+		    if [ "x$1" = "xjist" ]; then
+		      echo -n "handler.script = " > $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties
+		    fi
 		    while read line; do
 		        ISCOMMENT=`echo $line | grep "#" | wc -l`
 		        if [ $ISCOMMENT -eq 0 ]; then
@@ -279,13 +282,24 @@ case "$MODE" in
 			    if [ "x$TIME" != "x" ]; then
     				if [ "x$MODE" = "xwrite" ]; then
 				    VALUE=`get_params $line | sed $NODEMAC_SEDARG`
-				    echo "\$ns_ at $TIME \"set result \\[\\[\$node_($NODENUM) entry\\] writehandler $ELEMENT $HANDLER \\\"$VALUE\\\" \\]\"" >> $TCLFILE
+				    if [ "x$1" = "xns" ]; then
+				      echo "\$ns_ at $TIME \"set result \\[\\[\$node_($NODENUM) entry\\] writehandler $ELEMENT $HANDLER \\\"$VALUE\\\" \\]\"" >> $TCLFILE
+				    else
+				      echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,$VALUE;" >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties
+				    fi
 				else
-				    echo "\$ns_ at $TIME \"puts \\\"\\[\\[\$node_($NODENUM) entry\\] readhandler $ELEMENT $HANDLER \\]\\\"\"" >> $TCLFILE
+				    if [ "x$1" = "xns" ]; then
+				      echo "\$ns_ at $TIME \"puts \\\"\\[\\[\$node_($NODENUM) entry\\] readhandler $ELEMENT $HANDLER \\]\\\"\"" >> $TCLFILE
+				    else
+				      echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,;" >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties
+				    fi
 				fi
 			    fi
 			fi
 		    done < $CONTROLFILE
+		    if [ "x$1" = "xjist" ]; then
+		      echo "" >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties
+		    fi
 		fi
 
 		cat $DIR/../etc/ns/script_03.tcl >> $TCLFILE
@@ -321,7 +335,7 @@ case "$MODE" in
 		      exit 1
 		    fi
 		else
-		    ( cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX > $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties )
+		    ( cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties )
 		    ( cd $FINALRESULTDIR; $DIR/start-jist-sim.sh $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
 		fi		
 		;;

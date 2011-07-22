@@ -14,6 +14,8 @@ elementclass BATMAN {$ID, $LT |
   bf::BatmanForwarder( NODEID $ID, BATMANTABLE brt);
   br::BatmanRouting(NODEID $ID, BATMANTABLE brt);
   
+  bfd::BatmanFailureDetection( NODEID $ID, BATMANTABLE brt, ACTIVE true);
+  
   input[1]
   -> BRN2Decap()
 //-> Print("NODENAME: BATMAN", TIMESTAMP true)
@@ -32,6 +34,7 @@ elementclass BATMAN {$ID, $LT |
 
   bc[1]
 //-> Print("NODENAME: Routing FWD", TIMESTAMP true)
+  -> bfd
   -> bf;
 
   bf[0]
@@ -43,6 +46,10 @@ elementclass BATMAN {$ID, $LT |
   
   bf[2] 
   -> Print("RouteError",150)
+  -> Discard;
+
+  bfd[1]
+  -> Print("RouteFailure")
   -> Discard;
 
   input[0]
@@ -61,6 +68,10 @@ elementclass BATMAN {$ID, $LT |
   -> Discard;
 
   input[2]
-  -> Discard;
+  -> [1]bfd[2]
+//  -> Print("Retry")
+  -> brnee;
+  
+  
   
 }

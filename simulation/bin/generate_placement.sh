@@ -64,6 +64,15 @@ case "$1" in
 	  NPART_DIR="$DIR/../../src/Npart"
 	  java -classpath $NPART_DIR/classes/production/Npart:$NPART_DIR/lib/jargs.jar:$NPART_DIR/lib/mantissa-7.2.jar NPART.TopologyGenerator -n $NODECOUNT -r 80 -d 0.8 -o ts -p 5 -c 1 -t 150 -a distroL | sed $REPLACE | sed "s#;# #g"
 	  ;;
+    "degree")
+	  NODES=`cat $2 | grep -v "#" | awk '{print $1"\n"}' | uniq`
+          NODECOUNT=`echo $NODES | wc -w`
+	  REPLACE=`cat $2 | grep -v "#" | awk '{print " -e s#node_" NR - 1 "[[:space:]]#"$1";#g"}' | sed 's/$/ /' | tr -d '\n'`
+	  #REPLACE=`cat $2 | grep -v "#" | awk '{print " \"s#node_" NR - 1 " #"$1" #g\""}'`
+	  #echo "$REPLACE"
+	  DEGREE_DIR="$DIR/../../src/DegreePlacement"
+	  java -classpath $DEGREE_DIR/ DegreePlacementGenerator -n $NODECOUNT -r -d -x -y
+	  ;;	  
     "string")
           NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
           NODECOUNT=`echo $NODES | wc -w`
