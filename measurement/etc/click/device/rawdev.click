@@ -1,6 +1,15 @@
 #ifndef __RAWDEV_CLICK__
 #define __RAWDEV_CLICK__
 
+/*
+ * Input:
+ * 0: raw packets
+ * 
+ * Output:
+ * 0: raw rx packets (incl. txfeedback)
+ * 1: raw tx packet for further reuse  ; enable this using #define PACKET_REUSE
+ *
+ */
 
 #ifndef RAWDUMPSNAPLEN
 #define RAWDUMPSNAPLEN 8192
@@ -22,12 +31,17 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
   -> TORAWDEVICE($devname);
 #endif
 
+
   FROMRAWDEVICE($devname)
 #ifdef RAWDEV_DEBUG
   -> Print("From Device")
 #endif
 #ifdef RAWDUMP
-  -> raw_dump_tee :: Tee()
+#ifdef REMOTEDUMP
+  -> raw_dump_tee::Tee()
+#else
+   -> TODUMP("RESULTDIR/NODENAME.NODEDEVICE.raw.dump")
+#endif
 #endif
 #ifdef SIMULATION
   -> SetTimestamp()
@@ -36,8 +50,10 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
   -> [0]output;
 
 #ifdef RAWDUMP
+#ifdef REMOTEDUMP
    raw_dump_tee[1]
    -> TODUMP(FILENAME "RESULTDIR/NODENAME.NODEDEVICE.raw.dump", SNAPLEN RAWDUMPSNAPLEN);
+#endif
 #endif
 
 }
