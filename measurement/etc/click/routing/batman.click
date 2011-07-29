@@ -9,7 +9,7 @@ elementclass BATMAN {$ID, $LT |
   brt::BatmanRoutingTable( NODEID $ID, LINKTABLE $LT, ORIGINATORMODE 1);
 
   bos::BatmanOriginatorSource( BATMANTABLE brt, NODEID $ID, INTERVAL 2000);
-  bofwd::BatmanOriginatorForwarder( NODEID $ID, BATMANTABLE brt, DEBUG 4)
+  bofwd::BatmanOriginatorForwarder( NODEID $ID, BATMANTABLE brt, DEBUG 2)
 
   bf::BatmanForwarder( NODEID $ID, BATMANTABLE brt);
   br::BatmanRouting(NODEID $ID, BATMANTABLE brt);
@@ -72,6 +72,6 @@ elementclass BATMAN {$ID, $LT |
 //  -> Print("Retry")
   -> brnee;
   
-  
+  input[3] -> Discard;
   
 }
