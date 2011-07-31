@@ -1,5 +1,8 @@
 import click.ClickConnection;
+import compression.BrnLZW;
+import sun.misc.BASE64Decoder;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -41,9 +44,47 @@ public class ClickClient {
       ClickConnection cc = new ClickConnection(ip, p.intValue());
       cc.openClickConnection();
       String result = cc.readHandler(args[3], args[4]);
-      if ( result != null )
-        System.out.println(result);
-      else {
+
+      if ( result != null ) {
+        if ( result.contains("compressed_data")) {
+          String raw_data = result.substring(result.indexOf("CDATA[")+6, result.indexOf("]]>"));
+          //System.out.println(result);
+          Integer uncomp_size = new Integer(result.substring(result.indexOf("uncompressed=")+14,
+                                                   result.indexOf(" compressed") - 1));
+          Integer comp_size = new Integer(result.substring(result.indexOf(" compressed=")+13,
+                                                   result.indexOf("><!") - 1));
+
+          BASE64Decoder decoder = new BASE64Decoder();
+          byte[] decodedBytes = null;
+          try {
+            decodedBytes = decoder.decodeBuffer(raw_data);
+          } catch (IOException e ) {
+            e.printStackTrace();
+          }
+
+          if ( decodedBytes != null ) {
+
+            //System.out.println("Base64 dec: " + decodedBytes.length + " Data 0: " + (int)decodedBytes[0]);
+
+            BrnLZW lzwdata = new BrnLZW();
+
+            byte[] data = lzwdata.decode(decodedBytes, decodedBytes.length, uncomp_size  );
+
+            if ( data != null ) {
+              //System.out.println("LZW dec: " + data.length);
+              String uncomp_result = new String(data);
+              System.out.println(uncomp_result);
+              //System.out.println("Size: " + uncomp_size + " " + comp_size + " " + uncomp_result.length());
+            } else {
+              System.out.println(result);
+            }
+          } else {
+            System.out.println(result);
+          }
+        } else {
+          System.out.println(result);
+        }
+      } else {
         cc.closeClickConnection();
 //        System.err.println("Error");
         System.exit(1);
