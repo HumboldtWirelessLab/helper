@@ -12,7 +12,7 @@ static unsigned char base64_chars_find(unsigned char c) {
   if ( c == 43 ) return 62;                           //'+'     -> 62
   if ( c == 47 ) return 63;                           //'/'     -> 62
 
-  printf("Base64 error: %d",(int)c);
+  printf("Base64 error: %d\n",(int)c);
   return 255;
 }
 
@@ -94,7 +94,7 @@ Base64::decode(unsigned char *input, int inputlen, unsigned char *output, int ma
     if (i ==4) {
       for (i = 0; i <4; i++) {
         unsigned char f = base64_chars_find(char_array_4[i]);
-        if ( f == 255 ) printf("Foo: %d",(int)char_array_4[i]);
+        if ( f == 255 ) printf("Unknown char: %d\n",(int)char_array_4[i]);
         char_array_4[i] = f;
       }
 
@@ -109,13 +109,15 @@ Base64::decode(unsigned char *input, int inputlen, unsigned char *output, int ma
   }
 
   if (i) {
-    for (j = i; j <4; j++)
+    for (j = i; j < 4; j++)
       char_array_4[j] = 0;
 
-    for (j = 0; j <4; j++) {
-      unsigned char f = base64_chars_find(char_array_4[j]);
-      if ( f == 255 ) printf("Foo: %d",(int)char_array_4[j]);
-      char_array_4[j] = f;
+    for (j = 0; j < 4; j++) {
+      if ( char_array_4[j] != 0 ) {
+        unsigned char f = base64_chars_find(char_array_4[j]);
+        if ( f == 255 ) printf("Rest: %d %d %d\n",(int)char_array_4[j], output_index,i);
+        char_array_4[j] = f;
+      }
     }
 
     char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);

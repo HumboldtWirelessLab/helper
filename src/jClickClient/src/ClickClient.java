@@ -1,6 +1,6 @@
 import click.ClickConnection;
 import compression.BrnLZW;
-import sun.misc.BASE64Decoder;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -55,13 +55,9 @@ public class ClickClient {
           Integer comp_size = new Integer(result.substring(result.indexOf(" compressed=")+13,
                                                    result.indexOf("><!") - 1));
 
-          BASE64Decoder decoder = new BASE64Decoder();
+          Base64 decoder = new Base64();
           byte[] decodedBytes = null;
-          try {
-            decodedBytes = decoder.decodeBuffer(raw_data);
-          } catch (IOException e ) {
-            e.printStackTrace();
-          }
+          decodedBytes = decoder.decode(raw_data);
 
           if ( decodedBytes != null ) {
             //System.out.println("Base64 dec: " + decodedBytes.length + " Data 0: " + (int)decodedBytes[0]);

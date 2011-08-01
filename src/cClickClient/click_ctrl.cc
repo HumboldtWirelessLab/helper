@@ -75,70 +75,62 @@ main(int argc, char **argv)
     err = cs.read( argv[3], argv[4], data2);
     ok(err);
     
-
-    char *marker_comdat = strstr((char *)data2.c_str(),"<compressed_data");
-    if ( marker_comdat != NULL ) {
+    if ( strstr((char *)data2.c_str(),"<compressed_data") != NULL ) {
+      
+      char *raw_data = (char *)data2.c_str();
     	int res, uncompressed, compressed, base64comp;
-    	char err_mesg[256], head[200], buffer[200], *data_enc;
+    	char buffer[151], *data_enc;
 
-		/* print first symbols */
-    	strncpy(head, marker_comdat, 100);
-    	head[100] = '\0';
-    	printf("Head: %s\n", head);
-
-//    	/* Compile regex */
+      //strncpy(buffer,data2.c_str(),150);
+      //buffer[150] = '\0';
+      //printf("%s\n",buffer);
+      /* Compile regex */
 
     	regex_t r1;
     	regmatch_t matchptr[5];
-    	regcomp(&r1, "type=\"\\(.*\\)\" uncompressed=\"\\(.*\\)\" compressed=\"\\(.*\\)\"><!\\[CDATA\\[\\(.*\\)\\]\\]", REG_ICASE); //
+    	regcomp(&r1, "type=\"\\(.*\\)\" uncompressed=\"\\(.*\\)\" compressed=\"\\(.*\\)\"><!\\[CDATA\\[\\(.*\\)\\]\\]",
+    	                REG_ICASE);
 
     	/* Execute regex against string */
-    	res=regexec(&r1, marker_comdat, 5, matchptr, 0);
+    	res=regexec(&r1, raw_data, 5, matchptr, 0);
     	if ( !res ) {
-			for(int i=1; i<5; i++) {
-				if (i<4) {
-					//printf("Res%d: %d %d\n", i /*, &marker_comdat[matchptr[i].rm_so]*/, matchptr[i].rm_so, matchptr[i].rm_eo);
-					strncpy(buffer, &marker_comdat[matchptr[i].rm_so], matchptr[i].rm_eo-matchptr[i].rm_so);
-					buffer[matchptr[i].rm_eo-matchptr[i].rm_so] = '\0';
-					//printf("Found: %s\n\n", &buffer);
-				}
+			  for(int i = 1; i < 5; i++) {
+				  if (i<4) {
+					  strncpy(buffer, &raw_data[matchptr[i].rm_so], matchptr[i].rm_eo-matchptr[i].rm_so);
+					  buffer[matchptr[i].rm_eo-matchptr[i].rm_so] = '\0';
+				  }
 
-				if (i==2) uncompressed = atoi(buffer);
-				if (i==3) compressed = atoi(buffer);
-				if (i==4) {
-						base64comp = matchptr[i].rm_eo-matchptr[i].rm_so;
-						data_enc = &marker_comdat[matchptr[i].rm_so];
-				}
+          if (i == 2) uncompressed = atoi(buffer);
+          if (i == 3) compressed = atoi(buffer);
+          if (i == 4) {
+              base64comp = matchptr[i].rm_eo-matchptr[i].rm_so;
+              data_enc = &(raw_data[matchptr[i].rm_so]);
+          }
+      	}
+        //data_enc[base64comp] = '\0';
+        //printf("%d %d %d \n%s\n", uncompressed, compressed, base64comp,data_enc);
 
+        unsigned char *data_base64_decoded = (unsigned char *)malloc(compressed+10);
 
-			}
+        /* Decode Base64 */
+        int res = Base64::decode((unsigned char *)data_enc, base64comp, data_base64_decoded, compressed);
 
-			printf("%d %d %d \n", uncompressed, compressed, base64comp);
+        /* Uncompress */
+        LZW lzw;
+        unsigned char *data_lzw_uncompressed = (unsigned char *)malloc(uncompressed);
+        lzw.decode(data_base64_decoded, compressed, data_lzw_uncompressed, uncompressed);
 
-			char *data_base64_decoded = (char *)malloc(compressed+10);
-
-			/* Decode Base64 */
-			int res = Base64::decode((unsigned char*)data_enc, base64comp, (unsigned char*)data_base64_decoded, compressed+10);
-			cout << res;
-
-			/* Uncompress */
-			LZW lzw;
-			char *data_lzw_compressed = data_base64_decoded;
-			char *data_lzw_uncompressed = (char *)malloc(uncompressed);
-			lzw.decode((unsigned char*)data_lzw_compressed, compressed, (unsigned char*)data_lzw_uncompressed, uncompressed);
-
-			printf("Result: %s\n", data_lzw_uncompressed);
+        printf("%s\n", data_lzw_uncompressed);
+        
+        delete data_base64_decoded;
+        delete data_lzw_uncompressed;
     	} else {
-    		regerror(res, &r1, err_mesg, 256);
-    		cout << "Error: " << err_mesg << "\n";
+    	  cout << data2 << "\n";
     	}
 
     	regfree(&r1);
-//      char *marker_uncom_s = strstr(data2,"uncompressed=");
-//      char *marker_com_s = strstr(data2," compressed=");
-//      char *marker_cddat = strstr(data2,"<compressed_data");
     } else {
-      cout << data2 /*<< "\n"*/;
+      cout << data2;
     }
   }
 
