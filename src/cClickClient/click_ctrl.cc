@@ -70,7 +70,15 @@ main(int argc, char **argv)
     string data2;
     err = cs.read( argv[3], argv[4], data2);
     ok(err);
-    cout << data2 /*<< "\n"*/;
+    
+    char *marker_comdat = strstr(data2.c_str(),"<compressed_data");
+    if ( marker_comdat != NULL ) {
+//      char *marker_uncom_s = strstr(data2,"uncompressed=");
+//      char *marker_com_s = strstr(data2," compressed=");
+//      char *marker_cddat = strstr(data2,"<compressed_data");
+    } else {
+      cout << data2 /*<< "\n"*/;
+    }
   }
 
   return 0;

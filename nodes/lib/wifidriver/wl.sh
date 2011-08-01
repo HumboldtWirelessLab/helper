@@ -35,10 +35,10 @@ case "$1" in
 		fi
 		;;
     "device_name")
-                IS_TMPL=`echo $DEVICE | grep DEV | wc -l`
+                IS_TMPL=`echo $DEVICE | grep "DEV_" | wc -l`
 		    
 		if [ $IS_TMPL -ne 0 ]; then
-		    NUM=`echo $DEVICE | sed "s#DEV##g"`
+		    NUM=`echo $DEVICE | sed "s#DEV_##g"`
 		    NUM=`expr $NUM + 1`
 		    echo "eth$NUM"
 		else

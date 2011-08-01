@@ -49,7 +49,7 @@ if [ "x$WIFI" = "xraw" ]; then
 fi
 
 if [ "x$WIFI" = "x" ]; then
-  WIFI=805
+  WIFI=`$DIR/test_header.sh $1`
 fi
 
 if [ "x$RX" = "x" ]; then
