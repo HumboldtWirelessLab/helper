@@ -119,6 +119,9 @@ elementclass DSR {$ID, $LT, $RC, $METRIC |
   // undeliverable packets
   // ------------------
   input[2]
-  -> [0]err_forwarder;
+  -> Discard;
+//  -> [0]err_forwarder;
+
+  input[3] -> Discard;
 }
 

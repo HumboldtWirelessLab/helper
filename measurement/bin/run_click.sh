@@ -21,5 +21,9 @@ esac
 if [ "x$2" = "xprint" ]; then
   cpp -I$DIR/../etc/click/ $1 | grep -v "#"
 else
-  cpp -I$DIR/../etc/click/ $1 | grep -v "#" | click
+  if [ "x$VALGRIND" = "x1" ]; then
+    cpp -I$DIR/../etc/click/ $1 | grep -v "#" | valgrind --leak-check=full --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=valgrind.log `which click` > out.log  2>&1
+  else
+    cpp -I$DIR/../etc/click/ $1 | grep -v "#" | click
+  fi
 fi

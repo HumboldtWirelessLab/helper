@@ -385,11 +385,51 @@ for state in  $STATES; do
   if [ "x$state" = "xnodeinfo" ]; then
     echo -n "" > status/all_wireless_nodeinfo.log.tmp
     echo -n "" > status/all_wireless_nodes.log
+    echo -n "" > status/all_nodeinfo.log
     for node in $NODELIST; do
-      cat status/$node\_nodeinfo.log | awk '{print $2" "$3}' >> status/all_wireless_nodeinfo.log.tmp
-      cat status/$node\_nodeinfo.log >> status/all_wireless_nodes.log
+      if [ -f status/$node\_nodeinfo.log ]; then
+        cat status/$node\_nodeinfo.log  >> status/all_nodeinfo.log
+      fi    
+      if [ -f status/$node\_wifinodeinfo.log ]; then
+        cat status/$node\_wifinodeinfo.log | awk '{print $2" "$3}' >> status/all_wireless_nodeinfo.log.tmp
+      fi
+      cat status/$node\_wifinodeinfo.log >> status/all_wireless_nodes.log
     done
     cat status/all_wireless_nodeinfo.log.tmp | sort -u > status/all_wireless_nodeinfo.log
+        
+    #REPLACE DEVICE TMPL
+    
+    echo -n "" > $CONFIGFILE.tmp
+
+    while read line; do
+      NODE=`echo $line | awk '{print $1}'`
+      KERNEL=`cat status/all_nodeinfo.log | grep "$NODE[[:space:]]" | awk '{print $3}'`
+      ARCH=`cat status/all_nodeinfo.log | grep "$NODE[[:space:]]" | awk '{print $2}'`
+      DEVNAME=`echo $line | awk '{print $2}'`
+      MODULSPATH=`echo $line | awk '{print $3}' | sed -e "s#NODEARCH#$ARCH#g" -e "s#KERNELVERSION#$KERNEL#g"`
+      IS_TMPL=`echo $DEVNAME | grep "DEV_" | wc -l`
+      
+      CLICKFILE=`echo $line | awk '{print $7}'`
+      
+      #echo "$NODE $KERNEL $ARCH $DEVNAME $MODULSPATH $IS_TMPL" >> $CONFIGFILE.log
+      if [ $IS_TMPL -eq 1 ]; then
+        FINALDEVICE=`DEVICE=$DEVNAME MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSPATH $DIR/../../nodes/bin/wlanmodules.sh device_name`
+        echo $line | sed -e "s#$DEVNAME#$FINALDEVICE#g" >> $CONFIGFILE.tmp
+        
+        CLICKFILE_USE_TMPL=`echo $CLICKFILE | grep $DEVNAME | wc -l`
+        
+        if [ $CLICKFILE_USE_TMPL -eq 1 ]; then
+          NEW_CLICKFILE=`echo $CLICKFILE | sed -e "s#$DEVNAME#$FINALDEVICE#g"`
+          cat $CLICKFILE | sed -e "s#$DEVNAME#$FINALDEVICE#g" > $NEW_CLICKFILE
+          rm $CLICKFILE
+        fi
+      fi    
+      
+    done < $CONFIGFILE
+
+    mv $CONFIGFILE.tmp $CONFIGFILE
+
+    #end REPLACE DEVICE TMPL
 
     REMOTENODECOUNT=`cat status/all_wireless_nodes.log | grep -v "^$" | wc -l`
     if [ $REMOTENODECOUNT -gt 0 ]; then
