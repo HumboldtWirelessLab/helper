@@ -639,7 +639,14 @@ if [ $MEASUREMENT_ABORT -eq 0 ]; then
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
 	  #add 10 second extra to make sure that we are not faster than the devices (click,application)
-	  WAITTIME=`expr $TIME + 10`
+	  EXTRA_WAITTIME=10
+	  
+	  if [ "x$NODENUM" != "x" ]; then
+	    if [ $NODENUM -lt 5 ]; then
+	      $EXTRA_WAITTIME=5
+	    fi
+	  fi
+	  WAITTIME=`expr $TIME + $EXTRA_WAITTIME`
 	  echo "Wait for $WAITTIME sec"
 
 	  # Countdown
