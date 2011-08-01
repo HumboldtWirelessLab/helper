@@ -44,7 +44,8 @@ public class ClickClient {
       ClickConnection cc = new ClickConnection(ip, p.intValue());
       cc.openClickConnection();
       String result = cc.readHandler(args[3], args[4]);
-
+      String uncomp_result = null;
+      
       if ( result != null ) {
         if ( result.contains("compressed_data")) {
           String raw_data = result.substring(result.indexOf("CDATA[")+6, result.indexOf("]]>"));
@@ -63,24 +64,20 @@ public class ClickClient {
           }
 
           if ( decodedBytes != null ) {
-
             //System.out.println("Base64 dec: " + decodedBytes.length + " Data 0: " + (int)decodedBytes[0]);
-
             BrnLZW lzwdata = new BrnLZW();
-
             byte[] data = lzwdata.decode(decodedBytes, decodedBytes.length, uncomp_size  );
 
             if ( data != null ) {
               //System.out.println("LZW dec: " + data.length);
-              String uncomp_result = new String(data);
-              System.out.println(uncomp_result);
+              uncomp_result = new String(data);
               //System.out.println("Size: " + uncomp_size + " " + comp_size + " " + uncomp_result.length());
-            } else {
-              System.out.println(result);
-            }
-          } else {
-            System.out.println(result);
+            } 
           }
+        }
+
+        if ( uncomp_result != null ) {
+          System.out.println(uncomp_result);
         } else {
           System.out.println(result);
         }
