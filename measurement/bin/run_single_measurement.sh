@@ -396,9 +396,10 @@ for state in  $STATES; do
       cat status/$node\_wifinodeinfo.log >> status/all_wireless_nodes.log
     done
     cat status/all_wireless_nodeinfo.log.tmp | sort -u > status/all_wireless_nodeinfo.log
-        
+
     #REPLACE DEVICE TMPL
-    
+
+    if [ "x$REWRITER" = "xyes" ]; then
     echo -n "" > $CONFIGFILE.tmp
 
     while read line; do
@@ -408,27 +409,28 @@ for state in  $STATES; do
       DEVNAME=`echo $line | awk '{print $2}'`
       MODULSPATH=`echo $line | awk '{print $3}' | sed -e "s#NODEARCH#$ARCH#g" -e "s#KERNELVERSION#$KERNEL#g"`
       IS_TMPL=`echo $DEVNAME | grep "DEV_" | wc -l`
-      
+
       CLICKFILE=`echo $line | awk '{print $7}'`
-      
+
       #echo "$NODE $KERNEL $ARCH $DEVNAME $MODULSPATH $IS_TMPL" >> $CONFIGFILE.log
       if [ $IS_TMPL -eq 1 ]; then
         FINALDEVICE=`DEVICE=$DEVNAME MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSPATH $DIR/../../nodes/bin/wlanmodules.sh device_name`
         echo $line | sed -e "s#$DEVNAME#$FINALDEVICE#g" >> $CONFIGFILE.tmp
-        
+
         CLICKFILE_USE_TMPL=`echo $CLICKFILE | grep $DEVNAME | wc -l`
-        
+
         if [ $CLICKFILE_USE_TMPL -eq 1 ]; then
           NEW_CLICKFILE=`echo $CLICKFILE | sed -e "s#$DEVNAME#$FINALDEVICE#g"`
           cat $CLICKFILE | sed -e "s#$DEVNAME#$FINALDEVICE#g" > $NEW_CLICKFILE
           rm $CLICKFILE
         fi
-      fi    
-      
+      fi
+
     done < $CONFIGFILE
 
     mv $CONFIGFILE.tmp $CONFIGFILE
 
+    fi
     #end REPLACE DEVICE TMPL
 
     REMOTENODECOUNT=`cat status/all_wireless_nodes.log | grep -v "^$" | wc -l`
@@ -680,10 +682,10 @@ if [ $MEASUREMENT_ABORT -eq 0 ]; then
 
 	  #add 10 second extra to make sure that we are not faster than the devices (click,application)
 	  EXTRA_WAITTIME=10
-	  
+
 	  if [ "x$NODENUM" != "x" ]; then
 	    if [ $NODENUM -lt 5 ]; then
-	      $EXTRA_WAITTIME=5
+	      EXTRA_WAITTIME=5
 	    fi
 	  fi
 	  WAITTIME=`expr $TIME + $EXTRA_WAITTIME`
