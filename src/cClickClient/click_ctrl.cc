@@ -118,7 +118,8 @@ main(int argc, char **argv)
         /* Uncompress */
         LZW lzw;
         unsigned char *data_lzw_uncompressed = (unsigned char *)malloc(uncompressed);
-        lzw.decode(data_base64_decoded, compressed, data_lzw_uncompressed, uncompressed);
+        int size = lzw.decode(data_base64_decoded, compressed, data_lzw_uncompressed, uncompressed);
+        data_lzw_uncompressed[size] = '\0';
 
         printf("%s\n", data_lzw_uncompressed);
         
