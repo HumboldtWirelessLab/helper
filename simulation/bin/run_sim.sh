@@ -56,10 +56,22 @@ FINALRESULTDIR=`echo $RESULTDIR | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#CONFIGDIR#
 
 if [ "x$3" = "x" ]; then
     echo "RESULTDIR is target. No Subdir."
+    
+    # check numbered directories to propose automatically 
+    i=1 
+    while [ -e "./$i" ]; do i=$((i+1)); done 
+         
+    echo "Proposing $FINALRESULTDIR/$i" 
+    FINALRESULTDIR=$FINALRESULTDIR/$i 
 else
     if [ -e $FINALRESULTDIR/$3 ]; then
 	echo "Measurement already exits"
-	exit 0
+	
+        i=$3
+        while [ -e "./$i" ]; do i=$((i+1); done 
+	echo "Use $FINALRESULTDIR/$i"
+	FINALRESULTDIR=$FINALRESULTDIR/$i
+	#exit 0
     else
 	FINALRESULTDIR=$FINALRESULTDIR/$3
     fi
