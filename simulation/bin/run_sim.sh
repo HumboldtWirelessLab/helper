@@ -68,7 +68,7 @@ else
 	echo "Measurement already exits"
 	
         i=$3
-        while [ -e "./$i" ]; do i=$((i+1); done 
+        while [ -e "./$i" ]; do i=$((i+1)); done 
 	echo "Use $FINALRESULTDIR/$i"
 	FINALRESULTDIR=$FINALRESULTDIR/$i
 	#exit 0
