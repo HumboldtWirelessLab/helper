@@ -53,6 +53,8 @@ case "$1" in
 	
 	NODEARCH=`$DIR/../../bin/system.sh get_arch`
 	killall obd-$NODEARCH
+	
+	sleep 1
 
 	NUM=`echo $DEVICE | sed "s#obd##g"`
 	ARCH=$NODEARCH $DIR/../openbeacon/obd-$NODEARCH -O $NUM < /dev/null > /dev/null 2>&1 &
