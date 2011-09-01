@@ -9,6 +9,8 @@ elementclass DSR {$ID, $LT, $RC, $METRIC |
   dsr_decap :: BRN2DSRDecap(NODEIDENTITY $ID, LINKTABLE $LT);
   dsr_encap :: BRN2DSREncap(NODEIDENTITY $ID, LINKTABLE $LT);
 
+  dsr_stats :: DSRStats(DEBUG 4);
+
 #ifdef DSR_ID_CACHE
   ridc::BrnRouteIdCache(DEBUG 4);
 #endif
@@ -39,7 +41,8 @@ elementclass DSR {$ID, $LT, $RC, $METRIC |
 #ifdef DEBUG_DSR
   -> Print("NODENAME: DSR: querie",100)
 #endif
-  -> [1]output;                                             // rreq packets (broadcast)
+ -> BRN2EtherEncap() 
+ -> [1]output;                                             // rreq packets (broadcast)
   
   querier[1] 
 #ifdef DEBUG_DSR
@@ -51,9 +54,9 @@ elementclass DSR {$ID, $LT, $RC, $METRIC |
 #ifdef DEBUG_DSR
   -> Print("NODENAME: Forward",100)
 #endif
+  -> dsr_stats
   -> routing_peek
   -> BRN2EtherEncap(USEANNO true)
-  -> BRN2EtherDecap()
   -> [1]output;
 
   src_forwarder[1]
@@ -90,6 +93,7 @@ elementclass DSR {$ID, $LT, $RC, $METRIC |
 #ifdef DEBUG_DSR
   -> Print("NODENAME: Req_fwd_out")
 #endif
+  -> BRN2EtherEncap()
   -> [1]output;
 
   req_forwarder[1]
@@ -97,6 +101,7 @@ elementclass DSR {$ID, $LT, $RC, $METRIC |
   -> Print("NODENAME: Target! now send reply")
 #endif
   -> [0]rep_forwarder
+  -> BRN2EtherEncap()
   -> [1]output;
 
   dsrclf[1] 
@@ -107,6 +112,7 @@ elementclass DSR {$ID, $LT, $RC, $METRIC |
 
   dsrclf[2]
   -> [1]err_forwarder
+  -> BRN2EtherEncap()
   -> [1]output;
 
   dsrclf[3]
