@@ -9,7 +9,7 @@ elementclass DSR {$ID, $LT, $RC, $METRIC |
   dsr_decap :: BRN2DSRDecap(NODEIDENTITY $ID, LINKTABLE $LT);
   dsr_encap :: BRN2DSREncap(NODEIDENTITY $ID, LINKTABLE $LT);
 
-  dsr_stats :: DSRStats(DEBUG 4);
+  dsr_stats :: DSRStats(DEBUG 2);
 
 #ifdef DSR_ID_CACHE
   ridc::BrnRouteIdCache(DEBUG 4);
