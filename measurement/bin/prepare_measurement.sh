@@ -132,7 +132,11 @@ case "$1" in
 				                fi
 				        fi
                                       fi
-						
+					
+				      if [ "x$WIFITYPE" = "xDEFAULT" ] || [ "x$WIFITYPE" = "x0" ]; then
+				      
+				        WIFITYPE=
+				      fi	
                                       CPPOPTS="$CPPOPTS -DWIFITYPE=$WIFITYPE"
                               else
 				      WIFICONFIGFINALNAME="-"

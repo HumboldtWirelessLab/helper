@@ -7,10 +7,10 @@
 elementclass GEOR {$ID, $LT, $LS |
 
   gps::GPS();
-  grt::GeorTable(GPS gps, LINKTABLE $LT, DEBUG 4);
+  grt::GeorTable(GPS gps, LINKTABLE $LT, DEBUG 2);
   glp::GeorLinkProbeHandler(LINKSTAT $LS, GEORTABLE grt);
-  gqu::GeorQuerier(NODEID $ID, GEORTABLE grt, DEBUG 4);
-  gfwd::GeorForwarder(NODEID id, GEORTABLE grt, DEBUG 4);
+  gqu::GeorQuerier(NODEID $ID, GEORTABLE grt, DEBUG 2);
+  gfwd::GeorForwarder(NODEID id, GEORTABLE grt, DEBUG 2);
 
   Idle
   -> [1]gqu;
@@ -44,4 +44,6 @@ elementclass GEOR {$ID, $LT, $LS |
   input[2]
   -> Discard;
 
+ input[3]
+ -> Discard;
 }

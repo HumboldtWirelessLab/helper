@@ -52,6 +52,9 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef CST
   -> cst                                                            //add channel stats if requested
 #endif
+#ifdef CERR
+  -> ced::ChannelErrorDetection(DEVICE $device, DEBUG 4)
+#endif
   -> [0]output;
 
 
