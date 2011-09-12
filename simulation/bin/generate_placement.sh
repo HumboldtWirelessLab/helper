@@ -46,7 +46,11 @@ case "$1" in
 	  #echo "SL: $SIDELEN"
 	  
 	  NODEN=0
-	  SIDESTEP=`expr $3 / \( $SIDELEN - 1 \)`
+	  if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
+	    SIDESTEP=$3
+	  else
+	    SIDESTEP=`expr $3 / \( $SIDELEN - 1 \)`
+	  fi
 	  #echo "ST: $SIDESTEP"
 	  for n in $NODES; do
 	    X=`expr \( $NODEN % $SIDELEN \) \* $SIDESTEP`
