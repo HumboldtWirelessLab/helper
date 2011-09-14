@@ -30,7 +30,7 @@ elementclass DSR {$ID, $LT, $RC, $METRIC |
   src_forwarder :: BRN2SrcForwarder(NODEIDENTITY $ID, LINKTABLE $LT, DSRENCAP dsr_encap, ROUTEQUERIER querier, DSRDECAP dsr_decap, DEBUG 2);
 #endif
 
-  err_forwarder :: BRN2ErrorForwarder(NODEIDENTITY $ID, LINKTABLE $LT, DSRENCAP dsr_encap, DSRDECAP dsr_decap, ROUTEQUERIER querier);
+  err_forwarder :: BRN2ErrorForwarder(NODEIDENTITY $ID, LINKTABLE $LT, DSRENCAP dsr_encap, DSRDECAP dsr_decap, ROUTEQUERIER querier, DEBUG 2);
   routing_peek :: DSRPeek(DEBUG 2);
 
   input[0]
@@ -125,8 +125,8 @@ elementclass DSR {$ID, $LT, $RC, $METRIC |
   // undeliverable packets
   // ------------------
   input[2]
-  -> Discard;
-//  -> [0]err_forwarder;
+  //-> Discard;
+  -> [0]err_forwarder;
 
   input[3] -> Discard;
 }
