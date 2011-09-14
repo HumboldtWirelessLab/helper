@@ -24,6 +24,13 @@ function get_params() {
   echo $@
 }
 
+
+if [ "x$1" = "xhelp" ]; then
+  echo "Use: [DUMPFILEDIR=Path-to-dumps] $0 [ns|jist [des-file  [target-dir]]]"
+  
+  exit 0
+fi
+
 if [ $# -gt 0 ]; then
   if [ ! "x$1" = "xjist" ] && [ ! "x$1" = "xns" ]; then
 	echo "Use $0 [ns|jist] des-file"
@@ -152,7 +159,7 @@ case "$MODE" in
                   fi
 		fi 
 
-		USED_SIMULATOR=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR POSTFIX=$POSTFIX NODEPLACEMENTFILE=$FINALPLMFILE $DIR/prepare-sim.sh prepare $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
+		DUMPFILEDIR=$DUMPFILEDIR USED_SIMULATOR=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR POSTFIX=$POSTFIX NODEPLACEMENTFILE=$FINALPLMFILE $DIR/prepare-sim.sh prepare $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 
 		mv $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX $FINALRESULTDIR/$DESCRIPTIONFILENAME.tmp
 

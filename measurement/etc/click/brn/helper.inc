@@ -126,15 +126,23 @@ BRNAddressInfo(ipdev eth0:ip);
 	     ->Strip(8) \
 	     //->Print(TIMESTAMP\ttrue)
 #endif
+/* End KERNEL stuff */
+
 
 /* USERLEVEL stuff */
-
 #ifdef USERLEVEL
 
 #ifdef SOCKETDEVICE
 
 #define FROMRAWDEVICE(x) FromSocket("UDP", 127.0.0.1, 20000)
 #define TORAWDEVICE(x) ToSocket("UDP", 127.0.0.1, 20001);
+
+#else 
+
+#ifdef DUMPDEVICE
+
+#define FROMRAWDEVICE(x) FromDump("DUMPFILESRC", TIMING true)
+#define TORAWDEVICE(x) Discard();
 
 #else
 
@@ -157,12 +165,14 @@ BRNAddressInfo(ipdev eth0:ip);
 
 //nopcap
 #else
+//use_pcap
 
 #define FROMRAWDEVICE(x) BrnFromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, CAPTURE LINUX, HEADROOM 64)
 #define TORAWDEVICE(x) BrnToDevice(DEVNAME x, DEBUG false)
 
-//end nopcap
+//end usepcap
 #endif
+/* END NOPCAP */
 
 //nobrndevice
 #else
@@ -188,10 +198,12 @@ BRNAddressInfo(ipdev eth0:ip);
 //end no pcap
 #endif
 
-//end brn device
+//end USEBRNDEVICE
 #endif
 
-//socketdevice
+//else for dumpdevice
+#endif
+//else for socketdevice
 #endif
 
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
@@ -221,8 +233,13 @@ BRNAddressInfo(ipdev eth0:ip);
 
 #ifdef SIMULATION
 
+#ifdef DUMPDEVICE
+#define FROMRAWDEVICE(x) FromDump(FILENAME DUMPFILESRC, TIMING true)
+#define TORAWDEVICE(x) Discard()
+#else 
 #define FROMRAWDEVICE(x) FromSimDevice(x, SNAPLEN 8190)
 #define TORAWDEVICE(x) ToSimDevice(x, ENCAP UNKNOWN )
+#endif
 
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
