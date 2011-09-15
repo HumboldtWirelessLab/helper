@@ -78,8 +78,35 @@ case "$1" in
 		        CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#"`
 		        #echo "NODES: $CNODE"
 		      else
-        		CNODES=$CNODE
-			GROUP_LIMIT=0
+	                ISRANDOM=`echo $CNODE | grep "random:" | wc -l`
+			
+			LIMIT=`echo $CNODE | sed "s#random:##g"`
+			
+			if [ $ISRANDOM -eq 1 ] && [ "x$LIMIT" != "x" ]; then
+			  NO_NODES=0
+			  AC_NODEID=1
+			
+			  CNODES=""
+			  while [ $NO_NODES -lt $LIMIT ]; do
+			    NEW_NODE="sk$AC_NODEID"
+			    
+			    AC_NODEID=`expr $AC_NODEID + 1`
+			    			    
+			    NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$NEW_NODE[[:space:]]*$CDEV" | wc -l`
+			    NODEINFILE2=`cat $CONFIGDIR/$NODETABLE | grep -e "^$NEW_NODE[[:space:]]*$CDEV" | wc -l`
+
+
+			    if [ $NODEINFILE -eq 0 ] && [ $NODEINFILE2 -eq 0 ]; then
+			      CNODES="$CNODES $NEW_NODE"
+			      NO_NODES=`expr $NO_NODES + 1`
+			    fi
+			  
+			  done
+			  
+			else
+		          CNODES=$CNODE
+			  GROUP_LIMIT=0
+			fi
         	      fi
 
                       NODES_OF_GROUP=0
@@ -149,7 +176,7 @@ case "$1" in
 		  . $WIFICONFIG
 		  cp $WIFICONFIG $RESULTDIR
 		  
-		  if [ "x$WIFITYPE" = "x" ]; then
+		  if [ "x$WIFITYPE" = "x" ] || [ "x$WIFITYPE" = "x0" ]; then
 		    WIFITYPE=806
 		  fi
 		else
@@ -158,15 +185,18 @@ case "$1" in
 		
 		CPPOPTS=""
 		
-		echo "DUMP: $DUMPFILEDIR" >> $RESULTDIR/debug.txt
+		#echo "DUMP: $DUMPFILEDIR" >> $RESULTDIR/debug.txt
 		if [ "x$DUMPFILEDIR" != "x" ]; then
+		  if  [ -e $PWD/$DUMPFILEDIR ]; then
+		    DUMPFILEDIR=$PWD/$DUMPFILEDIR
+		  fi
 		  DUMPFILESRC="$DUMPFILEDIR/$CNODE.$CDEV.raw.dump"
-		  echo "SRC: $DUMPFILESRC" >> $RESULTDIR/debug.txt
+		  #echo "SRC: $DUMPFILESRC" >> $RESULTDIR/debug.txt
 		  if [ -e $DUMPFILESRC ]; then
 		    WIFITYPE=`test_header.sh $DUMPFILESRC`
-		    echo "WIFI: $WIFITYPE" >> $RESULTDIR/debug.txt
+		    #echo "WIFI: $WIFITYPE" >> $RESULTDIR/debug.txt
 		    CPPOPTS="$CPPOPTS -DDUMPDEVICE -DDUMPFILESRC=\"$DUMPFILESRC\""
-		    echo "CPPOPTS: $CPPOPTS" >> $RESULTDIR/debug.txt
+		    #echo "CPPOPTS: $CPPOPTS" >> $RESULTDIR/debug.txt
 		  fi
 		fi
 		
@@ -175,7 +205,6 @@ case "$1" in
                 CPPOPTS="$CPPOPTS -DSIMULATION"
                 CPPOPTS="$CPPOPTS -DWIFITYPE=$WIFITYPE"
 			
-
 		NODEID_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "BRN2NodeIdentity" | wc -l)`
 		
 		if [ $NODEID_INC -gt 0 ]; then
