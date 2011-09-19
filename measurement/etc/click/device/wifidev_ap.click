@@ -114,6 +114,9 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 #else
   -> error_clf :: FilterPhyErr()
 #endif
+#ifndef DISABLE_WIFIDUBFILTER
+  -> WifiDupeFilter()
+#endif
   -> wififrame_clf :: Classifier( 1/40%40,  // wep frames
                                   0/00%0f,  // management frames
                                       - );
@@ -122,10 +125,14 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> Discard;
 
   wififrame_clf[1]
+    -> FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
     -> ap
     -> wifioutq;
 
   wififrame_clf[2]
+    -> fbssid::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo);
+
+    fbssid[1]    
     -> WifiDecap()
 //  -> nbdetect
 //  -> Print("Data")
@@ -156,12 +163,20 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
  
   brn_ether_clf[1]                        //For  me or broadcast and no BRN
+  -> Discard;
+  
+  Idle
   -> bc_clf::Classifier( 0/ffffffffffff,
                             - )
   -> [4]output;
   
   bc_clf[1]
   -> [3]output;
+  
+  fbssid[0]
+//  -> Print("From Client", TIMESTAMP true)
+  -> WifiDecap()
+  -> bc_clf;
   
   lp_clf[1]                               //brn, but no lp
   -> brn_bc_clf::Classifier( 0/ffffffffffff,
