@@ -27,6 +27,7 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
   wifioutq::NotifierQueue(50);
 
   rawdevice
+  -> filter_tx :: FilterTX()
 #ifndef DISABLE_WIFIDUBFILTER
   -> WifiDupeFilter()
 #endif
