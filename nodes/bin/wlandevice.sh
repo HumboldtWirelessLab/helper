@@ -94,7 +94,6 @@ case "$1" in
 	  exit 0
 	fi
 	;;
-
     *)
         ;;
 esac

@@ -24,9 +24,27 @@ function get_params() {
   echo $@
 }
 
-if [ ! "x$1" = "xjist" ] && [ ! "x$1" = "xns" ]; then
-	echo "Use $0 [ns|jist] dis-file"
+
+if [ "x$1" = "xhelp" ]; then
+  echo "Use: [DUMPFILEDIR=Path-to-dumps] $0 [ns|jist [des-file  [target-dir]]]"
+  
+  exit 0
+fi
+
+if [ $# -gt 0 ]; then
+  if [ ! "x$1" = "xjist" ] && [ ! "x$1" = "xns" ]; then
+	echo "Use $0 [ns|jist] des-file"
 	exit 0
+  fi
+
+  USED_SIMULATOR=$1
+else
+  USED_SIMULATOR=ns
+fi
+
+
+if [ "x$EVAL_LOG_OUT" = "x" ]; then
+  EVAL_LOG_OUT=1
 fi
 
 WORKDIR=$pwd
@@ -44,13 +62,23 @@ case "$SIGN" in
       ;;
 esac
 
-if [ -f $2 ]; then
-    DISCRIPTIONFILE=$2
-    . $DISCRIPTIONFILE
-else
+if [ $# -gt 1 ]; then
+  if [ -f $2 ]; then
+    DESCRIPTIONFILE=$2
+  else
     echo "$2 : No such file !"
     exit 0;
+  fi
+else
+  DESCRIPTIONFILE=`ls *.des | awk '{print $1}'`
+  
+  if [ "x$DESCRIPTIONFILE" = "x" ]; then
+    echo "No description-file"
+    exit 0
+  fi
 fi
+
+. $DESCRIPTIONFILE
 
 FINALRESULTDIR=`echo $RESULTDIR | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 
@@ -84,20 +112,20 @@ MODE=sim
 
 case "$MODE" in
     "sim")
-	        if [ "x$1" = "xjist" ]; then
+	        if [ "x$USED_SIMULATOR" = "xjist" ]; then
 		    POSTFIX=jist
 		else
 		    POSTFIX=ns2
 		fi
 
-		DISCRIPTIONFILENAME=`basename $DISCRIPTIONFILE`
+		DESCRIPTIONFILENAME=`basename $DESCRIPTIONFILE`
 
                 if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ]; then
-		  cat $DISCRIPTIONFILE | sed -e "s#[[:space:]]*NODEPLACEMENTFILE[[:space:]]*=.*##g" -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
-		  echo "" >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
-		  echo "NODEPLACEMENTFILE=$FINALRESULTDIR/placementfile.plm" >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
+		  cat $DESCRIPTIONFILE | sed -e "s#[[:space:]]*NODEPLACEMENTFILE[[:space:]]*=.*##g" -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
+		  echo "" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
+		  echo "NODEPLACEMENTFILE=$FINALRESULTDIR/placementfile.plm" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 		else
-		  cat $DISCRIPTIONFILE | sed -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
+		  cat $DESCRIPTIONFILE | sed -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 		fi
 
                 if [ "x$NODEPLACEMENT" = "x" ]; then
@@ -131,17 +159,17 @@ case "$MODE" in
                   fi
 		fi 
 
-		USED_SIMULATOR=$1 CONFIGDIR=$CONFIGDIR POSTFIX=$POSTFIX NODEPLACEMENTFILE=$FINALPLMFILE $DIR/prepare-sim.sh prepare $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
+		DUMPFILEDIR=$DUMPFILEDIR USED_SIMULATOR=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR POSTFIX=$POSTFIX NODEPLACEMENTFILE=$FINALPLMFILE $DIR/prepare-sim.sh prepare $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 
-		mv $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp
+		mv $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX $FINALRESULTDIR/$DESCRIPTIONFILENAME.tmp
 
-		cat $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp | grep -v "NODEPLACEMENTFILE" | sed -e "s#$NODETABLE#$FINALRESULTDIR/$NODETABLE.$POSTFIX#g" > $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
-		echo "NODEPLACEMENTFILE=$FINALPLMFILE" >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
+		cat $FINALRESULTDIR/$DESCRIPTIONFILENAME.tmp | grep -v "NODEPLACEMENTFILE" | sed -e "s#$NODETABLE#$FINALRESULTDIR/$NODETABLE.$POSTFIX#g" > $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
+		echo "NODEPLACEMENTFILE=$FINALPLMFILE" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 		
-		rm $FINALRESULTDIR/$DISCRIPTIONFILENAME.tmp
+		rm $FINALRESULTDIR/$DESCRIPTIONFILENAME.tmp
 
-		SIMDIS=$FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX
-		. $SIMDIS
+		SIMDES=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
+		. $SIMDES
 		
 		if [ "x$POSTFIX" = "xns2" ]; then
 		  TCLFILE="$FINALRESULTDIR/$NAME.tcl"
@@ -154,7 +182,7 @@ case "$MODE" in
 		cat $DIR/../etc/ns/radio/$RADIO\.tcl > $TCLFILE
 		
                 if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ] || [ "x$NODEPLACEMENT" = "xstring" ]; then
-		  $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
+		  NODEPLACEMENTOPTS="$NODEPLACEMENTOPTS" $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
 		  FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
                 fi
 
@@ -277,8 +305,8 @@ case "$MODE" in
 		cat $DIR/../etc/ns/script_02.tcl >> $TCLFILE
 
 		if [ "x$CONTROLFILE" != "x" ]; then
-		    if [ "x$1" = "xjist" ]; then
-		      echo -n "handler.script = " > $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties
+		    if [ "x$USED_SIMULATOR" = "xjist" ]; then
+		      echo -n "handler.script = " > $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 		    fi
 		    while read line; do
 		        ISCOMMENT=`echo $line | grep "#" | wc -l`
@@ -294,23 +322,23 @@ case "$MODE" in
 			    if [ "x$TIME" != "x" ]; then
     				if [ "x$MODE" = "xwrite" ]; then
 				    VALUE=`get_params $line | sed $NODEMAC_SEDARG`
-				    if [ "x$1" = "xns" ]; then
+				    if [ "x$USED_SIMULATOR" = "xns" ]; then
 				      echo "\$ns_ at $TIME \"set result \\[\\[\$node_($NODENUM) entry\\] writehandler $ELEMENT $HANDLER \\\"$VALUE\\\" \\]\"" >> $TCLFILE
 				    else
-				      echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,$VALUE;" >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties
+				      echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,$VALUE;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 				    fi
 				else
-				    if [ "x$1" = "xns" ]; then
+				    if [ "x$USED_SIMULATOR" = "xns" ]; then
 				      echo "\$ns_ at $TIME \"puts \\\"\\[\\[\$node_($NODENUM) entry\\] readhandler $ELEMENT $HANDLER \\]\\\"\"" >> $TCLFILE
 				    else
-				      echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,;" >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties
+				      echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 				    fi
 				fi
 			    fi
 			fi
 		    done < $CONTROLFILE
-		    if [ "x$1" = "xjist" ]; then
-		      echo "" >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties
+		    if [ "x$USED_SIMULATOR" = "xjist" ]; then
+		      echo "" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 		    fi
 		fi
 
@@ -325,7 +353,7 @@ case "$MODE" in
 		    mkdir -p $RESULTDIR
 		fi
 
-		if [ "x$1" = "xns" ]; then
+		if [ "x$USED_SIMULATOR" = "xns" ]; then
 		    which valgrind > /dev/null
 		    if [ $? -ne 0 ]; then
 			VALGRIND=0
@@ -342,13 +370,13 @@ case "$MODE" in
 		    fi
 		
 		    if [ $? -eq 0 ]; then
-			MODE=sim SIM=ns2 CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh
+			MODE=sim SIM=ns2 CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
 		    else
 		      exit 1
 		    fi
 		else
-		    ( cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DISCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties )
-		    ( cd $FINALRESULTDIR; $DIR/start-jist-sim.sh $FINALRESULTDIR/$DISCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
+		    ( cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties )
+		    ( cd $FINALRESULTDIR; $DIR/start-jist-sim.sh $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
 		fi		
 		;;
 esac

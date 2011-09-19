@@ -27,6 +27,9 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
   wifioutq::NotifierQueue(50);
 
   rawdevice
+#ifndef DISABLE_WIFIDUBFILTER
+  -> WifiDupeFilter()
+#endif
   -> wififrame_clf :: Classifier( 0/00%0f,  // management frames
                                       - ); 
 

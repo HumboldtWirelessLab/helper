@@ -58,6 +58,13 @@ case "$1" in
 		    exit 0
 		fi
 		;;
+    "wifi_type")
+		if [ "x$RESPONSIBLE" != "x" ]; then
+		    #echo "$RESPONSIBLE is responsible"
+		    DEVICE=$DEVICE MODOPTIONS=$MODOPTIONS MODULSDIR=$MODULSDIR $RESPONSIBLE wifi_type
+		    exit 0
+		fi
+		;;
               *)
 		echo "unknown options"
 		;;
