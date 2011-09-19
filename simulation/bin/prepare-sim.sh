@@ -154,12 +154,27 @@ case "$1" in
 		  fi
 		else
 		  WIFITYPE=806
-		fi																		      
-
-                CPPOPTS="-DNODENAME=$CNODE -DNODEDEVICE=$CDEV -DTIME=$TIME"
+		fi
+		
+		CPPOPTS=""
+		
+		echo "DUMP: $DUMPFILEDIR" >> $RESULTDIR/debug.txt
+		if [ "x$DUMPFILEDIR" != "x" ]; then
+		  DUMPFILESRC="$DUMPFILEDIR/$CNODE.$CDEV.raw.dump"
+		  echo "SRC: $DUMPFILESRC" >> $RESULTDIR/debug.txt
+		  if [ -e $DUMPFILESRC ]; then
+		    WIFITYPE=`test_header.sh $DUMPFILESRC`
+		    echo "WIFI: $WIFITYPE" >> $RESULTDIR/debug.txt
+		    CPPOPTS="$CPPOPTS -DDUMPDEVICE -DDUMPFILESRC=\"$DUMPFILESRC\""
+		    echo "CPPOPTS: $CPPOPTS" >> $RESULTDIR/debug.txt
+		  fi
+		fi
+		
+                CPPOPTS="$CPPOPTS -DNODENAME=$CNODE -DNODEDEVICE=$CDEV -DTIME=$TIME"
                 CPPOPTS="$CPPOPTS -DDEBUGLEVEL=$DEBUG"
                 CPPOPTS="$CPPOPTS -DSIMULATION"
                 CPPOPTS="$CPPOPTS -DWIFITYPE=$WIFITYPE"
+			
 
 		NODEID_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "BRN2NodeIdentity" | wc -l)`
 		

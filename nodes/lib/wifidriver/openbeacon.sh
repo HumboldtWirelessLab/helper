@@ -55,6 +55,9 @@ case "$1" in
 		;;
     "uninstall")
 		;;
+    "wifi_type")
+                echo "807"
+		;;
     *)
 		echo "unknown options"
 		;;

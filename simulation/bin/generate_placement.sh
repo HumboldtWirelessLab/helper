@@ -46,7 +46,11 @@ case "$1" in
 	  #echo "SL: $SIDELEN"
 	  
 	  NODEN=0
-	  SIDESTEP=`expr $3 / \( $SIDELEN - 1 \)`
+	  if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
+	    SIDESTEP=$3
+	  else
+	    SIDESTEP=`expr $3 / \( $SIDELEN - 1 \)`
+	  fi
 	  #echo "ST: $SIDESTEP"
 	  for n in $NODES; do
 	    X=`expr \( $NODEN % $SIDELEN \) \* $SIDESTEP`
@@ -77,9 +81,14 @@ case "$1" in
           NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
           NODECOUNT=`echo $NODES | wc -w`
 	  NODEN=0
-	  SIDESTEP=`expr $3 / \( $NODECOUNT - 1 \)`
 
-	  Y=`expr $3 / 2`
+	  if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
+	    SIDESTEP=$3
+	  else
+	    SIDESTEP=`expr $3 / \( $NODECOUNT - 1 \)`
+	  fi
+
+  	  Y=`expr $3 / 2`
 
 	  for n in $NODES; do
 	    X=`expr $NODEN \* $SIDESTEP`

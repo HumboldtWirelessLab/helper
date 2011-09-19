@@ -27,6 +27,7 @@ elementclass BATMAN {$ID, $LT |
 //-> Print("Forward org")
   -> bofwd
   -> brnee::Null()
+  -> BRN2EtherEncap(USEANNO true)
   -> [1]output;
 
   bos

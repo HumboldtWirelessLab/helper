@@ -93,6 +93,9 @@ case "$1" in
 
 		done
 		;;
+    "wifi_type")
+		echo "802"
+		;;
     *)
 		echo "unknown options"
 		;;
