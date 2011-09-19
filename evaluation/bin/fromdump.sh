@@ -43,13 +43,16 @@ else
   GPSREP="//"
 fi
 
-if [ "x$WIFI" = "xraw" ]; then
-  echo "FromDump($1,STOP true) -> Print(\"\",2000) -> Discard" | click-align 2> /dev/null | click 2>&1
-  exit 0
-fi
-
 if [ "x$WIFI" = "x" ]; then
   WIFI=`$DIR/test_header.sh $1`
+  if [ "x$WIFI" = "x806" ]; then
+    WIFI=raw
+  fi
+fi
+
+if [ "x$WIFI" = "xraw" ]; then
+  echo "FromDump($1,STOP true) -> Print(\"\",2000,TIMESTAMP true) -> Discard" | click-align 2> /dev/null | click 2>&1
+  exit 0
 fi
 
 if [ "x$RX" = "x" ]; then
