@@ -79,6 +79,6 @@ public class GeoParser {
 		d = Math.sqrt( Math.pow(d,2) +  Math.pow(Math.abs(h1-h2),2) );// norm eines vektors im euklidischen raum
 	}
 
-    System.out.println(d);
+    System.out.print(d);
   }
 }
