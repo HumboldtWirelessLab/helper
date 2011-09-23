@@ -82,7 +82,7 @@ case "$1" in
 			
 			LIMIT=`echo $CNODE | sed "s#random:##g"`
 			
-			if [ $ISRANDOM -eq 1 ] && [ "x$LIMIT" != "x" ]; then
+			if [ $ISRANDOM -gt 0 ] && [ "x$LIMIT" != "x" ]; then
 			  NO_NODES=0
 			  AC_NODEID=1
 			
@@ -92,9 +92,8 @@ case "$1" in
 			    
 			    AC_NODEID=`expr $AC_NODEID + 1`
 			    			    
-			    NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$NEW_NODE[[:space:]]*$CDEV" | wc -l`
-			    NODEINFILE2=`cat $CONFIGDIR/$NODETABLE | grep -e "^$NEW_NODE[[:space:]]*$CDEV" | wc -l`
-
+			    NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$NEW_NODE[[:space:]]*" | wc -l`
+			    NODEINFILE2=`cat $CONFIGDIR/$NODETABLE | grep -e "^$NEW_NODE[[:space:]]*" | wc -l`
 
 			    if [ $NODEINFILE -eq 0 ] && [ $NODEINFILE2 -eq 0 ]; then
 			      CNODES="$CNODES $NEW_NODE"
@@ -102,6 +101,8 @@ case "$1" in
 			    fi
 			  
 			  done
+			  
+			  GROUP_LIMIT=0
 			  
 			else
 		          CNODES=$CNODE

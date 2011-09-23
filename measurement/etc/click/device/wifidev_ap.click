@@ -58,16 +58,19 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   prios::PrioSched()
   -> wifidevice;
 
+  qc_suppressor::Suppressor();
   q::NotifierQueue(500)
 
-  qc::BRN2PacketQueueControl(QUEUESIZEHANDLER q.length, QUEUERESETHANDLER q.reset, MINP 100 , MAXP 500)
+  qc::BRN2PacketQueueControl(QUEUESIZEHANDLER q.length, QUEUERESETHANDLER q.reset, MINP 100 , MAXP 500, SUPPRESSORHANDLER qc_suppressor.active0,DISABLE_QUEUE_RESET false, TXFEEDBACK_REUSE false, UNICAST_RETRIES 0)
   -> EtherEncap(0x0800, $etheraddress , ff:ff:ff:ff:ff:ff)
   -> WifiEncap(0x00, 0:0:0:0:0:0)
   -> SetTXRate(2)
   -> SetTXPower(15)
   -> SetTimestamp()
   -> q
-
+  -> qc_suppressor
+  // -> cnt::Counter()
+  
 #ifdef PQUEUE_ENABLE
   -> [1]prios;
 
@@ -125,9 +128,13 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> Discard;
 
   wififrame_clf[1]
-    -> FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
+    -> fb::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
     -> ap
     -> wifioutq;
+
+  fb[1]
+    -> Classifier( 16/ffffffffffff )
+    -> ap;
 
   wififrame_clf[2]
     -> fbssid::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo);

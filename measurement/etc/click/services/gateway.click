@@ -91,14 +91,14 @@ elementclass Gateway {
 
     // no gateway known
     setgw[1]
-    //-> Print("No gateway known")
+    -> Print("No gateway known")
     // generate ICMP error
     -> Paint(0) // for identification
     -> icmp_error2client;
 
 
     from_clients[1] // flow packets
-    -> IPPrint("TO FLOW")
+    //-> IPPrint("TO FLOW")
     -> flows :: AggregateIPFlows(TCP_TIMEOUT 60, TCP_DONE_TIMEOUT 10, UDP_TIMEOUT 60, ICMP false)
     -> direction :: IPClassifier(src $addr_prefix, -) // look only for our client for a gateway; not the reverse flow's packets
     -> clients
@@ -123,20 +123,22 @@ elementclass Gateway {
     // packets from Internet to clients
     //////
     input[1]
-    -> decap :: BRNGatewayDecap(gateway)
-     -> Print("flow packets have to pass AggregateIPFlows")
+    //-> Print("Internet to Client")
+    -> decap :: BRNGatewayDecap(gateway, DEBUG 2)
+    //-> Print("flow packets have to pass AggregateIPFlows")
     -> CheckIPHeader(0)
+    //-> Print("To Clients")
     -> to_clients :: IPClassifier(udp && src port 1194, tcp or udp or icmp type unreachable, -)
     -> [0]output;
-
+    
     // send flow packet to flows (used for tracking)
     to_clients[1]
-    -> IPPrint("to Client: TO FLOW")
+    //-> IPPrint("to Client: TO FLOW")
     -> flows;
 
     // ... but send them only to flow (not to choose a gateway)
     direction[1]
-    -> IPPrint("Reverse packets")
+    //-> IPPrint("Reverse packets")
     -> ResolveEthernet($my_wlan, localsolve)
     -> [0]output;
 
@@ -147,7 +149,7 @@ elementclass Gateway {
     // packets to Internet (this host was chosen as a Internet gateway)
     ///////
     input[2]
-     -> Print(" Packet to Internet ")
+    //-> Print(" Packet to Internet ")
     -> before_local_gw :: IPClassifier(udp && src port 1194, tcp or udp, -)
     // supercise packet (this node may not a gateway be anymore)
     -> [1]gws :: BRNGatewaySupervisor(gateway, $lt);

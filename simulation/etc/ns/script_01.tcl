@@ -26,6 +26,11 @@ Agent/CBR set dport_		5000
 Simulator set MacTrace_ ON
 set ns_		[new Simulator]
 
+#$ns_ use-scheduler Calendar
+$ns_ use-scheduler Heap
+#$ns_ use-scheduler List
+#$ns_ use-scheduler Map
+#$ns_ use-scheduler RealTime
 #
 # Create and activate trace files.
 #
