@@ -21,11 +21,13 @@ Antenna/OmniAntenna set Gr_ 1.0
 ##FHSS (IEEE802.11)
 
 Phy/WirelessPhy set CPThresh_ 10.0
-Phy/WirelessPhy set CSThresh_ 1.559e-11
-Phy/WirelessPhy set RXThresh_ 3.652e-10
+#Phy/WirelessPhy set CSThresh_ 1.559e-11
+#Phy/WirelessPhy set RXThresh_ 3.652e-10
+Phy/WirelessPhy set CSThresh_ 3.1623e-10; #-95db
+Phy/WirelessPhy set RXThresh_ 6.3096e-10; #-92db
 Phy/WirelessPhy set Rb_ 2*1e6
 Phy/WirelessPhy set Pt_ 0.2818
-Phy/WirelessPhy set freq_ 914e+6 
+Phy/WirelessPhy set freq_ 2.472e9
 Phy/WirelessPhy set L_ 1.0
 Phy/WirelessPhy set bandwidth_ 1Mb
 

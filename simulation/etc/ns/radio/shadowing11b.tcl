@@ -15,14 +15,25 @@ Antenna/OmniAntenna set Gr_ 1.0
 # Propagation model
 # first set values of shadowing model
 Propagation/Shadowing set pathlossExp_ 2.0  ;# path loss exponent
-Propagation/Shadowing set std_db_ 4.0       ;# shadowing deviation (dB)
+Propagation/Shadowing set std_db_ 2.0       ;# shadowing deviation (dB)
 Propagation/Shadowing set dist0_ 1.0        ;# reference distance (m)
 Propagation/Shadowing set seed_ 0           ;# seed for RNG
 
 # Physical Layer
-Phy/WirelessPhy set Pt_ 0.281838     ;# transmission power
-Phy/WirelessPhy set freq_ 2.472e9    ;# for broadcast packets channel-13.2.472GHz
-Phy/WirelessPhy set RXThresh_ 3.28984e-09   ;# communication radius
+
+Phy/WirelessPhy set CPThresh_ 10.0
+#Phy/WirelessPhy set CSThresh_ 1.559e-11 ;
+#Phy/WirelessPhy set RXThresh_ 3.28984e-09
+Phy/WirelessPhy set CSThresh_ 3.1623e-10; #-95db
+Phy/WirelessPhy set RXThresh_ 3.28984e-09; #-84.8db
+Phy/WirelessPhy set Rb_ 2*1e6
+Phy/WirelessPhy set Pt_ 0.281838
+Phy/WirelessPhy set freq_ 2.472e9
+Phy/WirelessPhy set L_ 1.0
+
+#Phy/WirelessPhy set Pt_ 0.281838     ;# transmission power
+#Phy/WirelessPhy set freq_ 2.472e9    ;# for broadcast packets channel-13.2.472GHz
+#Phy/WirelessPhy set RXThresh_ 3.28984e-09   ;# communication radius
 
 # Mac Layer
 Mac/802_11 set dataRate_ 11Mb

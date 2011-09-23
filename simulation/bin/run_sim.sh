@@ -169,8 +169,16 @@ case "$MODE" in
 		rm $FINALRESULTDIR/$DESCRIPTIONFILENAME.tmp
 
 		SIMDES=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
+		
 		. $SIMDES
 		
+		if [ -f $DIR/../etc/ns/distances/$RADIO ]; then
+		  . $DIR/../etc/ns/distances/$RADIO
+		  if [ "x$FIELDSIZE" = "xRXRANGE" ]; then
+		    FIELDSIZE=$RXRANGE
+		  fi
+		fi
+				
 		if [ "x$POSTFIX" = "xns2" ]; then
 		  TCLFILE="$FINALRESULTDIR/$NAME.tcl"
 		else
