@@ -398,6 +398,13 @@ case "$MODE" in
 		else
 		    ( cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties )
 		    ( cd $FINALRESULTDIR; $DIR/start-jist-sim.sh $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
+
+		    if [ $? -eq 0 ]; then
+			MODE=sim SIM=ns2 CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
+		    else
+		      exit 1
+		    fi
+		    
 		fi		
 		;;
 esac
