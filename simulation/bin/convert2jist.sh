@@ -44,6 +44,7 @@ case "$1" in
 
     echo ""
     FIELDSIZE=`expr $FIELDSIZE + 1`
+    
     echo "field.size.x = $FIELDSIZE"
     echo "field.size.y = $FIELDSIZE"
 

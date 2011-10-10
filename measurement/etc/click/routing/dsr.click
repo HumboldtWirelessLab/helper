@@ -4,7 +4,7 @@
 // [0]output - ethernet (802.3) frames to external nodes/clients or me (no BRN protocol)
 // [1]output - BRN DSR packets to internal nodes (BRN DSR protocol)
 
-elementclass DSR {$ID, $LT, $RC, $METRIC |
+elementclass DSR {$ID, $LT, $METRIC |
 
   dsr_decap :: BRN2DSRDecap(NODEIDENTITY $ID, LINKTABLE $LT);
   dsr_encap :: BRN2DSREncap(NODEIDENTITY $ID, LINKTABLE $LT);
