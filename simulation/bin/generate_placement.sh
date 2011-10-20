@@ -49,7 +49,11 @@ case "$1" in
 	  if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
 	    SIDESTEP=$3
 	  else
-	    SIDESTEP=`expr $3 / \( $SIDELEN - 1 \)`
+	    if [ $SIDELEN -eq 1 ]; then
+	      SIDESTEP=$3
+	    else
+	      SIDESTEP=`expr $3 / \( $SIDELEN - 1 \)`
+	    fi
 	  fi
 	  #echo "ST: $SIDESTEP"
 	  for n in $NODES; do
@@ -85,7 +89,11 @@ case "$1" in
 	  if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
 	    SIDESTEP=$3
 	  else
-	    SIDESTEP=`expr $3 / \( $NODECOUNT - 1 \)`
+	    if [ $NODECOUNT -eq 1 ]; then
+	      SIDESTEP=$3
+	    else
+	      SIDESTEP=`expr $3 / \( $NODECOUNT - 1 \)`
+	    fi
 	  fi
 
   	  Y=`expr $3 / 2`
