@@ -16,7 +16,7 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   flp::SimpleFlooding();
 #endif
   
-  fl::Flooding(FLOODINGPOLICY flp);
+  fl::Flooding(NODEIDENTITY $id, FLOODINGPOLICY flp, DEBUG 4);
 
 #ifdef BCAST2UNIC
   unicfl :: UnicastFlooding(NODEIDENTITY $id, LINKTABLE $lt, MAXNBMETRIC 200, CANDSELECTIONSTRATEGY 1, DEBUG 2);
