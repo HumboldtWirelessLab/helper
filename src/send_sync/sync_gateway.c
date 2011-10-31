@@ -108,13 +108,13 @@ int main(int argc,char* argv[])
     fwd_local.sin_family = AF_INET;
     if ( mode == MODE_FORWARD ) {
       fwd_local.sin_port = htons(fwd_port);
-    } else {
+      fwd_local.sin_addr.s_addr = inet_addr("0.0.0.0");
+  } else {
       fwd_local.sin_port = htons(0);
+      fwd_local.sin_addr.s_addr = inet_addr(argv[5]);
+      bcopy ( fwd_ip->h_addr, &(fwd_local.sin_addr.s_addr), fwd_ip->h_length);
     }
-      
-    fwd_local.sin_addr.s_addr = inet_addr(argv[5]);
-    bcopy ( fwd_ip->h_addr, &(fwd_local.sin_addr.s_addr), fwd_ip->h_length);
- 
+  
     val = 1;
     setsockopt(fwd_sd, SOL_SOCKET, SO_BROADCAST, (char *) &val, sizeof(val));
   
