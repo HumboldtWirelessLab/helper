@@ -18,13 +18,18 @@ case "$SIGN" in
       ;;
 esac
 
+
+if [ "x$SYNCSRCIP" = "x" ]; then
+  SYNCSRCIP=192.168.3.3
+fi
+
 case "$1" in
     start)
 	SYNCPID=`pidof send_sync`
 	echo "Stop old Sync"
 	kill -9 $SYNCPID
         echo "Start Sync"
-	$DIR/send_sync 60000 192.168.3.2 1 &
+	$DIR/send_sync 60000 $SYNCSRCIP 1 &
 	;;
     stop)
 	SYNCPID=`pidof send_sync`
