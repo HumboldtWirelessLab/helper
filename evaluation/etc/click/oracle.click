@@ -87,7 +87,10 @@ tee[4]
 ob_chkLen[0]
 	-> wifi_header_cnt_806 :: Counter
 	-> Discard;
-
+	
+Idle()	
+-> wifi_header_cnt_non :: Counter
+-> Discard;
 
 Script(
 	wait 0.1,
@@ -97,6 +100,7 @@ Script(
 	read wifi_header_cnt_804.count,
 	read wifi_header_cnt_805.count,
 	read wifi_header_cnt_806.count,
+	read wifi_header_cnt_non.count,
 	stop
 );
 
