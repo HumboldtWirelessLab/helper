@@ -1,19 +1,19 @@
 
 /*
- * In theorie the Ammonite-Algorithm tries to discover a dense subgraph within a graph. 
+ * In theory the Ammonite-Algorithm tries to discover a dense subgraph within a graph. 
  * The subgraph starts with two nodes and by inductively adding a node which is connected to at least
  * two nodes of the subgraph we continue building little cycles around the former subgraph, thus
  * creating an ammonite-like graph ;)
  */
 public class Ammonite implements SubgraphDiscovery {
 
-	SubgraphContext context;
+	DiscoveryContext context;
 	
 	/*
 	 * This algorithm needs a initial subgraph with  at least two nodes.
 	 * This is done by selecting two nodes, either randomly or having some criteria.
 	 */
-	public void init(SubgraphContext sgContext) {
+	public void init(DiscoveryContext sgContext) {
 		context 	= sgContext;
 		
 		int node1	= 0;
@@ -114,7 +114,7 @@ public class Ammonite implements SubgraphDiscovery {
 		
 		/*
 		 *  By discovering new nodes (without cycles) we possibly found a new "ammonite".
-		 *  So lets try again...
+		 *  So lets hunt for new ammonites ... :)
 		 */
 		if (potential_ammonite_found) discover();
 		
