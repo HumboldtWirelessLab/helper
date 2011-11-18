@@ -1,8 +1,8 @@
 
-public interface SubgraphDiscovery {
+public interface GenericDiscovery {
 	
 	// Do some init-ops
-	public void init(DiscoveryContext context);
+	public void init();
 	
 	// Here comes the discovery algorithm
 	public void discover();
