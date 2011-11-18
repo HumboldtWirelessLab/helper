@@ -119,6 +119,17 @@ case "$1" in
 	    #rm -rf $PACK_DIR/measurement/
 	fi
 
+	if [ "x$5" != "x" ]; then
+	  . $5
+
+	  if [ "x$REMOTEFILES" != "x" ]; then
+	    for i in $REMOTEFILES; do
+		NEXT_BASEDIR=`dirname $i`
+		mkdir -p $PACK_BASEDIR/$NEXT_BASEDIR
+		cp $i $PACK_BASEDIR/$NEXT_BASEDIR/
+	    done
+	  fi
+	fi
 	
 	(cd $PACK_BASEDIR/; tar cfvj ../$PACK_FILE *) > $PACK_LOG 2>&1
 	cp $PACK_BASEDIR/../$PACK_FILE .
