@@ -312,6 +312,10 @@ if [ "x$MODE" = "xwireless" ]; then
 
   echo "unpack"  >> status/$LOGMARKER\_environment.log 2>&1
   FILE="$FILENAME" TARGETDIR=/tmp NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh unpack_remote >> status/$LOGMARKER\_environment.log 2>&1
+
+  echo "Settime"  >> status/$LOGMARKER\_environment.log 2>&1
+  NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh settime >> status/$LOGMARKER\_environment.log 2>&1
+
   echo "0" > status/$LOGMARKER\_environment.state
   echo "0" > status/$LOGMARKER\_wirelesspackage.state
 
