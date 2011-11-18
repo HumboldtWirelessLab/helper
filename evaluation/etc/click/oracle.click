@@ -46,12 +46,17 @@ tee[2]
 chkLen[1]
 	-> AthdescDecap()
 	-> ath_clf :: Classifier(0/08,
-	              0/80,
-		      -)
+	                         0/80,
+	                         -)
 	-> wifi_header_cnt_804 :: Counter
 	-> Discard;
 
 ath_clf[1]
+	-> zero_dst::Classifier(4/000000, //802 hat nach AthDecap z.T. auch 08 vorne. Hier wird deshalb nochmal auf invalid dst-mac-address getestet.
+	                        - )
+	-> Discard;
+	
+	zero_dst[1]
 	-> wifi_header_cnt_804;
 
 ath_clf[2]

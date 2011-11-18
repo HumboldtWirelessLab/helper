@@ -33,6 +33,8 @@ case "$1" in
 	exit 0;
 	;;
     "settime")
+	export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+
         NOW=`date`
         echo "Date: $NOW"
         #echo "Settime"
@@ -49,6 +51,12 @@ case "$1" in
 	    #date
 	    NOW=`date`
             echo "(Pre)Date: $NOW"
+	    if [ $HWCLOCK -gt 0 ]; then
+                echo "Set hwclock"
+                hwclock --systohc
+                hwclock -w
+                hwclock
+	    fi
 	    exit 0
 	fi
 
@@ -56,7 +64,10 @@ case "$1" in
 	if [ $NTPDATE -gt 0 ]; then
 	    ntpdate $NTPSERVER > /dev/null 2>&1
 	    if [ $HWCLOCK -gt 0 ]; then
+              echo "Set hwclock"
 	      hwclock --systohc
+	      hwclock -w
+	      hwclock
 	    fi
 	    NOW=`date`
             echo "(Pre)Date: $NOW"
@@ -67,14 +78,21 @@ case "$1" in
 	if [ $RDATE -gt 0 ]; then
 	    rdate $NTPSERVER > /dev/null 2>&1
 	    if [ $HWCLOCK -gt 0 ]; then
+              echo "Set hwclock"
 	      hwclock --systohc
+	      hwclock -w
+	      hwclock
 	    fi
 	    NOW=`date`
             echo "(Pre)Date: $NOW"
 	    exit 0
 	fi
+	
+	echo "Unable to set time"
 	;;
     "waitfor")
+	export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+
 	if [ $1 -gt 235959 ]; then
 	    TIMENOW=`date +%s`
 	    TIMEDIFF=`$1 - $TIMENOW`
