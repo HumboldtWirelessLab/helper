@@ -439,7 +439,7 @@ for state in  $STATES; do
       echo "Found $REMOTENODECOUNT wireless nodes." >&6
       echo "Found $REMOTENODECOUNT wireless nodes: $WIRELESSNODELIST"
       echo "Pack files for wireless nodes." >&6
-      $DIR/../lib/remote/pack_files.sh pack status/all_wireless_nodeinfo.log status/all_wireless_nodes.log $CONFIGFILE
+      $DIR/../lib/remote/pack_files.sh pack status/all_wireless_nodeinfo.log status/all_wireless_nodes.log $CONFIGFILE $FINALRESULTDIR/$DISCRIPTIONFILENAME
       echo "finished pack. Set state to continue node setup"
 
       echo -n "Unpack files on wireless nodes ... " >&6
