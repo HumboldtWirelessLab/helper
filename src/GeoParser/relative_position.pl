@@ -24,11 +24,19 @@ while (@array = $query->fetchrow_array) {
 
 	#Bezugssystem, parametrisiert durch Bezugspunkt und variablen Punkt
 	my $x = "java GeoParser 52.4298070000 13.5308930000  $lat 13.5308930000 0 0";
+	my $x_f = `$x`;
+	if ($lat < 52.4298070000) {
+	  $x_f = $x_f * -1;
+	}
 	my $y = "java GeoParser 52.4298070000 13.5308930000  52.4298070000 $lon 0 0";
+	my $y_f = `$y`;
+	if ($lon > 13.5308930000) {
+	  $y_f = $y_f * -1;
+	}
 	my $z = "java GeoParser 52.4298070000 13.5308930000  52.4298070000 13.5308930000 0 $h";
 #	my $distance = "java GeoParser 52.4293620000 13.5308670000  $lat $lon 42.0 $h";
 	
-	print "$name $lat $lon $h ",`$x`," ",`$y`," ",`$z`,"\n";
+	print "$name $lat $lon $h $x_f $y_f ",`$z`,"\n";
 	#print "\t$distance\n";
 }
 
