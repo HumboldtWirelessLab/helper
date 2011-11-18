@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 dir=$(dirname "$0")
 pwd=$(pwd)
@@ -94,11 +94,27 @@ case "$1" in
 			    WIFICONFIG=`echo "$WIFICONFIG" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 
 			    ISGROUP=`echo $CNODE | grep "group:" | wc -l`
+			    ISRANDOM=`echo $CNODE | grep "random:" | wc -l`
 			    
 			    if [ "x$ISGROUP" = "x1" ]; then
 			      GROUP=`echo $CNODE | sed "s#group:##g"`
 			      CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#"`
 			      #echo "NODES: $CNODE"
+			    elif [ "x$ISRANDOM" = "x1" ]; then	
+			      PARAMS=(`echo $CNODE | sed "s#:# #g"`)
+			      if [ "x${PARAMS[1]}" != "x" ]; then
+			      	NODE_NUMBER="-n ${PARAMS[1]}"
+			      fi
+			      	 
+			      if [ "x${PARAMS[2]}" != "x" ]; then 
+			      	FILE="-f ${PARAMS[2]}"
+			      fi
+			      
+			      if [ "x${PARAMS[3]}" != "x" ]; then 
+			      	ALGORITHM="-algo ${PARAMS[3]}"
+			      fi
+			      
+			      CNODES=`cd ../../helper/src/subnetworkDiscovery/; java SubnetworkDiscovery $ALGORITHM $FILE $NODE_NUMBER -t 1500 -h 15`
 			    else
 			      CNODES=$CNODE
 			    fi
