@@ -4,7 +4,6 @@
  */
 
 
-import org.apache.commons.cli.*;
 
 /*
  * In theory the Ammonite-Algorithm tries to discover a dense subgraph within a graph. 
@@ -15,7 +14,7 @@ import org.apache.commons.cli.*;
 public class Ammonite implements GenericDiscovery {
 
 	DiscoveryContext ctx;
-
+	
 	String srcFile;
 	int requested_nodes;
 	
@@ -23,22 +22,17 @@ public class Ammonite implements GenericDiscovery {
 	int trashold_metric;
 	int hop_limit;
 	
-	public Ammonite(String[] args, DiscoveryContext Context) {
-		ctx 				= Context;
-
-		// Get the parameters from user
-		nodes_left 			= (ctx.cmd.hasOption("nodes")) ? Integer.parseInt(ctx.cmd.getOptionValue("nodes")) : 10;
-		trashold_metric 	= (ctx.cmd.hasOption("thrashold-metric")) ? Integer.parseInt(ctx.cmd.getOptionValue("thrashold-metric")) : 1500;
-		hop_limit			= (ctx.cmd.hasOption("hop-limit")) ? Integer.parseInt(ctx.cmd.getOptionValue("hop-limit")) : 10;
-		
-	}
-	
-	
 	/*
 	 * This algorithm needs a initial subgraph with  at least two nodes.
 	 * This is done by selecting two nodes, either randomly or having some criteria.
 	 */
-	public void init() {
+	public void init(DiscoveryContext Context) {
+		ctx 				= Context;
+		nodes_left 			= ctx.nodes;
+		
+		// Check parameters, if necessary set a default value
+		trashold_metric = ( ctx.paramlist.containsKey("t") ) ? Integer.parseInt(ctx.paramlist.get("t")) : 1500;
+		hop_limit		= ( ctx.paramlist.containsKey("h")) ? Integer.parseInt(ctx.paramlist.get("h")) : 10; // todo
 		
 		int node = -1, neighbour_node = -1;
 		
@@ -105,7 +99,7 @@ public class Ammonite implements GenericDiscovery {
 					}
 					
 					// now, if optimum was found and we still need nodes, then add new (relative) optimal node
-					if (best_w != -1 && nodes_left-1>=0) {
+					if (best_w != -1 && nodes_left-1>=0 && hop_limit >= max_hops()) {
 						nodes_left--;
 						ctx.subgraph.add(best_w);
 					}
@@ -147,5 +141,14 @@ public class Ammonite implements GenericDiscovery {
 		
 		// System.out.println("");
 		// System.out.println("Subgraph "+ ctx.subgraph.size() +" of " + ctx.name_table.size() + ".");
+	}
+	
+	
+	private int max_hops() {
+		// todo
+		// 1. generate routing tables for every node
+		// 2. compute max hops of every node
+		// 3. return max{for all nodes do max(node)}
+		return 0;
 	}
 }
