@@ -1,6 +1,5 @@
+import java.util.HashMap;
 import java.util.Vector;
-
-import org.apache.commons.cli.*;
 
 
 public class DiscoveryContext {
@@ -12,16 +11,17 @@ public class DiscoveryContext {
 	public Vector<String> name_table;
 	public Vector<Integer> subgraph;
 	
-	Options options;
-	CommandLine cmd;
-	CommandLineParser parser;
+	HashMap<String,String> paramlist;
+	
+	int nodes;
 	
 	public DiscoveryContext() {
 		
 		link_matrix 	= new int[MAX_NODES][MAX_NODES];
 		name_table 		= new Vector<String>();
 		subgraph 		= new Vector<Integer>();
-
+		
+		paramlist		= new HashMap<String,String>();
 	}
 	
 	public int getGraphSize() {

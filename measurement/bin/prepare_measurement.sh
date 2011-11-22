@@ -114,7 +114,7 @@ case "$1" in
 			      	ALGORITHM="-algo ${PARAMS[3]}"
 			      fi
 			      
-			      CNODES=`cd ../../helper/src/subnetworkDiscovery/; java SubnetworkDiscovery $ALGORITHM $FILE $NODE_NUMBER -t 1500 -h 15`
+			      CNODES=`cd ../../helper/src/subnetworkDiscovery/; java SubnetworkDiscovery $ALGORITHM $FILE $NODE_NUMBER -paramlist "t=1500&h=15"`
 			    else
 			      CNODES=$CNODE
 			    fi
