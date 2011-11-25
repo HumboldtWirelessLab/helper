@@ -32,14 +32,8 @@ public class SubnetworkDiscovery {
 		ctx.nodes	= Integer.parseInt(cmd.getOptionValue("nodes", "10"));
 		
 		// Get parameters for ammonite
-		if (cmd.hasOption("paramlist")) {
-			
-			String[] tmplist = cmd.getOptionValue("paramlist").split("&");
-			for (String parameter : tmplist) {
-				String[] tmpparam = parameter.split("=");
-				ctx.paramlist.put(tmpparam[0], tmpparam[1]);
-			}
-		} 
+		if (cmd.hasOption("paramlist")) 
+			getExtraParams(ctx, cmd);
 		
 		if (cmd.hasOption("h")) {
 			// automatically generate general help statement
@@ -88,5 +82,13 @@ public class SubnetworkDiscovery {
 
 	}
 	
+	private static void getExtraParams(DiscoveryContext ctx, CommandLine cmd) {
+		
+		String[] tmplist = cmd.getOptionValue("paramlist").split("&");
+		for (String parameter : tmplist) {
+			String[] tmpparam = parameter.split("=");
+			ctx.paramlist.put(tmpparam[0], tmpparam[1]);
+		}
+	}
 	
 }
