@@ -62,3 +62,10 @@ Die Ausgabe der Simulation sollte dabei folgendermaßen aussehen::
     sim is ns
     Send 26 packet, received 26 packets and 26 echo packets are received. OK !
 
+Troubleshooting
+---------------
+
+Wenn die Simulation mit dem Fehler ``*** buffer overflow detected ***: ./ns terminated``
+abbricht liegt das vermutlich daran, dass die falsche TCL Version verwendet wird. Abhilfe
+schafft entweder die Deinstallation von TCL auf dem System oder aber das Sicherstellen,
+dass ns2/bin/tcl vor den Systembinaries im Pfad liegt.
