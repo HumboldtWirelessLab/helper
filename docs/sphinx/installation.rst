@@ -32,7 +32,7 @@ Vorbereitungen
 Software auschecken
 -------------------
 
-#. In einem seperaten Terminal SSH Verbindung zu gruenau herstellen (und geöffnet halten)::
+#. In einem separaten Terminal SSH Verbindung zu gruenau herstellen (und geöffnet halten)::
     
     ssh gruenau
 
