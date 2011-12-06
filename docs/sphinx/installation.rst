@@ -46,12 +46,12 @@ Software auschecken
     chmod a+x brn-tools.sh
     ./brn-tools.sh
 
-#. Umgebungsvariablen setzen. Entweder per ``source /tmp/./brn-tools.bashrc`` oder durch das Kopieren der Einträge in brn-tools.bashrc in die eigene .bashrc
+#. Umgebungsvariablen setzen. Entweder per ``source /tmp/./brn-tools.bashrc`` oder durch das Kopieren der Einträge in ``brn-tools.bashrc`` in die eigene ``.bashrc``
 
 Testen
 ------
 
-Zum Testen der Installation kann die simple_flow (oder eine andere) Simulation ausgeführt werden::
+Zum Testen der Installation kann die *simple_flow* (oder eine andere) Simulation ausgeführt werden::
 
     cd click-brn-scripts/003-simple_flow
     run_sim.sh
@@ -62,10 +62,18 @@ Die Ausgabe der Simulation sollte dabei folgendermaßen aussehen::
     sim is ns
     Send 26 packet, received 26 packets and 26 echo packets are received. OK !
 
+Alternativ können über das Shellscript test.sh alle Simulationen angestoßen werden. ``test.sh``
+erzeugt dabei ein pdf namens ``testbed.pdf``, welches die Resultate aller Simulationen enthält.
+
 Troubleshooting
 ---------------
 
-Wenn die Simulation mit dem Fehler ``*** buffer overflow detected ***: ./ns terminated``
-abbricht liegt das vermutlich daran, dass die falsche TCL Version verwendet wird. Abhilfe
-schafft entweder die Deinstallation von TCL auf dem System oder aber das Sicherstellen,
-dass ns2/bin/tcl vor den Systembinaries im Pfad liegt.
+* Wenn die Simulation mit dem Fehler ``*** buffer overflow detected ***: ./ns terminated``
+    abbricht liegt das vermutlich daran, dass die falsche TCL Version verwendet wird. Abhilfe
+    schafft entweder die Deinstallation von TCL auf dem System oder aber das Sicherstellen,
+    dass ns2/bin/tcl vor den Systembinaries im Pfad liegt.
+
+* Falls das Ausführen von test.sh Warnungen und/oder Fehler erzeugt liegt dies unter Ubuntu
+    Systemen evtl. daran, dass die dash als System Shell verwendet wird. Eine mögliche Lösung
+    besteht darin, eine andere System Shell mittels ``sudo dpkg-reconfigure dash`` festzulegen.
+    
