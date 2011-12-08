@@ -45,17 +45,18 @@ fi
 
 
 DUMPFILE=$1
+COMPRESSED=0
 
 # check if bzip-packed
-if [ $DUMPFILE = *.bz2 ]; then
+if [ "$DUMPFILE" = "*.bz2" ]; then
 	ZIP=$1
+	COMPRESSED=1
 	NONCE=`date +%N`
 	TMPFILE=/tmp/$NONCE
 	touch $TMPFILE
 	DUMPFILE=$TMPFILE
 	bzip2 -d -c $ZIP > $DUMPFILE
 fi
-
 
 if [ "x$WIFI" = "x" ]; then
   WIFI=`$DIR/test_header.sh $DUMPFILE`
@@ -87,7 +88,7 @@ else
   cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed -e "s#DUMP#$DUMPFILE#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" | click-align 2> /dev/null | click 2>&1
 fi
 
-if [ -f "$TMPFILE" ]; then
-	echo "Deleted temporary file $TMPFILE"
+if [ $COMPRESSED -ne 0 ]; then
+	#echo "Deleted temporary file $TMPFILE"
 	rm $TMPFILE
 fi
