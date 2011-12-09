@@ -67,8 +67,16 @@ if [ "x$EVM" = "x" ]; then
   EVM="false"
 fi
 
-if [ "x$2" = "xprint" ]; then
-  cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed -e "s#DUMP#$1#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" | click-align 2> /dev/null
+if [ "x$CONTENT" = "xyes" ]; then
+  WRAP=""
+  NOWRAP_PARAM=true
 else
-  cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed -e "s#DUMP#$1#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" | click-align 2> /dev/null | click 2>&1
+  WRAP="//"
+  NOWRAP_PARAM=false
+fi
+
+if [ "x$2" = "xprint" ]; then
+  cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed -e "s#DUMP#$1#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" -e "s#//WRAP#$WRAP#g" -e "s#NOWRAP_PARAMS#$NOWRAP_PARAM#g" | click-align 2> /dev/null
+else
+  cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed -e "s#DUMP#$1#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" -e "s#//WRAP#$WRAP#g" -e "s#NOWRAP_PARAMS#$NOWRAP_PARAM#g" | click-align 2> /dev/null | click 2>&1
 fi
