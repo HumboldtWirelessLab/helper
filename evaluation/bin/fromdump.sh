@@ -30,6 +30,7 @@ else
   SEQREP="//"
 fi
 
+
 GPSDECAP="GPSDecap()"
 GPSPRINT="GPSPrint(NOWRAP true)"
 
@@ -43,15 +44,41 @@ else
   GPSREP="//"
 fi
 
+
+DUMPFILE=$1
+COMPRESSED=0
+
+# check if bzip-packed
+if [ "$DUMPFILE" = "*.bz2" ]; then
+	ZIP=$1
+	COMPRESSED=1
+	NONCE=`date +%N`
+	TMPFILE=/tmp/$NONCE
+	touch $TMPFILE
+	DUMPFILE=$TMPFILE
+	bzip2 -d -c $ZIP > $DUMPFILE
+fi
+
 if [ "x$WIFI" = "x" ]; then
-  WIFI=`$DIR/test_header.sh $1`
+  WIFI=`$DIR/test_header.sh $DUMPFILE`
+  if [ "$WIFI" = "compressed" ]; then
+    WIFI=`COMPRESSION=yes $DIR/test_header.sh $DUMPFILE`
+    COMPRESSION="yes"
+  fi
+
   if [ "x$WIFI" = "x806" ]; then
     WIFI=raw
   fi
 fi
 
+if [ "x$COMPRESSION" = "xyes" ]; then
+  COMPRESSION=""
+else
+  COMPRESSION="//"
+fi
+
 if [ "x$WIFI" = "xraw" ]; then
-  echo "FromDump($1,STOP true) -> Print(\"\",2000,TIMESTAMP true) -> Discard" | click-align 2> /dev/null | click 2>&1
+  echo "FromDump($DUMPFILE,STOP true) -> Print(\"\",2000,TIMESTAMP true) -> Discard" | click-align 2> /dev/null | click 2>&1
   exit 0
 fi
 
@@ -76,7 +103,12 @@ else
 fi
 
 if [ "x$2" = "xprint" ]; then
-  cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed -e "s#DUMP#$1#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" -e "s#//WRAP#$WRAP#g" -e "s#NOWRAP_PARAMS#$NOWRAP_PARAM#g" | click-align 2> /dev/null
+  cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed -e "s#DUMP#$DUMPFILE#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" -e "s#//WRAP#$WRAP#g" -e "s#NOWRAP_PARAMS#$NOWRAP_PARAM#g" -e "s#//COMPRESSION#$COMPRESSION#g" | click-align
 else
-  cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed -e "s#DUMP#$1#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" -e "s#//WRAP#$WRAP#g" -e "s#NOWRAP_PARAMS#$NOWRAP_PARAM#g" | click-align 2> /dev/null | click 2>&1
+  cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed -e "s#DUMP#$DUMPFILE#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" -e "s#//WRAP#$WRAP#g" -e "s#NOWRAP_PARAMS#$NOWRAP_PARAM#g" -e "s#//COMPRESSION#$COMPRESSION#g" | click-align 2> /dev/null | click 2>&1 | grep -v "expensive"
+fi
+
+if [ $COMPRESSED -ne 0 ]; then
+	#echo "Deleted temporary file $TMPFILE"
+	rm $TMPFILE
 fi

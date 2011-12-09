@@ -177,7 +177,7 @@ case "$1" in
 		  . $WIFICONFIG
 		  cp $WIFICONFIG $RESULTDIR
 		  
-		  if [ "x$WIFITYPE" = "x" ] || [ "x$WIFITYPE" = "x0" ]; then
+		  if [ "x$WIFITYPE" = "x" ] || [ "x$WIFITYPE" = "x0" ] || [ "x$WIFITYPE" = "xDEFAULT" ]; then
 		    WIFITYPE=806
 		  fi
 		else
