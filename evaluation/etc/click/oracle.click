@@ -1,6 +1,10 @@
 FromDump("DUMP" )
 	-> raw_cnt :: Counter
 	//-> Print("RAW",100)
+//COMPRESSION -> pdc::PacketDecompression(CMODE 0)
+//COMPRESSION -> n::Null();
+//COMPRESSION pdc[1]
+//COMPRESSION -> n
 	-> tee :: Tee;
 
 
@@ -82,10 +86,22 @@ rt_clf[2]
 
 
 
+/**********************   Compressed  ***********************/
+
+// Idea: Compressed have 9f in the beginning
+tee[4]
+	-> comp_clf :: Classifier(0/9f,
+		                 -)
+	-> wifi_header_cnt_compressed :: Counter
+	-> Discard;
+
+comp_clf[1]
+	-> Discard;
+
 /**********************   OpenBeacon   ***********************/
 
 // Idea: OpenBeacon-Frames are really small, maximum 14 B for header and 32 for payload
-tee[4]
+tee[5]
 	-> ob_chkLen :: CheckLength(63)[1]
 	-> Discard;
 
@@ -93,6 +109,8 @@ ob_chkLen[0]
 	-> wifi_header_cnt_806 :: Counter
 	-> Discard;
 	
+/*************   NON (dummy for paring results)  ************/
+
 Idle()	
 -> wifi_header_cnt_non :: Counter
 -> Discard;
@@ -104,6 +122,7 @@ Script(
 	read wifi_header_cnt_802.count,
 	read wifi_header_cnt_804.count,
 	read wifi_header_cnt_805.count,
+	read wifi_header_cnt_compressed.count,
 	read wifi_header_cnt_806.count,
 	read wifi_header_cnt_non.count,
 	stop

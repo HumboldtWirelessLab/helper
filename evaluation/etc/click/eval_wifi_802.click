@@ -1,4 +1,8 @@
 FromDump("DUMP",STOP true)
+//COMPRESSION -> pdc::PacketDecompression(CMODE 0)
+//COMPRESSION -> n::Null();
+//COMPRESSION pdc[1]
+//COMPRESSION -> n
   -> packets :: Counter
   -> maxl :: CheckLength(4)
   -> minl :: CheckLength(3)[1]
