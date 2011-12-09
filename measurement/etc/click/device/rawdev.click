@@ -36,11 +36,18 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 #ifdef RAWDEV_DEBUG
   -> Print("From Device")
 #endif
+#ifdef RAWFILTER
+  -> RAWFILTER
+#endif
 #ifdef RAWDUMP
 #ifdef REMOTEDUMP
   -> raw_dump_tee::Tee()
 #else
+#ifdef TMPDUMP
+  -> ToDump(FILENAME "/tmp/NODENAME.NODEDEVICE.raw.dump", SNAPLEN RAWDUMPSNAPLEN)
+#else
   -> ToDump(FILENAME "RESULTDIR/NODENAME.NODEDEVICE.raw.dump", SNAPLEN RAWDUMPSNAPLEN)
+#endif
 #endif
 #endif
 #ifdef SIMULATION

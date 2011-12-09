@@ -43,7 +43,6 @@ Mac/802_11 set TXFeedback_ 1
 Mac/802_11 set Promisc_ 1
 Mac/802_11 set FilterDub_ 0
 
-
 #
 # The network channel, physical layer, MAC, propagation model,
 # and antenna model are all standard ns-2.
