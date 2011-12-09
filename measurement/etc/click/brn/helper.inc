@@ -12,6 +12,11 @@
 #define PACKETBURST 1
 #endif
 
+#ifndef DUMPSNAPLEN
+#define DUMPSNAPLEN 4000
+#endif
+
+
 #ifndef WIFITYPE
 #warning No Wifitype. Using default (805).
 #define WIFITYPE 805
@@ -218,7 +223,7 @@ BRNAddressInfo(ipdev eth0:ip);
                   -> Socket(UDP, DUMPIP, DUMPPORTBASE, CLIENT true ) \
                   -> Discard
 #else
-#define TODUMP(x) ToDump(FILENAME x, SNAPLEN 4000)
+#define TODUMP(x) ToDump(FILENAME x, SNAPLEN DUMPSNAPLEN)
 #endif
 
 
@@ -244,7 +249,7 @@ BRNAddressInfo(ipdev eth0:ip);
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
 #define FROMDEVICE(x) FROMRAWDEVICE(x) -> __WIFIDECAP__
 
-#define TODUMP(x) ToDump(FILENAME x, SNAPLEN 4000)
+#define TODUMP(x) ToDump(FILENAME x, SNAPLEN DUMPSNAPLEN)
 
 #define SYNC Null()
 

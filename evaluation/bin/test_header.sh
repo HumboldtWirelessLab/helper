@@ -18,7 +18,14 @@ case "$SIGN" in
 	;;
 esac
 
-RESULT=`cat $DIR/../etc/click/oracle.click | sed -e "s#DUMP#$1#g" | click-align 2> /dev/null | click 2>&1`
+if [ "x$COMPRESSION" = "xyes" ]; then
+  COMPRESSION=""
+else
+  COMPRESSION="//"
+fi
+    
+
+RESULT=`cat $DIR/../etc/click/oracle.click | sed -e "s#DUMP#$1#g" -e "s#//COMPRESSION#$COMPRESSION#g" | click-align 2> /dev/null | click 2>&1 | grep -v "expensive"`
 
 PACKETS=`echo "$RESULT" | grep -v ":"`
 HANDLER=`echo "$RESULT" | grep ":" | sed -e "s#raw_cnt.count:##g" -e "s#wifi_header_cnt_##g" -e "s#.count:##g"`

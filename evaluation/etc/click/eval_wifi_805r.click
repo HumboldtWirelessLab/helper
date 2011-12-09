@@ -1,4 +1,8 @@
 FromDump("DUMP",STOP true)
+//COMPRESSION -> pdc::PacketDecompression(CMODE 0)
+//COMPRESSION -> n::Null();
+//COMPRESSION pdc[1]
+//COMPRESSION -> n
   -> packets :: Counter
   -> sync1 :: CheckLength(4)[1]
 //GPS  -> GPSPrint(NOWRAP true)
