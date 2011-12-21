@@ -31,8 +31,13 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #if defined(SIMULATION) || (WIFITYPE == 802)
   -> WifiSeq()                                                      // Set sequencenumber for simulation
 #endif
-#ifndef TOS2QUEUEMAPPER
-  -> Tos2QueueMapper()
+#ifndef DISABLE_TOS2QUEUEMAPPER
+#ifdef SIMULATION
+  -> Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst )
+#endif
+//#else
+//  -> Tos2QueueMapper()
+//#endif
 #endif
   -> __WIFIENCAP__
 #ifdef SETCHANNEL
