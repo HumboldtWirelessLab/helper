@@ -181,6 +181,9 @@ case "$1" in
 		    WIFITYPE=806
 		  fi
 		else
+		  #read wificonfig for aifs, cwmin etc.
+		  . $WIFICONFIG
+		  #but overwrite wifitype, since ns2 only support wifiextra
 		  WIFITYPE=806
 		fi
 		
@@ -201,6 +204,21 @@ case "$1" in
 		  fi
 		fi
 		
+                . $DIR/../../nodes/etc/wifi/default
+                if [ "x$CWMIN" = "x" ]; then
+                  CWMIN=$DEFAULT_CWMIN
+                fi
+	        if [ "x$CWMAX" = "x" ]; then
+	          CWMAX=$DEFAULT_CWMAX
+	        fi
+	        if [ "x$AIFS" = "x" ]; then
+	          AIFS=$DEFAULT_AIFS
+	        fi
+	
+		AIFS=`echo $AIFS | sed "s# #\\\\ #g"`
+		CWMIN=`echo $CWMIN | sed "s# #\\\\ #g"`
+		CWMAX=`echo $CWMAX | sed "s# #\\\\ #g"`
+		
                 CPPOPTS="$CPPOPTS -DNODENAME=$CNODE -DNODEDEVICE=$CDEV -DTIME=$TIME"
                 CPPOPTS="$CPPOPTS -DDEBUGLEVEL=$DEBUG"
                 CPPOPTS="$CPPOPTS -DSIMULATION"
@@ -212,7 +230,10 @@ case "$1" in
 		     CPPOPTS="$CPPOPTS -DNODEID_NAME"
 		fi
 
-                ( cd $CONFIGDIR; cat $CLICK | add_include | cpp -I$DIR/../../measurement/etc/click $CPPOPTS | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" | grep -v "^#" > $CLICKFINALNAME )
+		#CPPOPTS="$CPPOPTS -DCWMINPARAM=\"$CWMIN\""#-DCWMAXPARAM=\\\"$CWMAX\\\" -DAIFSPARAM=\\\"$AIFS\\\""
+		#echo $CPPOPTS
+
+                ( cd $CONFIGDIR; cat $CLICK | add_include | cpp -I$DIR/../../measurement/etc/click $CPPOPTS -DCWMINPARAM="\"$CWMIN\"" -DCWMAXPARAM="\"$CWMAX\"" -DAIFSPARAM="\"$AIFS\"" | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" | grep -v "^#" > $CLICKFINALNAME )
                 
               else
                 CLICKFINALNAME="-"
