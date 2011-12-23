@@ -31,8 +31,13 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #if defined(SIMULATION) || (WIFITYPE == 802)
   -> WifiSeq()                                                      // Set sequencenumber for simulation
 #endif
-#ifndef TOS2QUEUEMAPPER
-  -> Tos2QueueMapper()
+#ifndef DISABLE_TOS2QUEUEMAPPER
+#ifdef SIMULATION
+  -> Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst )
+#endif
+//#else
+//  -> Tos2QueueMapper()
+//#endif
 #endif
   -> __WIFIENCAP__
 #ifdef SETCHANNEL
@@ -56,7 +61,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> cst                                                            //add channel stats if requested
 #endif
 #ifdef CERR
-  -> ced::ChannelErrorDetection(DEVICE $device, DEBUG 4)
+  -> hnd::HiddenNodeDetection(DEVICE $device, DEBUG 4)
 #endif
   -> [0]output;
 

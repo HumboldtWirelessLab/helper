@@ -62,7 +62,9 @@ fi
 if [ "x$WIFI" = "x" ]; then
   WIFI=`$DIR/test_header.sh $DUMPFILE`
   if [ "$WIFI" = "compressed" ]; then
+#    echo "Compressed"
     WIFI=`COMPRESSION=yes $DIR/test_header.sh $DUMPFILE`
+#    echo "$WIFI"
     COMPRESSION="yes"
   fi
 
