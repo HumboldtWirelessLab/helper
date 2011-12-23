@@ -27,8 +27,12 @@
 
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
 
-  rates::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
-  proberates::AvailableRates(DEFAULT 2 12 22 108);
+#ifdef NEWLINKSTAT
+  rates::BrnAvailableRates(DEFAULT 2 12 22 108);
+#else
+  rates::AvailableRates(DEFAULT 2 12 22 108);
+#endif
+
   etx_metric :: BRN2ETXMetric($lt);
 
   link_stat :: BRN2LinkStat(DEVICE                    $device,
@@ -47,7 +51,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #else
                             PROBES   DEFAULT_LINKPROBE_PROBES,
 #endif
-                            RT      proberates,
+                            RT      rates,
                             ETX     etx_metric,
                             DEBUG            2 );
 
