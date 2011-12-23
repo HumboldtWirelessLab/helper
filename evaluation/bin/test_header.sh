@@ -20,8 +20,12 @@ esac
 
 if [ "x$COMPRESSION" = "xyes" ]; then
   COMPRESSION=""
+#  echo "Compression in TH"  >> $pwd/foo
+#cat $DIR/../etc/click/oracle.click | sed -e "s#DUMP#$1#g" -e "s#//COMPRESSION#$COMPRESSION#g" > foo.comp
 else
   COMPRESSION="//"
+#  echo "No Compression in TH" >> $pwd/foo
+#cat $DIR/../etc/click/oracle.click | sed -e "s#DUMP#$1#g" -e "s#//COMPRESSION#$COMPRESSION#g" > foo.nocomp
 fi
     
 
