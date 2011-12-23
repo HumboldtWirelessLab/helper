@@ -16,5 +16,9 @@ ControlSocket(tcp, CONTROLSOCKETPORT);
 #endif
 
 #if TIME > 0
+#ifdef LOGMARKEND
+Script(wait TIME, print "MEASUREMENT FINISHED", stop);
+#else
 Script(wait TIME, stop);
+#endif
 #endif
