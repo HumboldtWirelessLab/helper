@@ -32,6 +32,8 @@ case "$1" in
 		echo "Use NODELIST"
 		;;
 	"reboot")
+		WAITTIME=`expr $RANDOM % 10`
+		sleep $WAITTIME
 		for node in $NODELIST; do
 		    echo -n "$node: "
 		    DENYREBOOT=`cat $DIR/../etc/reboot.deny | grep -e "^$node$" | wc -l`
@@ -40,7 +42,7 @@ case "$1" in
 		    else
 		      echo "Reboot"
 		      run_on_node $node "if [ -f /sbin/reboot ]; then /sbin/reboot; else reboot; fi" "/" $DIR/../etc/keys/id_dsa
-		    fi  
+		    fi
 		done
 		;;
 	"status")	
@@ -84,7 +86,13 @@ case "$1" in
 		;;
 	"nodeinfo")	
 		for node in $NODELIST; do
-		    WNDR=`run_on_node $node "cat /proc/cpuinfo | grep 'WNDR' | wc -l" "/" $DIR/../etc/keys/id_dsa`
+		    WNDR=""
+		    while [ "x$WNDR" = "x" ]; do
+			WNDR=`run_on_node $node "cat /proc/cpuinfo | grep 'WNDR' | wc -l" "/" $DIR/../etc/keys/id_dsa`
+			if [ "x$WNDR" = "x" ]; then
+			    sleep 1
+			fi
+		    done
 		    if [ $WNDR -gt 0 ]; then
 		      ARCH="mips-wndr3700"
 		    else
