@@ -32,8 +32,6 @@ case "$1" in
 		echo "Use NODELIST"
 		;;
 	"reboot")
-		WAITTIME=`expr $RANDOM % 10`
-		sleep $WAITTIME
 		for node in $NODELIST; do
 		    echo -n "$node: "
 		    DENYREBOOT=`cat $DIR/../etc/reboot.deny | grep -e "^$node$" | wc -l`
