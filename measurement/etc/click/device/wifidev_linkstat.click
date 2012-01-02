@@ -23,13 +23,14 @@
 #define DEFAULT_LINKPROBE_PERIOD            1000
 #define DEFAULT_LINKPROBE_TAU             100000
 #define DEFAULT_LINKPROBE_PROBES  "2 100 2 1000"
+//#define DEFAULT_LINKPROBE_PROBES         "2 500 HT20 15 500 HT20 0 500 4 300 HT40 7 500"
 #endif
 
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
 
-  rates::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
-  proberates::AvailableRates(DEFAULT 2 12 22 108);
+  availablerates::BrnAvailableRates(DEFAULT 2 4 11 22 12 18 24 36 48 72 96 108); //rates, that are used by that node
   etx_metric :: BRN2ETXMetric($lt);
+//  ett_metric :: BRNETTMetric($lt);
 
   link_stat :: BRN2LinkStat(DEVICE                    $device,
 #ifdef LINKPROBE_PERIOD
@@ -47,8 +48,9 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #else
                             PROBES   DEFAULT_LINKPROBE_PROBES,
 #endif
-                            RT      proberates,
-                            ETX     etx_metric,
+                            RT      availablerates,
+//                            METRIC     "etx_metric ett_metric",
+                            METRIC     "etx_metric",
                             DEBUG            2 );
 
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
@@ -138,9 +140,27 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> Discard;
 
   lp_clf[1]                               //brn, but no lp
+#ifdef CST
+#ifdef SIMULATION
+  -> co_cst_clf :: Classifier( 14/BRN_PORT_CHANNELSTATSINFO, - );
+  
+  co_cst_clf[1]
+#endif
+#endif
   //-> Print("Data, no LP")
   -> [1]data_suppressor[1]
   -> brnToMe;
+
+#ifdef CST
+#ifdef SIMULATION
+  co_cst_clf[0]
+  -> BRN2Decap()
+  -> cocst::CooperativeChannelStats(CHANNELSTATS wifidevice/cst, INTERVAL 1000)
+  -> cocst_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
+  -> cocst_rate::SetTXRate(RATE 2, TRIES 1)
+  -> brnwifi;
+#endif
+#endif
 
   brnToMe[0] -> /*Print("NODENAME: wifi0", TIMESTAMP true) ->*/ [0]output;
   brnToMe[1] -> /*Print("wifi1") ->*/ [1]output;

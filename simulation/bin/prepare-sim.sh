@@ -164,17 +164,19 @@ case "$1" in
                   fi
                 fi
 	
-	        if [ "x$USED_SIMULATOR" = "xjist" ]; then	
-		  #echo "$WIFICONFIG"
-	          if [ ! -f $WIFICONFIG ]; then
-		    if [ -f $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then
+                if [ ! -f $WIFICONFIG ]; then
+                  if [ -f $DIR/../../nodes/etc/wifi/$WIFICONFIG ]; then
 		      WIFICONFIG="$DIR/../../nodes/etc/wifi/$WIFICONFIG"
-		    else
+		  else
 		      WIFICONFIG="$DIR/../../nodes/etc/wifi/monitor.default"
-		    fi
 		  fi
+		fi
+		
+		#echo "$WIFICONFIG"
 																			    
-		  . $WIFICONFIG
+		. $WIFICONFIG
+		
+	        if [ "x$USED_SIMULATOR" = "xjist" ]; then	
 		  cp $WIFICONFIG $RESULTDIR
 		  
 		  if [ "x$WIFITYPE" = "x" ] || [ "x$WIFITYPE" = "x0" ] || [ "x$WIFITYPE" = "xDEFAULT" ]; then
@@ -182,7 +184,7 @@ case "$1" in
 		  fi
 		else
 		  #read wificonfig for aifs, cwmin etc.
-		  . $WIFICONFIG
+		  #Hint: already done
 		  #but overwrite wifitype, since ns2 only support wifiextra
 		  WIFITYPE=806
 		fi

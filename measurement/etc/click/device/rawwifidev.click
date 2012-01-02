@@ -23,7 +23,13 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #else
   cst::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
 #endif
+
+#ifdef SIMULATION
+  cinfo::CollisionInfo();
 #endif
+
+#endif
+
 
   rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);
 
@@ -33,7 +39,11 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 #ifndef DISABLE_TOS2QUEUEMAPPER
 #ifdef SIMULATION
-  -> Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst )
+#ifdef CST
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo )
+#else
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM )
+#endif
 #endif
 //#else
 //  -> Tos2QueueMapper()
@@ -59,9 +69,12 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> dev_decap::__WIFIDECAP__
 #ifdef CST
   -> cst                                                            //add channel stats if requested
+#ifdef SIMULATION
+  -> cinfo
+#endif
 #endif
 #ifdef CERR
-  -> hnd::HiddenNodeDetection(DEVICE $device, DEBUG 4)
+  -> hnd::HiddenNodeDetection(DEVICE $device, DEBUG 2)
 #endif
   -> [0]output;
 
