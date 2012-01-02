@@ -94,6 +94,11 @@ case "$1" in
 	    	MODE=$DEFAULT_MODE
 	    fi
 
+
+	    if [ "x$MODE" = "xadhoc" ]; then
+	    	MODE="ad-hoc"
+	    fi
+
 	    echo "$IWCONFIG $DEVICE mode $MODE"
 	    ${IWCONFIG} $DEVICE mode $MODE
 

@@ -21,7 +21,7 @@ esac
 . $CONFIGFILE
 
 if [ -e $RESULTDIR/status ]; then
-    ( cd $RESULTDIR; tar cvfj status.bz2 status; rm -rf status )
+    ( cd $RESULTDIR; tar cfj status.tar.bz2 status; rm -rf status )
 fi
 
 exit 0

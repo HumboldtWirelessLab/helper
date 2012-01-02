@@ -29,6 +29,7 @@
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
 
   availablerates::BrnAvailableRates(DEFAULT 2 4 11 22 12 18 24 36 48 72 96 108); //rates, that are used by that node
+
   etx_metric :: BRN2ETXMetric($lt);
 //  ett_metric :: BRNETTMetric($lt);
 
@@ -49,7 +50,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
                             PROBES   DEFAULT_LINKPROBE_PROBES,
 #endif
                             RT      availablerates,
-//                            METRIC     "etx_metric ett_metric",
+//                          METRIC     "etx_metric ett_metric",
                             METRIC     "etx_metric",
                             DEBUG            2 );
 
