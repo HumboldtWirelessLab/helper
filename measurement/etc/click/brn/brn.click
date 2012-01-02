@@ -42,5 +42,9 @@
 #define BRN_PORT_TFTP                    33
 #define BRN_PORT_FLOW                    34
 #define BRN_PORT_COMPRESSION             35
+#define BRN_PORT_FRAGMENTATION           36
+/*Info*/
+#define BRN_PORT_NODEINFO                3c
+#define BRN_PORT_CHANNELSTATSINFO        3d
 
 #endif

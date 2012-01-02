@@ -13,8 +13,6 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
                               SSID $ssid,
                               ACTIVESCAN $active |
 
-  rates::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
-                     
   auth_info :: WirelessInfo(SSID $ssid, BSSID 00:00:00:00:00:00 , CHANNEL 5);
   infra_wifiencap ::  WifiEncap(0x01, WIRELESS_INFO auth_info);
          

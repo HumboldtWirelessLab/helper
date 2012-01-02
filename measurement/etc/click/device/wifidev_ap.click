@@ -26,10 +26,10 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 //  nblist::BRN2NBList(NODEID );  //stores all neighbors (known (friend) and unknown (foreign))
 //  nbdetect::NeighborDetect(NBLIST nblist);
   
-  rates::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
+  rates::BrnAvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
 
 #ifdef LINKSTAT_ENABLE
-  proberates::AvailableRates(DEFAULT 2 22);
+  proberates::BrnAvailableRates(DEFAULT 2 22);
   etx_metric :: BRN2ETXMetric($lt);
   
   link_stat :: BRN2LinkStat(ETHTYPE          0x0a04,
