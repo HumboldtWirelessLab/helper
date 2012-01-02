@@ -367,6 +367,20 @@ fi
 
 if [ $RUNMODENUM -le 1 ]; then
     echo "Reboot node $NODELIST" >> status/$LOGMARKER\_reboot.log 2>&1
+
+    NONODES=`cat $CONFIGFILE | awk '{print $1}' | sort -u | wc -l`
+    WAITTIMEMOD=`expr $NONODES / 8`
+    if [ $WAITTIMEMOD -ne 0 ]; then
+      WAITTIME=`expr $RANDOM % $WAITTIMEMOD`
+
+      echo "Wait $WAITTIME til reboot" >> status/$LOGMARKER\_reboot.log 2>&1
+      if [ $WAITTIME -ne 0 ]; then
+        sleep $WAITTIME
+      fi
+    else
+      echo "Don't wait. Fast Reboot $WAITTIME til reboot" >> status/$LOGMARKER\_reboot.log 2>&1
+    fi
+
     NODELIST="$NODELIST" $DIR/../../host/bin/system.sh reboot >> status/$LOGMARKER\_reboot.log 2>&1
 
     echo "Wait for node $NODELIST" >> status/$LOGMARKER\_reboot.log 2>&1
