@@ -65,12 +65,18 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #endif
   -> data_rate::SetTXRate(RATE 2, TRIES 11)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+//  -> SetTimestamp()
+//  -> Print("NODENAME: In Queue", 100, TIMESTAMP true)
   -> data_queue::NotifierQueue(100)
+//  -> SetTimestamp()
+//  -> Print("NODENAME: Out Queue", 100, TIMESTAMP true)
   -> data_suppressor::Suppressor()
   -> [1]lp_data_scheduler::PrioSched()
 #ifdef PRIO_QUEUE
   -> [2]x_prio_q::PrioSched()
 #endif
+//  -> SetTimestamp()
+//  -> Print("NODENAME: To Wifidev", 100, TIMESTAMP true)
   -> wifidevice
 //-> PrintWifi("Fromdev", TIMESTAMP true)
   -> filter_tx :: FilterTX()

@@ -316,13 +316,13 @@ case "$MODE" in
 			    if [ $m2 -lt 16 ]; then
 			      m2h="0$m2h"
 			    fi
-			    echo "$node $nodedevice 00:00:00:00:$m1h:$m2h $i" >> $FINALRESULTDIR/nodes.mac
+			    echo "$node $nodedevice 00-00-00-00-$m1h-$m2h $i" >> $FINALRESULTDIR/nodes.mac
 			    if [ "x$NODEMAC_SEDARG" = "x" ]; then
-			      NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#FIRSTNODE:eth#00:00:00:00:$m1h:$m2h#g"
+			      NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#FIRSTNODE:eth#00-00-00-00-$m1h-$m2h#g"
 			      NODENAME_SEDARG="$NODENAME_SEDARG -e s#FIRSTNODE#$node#g"
 			    fi
 			    
-			    NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#$node:eth#00:00:00:00:$m1h:$m2h#g"
+			    NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#$node:eth#00-00-00-00-$m1h-$m2h#g"
 			    
                             i=$mac_raw
 			    
@@ -331,7 +331,7 @@ case "$MODE" in
 		done
 
 		if [ "x$NODEMAC_SEDARG" != "x" ]; then
-		  NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#LASTNODE:eth#00:00:00:00:$m1h:$m2h#g"
+		  NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#LASTNODE:eth#00-00-00-00-$m1h-$m2h#g"
 		  NODENAME_SEDARG="$NODENAME_SEDARG -e s#LASTNODE#$last_node#g"
 		fi
 		
