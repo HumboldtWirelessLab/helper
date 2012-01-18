@@ -397,6 +397,9 @@ for state in  $STATES; do
     done
     cat status/all_wireless_nodeinfo.log.tmp | sort -u > status/all_wireless_nodeinfo.log
 
+    #rebuild click config if needed (e.g. devicetype,...)
+    $DIR/prepare_measurement.sh afterwards
+
     #REPLACE DEVICE TMPL
 
     if [ "x$REWRITER" = "xyes" ]; then
