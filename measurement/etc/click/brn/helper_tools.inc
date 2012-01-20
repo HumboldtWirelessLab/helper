@@ -11,14 +11,24 @@ ControlSocket(tcp, CONTROLSOCKETPORT);
 
 #endif
 
+#ifdef SIMULATION
+#ifdef GUICONNECTOR
+gc::GuiConnector(ADDR 127.0.0.1, PORT 2000);
+#endif
+#endif
+
 #ifndef TIME
 #define TIME 60
 #endif
 
 #if TIME > 0
-#ifdef LOGMARKEND
-Script(wait TIME, print "MEASUREMENT FINISHED", stop);
-#else
-Script(wait TIME, stop);
+Script(wait TIME,
+#ifdef GUICONNECTOR
+       write gc.finish 1,
 #endif
+#ifdef LOGMARKEND
+       print "MEASUREMENT FINISHED",
+#endif
+       stop);
+
 #endif
