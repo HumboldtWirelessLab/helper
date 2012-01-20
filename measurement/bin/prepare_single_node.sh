@@ -369,7 +369,7 @@ if [ $RUNMODENUM -le 1 ]; then
     echo "Reboot node $NODELIST" >> status/$LOGMARKER\_reboot.log 2>&1
 
     NONODES=`cat $CONFIGFILE | awk '{print $1}' | sort -u | wc -l`
-    WAITTIMEMOD=`expr $NONODES / 8`
+    WAITTIMEMOD=`expr $NONODES / 5`
     if [ $WAITTIMEMOD -ne 0 ]; then
       WAITTIME=`expr $RANDOM % $WAITTIMEMOD`
 

@@ -57,7 +57,7 @@ case "$1" in
 	sleep 1
 
 	NUM=`echo $DEVICE | sed "s#obd##g"`
-	ARCH=$NODEARCH $DIR/../openbeacon/obd-$NODEARCH -O $NUM < /dev/null > /dev/null 2>&1 &
+	ARCH=$NODEARCH $DIR/../openbeacon/obd-$NODEARCH -O $NUM -d < /dev/null > /dev/null 2>&1 &
 
 	;;
     "config_post_start")
@@ -66,6 +66,9 @@ case "$1" in
 	export PATH=$PATH:/usr/bin:/usr/sbin:/bin:/sbin
 	ifconfig $DEVICE
 	ps
+	NODEARCH=`$DIR/../../bin/system.sh get_arch`
+	echo "PID of obd"
+	pidof obd-$NODEARCH
         ;;
         *)
         ;;
