@@ -250,21 +250,6 @@ case "$MODE" in
 		  if [ $POS_Z -gt $POS_Z_MAX ]; then
 			    POS_Z_MAX=$POS_Z;
 		  fi
- 
-                 # write position to .click file (there call a handler in Script like) 
-                 # Script (
-                 #   "write loc.cart_coord NODEPOSITIONX NODEPOSITIONY NODEPOSITIONZ,"
-                 #   ...
-                 # );
-		  NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-		  for nodedevice in $NODEDEVICELIST; do		    
-		    CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
-		    if [ "x$CLICK" != "x-" ] && [ -f $CLICK ]; then
-		      cat $CLICK | sed -e "s#NODEPOSITIONX#$POS_X#g" -e "s#NODEPOSITIONY#$POS_Y#g" -e "s#NODEPOSITIONZ#$POS_Z#g" > $CLICK.tmp
-		      mv $CLICK.tmp $CLICK
-		    fi
-                  done
-
 		done
     
 		POS_X_MAX=`expr $POS_X_MAX + 50`
@@ -384,11 +369,22 @@ case "$MODE" in
 				    else
 				      echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,$VALUE;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 				    fi
-				else
+				elif [ "x$MODE" = "xread" ]; then
 				    if [ "x$USED_SIMULATOR" = "xns" ]; then
-				      echo "\$ns_ at $TIME \"puts \\\"\\[\\[\$node_($NODENUM) entry\\] readhandler $ELEMENT $HANDLER \\]\\\"\"" >> $TCLFILE
+				        echo "\$ns_ at $TIME \"puts \\\"\\[\\[\$node_($NODENUM) entry\\] readhandler $ELEMENT $HANDLER \\]\\\"\"" >> $TCLFILE
 				    else
-				      echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
+				    	echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
+				    fi
+				elif [ "x$MODE" = "xmove" ]; then
+				    MOVE_MODE=$ELEMENT
+				    MOVE_SPEED=$HANDLER
+				    MOVE_X=`echo $line | awk '{print $7}'`
+				    MOVE_Y=`echo $line | awk '{print $8}'`
+				    MOVE_Z=`echo $line | awk '{print $9}'`
+				    if [ "x$USED_SIMULATOR" = "xns" ]; then
+				        echo "\$ns_ at $TIME \"\$node_($NODENUM) setdest $MOVE_X $MOVE_Y $MOVE_SPEED\"" >> $TCLFILE
+				    else
+				    	echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 				    fi
 				fi
 			    fi
@@ -398,7 +394,7 @@ case "$MODE" in
 		      echo "" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 		    fi
 		fi
-
+		
 		cat $DIR/../etc/ns/script_03.tcl >> $TCLFILE
 	
 		if [ ! -e $LOGDIR ]; then
