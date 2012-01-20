@@ -6,7 +6,8 @@
 
 elementclass DSR {$ID, $LT, $METRIC |
 
-  dsr_decap :: BRN2DSRDecap(NODEIDENTITY $ID, LINKTABLE $LT);
+  dsr_decap :: BRN2DSRDecap();
+//  dsr_decap :: BRN2DSRDecap(NODEIDENTITY $ID, LINKTABLE $LT);
   dsr_encap :: BRN2DSREncap(NODEIDENTITY $ID, LINKTABLE $LT);
 
   dsr_stats :: DSRStats(DEBUG 2);
@@ -21,7 +22,7 @@ elementclass DSR {$ID, $LT, $METRIC |
   querier :: BRN2RouteQuerier(NODEIDENTITY $ID, LINKTABLE $LT, DSRENCAP dsr_encap, DSRDECAP dsr_decap, METRIC $METRIC, DEBUG 2);
 #endif
 
-  req_forwarder :: BRN2RequestForwarder(NODEIDENTITY $ID, LINKTABLE $LT, DSRDECAP dsr_decap, DSRENCAP dsr_encap, ROUTEQUERIER querier, MINMETRIC 9998, ENABLE_DELAY_QUEUE true, DEBUG 2, LAST_HOP_OPT false);
+  req_forwarder :: BRN2RequestForwarder(NODEIDENTITY $ID, LINKTABLE $LT, DSRDECAP dsr_decap, DSRENCAP dsr_encap, ROUTEQUERIER querier, MINMETRIC 9998, ENABLE_DELAY_QUEUE true, DEBUG 2, LAST_HOP_OPT false, PASSIVE_ACK_RETRIES 2, PASSIVE_ACK_INTERVAL 0);
   rep_forwarder :: BRN2ReplyForwarder(NODEIDENTITY $ID, LINKTABLE $LT, DSRDECAP dsr_decap, ROUTEQUERIER querier, DSRENCAP dsr_encap);
 
 #ifdef DSR_ID_CACHE
@@ -39,20 +40,23 @@ elementclass DSR {$ID, $LT, $METRIC |
 #endif
   -> querier[0]
 #ifdef DEBUG_DSR
-  -> Print("NODENAME: DSR: querie",100)
+  -> SetTimestamp()
+  -> Print("NODENAME: DSR: querry", 100, TIMESTAMP true)
 #endif
  -> BRN2EtherEncap() 
  -> [1]output;                                             // rreq packets (broadcast)
   
   querier[1] 
 #ifdef DEBUG_DSR
-  -> Print("NODENAME: DSR: src_forwarder", 100)
+  -> SetTimestamp()
+  -> Print("NODENAME: DSR: src_forwarder", 100, TIMESTAMP true)
 #endif
   -> [0]src_forwarder;                                      // src routed packets (unicast)
 
   src_forwarder[0]
 #ifdef DEBUG_DSR
-  -> Print("NODENAME: Forward",100)
+  -> SetTimestamp()
+  -> Print("NODENAME: Forward", 100, TIMESTAMP true)
 #endif
   -> dsr_stats
   -> routing_peek
@@ -61,13 +65,14 @@ elementclass DSR {$ID, $LT, $METRIC |
 
   src_forwarder[1]
 #ifdef DEBUG_DSR
-  -> Print("NODENAME: Final dest", 100)
+  -> SetTimestamp()
+  -> Print("NODENAME: Final dest", 100, TIMESTAMP true)
 #endif
   -> [0]output;
 
   src_forwarder[2]
 #ifdef DEBUG_DSR
-  -> Print("NODENAME: Error")
+  -> Print("NODENAME: src_fwd Error")
 #endif
   -> tee_to_err_fwd :: Tee()
   -> Discard;                                                  //is for BRNiapp
@@ -87,18 +92,21 @@ elementclass DSR {$ID, $LT, $METRIC |
 
   dsrclf[0]
 #ifdef DEBUG_DSR
-  -> Print("NODENAME: Req_fwd_in")
+  -> SetTimestamp()
+  -> Print("NODENAME: Req_fwd_in", 100, TIMESTAMP true)
 #endif
   -> req_forwarder[0]
 #ifdef DEBUG_DSR
-  -> Print("NODENAME: Req_fwd_out")
+  -> SetTimestamp()
+  -> Print("NODENAME: Req_fwd_out", 100, TIMESTAMP true)
 #endif
   -> BRN2EtherEncap()
   -> [1]output;
 
   req_forwarder[1]
 #ifdef DEBUG_DSR
-  -> Print("NODENAME: Target! now send reply")
+  -> SetTimestamp()
+  -> Print("NODENAME: Target! now send reply", 100, TIMESTAMP true)
 #endif
   -> [0]rep_forwarder
   -> BRN2EtherEncap()
@@ -106,6 +114,7 @@ elementclass DSR {$ID, $LT, $METRIC |
 
   dsrclf[1] 
 #ifdef DEBUG_DSR
+  -> SetTimestamp()
   -> Print("NODENAME: Route Reply")
 #endif
   -> [1]rep_forwarder;
