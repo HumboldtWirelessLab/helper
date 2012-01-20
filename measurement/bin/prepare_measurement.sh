@@ -257,6 +257,9 @@ case "$1" in
 		fi
 				
 		;;
+	"afterwards")
+		;;
+		
 	*)
 		$0 help
 		;;
