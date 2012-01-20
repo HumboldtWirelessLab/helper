@@ -225,6 +225,10 @@ case "$1" in
                 CPPOPTS="$CPPOPTS -DDEBUGLEVEL=$DEBUG"
                 CPPOPTS="$CPPOPTS -DSIMULATION"
                 CPPOPTS="$CPPOPTS -DWIFITYPE=$WIFITYPE"
+		
+		if [ "x$USED_SIMULATOR" = "xns" ] && [ "x$GUICONNECTOR" = "xyes" ]; then
+		  CPPOPTS="$CPPOPTS -DGUICONNECTOR" 
+		fi 
 			
 		NODEID_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "BRN2NodeIdentity" | wc -l)`
 		
@@ -236,7 +240,7 @@ case "$1" in
 		#echo $CPPOPTS
 
                 ( cd $CONFIGDIR; cat $CLICK | add_include | cpp -I$DIR/../../measurement/etc/click $CPPOPTS -DCWMINPARAM="\"$CWMIN\"" -DCWMAXPARAM="\"$CWMAX\"" -DAIFSPARAM="\"$AIFS\"" | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" | grep -v "^#" > $CLICKFINALNAME )
-                
+
               else
                 CLICKFINALNAME="-"
               fi
