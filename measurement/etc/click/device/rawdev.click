@@ -19,7 +19,8 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 
   input[0]
 #ifdef RAWDEV_DEBUG
-  -> Print("To Device")
+  -> SetTimestamp()
+  -> Print("NODENAME: To Device", 100, TIMESTAMP true)
 #endif
 #ifdef PACKET_REUSE
   -> toraw::TORAWDEVICE($devname)
@@ -34,7 +35,8 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 
   FROMRAWDEVICE($devname)
 #ifdef RAWDEV_DEBUG
-  -> Print("From Device")
+  -> SetTimestamp()
+  -> Print("NODENAME: From Device", 100, TIMESTAMP true)
 #endif
 #ifdef RAWFILTER
   -> RAWFILTER
