@@ -397,6 +397,9 @@ for state in  $STATES; do
     done
     cat status/all_wireless_nodeinfo.log.tmp | sort -u > status/all_wireless_nodeinfo.log
 
+    #rebuild click config if needed (e.g. devicetype,...)
+    $DIR/prepare_measurement.sh afterwards
+
     #REPLACE DEVICE TMPL
 
     if [ "x$REWRITER" = "xyes" ]; then
@@ -681,11 +684,14 @@ if [ $MEASUREMENT_ABORT -eq 0 ]; then
   if [ $RUN_CLICK_APPLICATION -eq 1 ]; then
 
 	  #add 10 second extra to make sure that we are not faster than the devices (click,application)
-	  EXTRA_WAITTIME=10
+	  EXTRA_WAITTIME=20
 
 	  if [ "x$NODENUM" != "x" ]; then
 	    if [ $NODENUM -lt 5 ]; then
 	      EXTRA_WAITTIME=5
+	    fi
+	    if [ $NODENUM -lt 20 ]; then
+	      EXTRA_WAITTIME=10
 	    fi
 	  fi
 	  WAITTIME=`expr $TIME + $EXTRA_WAITTIME`
