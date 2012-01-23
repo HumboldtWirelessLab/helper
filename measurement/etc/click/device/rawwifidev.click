@@ -26,6 +26,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef SIMULATION
   cinfo::CollisionInfo();
+  pli::PacketLossInformation();
 #endif
 
 #endif
@@ -48,6 +49,9 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 //#else
 //  -> Tos2QueueMapper()
 //#endif
+#endif
+#ifdef USE_RTS_CTS
+	->Brn2_SetRTSCTS(PLI pli)
 #endif
   -> __WIFIENCAP__
 #ifdef SETCHANNEL
