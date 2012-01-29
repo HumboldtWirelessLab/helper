@@ -20,7 +20,7 @@ elementclass ACCESS_POINT { DEVICE $device, ETHERADDRESS $etheraddress, SSID $ss
 
     assoclist :: BRN2AssocList(LINKTABLE $link_table);
     winfo :: WirelessInfo(SSID $ssid, BSSID $etheraddress, CHANNEL $channel, INTERVAL $beacon_interval);
-    bs :: BeaconScanner(RT rates);
+    bs :: BRN2BeaconScanner(RT rates);
 
 #ifdef VLAN_ENABLE
     wil :: BRN2WirelessInfoList();

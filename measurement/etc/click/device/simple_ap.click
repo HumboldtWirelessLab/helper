@@ -11,7 +11,7 @@
 elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid,
                           CHANNEL $channel, LT $lt |
 
-  rates::AvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
+  rates::BrnAvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
 
   ap::ACCESS_POINT(DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid, CHANNEL $channel, BEACON_INTERVAL 100, LT $lt, RATES rates);
 
