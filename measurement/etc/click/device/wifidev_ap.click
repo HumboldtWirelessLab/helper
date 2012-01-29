@@ -36,7 +36,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
                             DEVICE          $device,
                             PERIOD             3000,
                             TAU               30000,
-                            ETX          etx_metric,
+                            METRIC     "etx_metric",
 //                          PROBES  "2 250 22 1000",
                             PROBES  "2 250",
                             RT           proberates);

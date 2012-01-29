@@ -18,13 +18,13 @@ elementclass BATMAN {$ID, $LT |
   
   input[1]
   -> BRN2Decap()
-//-> Print("NODENAME: BATMAN", TIMESTAMP true)
-  -> bc::Classifier( 0/01,  //originator
-                     0/02   //routingfwd
+-> Print("NODENAME: BATMAN", TIMESTAMP true)
+  -> bc::Classifier( 0/10,  //originator
+                     0/20   //routingfwd
                   );
 
   bc[0]
-//-> Print("Forward org")
+  -> Print("Forward org")
   -> bofwd
   -> brnee::Null()
   -> BRN2EtherEncap(USEANNO true)

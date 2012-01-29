@@ -14,9 +14,9 @@ elementclass ADHOC_OR_INFRASTRUCTURE_CLIENT {
     WIRELESS_INFO $auth_info,
     ACTIVESCAN $active |
 
-    auth_rates :: AvailableRates(DEFAULT 2 4 11 12 18 22);
+    auth_rates :: BrnAvailableRates(DEFAULT 2 4 11 12 18 22);
 
-    probe_req :: ProbeRequester(WIRELESS_INFO $auth_info, ETH $eth, RT auth_rates);
+    probe_req :: BrnProbeRequester(WIRELESS_INFO $auth_info, ETH $eth, RT auth_rates);
     auth_req :: OpenAuthRequester(ETH $eth, WIRELESS_INFO $auth_info);
     assoc_req :: BRN2AssocRequester(ETH $eth, WIRELESS_INFO $auth_info, RT auth_rates, DEBUG 0);
 
