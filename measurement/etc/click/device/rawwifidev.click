@@ -26,11 +26,10 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef SIMULATION
   cinfo::CollisionInfo();
-#ifdef USE_RTS_CTS
   pli::PacketLossInformation();
+#ifdef USE_RTS_CTS
 #endif
 #ifdef PLE
-  pli::PacketLossInformation();
   ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli, DEVICE $device, DEBUG 2);
 #endif
 #endif
