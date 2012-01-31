@@ -23,19 +23,17 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #else
   cst::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
 #endif
+#endif
 
 #ifdef SIMULATION
   cinfo::CollisionInfo();
-  pli::PacketLossInformation();
 #ifdef USE_RTS_CTS
-#endif
+  pli::PacketLossInformation();
 #ifdef PLE
   ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli, DEVICE $device, DEBUG 2);
 #endif
 #endif
-
 #endif
-
 
   rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);
 
@@ -49,17 +47,21 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifndef DISABLE_TOS2QUEUEMAPPER
 #ifdef SIMULATION
 #ifdef CST
+#ifdef USE_RTS_CTS
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli)
 #else
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo)
+#endif //PLE
+#else //CST
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM )
-#endif
-#endif
+#endif //CST
+#endif //SIMULATION
 //#else
 // -> Tos2QueueMapper()
 //#endif
 #endif
 #ifdef USE_RTS_CTS
-  ->Brn2_SetRTSCTS(PLI pli)
+  -> Brn2_SetRTSCTS(PLI pli)
 #endif
 #ifdef SETCHANNEL
   -> sc::BRN2SetChannel(DEVICE $device, CHANNEL 0)
@@ -81,8 +83,11 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> dev_decap::__WIFIDECAP__
 #ifdef CST
   -> cst                                                            //add channel stats if requested
+#endif
 #ifdef SIMULATION
   -> cinfo
+#ifdef PLE
+  -> ple
 #endif
 #endif
 #ifdef CERR
