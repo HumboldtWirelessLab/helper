@@ -22,10 +22,10 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
                           CHANNEL $channel, LT $lt |
 #endif
 
-#warning Fix NBList in wifidev_ap
+//#warning Fix NBList in wifidev_ap
 //  nblist::BRN2NBList(NODEID );  //stores all neighbors (known (friend) and unknown (foreign))
 //  nbdetect::NeighborDetect(NBLIST nblist);
-  
+
   rates::BrnAvailableRates(DEFAULT 2 4 11 12 18 22 24 36 48 72 96 108);
 
 #ifdef LINKSTAT_ENABLE
