@@ -7,7 +7,6 @@
 elementclass DSR {$ID, $LT, $METRIC |
 
   dsr_decap :: BRN2DSRDecap();
-//  dsr_decap :: BRN2DSRDecap(NODEIDENTITY $ID, LINKTABLE $LT);
   dsr_encap :: BRN2DSREncap(NODEIDENTITY $ID, LINKTABLE $LT);
 
   dsr_stats :: DSRStats(DEBUG 2);
@@ -22,7 +21,7 @@ elementclass DSR {$ID, $LT, $METRIC |
   querier :: BRN2RouteQuerier(NODEIDENTITY $ID, LINKTABLE $LT, DSRENCAP dsr_encap, DSRDECAP dsr_decap, METRIC $METRIC, DEBUG 2);
 #endif
 
-  req_forwarder :: BRN2RequestForwarder(NODEIDENTITY $ID, LINKTABLE $LT, DSRDECAP dsr_decap, DSRENCAP dsr_encap, ROUTEQUERIER querier, MINMETRIC 9998, ENABLE_DELAY_QUEUE true, DEBUG 2, LAST_HOP_OPT false, PASSIVE_ACK_RETRIES 2, PASSIVE_ACK_INTERVAL 0);
+  req_forwarder :: BRN2RequestForwarder(NODEIDENTITY $ID, LINKTABLE $LT, DSRDECAP dsr_decap, DSRENCAP dsr_encap, ROUTEQUERIER querier, MINMETRIC 5000, ENABLE_DELAY_QUEUE true, DEBUG 2, LAST_HOP_OPT false, PASSIVE_ACK_RETRIES 2, PASSIVE_ACK_INTERVAL 0);
   rep_forwarder :: BRN2ReplyForwarder(NODEIDENTITY $ID, LINKTABLE $LT, DSRDECAP dsr_decap, ROUTEQUERIER querier, DSRENCAP dsr_encap);
 
 #ifdef DSR_ID_CACHE

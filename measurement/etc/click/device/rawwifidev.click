@@ -26,7 +26,13 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef SIMULATION
   cinfo::CollisionInfo();
+#ifdef USE_RTS_CTS
   pli::PacketLossInformation();
+#endif
+#ifdef PLE
+  pli::PacketLossInformation();
+  ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli, DEVICE $device, DEBUG 2);
+#endif
 #endif
 
 #endif
@@ -38,6 +44,9 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #if defined(SIMULATION) || (WIFITYPE == 802)
   -> WifiSeq()                                                      // Set sequencenumber for simulation
 #endif
+#ifdef PLE
+  -> ple
+#endif
 #ifndef DISABLE_TOS2QUEUEMAPPER
 #ifdef SIMULATION
 #ifdef CST
@@ -47,13 +56,12 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 #endif
 //#else
-//  -> Tos2QueueMapper()
+// -> Tos2QueueMapper()
 //#endif
 #endif
 #ifdef USE_RTS_CTS
-	->Brn2_SetRTSCTS(PLI pli)
+  ->Brn2_SetRTSCTS(PLI pli)
 #endif
-  -> __WIFIENCAP__
 #ifdef SETCHANNEL
   -> sc::BRN2SetChannel(DEVICE $device, CHANNEL 0)
 #endif
