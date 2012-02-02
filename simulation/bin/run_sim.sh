@@ -152,6 +152,7 @@ case "$MODE" in
                         if [ -e $FINALRESULTDIR/$NODEPLACEMENTFILE ]; then
                           FINALPLMFILE="$FINALRESULTDIR/$NODEPLACEMENTFILE"
                         else
+			  echo "Unable to find placementfile $NODEPLACEMENTFILE. Use default!"
                           FINALPLMFILE="$DIR/../etc/nodeplacement/placement.default"
                         fi
                       fi
@@ -256,6 +257,16 @@ case "$MODE" in
 		POS_Y_MAX=`expr $POS_Y_MAX + 50`
 		POS_Z_MAX=`expr $POS_Z_MAX + 50`
 		
+		if [ "x$FIELDSIZE" = "x" ]; then
+		    FIELDSIZE=$POS_X_MAX
+		fi
+		if [ $FIELDSIZE -lt $POS_X_MAX ]; then
+		    FIELDSIZE=$POS_X_MAX
+		fi
+		if [ $FIELDSIZE -lt $POS_Y_MAX ]; then
+		    FIELDSIZE=$POS_Y_MAX
+		fi
+		
 		if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ]; then
 		  if [ $POS_X_MAX -lt $FIELDSIZE ]; then
 		    POS_X_MAX=$FIELDSIZE
@@ -354,14 +365,23 @@ case "$MODE" in
 		        ISCOMMENT=`echo $line | grep "#" | wc -l`
 		        if [ $ISCOMMENT -eq 0 ]; then
 			    TIME=`echo $line | awk '{print $1}'`
-			    NODENAME=`echo $line | awk '{print $2}' | sed $NODENAME_SEDARG`
+			    NODENAME=`echo $line | awk '{print $2}' | sed $NODENAME_SEDARG | sed "s#,# #g"`
 			    NODEDEVICE=`echo $line | awk '{print $3}'`
 			    MODE=`echo $line | awk '{print $4}'`
 			    ELEMENT=`echo $line | awk '{print $5}'`
 			    HANDLER=`echo $line | awk '{print $6}'`
 			    NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$NODENAME[[:space:]]" | awk '{print $4}'`
 			    
-			    if [ "x$TIME" != "x" ]; then
+			    HANDLERNODES=$NODENAME
+			    
+			    if [ "x$HANDLERNODES" = "xALL" ]; then
+			      HANDLERNODES=$NODELIST
+			    fi
+			    
+			    for n in $HANDLERNODES; do
+			    
+			      NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$n[[:space:]]" | awk '{print $4}'`
+			      if [ "x$TIME" != "x" ]; then
     				if [ "x$MODE" = "xwrite" ]; then
 				    VALUE=`get_params $line | sed $NODEMAC_SEDARG`
 				    if [ "x$USED_SIMULATOR" = "xns" ]; then
@@ -387,7 +407,8 @@ case "$MODE" in
 				    	echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 				    fi
 				fi
-			    fi
+			      fi
+			    done
 			fi
 		    done < $CONTROLFILE
 		    if [ "x$USED_SIMULATOR" = "xjist" ]; then
