@@ -42,7 +42,7 @@ Software auschecken
 
 #. brn-tools.sh ausführen::
 
-    cp click-brn/elements/brn2/brn-tools.sh .
+    cp click-brn/elements/brn2/tools/brn-tools.sh .
     chmod a+x brn-tools.sh
     ./brn-tools.sh
 
