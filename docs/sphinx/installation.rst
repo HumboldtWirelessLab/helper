@@ -22,12 +22,14 @@ Vorbereitungen
     Host gruenau
         User username
         HostName gruenau.informatik.hu-berlin.de
-        LocalForward 23452 sar.informatik.hu-berlin.de:2222
 
     Host gitsar
         User username
-        HostName localhost
-        Port 23452
+        ProxyCommand ssh -q gruenau netcat sar 2222
+
+Am komfortabelsten funktioniert die Verbindung beim Einsatz von
+`SSH-Keys und dem ssh-agent <http://mah.everybody.org/docs/ssh>`_, da man dann
+nur einmal die Passphrase für den SSH Schlüssel eingeben muss.
 
 Software auschecken
 -------------------
