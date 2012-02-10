@@ -61,7 +61,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 //#endif
 #endif
 #ifdef USE_RTS_CTS
-  -> Brn2_SetRTSCTS(PLI pli)
+  ->setrtscts::Brn2_SetRTSCTS(PLI pli)
 #endif
 #ifdef SETCHANNEL
   -> sc::BRN2SetChannel(DEVICE $device, CHANNEL 0)
