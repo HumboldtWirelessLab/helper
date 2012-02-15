@@ -42,7 +42,7 @@ elementclass DHT_FALCON { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $s
     -> [0]output;
     
   frc[4]
-    -> [0]output;
+    -> Discard;
 
   dhtroutingpeek -> [0]output;
    
@@ -91,7 +91,7 @@ elementclass DHT_FALCON { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $s
     -> [0]output;
 	
   frc[4]
-    -> [0]output;
+    -> Discard;
 
 }
 
