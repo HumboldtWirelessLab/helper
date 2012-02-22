@@ -1,11 +1,28 @@
+Click
+=====
+
+Introduction
+------------
+
+The folder ``simulation/click-brn-scripts/`` contains different click scripts
+for different experiments. Running this scripts (see :ref:`running-simulations`) the click
+framework generates dumps of the communicating nodes. These dumps are then
+automatically analyzed and evaluated, putting the results into the folder
+``simulation/click-brn-scripts/<SOME_SCRIPT>/<NUMBER_OF_EXPERIMENT>``.
+
+The click scripts use the following files:
+
+* Mes-files contain the devices which will be prepared for the experiment.
+* Des-Files contain a gross description for the experiment. E.g.: Duration of the experiment; Directory for log-files; network topology; etc...
+
 Installation
-============
+------------
 
 Vorbereitungen
---------------
+##############
 
 #. Benötigte Software installieren: gcc, g++, autoconf, libx11-dev, libxt-dev, libxmu-dev, flex, bison, git
-   
+
    gcc und g++ müssen zur Zeit in Version 4.4 vorliegen.
    Zum Übersetzen der Software sollten also die Pakete gcc-4.4 und g++-4.4 installiert werden und temporär
    die symbolischen Links in /usr/bin auf die entsprechenden binaries gesetzt werden::
@@ -19,7 +36,7 @@ Vorbereitungen
 
 #. Folgende Einträge in der .ssh/config vornehmen: ::
 
-    Host gruenau
+        Host gruenau
         User username
         HostName gruenau.informatik.hu-berlin.de
 
@@ -32,10 +49,10 @@ Am komfortabelsten funktioniert die Verbindung beim Einsatz von
 nur einmal die Passphrase für den SSH Schlüssel eingeben muss.
 
 Software auschecken
--------------------
+###################
 
 #. In einem separaten Terminal SSH Verbindung zu gruenau herstellen (und geöffnet halten)::
-    
+
     ssh gruenau
 
 #. click-brn auschecken::
@@ -51,7 +68,7 @@ Software auschecken
 #. Umgebungsvariablen setzen. Entweder per ``source /tmp/./brn-tools.bashrc`` oder durch das Kopieren der Einträge in ``brn-tools.bashrc`` in die eigene ``.bashrc``
 
 Testen
-------
+######
 
 Zum Testen der Installation kann die *simple_flow* (oder eine andere) Simulation ausgeführt werden::
 
@@ -68,7 +85,7 @@ Alternativ können über das Shellscript test.sh alle Simulationen angestoßen w
 erzeugt dabei ein pdf namens ``testbed.pdf``, welches die Resultate aller Simulationen enthält.
 
 Troubleshooting
----------------
+###############
 
 * Wenn die Simulation mit dem Fehler ``*** buffer overflow detected ***: ./ns terminated``
     abbricht liegt das vermutlich daran, dass die falsche TCL Version verwendet wird. Abhilfe
@@ -78,4 +95,42 @@ Troubleshooting
 * Falls das Ausführen von test.sh Warnungen und/oder Fehler erzeugt liegt dies unter Ubuntu
     Systemen evtl. daran, dass die dash als System Shell verwendet wird. Eine mögliche Lösung
     besteht darin, eine andere System Shell mittels ``sudo dpkg-reconfigure dash`` festzulegen.
-    
+
+Scripte
+-------
+
+/helper/host/bin/clickctrl.sh
+#############################
+
+Mit dem *clickctrl.sh* Script kann man einzelne Handler von einzelnen Knoten im
+Netzwerk abfragen oder schreiben. Ein Anwendungsfall ist beispielsweise das
+Abfragen von Statistiken zur Laufzeit eines Experiments. Das Skript wird
+folgendermaßen aufgerufen::
+
+    clickctrl.sh read address port element handler
+    clickctrl.sh write address port element handler "arguments of element"
+
+
+Das Skript verwendet intern das `ControlSocket <http://read.cs.ucla.edu/click/elements/controlsocket>`_
+Element.
+
+.. _running-simulations:
+
+/helper/simulation/bin/run_sim.sh
+#################################
+
+Um eine Simulation auszuführen wird das *run_sim.sh* Script verwendet. Dieses
+nimmt als Parameter den zu verwendenden Simulator (*ns* oder *jist*) und den
+Pfad zur *des* Datei der Simulation entgegen::
+
+   run_sim.sh ns <des-File>
+   run_sim.sh jist <des-File>
+
+Weitere Dokumentation
+---------------------
+
+* Search click documentation: http://read.cs.ucla.edu/click/docs
+* Publications about click and stuff that uses click: http://read.cs.ucla.edu/click/publications
+* Manual how to program click elements: http://read.cs.ucla.edu/click/doxygen/class_element.html
+* Information about click elements: http://www.read.cs.ucla.edu/click/elements
+* Network Simulator 2 (NS2) Docu: http://isi.edu/nsnam/ns/
