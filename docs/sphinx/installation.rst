@@ -1,23 +1,6 @@
 Click
 =====
 
-Introduction
-------------
-
-The folder ``simulation/click-brn-scripts/`` contains different click scripts
-for different experiments. Running this scripts (see :ref:`running-simulations`) the click
-framework generates dumps of the communicating nodes. These dumps are then
-automatically analyzed and evaluated, putting the results into the folder
-``simulation/click-brn-scripts/<SOME_SCRIPT>/<NUMBER_OF_EXPERIMENT>``.
-
-The click scripts use the following files:
-
-* Mes-files contain the devices which will be prepared for the experiment.
-* Des-Files contain a gross description for the experiment. E.g.: Duration of the experiment; Directory for log-files; network topology; etc...
-
-Installation
-------------
-
 Vorbereitungen
 ##############
 
@@ -96,16 +79,44 @@ Troubleshooting
     Systemen evtl. daran, dass die dash als System Shell verwendet wird. Eine mögliche Lösung
     besteht darin, eine andere System Shell mittels ``sudo dpkg-reconfigure dash`` festzulegen.
 
+Simulationen
+-------------
+
+Im Ordner ``simulation/click-brn-scripts/`` liegen Simulationsscripte für
+verschiedene Experimente. Beim Ausführen der Scripte (siehe :ref:`running-simulations`)
+werden verschiedene die Ausgaben der verschiedenen Knoten gesammelt.
+Anschließend werden diese Ausgaben analysiert und ausgerwertet und die
+Resultate im Ordner ``simulation/click-brn-scripts/<SCRIPT>/<NUMBER_OF_EXPERIMENT>``
+gespeichert.
+
+Eine Simulation wird durch die folgenden beiden Dateien definiert:
+
+* Mes-files contain the devices which will be prepared for the experiment.
+* Des-Files contain a gross description for the experiment. E.g.: Duration of the experiment; Directory for log-files; network topology; etc...
+
+.. _running-simulations:
+
+run_sim.sh
+###########
+
+Um eine Simulation auszuführen wird das *run_sim.sh* Script verwendet, welches
+sich im Verzeichnes */helper/simulation/bin/* befindet. Das Script nimmt als
+Parameter den zu verwendenden Simulator (*ns* oder *jist*) und den Pfad zur
+*des* Datei der Simulation entgegen::
+
+   run_sim.sh ns <des-File>
+   run_sim.sh jist <des-File>
+
 Scripte
 -------
 
-/helper/host/bin/clickctrl.sh
-#############################
+clickctrl.sh
+#############
 
-Mit dem *clickctrl.sh* Script kann man einzelne Handler von einzelnen Knoten im
-Netzwerk abfragen oder schreiben. Ein Anwendungsfall ist beispielsweise das
-Abfragen von Statistiken zur Laufzeit eines Experiments. Das Skript wird
-folgendermaßen aufgerufen::
+Mit dem *clickctrl.sh* Script (zu Finden im Ordner */helper/host/bin/* kann man
+einzelne Handler von einzelnen Knoten im Netzwerk abfragen oder schreiben. Ein
+Anwendungsfall ist beispielsweise das Abfragen von Statistiken zur Laufzeit
+eines Experiments. Das Skript wird folgendermaßen aufgerufen::
 
     clickctrl.sh read address port element handler
     clickctrl.sh write address port element handler "arguments of element"
@@ -113,18 +124,6 @@ folgendermaßen aufgerufen::
 
 Das Skript verwendet intern das `ControlSocket <http://read.cs.ucla.edu/click/elements/controlsocket>`_
 Element.
-
-.. _running-simulations:
-
-/helper/simulation/bin/run_sim.sh
-#################################
-
-Um eine Simulation auszuführen wird das *run_sim.sh* Script verwendet. Dieses
-nimmt als Parameter den zu verwendenden Simulator (*ns* oder *jist*) und den
-Pfad zur *des* Datei der Simulation entgegen::
-
-   run_sim.sh ns <des-File>
-   run_sim.sh jist <des-File>
 
 Weitere Dokumentation
 ---------------------
