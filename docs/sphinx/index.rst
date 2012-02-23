@@ -6,7 +6,7 @@
 Welcome to HWL's documentation!
 ===============================
 
-Contents:
+Inhalt:
 
 .. toctree::
    :maxdepth: 2
