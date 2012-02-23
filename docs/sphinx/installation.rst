@@ -1,8 +1,11 @@
 Click
-=====
+*****
+
+Installation
+============
 
 Vorbereitungen
-##############
+--------------
 
 #. Benötigte Software installieren: gcc, g++, autoconf, libx11-dev, libxt-dev, libxmu-dev, flex, bison, git
 
@@ -32,7 +35,7 @@ Am komfortabelsten funktioniert die Verbindung beim Einsatz von
 nur einmal die Passphrase für den SSH Schlüssel eingeben muss.
 
 Software auschecken
-###################
+-------------------
 
 #. In einem separaten Terminal SSH Verbindung zu gruenau herstellen (und geöffnet halten)::
 
@@ -51,7 +54,7 @@ Software auschecken
 #. Umgebungsvariablen setzen. Entweder per ``source /tmp/./brn-tools.bashrc`` oder durch das Kopieren der Einträge in ``brn-tools.bashrc`` in die eigene ``.bashrc``
 
 Testen
-######
+------
 
 Zum Testen der Installation kann die *simple_flow* (oder eine andere) Simulation ausgeführt werden::
 
@@ -68,7 +71,7 @@ Alternativ können über das Shellscript test.sh alle Simulationen angestoßen w
 erzeugt dabei ein pdf namens ``testbed.pdf``, welches die Resultate aller Simulationen enthält.
 
 Troubleshooting
-###############
+---------------
 
 * Wenn die Simulation mit dem Fehler ``*** buffer overflow detected ***: ./ns terminated``
     abbricht liegt das vermutlich daran, dass die falsche TCL Version verwendet wird. Abhilfe
@@ -80,7 +83,7 @@ Troubleshooting
     besteht darin, eine andere System Shell mittels ``sudo dpkg-reconfigure dash`` festzulegen.
 
 Simulationen
--------------
+============
 
 Im Ordner ``simulation/click-brn-scripts/`` liegen Simulationsscripte für
 verschiedene Experimente. Beim Ausführen der Scripte (siehe :ref:`running-simulations`)
@@ -97,7 +100,7 @@ Eine Simulation wird durch die folgenden beiden Dateien definiert:
 .. _running-simulations:
 
 run_sim.sh
-###########
+----------
 
 Um eine Simulation auszuführen wird das *run_sim.sh* Script verwendet, welches
 sich im Verzeichnes */helper/simulation/bin/* befindet. Das Script nimmt als
@@ -107,11 +110,11 @@ Parameter den zu verwendenden Simulator (*ns* oder *jist*) und den Pfad zur
    run_sim.sh ns <des-File>
    run_sim.sh jist <des-File>
 
-Scripte
--------
+Experimente im Testbed
+======================
 
 clickctrl.sh
-#############
+------------
 
 Mit dem *clickctrl.sh* Script (zu Finden im Ordner */helper/host/bin/* kann man
 einzelne Handler von einzelnen Knoten im Netzwerk abfragen oder schreiben. Ein
@@ -126,7 +129,7 @@ Das Skript verwendet intern das `ControlSocket <http://read.cs.ucla.edu/click/el
 Element.
 
 Weitere Dokumentation
----------------------
+=====================
 
 * Search click documentation: http://read.cs.ucla.edu/click/docs
 * Publications about click and stuff that uses click: http://read.cs.ucla.edu/click/publications
