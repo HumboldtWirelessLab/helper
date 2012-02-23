@@ -1,6 +1,8 @@
 Click-Elemente bauen
 ********************
 
+.. _handler:
+
 Handler
 =======
 
