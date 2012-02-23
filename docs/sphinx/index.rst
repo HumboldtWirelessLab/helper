@@ -12,7 +12,7 @@ Contents:
    :maxdepth: 2
 
    installation
-
+   click_elemente
 
 .. Indices and tables
 .. ==================
