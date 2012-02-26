@@ -22,7 +22,7 @@ Vorbereitungen
 
 #. Folgende Einträge in der .ssh/config vornehmen: ::
 
-        Host gruenau
+    Host gruenau
         User username
         HostName gruenau.informatik.hu-berlin.de
 
@@ -94,8 +94,8 @@ gespeichert.
 
 Eine Simulation wird durch die folgenden beiden Dateien definiert:
 
-* Mes-files contain the devices which will be prepared for the experiment.
-* Des-Files contain a gross description for the experiment. E.g.: Duration of the experiment; Directory for log-files; network topology; etc...
+* Mes-files beinhalten alle Geräte, die für das Experiment vorbereitet werden.
+* Des-Files beinhalten eine grobe Beschreibung vom Experiment. Z.b.: Die Dauer des Experiments; das Verzeichnis für die log-files; Netzwerk-Topologie; etz...
 
 .. _running-simulations:
 
