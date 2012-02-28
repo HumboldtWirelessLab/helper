@@ -88,14 +88,14 @@ Simulationen
 Im Ordner ``simulation/click-brn-scripts/`` liegen Simulationsscripte für
 verschiedene Experimente. Beim Ausführen der Scripte (siehe :ref:`running-simulations`)
 werden verschiedene die Ausgaben der verschiedenen Knoten gesammelt.
-Anschließend werden diese Ausgaben analysiert und ausgerwertet und die
+Anschließend werden diese Ausgaben analysiert und ausgewertet und die
 Resultate im Ordner ``simulation/click-brn-scripts/<SCRIPT>/<NUMBER_OF_EXPERIMENT>``
 gespeichert.
 
 Eine Simulation wird durch die folgenden beiden Dateien definiert:
 
 * Mes-files beinhalten alle Geräte, die für das Experiment vorbereitet werden.
-* Des-Files beinhalten eine grobe Beschreibung vom Experiment. Z.b.: Die Dauer des Experiments; das Verzeichnis für die log-files; Netzwerk-Topologie; etz...
+* Des-Files beinhalten eine grobe Beschreibung vom Experiment. Z.b.: Die Dauer des Experiments; das Verzeichnis für die log-files; Netzwerk-Topologie; etc. ...
 
 .. _running-simulations:
 
@@ -103,7 +103,7 @@ run_sim.sh
 ----------
 
 Um eine Simulation auszuführen wird das *run_sim.sh* Script verwendet, welches
-sich im Verzeichnes */helper/simulation/bin/* befindet. Das Script nimmt als
+sich im Verzeichnis */helper/simulation/bin/* befindet. Das Script nimmt als
 Parameter den zu verwendenden Simulator (*ns* oder *jist*) und den Pfad zur
 *des* Datei der Simulation entgegen::
 
