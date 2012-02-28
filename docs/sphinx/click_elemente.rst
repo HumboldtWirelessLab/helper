@@ -28,7 +28,7 @@ Handler sind Zugangspunkte, mittels derer die Nutzer mit einzelnen Elementen zur
 	add_read_handler("info", read_my_param, (void *) H_READ);
 	add_write_handler("debug", write_my_param, (void *) H_DEBUG);
 
-#. Nun müssen die Funktionen der neu eingeführten Handler definiert werden. (Die Besonderheit ist hier das Schüsselwort static. Dies hat tiefergehende Gründe, die hier nicht weiter diskutiert wereden.) ::
+#. Nun müssen die Funktionen der neu eingeführten Handler definiert werden. (Die Besonderheit ist hier das Schlüsselwort static. Dies hat tiefergehende Gründe, die hier nicht weiter diskutiert werden.) ::
 
 	#include <click/straccum.hh>
 	...
