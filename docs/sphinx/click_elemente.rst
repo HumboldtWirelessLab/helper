@@ -9,9 +9,14 @@ Handler
 Handler bauen
 -------------
 
-Handler sind Zugangspunkte, mittels derer die Nutzer mit einzelnen Elementen zur Laufzeit des Click-Routers interagieren können. Man unterscheidet dabei zwischen read und write handlern, die sich jeweils wie Dateien in einem Dateisystem verhalten. Im folgenden wird dies anhand eines Beispiels erläutert.
+Handler sind Zugangspunkte, mittels derer die Nutzer mit einzelnen Elementen
+zur Laufzeit des Click-Routers interagieren können. Man unterscheidet dabei
+zwischen read und write handlern, die sich jeweils wie Dateien in einem
+Dateisystem verhalten. Im folgenden wird dies anhand eines Beispiels erläutert.
 
-#. Falls nicht vorhanden, füge eine Klassen-Methode mit dem Namen add_handlers() zum Element hinzu. Diese Funktion dient als Sammelstelle für die Registrierung aller Element-Handler::
+#. Falls nicht vorhanden, füge eine Klassen-Methode mit dem Namen
+   add_handlers() zum Element hinzu. Diese Funktion dient als Sammelstelle für
+   die Registrierung aller Element-Handler::
 
 	void
 	MyElement::add_handlers()
@@ -19,7 +24,11 @@ Handler sind Zugangspunkte, mittels derer die Nutzer mit einzelnen Elementen zur
 		//todo
 	}
 
-#. Als nächstes folgt die read/write Handler im einzelnen. Dazu werden die Methoden *add_read_handler* und *add_write_handler* verwendet. Das Argument *name* definiert den Namen des Handlers, *func* steht für die aufzurufende Funktion und *thunk* für zusätzliche Parameter. Vollständige Signatur und Beispiel::
+#. Als nächstes folgt die read/write Handler im einzelnen. Dazu werden die
+   Methoden *add_read_handler* und *add_write_handler* verwendet. Das Argument
+   *name* definiert den Namen des Handlers, *func* steht für die aufzurufende
+   Funktion und *thunk* für zusätzliche Parameter. Vollständige Signatur und
+   Beispiel::
 
 	void add_read_handler (const String &name, ReadHandler func, void *thunk)
 	void add_write_handler (const String &name, WriteHandler func, void *thunk)
@@ -28,7 +37,9 @@ Handler sind Zugangspunkte, mittels derer die Nutzer mit einzelnen Elementen zur
 	add_read_handler("info", read_my_param, (void *) H_READ);
 	add_write_handler("debug", write_my_param, (void *) H_DEBUG);
 
-#. Nun müssen die Funktionen der neu eingeführten Handler definiert werden. (Die Besonderheit ist hier das Schlüsselwort static. Dies hat tiefergehende Gründe, die hier nicht weiter diskutiert werden.) ::
+#. Nun müssen die Funktionen der neu eingeführten Handler definiert werden.
+   (Die Besonderheit ist hier das Schlüsselwort static. Dies hat tiefergehende
+   Gründe, die hier nicht weiter diskutiert werden.) ::
 
 	#include <click/straccum.hh>
 	...
@@ -54,7 +65,8 @@ Handler verwenden
 
 Handler können auf verschiedenste Weisen verwendet werden.
 
-* In einem Click-Script: Dazu wird meist ein *Script*-Bereich am Ende eines Click-Scripts eingeführt. ::
+* In einem Click-Script: Dazu wird meist ein *Script*-Bereich am Ende eines
+  Click-Scripts eingeführt. ::
 
 	...
 
