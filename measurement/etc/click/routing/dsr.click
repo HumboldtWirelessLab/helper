@@ -4,7 +4,7 @@
 // [0]output - ethernet (802.3) frames to external nodes/clients or me (no BRN protocol)
 // [1]output - BRN DSR packets to internal nodes (BRN DSR protocol)
 
-elementclass DSR {$ID, $LT, $METRIC |
+elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
 
   dsr_decap :: BRN2DSRDecap();
   dsr_encap :: BRN2DSREncap(NODEIDENTITY $ID, LINKTABLE $LT);
@@ -16,9 +16,9 @@ elementclass DSR {$ID, $LT, $METRIC |
 #endif
 
 #ifdef DSR_ID_CACHE
-  querier :: BRN2RouteQuerier(NODEIDENTITY $ID, LINKTABLE $LT, DSRENCAP dsr_encap, DSRDECAP dsr_decap, METRIC $METRIC, DSRIDCACHE ridc, DEBUG 2);
+  querier :: BRN2RouteQuerier(NODEIDENTITY $ID, LINKTABLE $LT, DSRENCAP dsr_encap, DSRDECAP dsr_decap, METRIC $METRIC, DSRIDCACHE ridc, ROUTEMAINTENANCE $ROUTEMAINT, DEBUG 2);
 #else
-  querier :: BRN2RouteQuerier(NODEIDENTITY $ID, LINKTABLE $LT, DSRENCAP dsr_encap, DSRDECAP dsr_decap, METRIC $METRIC, DEBUG 2);
+  querier :: BRN2RouteQuerier(NODEIDENTITY $ID, LINKTABLE $LT, DSRENCAP dsr_encap, DSRDECAP dsr_decap, METRIC $METRIC, ROUTEMAINTENANCE $ROUTEMAINT, DEBUG 2);
 #endif
 
   req_forwarder :: BRN2RequestForwarder(NODEIDENTITY $ID, LINKTABLE $LT, DSRDECAP dsr_decap, DSRENCAP dsr_encap, ROUTEQUERIER querier, MINMETRIC 5000, ENABLE_DELAY_QUEUE true, DEBUG 2, LAST_HOP_OPT true, PASSIVE_ACK_RETRIES 2, PASSIVE_ACK_INTERVAL 0);
