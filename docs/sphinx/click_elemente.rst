@@ -9,7 +9,7 @@ Handler
 Handler bauen
 -------------
 
-Handler sind Zugangspunkte, mittels derer die Nutzer mit einzelnen Elementen zur Runtime des Click-Routers interagieren können. Man unterscheidet dabei zwischen read und write handlern, die sich jeweils wie Dateien in einem Dateisystem verhalten. Im folgenden wird dies anhand eines Beispiels erläutert.
+Handler sind Zugangspunkte, mittels derer die Nutzer mit einzelnen Elementen zur Laufzeit des Click-Routers interagieren können. Man unterscheidet dabei zwischen read und write handlern, die sich jeweils wie Dateien in einem Dateisystem verhalten. Im folgenden wird dies anhand eines Beispiels erläutert.
 
 #. Falls nicht vorhanden, füge eine Klassen-Methode mit dem Namen add_handlers() zum Element hinzu. Diese Funktion dient als Sammelstelle für die Registrierung aller Element-Handler::
 
