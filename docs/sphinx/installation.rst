@@ -117,7 +117,7 @@ clickctrl.sh
 ------------
 
 Mit dem *clickctrl.sh* Script (zu Finden im Ordner */helper/host/bin/* kann man
-einzelne Handler von einzelnen Knoten im Netzwerk abfragen oder schreiben. Ein
+einzelne :ref:`Handler <handler>` von einzelnen Knoten im Netzwerk abfragen oder schreiben. Ein
 Anwendungsfall ist beispielsweise das Abfragen von Statistiken zur Laufzeit
 eines Experiments. Das Skript wird folgendermaßen aufgerufen::
 
