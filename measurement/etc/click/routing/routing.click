@@ -22,7 +22,7 @@ elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKST
 
 #else
 
-elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat | 
+elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat, ROUTINGMAINTENANCE $route_maint | 
 
 #endif
 
@@ -31,7 +31,7 @@ elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKST
   lpr::LPRLinkProbeHandler(LINKSTAT $linkstat, ETXMETRIC $metric);
 #endif
 
-  routing::DSR($id, $lt, $metric);
+  routing::DSR($id, $lt, $metric, $route_maint);
 
 #define BRN_PORT_ROUTING BRN_PORT_DSR
 #define HAVEROUTING
@@ -67,7 +67,7 @@ elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKST
 
 #ifndef HAVEROUTING
 #define ROUTINGDSR
-  routing::DSR($id, $lt, $metric);
+  routing::DSR($id, $lt, $metric, $route_maint);
 #define BRN_PORT_ROUTING BRN_PORT_DSR
 #endif
 
