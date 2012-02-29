@@ -1,0 +1,48 @@
+PollingDevice
+
+Original:
+FromDevice scheduled sich solange selbst bis von oben kein Packet mehr kommt oder das device belegt ist (not ready)
+Im simulator wird anhand der ClickQueue entschieden, ob das Gert frei ist oder nicht. Ist kein paket in der queue (max. 1 Paket (QueueSize = 1))
+ist das gert frei:
+
+int LLExt::ready() {
+  ClickQueue* pcq = (ClickQueue*) ifq_;
+    if (pcq) {
+        return (!packetpending_ && pcq->ready());
+	  }
+	  
+	    // No ClickQueue? Then we're always ready.
+	      return 1;
+	      }
+      
+dequeue (ClickQueue) nimmt ein Paket aus der Queue, wenn die Uebertragung beendet wurde) und gibt es noch oben (click)
+      
+ Packet* ClickQueue::deque()
+  {
+    Scheduler& s = Scheduler::instance();
+    double dcurtime = s.clock();
+    fprintf(stderr,"Time: %f", dcurtime);
+   Packet* retval = pq_->deque();
+    return retval;
+ }
+	       
+Das Gert ist frei, sobald  ClickQueue::deque() aufgerufen wurde.
+ 
+
+Verbesserung:
+TXFeedback signalisiert, dass das Geraet wieder bereit ist. Maximal ist 1 Paket im Simulator
+
+Problem:
+Wenn die Uebertargung abgeschlossen wurde und das Paket aus der ClickQueue, wird es nach oben gegeben. Das jedoch nicht (unbedingt) sofort, sondern erst nach einer Veroegerung-
+Im tcl file aesst sich diese Verzoegerung einstellen:
+
+set netifq      Queue/ClickQueue
+set netll       LL/Ext
+#LL set delay_                  1ms 
+LL set delay_                   0ms
+
+Durch die 1 ms Verzoegerung gibt es einen unterschied zwischen Pollen und Nicht-pollen: Nicht pollen (txfeedback basiert) erkennt das frei-werden des Geraetes erst 1ms spaeter (nach dem delay_)
+Die alte Version hatte diese Verzoegerung nicht. Dadurch gibt es unterschiede in der Geschwindigkeit.
+
+loesung (mehr Workaround): Verzoegerung auf 0ms setzten.
+
