@@ -243,7 +243,11 @@ BRNAddressInfo(ipdev eth0:ip);
 #define TORAWDEVICE(x) Discard()
 #else 
 #define FROMRAWDEVICE(x) FromSimDevice(x, SNAPLEN 8190)
+#ifdef POLLING
 #define TORAWDEVICE(x) ToSimDevice(x, ENCAP UNKNOWN )
+#else
+#define TORAWDEVICE(x) ToSimDevice(x, ENCAP UNKNOWN, POLLING false, HAVETXFEEDBACKANNO true )
+#endif
 #endif
 
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
