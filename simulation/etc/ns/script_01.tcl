@@ -8,7 +8,8 @@ $wtopo load_flatgrid $xsize $ysize
 #
 set netifq	Queue/ClickQueue
 set netll	LL/Ext
-LL set delay_			1ms
+#LL set delay_			1ms
+LL set delay_			0ms
 
 #
 # With nsclick, we have to worry about details like which network
