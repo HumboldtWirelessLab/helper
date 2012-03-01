@@ -426,6 +426,12 @@ case "$MODE" in
 		    echo "Create $RESULTDIR"
 		    mkdir -p $RESULTDIR
 		fi
+		
+		if [ -f /usr/bin/time ]; then
+		    GETTIMESTATS="/usr/bin/time -f %E -o $FINALRESULTDIR/time.stats"
+		else
+		    GETTIMESTATS=""
+		fi
 
 		if [ "x$USED_SIMULATOR" = "xns" ]; then
 		    which valgrind > /dev/null
@@ -434,12 +440,12 @@ case "$MODE" in
 		    fi
 		    if [ "x$VALGRIND" = "x1" ]; then
 			NS_FULL_PATH=`which ns`
-			( cd $FINALRESULTDIR; valgrind --leak-check=full --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
+			( cd $FINALRESULTDIR; $GETTIMESTATS valgrind --leak-check=full --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
 		    else
 			if [ "x$PROFILE" = "x1" ]; then
-			    ( cd $FINALRESULTDIR; ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+			    ( cd $FINALRESULTDIR; $GETTIMESTATS ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
 			else
-			    ( cd $FINALRESULTDIR; ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+			    ( cd $FINALRESULTDIR; $GETTIMESTATS ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
 			fi
 		    fi
 		
@@ -450,7 +456,7 @@ case "$MODE" in
 		    fi
 		else
 		    ( cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties )
-		    ( cd $FINALRESULTDIR; $DIR/start-jist-sim.sh $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
+		    ( cd $FINALRESULTDIR; $GETTIMESTATS $DIR/start-jist-sim.sh $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
 
 		    if [ $? -eq 0 ]; then
 			MODE=sim SIM=ns2 CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
