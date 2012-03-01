@@ -30,7 +30,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef USE_RTS_CTS
   pli::PacketLossInformation();
 #ifdef PLE
-  ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE wifidevice/hnd, PLI pli, DEVICE $device, DEBUG 4);
+  ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, DEVICE $device, DEBUG 2);
 #endif
 #endif
 #endif
@@ -45,7 +45,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef SIMULATION
 #ifdef CST
 #ifdef USE_RTS_CTS
-  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli, DEBUG 4)
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli, DEBUG 2)
 #else
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, DEBUG 2)
 #endif //PLE
@@ -85,6 +85,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> cinfo
 #ifdef PLE
   -> ple
+  //-> co_cst
 #endif
 #endif
 #ifdef CERR
