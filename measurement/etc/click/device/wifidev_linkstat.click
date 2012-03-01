@@ -27,13 +27,12 @@
 #endif
 
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
+	
+	availablerates::BrnAvailableRates(DEFAULT 2 4 11 22 12 18 24 36 48 72 96 108); //rates, that are used by that node
+	etx_metric :: BRN2ETXMetric($lt);
+	//ett_metric :: BRNETTMetric($lt);
 
-  availablerates::BrnAvailableRates(DEFAULT 2 4 11 22 12 18 24 36 48 72 96 108); //rates, that are used by that node
-
-  etx_metric :: BRN2ETXMetric($lt);
-//  ett_metric :: BRNETTMetric($lt);
-
-  link_stat :: BRN2LinkStat(DEVICE                    $device,
+	link_stat :: BRN2LinkStat(DEVICE              $device,
 #ifdef LINKPROBE_PERIOD
                             PERIOD           LINKPROBE_PERIOD,
 #else
@@ -55,7 +54,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
                             DEBUG            2 );
 
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
-  wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
+  rawWifiDevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
 #if WIFITYPE == 805
@@ -77,7 +76,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #endif
 //  -> SetTimestamp()
 //  -> Print("NODENAME: To Wifidev", 100, TIMESTAMP true)
-  -> wifidevice
+  -> rawWifiDevice
 //-> PrintWifi("Fromdev", TIMESTAMP true)
   -> filter_tx :: FilterTX()
 #if WIFITYPE == 805
@@ -162,7 +161,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #ifdef SIMULATION
   co_cst_clf[0]
   -> BRN2Decap()
-  -> cocst::CooperativeChannelStats(CHANNELSTATS wifidevice/cst, INTERVAL 1000)
+  -> cocst::CooperativeChannelStats(CHANNELSTATS rawWifiDevice/cst, NEIGHBOURS true, INTERVAL 1000, DEBUG 2)
   -> cocst_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
   -> cocst_rate::SetTXRate(RATE 2, TRIES 1)
   -> brnwifi;
