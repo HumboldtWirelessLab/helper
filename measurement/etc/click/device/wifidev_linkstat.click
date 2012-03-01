@@ -161,7 +161,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #ifdef SIMULATION
   co_cst_clf[0]
   -> BRN2Decap()
-  -> cocst::CooperativeChannelStats(CHANNELSTATS rawWifiDevice/cst, INTERVAL 1000)
+  -> cocst::CooperativeChannelStats(CHANNELSTATS rawWifiDevice/cst, NEIGHBOURS true, INTERVAL 1000, DEBUG 2)
   -> cocst_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
   -> cocst_rate::SetTXRate(RATE 2, TRIES 1)
   -> brnwifi;
