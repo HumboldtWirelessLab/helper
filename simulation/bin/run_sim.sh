@@ -82,6 +82,8 @@ fi
 
 FINALRESULTDIR=`echo $RESULTDIR | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 
+
+# check for result directory 
 if [ "x$3" = "x" ]; then
     echo "RESULTDIR is target. No Subdir."
     
@@ -295,10 +297,16 @@ case "$MODE" in
 
 		NODEMAC_SEDARG=""	
 		NODENAME_SEDARG=""
+
+		# crx: Scann the node table to build a NetworkSimulator-Command for
+		# each line in the table, using mainly the information of "NODE" and
+		# "CLICKSCRIPT".
 		for node in $NODELIST; do
 		    NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 		    for nodedevice in $NODEDEVICELIST; do		    
+			    
 			    CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
+			    # we tell the NS what click-script to load for a certain node
 			    echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
 
 			    mac_raw=`expr $i + 1`
@@ -427,6 +435,7 @@ case "$MODE" in
 		    mkdir -p $RESULTDIR
 		fi
 
+		# check running NS with a memory debugger and profiler
 		if [ "x$USED_SIMULATOR" = "xns" ]; then
 		    which valgrind > /dev/null
 		    if [ $? -ne 0 ]; then

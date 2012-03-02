@@ -3,6 +3,17 @@
 
 #include "rawdev.click"
 
+/*
+ * Input:
+ * 0: ??
+ *
+ * Output:
+ * 0: pkts from raw device
+ * 1: pkts from raw device are decaped and passed ???
+ */
+
+
+
 elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifndef CST_PROCINTERVAL
@@ -35,6 +46,8 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 #endif
 
+
+  // RAWDEV from include rawdev.click
   rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
