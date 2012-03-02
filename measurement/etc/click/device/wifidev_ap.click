@@ -137,12 +137,13 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> ap;
 
   wififrame_clf[2]
+    //-> Print("Filter",TIMESTAMP true)
     -> fbssid::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo);
 
     fbssid[1]    
     -> WifiDecap()
 //  -> nbdetect
-//  -> Print("Data")
+//  -> Print("Data",TIMESTAMP true)
     -> toStation[2]    //no station, no broadcast
     -> toMe[0]         //it's me
     -> brn_ether_clf :: Classifier( 12/8086, - );
@@ -160,15 +161,15 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 #endif
 
   toStation[0]
-  //-> Print("For a Station")
+//-> Print("For a Station",TIMESTAMP true)
   -> clientwifi::WifiEncap(0x02, WIRELESS_INFO ap/winfo)
+//-> Print("Und wieder raus",TIMESTAMP true)
   -> wifioutq;
 
-   toStation[1]                
-  //-> Print("Broadcast")
+  toStation[1]                
+//-> Print("Broadcast",TIMESTAMP true)
   -> brn_ether_clf;
 
- 
   brn_ether_clf[1]                        //For  me or broadcast and no BRN
   -> Discard;
   
@@ -181,9 +182,21 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   -> [3]output;
   
   fbssid[0]
-//  -> Print("From Client", TIMESTAMP true)
+//-> Print("From Client", TIMESTAMP true)
   -> WifiDecap()
-  -> bc_clf;
+//-> Print("From Client Ether", TIMESTAMP true)
+  -> stationtoStation::BRN2ToStations(ASSOCLIST ap/assoclist);
+
+  stationtoStation[0]
+//-> Print("To Station 0",TIMESTAMP true)
+  -> clientwifi;
+  
+  stationtoStation[1]
+//-> Print("To Station 1",TIMESTAMP true)
+  -> [4]output;
+  
+  stationtoStation[2]
+  -> toMe;
   
   lp_clf[1]                               //brn, but no lp
   -> brn_bc_clf::Classifier( 0/ffffffffffff,
