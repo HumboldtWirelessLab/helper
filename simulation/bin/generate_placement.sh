@@ -79,7 +79,7 @@ case "$1" in
 	  #REPLACE=`cat $2 | grep -v "#" | awk '{print " \"s#node_" NR - 1 " #"$1" #g\""}'`
 	  #echo "$REPLACE"
 	  DEGREE_DIR="$DIR/../../src/DegreePlacement"
-	  java -classpath $DEGREE_DIR/ DegreePlacementGenerator -n $NODECOUNT -r -d -x -y
+	  java -classpath $DEGREE_DIR/bin/production/DegreePlacement:$DEGREE_DIR/lib DegreePlacementGenerator -n $NODECOUNT -r $3 -d 4 -x 1000 -y 1000
 	  ;;	  
     "string")
           NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
