@@ -43,9 +43,6 @@ elementclass DHT_FALCON { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $s
     // -> Print("R-NWS-out",100)
     -> [0]output;
     
-  frc[4]
-    -> Discard;
-
   dhtroutingpeek -> [0]output;
 
   frc[4]
@@ -100,9 +97,6 @@ elementclass DHT_FALCON { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $s
     // -> Print("R-NWS-out",100)
     -> [0]output;
 	
-  frc[4]
-    -> Discard;
-
   frc[4]
     //-> Print("FalconPassive in",100)
     -> dhtpassivemon
