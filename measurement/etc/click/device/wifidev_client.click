@@ -29,7 +29,9 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
 #ifndef DISABLE_WIFIDUBFILTER
   -> WifiDupeFilter()
 #endif
+  //-> Print("Client Raw", TIMESTAMP true)
   -> wififrame_clf :: Classifier( 0/00%0f,  // management frames
+                                  1/02%03,  //fromds
                                       - ); 
 
   wififrame_clf[0]
@@ -38,9 +40,18 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
     -> rawdevice;
 
   wififrame_clf[1]
-//    -> Print("Receive")
+    //-> Print("Receive")
     -> WifiDecap()
+    -> toMe::BRN2ToThisNode(NODEADDRESS $etheraddress)
     -> [0]output; 
+
+  toMe[1]         //broadcast 
+  -> [0]output; 
+  
+  toMe[2] -> Discard;
+
+  wififrame_clf[2]
+    -> Discard;
 
   input[0]
 //    -> Print("Send")
