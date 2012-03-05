@@ -77,7 +77,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #endif
 //  -> SetTimestamp()
 //  -> Print("NODENAME: To Wifidev", 100, TIMESTAMP true)
-  -> rawWifiDevice
+  -> wifidevice                                            //rawWifiDevice
 //-> PrintWifi("Fromdev", TIMESTAMP true)
   -> filter_tx :: FilterTX()
 #if WIFITYPE == 805
@@ -163,7 +163,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   co_cst_clf[0]
   -> BRN2EtherDecap()
   -> BRN2Decap()
-  -> cocst::CooperativeChannelStats(CHANNELSTATS rawWifiDevice/cst, NEIGHBOURS true, INTERVAL 1000, DEBUG 2)
+  -> cocst::CooperativeChannelStats(CHANNELSTATS wifidevice/cst, NEIGHBOURS true, INTERVAL 1000, DEBUG 2)
   -> cocst_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
   -> cocst_rate::SetTXRate(RATE 2, TRIES 1)
   -> brnwifi;
