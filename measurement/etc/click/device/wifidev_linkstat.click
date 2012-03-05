@@ -54,7 +54,8 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
                             DEBUG            2 );
 
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
-  rawWifiDevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
+  wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
+  //rawWifiDevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
 #if WIFITYPE == 805
@@ -160,6 +161,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #ifdef CST
 #ifdef SIMULATION
   co_cst_clf[0]
+  -> BRN2EtherDecap()
   -> BRN2Decap()
   -> cocst::CooperativeChannelStats(CHANNELSTATS rawWifiDevice/cst, NEIGHBOURS true, INTERVAL 1000, DEBUG 2)
   -> cocst_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
