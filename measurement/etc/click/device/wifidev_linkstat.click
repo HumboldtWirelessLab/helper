@@ -161,6 +161,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #ifdef CST
 #ifdef SIMULATION
   co_cst_clf[0]
+  //-> Print("ChannelStats")
   -> BRN2EtherDecap()
   -> BRN2Decap()
   -> cocst::CooperativeChannelStats(CHANNELSTATS wifidevice/cst, NEIGHBOURS true, INTERVAL 1000, DEBUG 2)
