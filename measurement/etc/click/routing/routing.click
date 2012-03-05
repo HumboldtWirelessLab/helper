@@ -22,16 +22,20 @@ elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKST
 
 #else
 
-elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat, ROUTINGMAINTENANCE $route_maint | 
+elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat | 
 
 #endif
+
+routingtable::BrnRoutingTable(DEBUG 0, ACTIVE false, DROP /* 1/20 = 5% */ 0, SLICE /* 100ms */ 0, TTL /* 4*100ms */4);
+routingalgo::Dijkstra(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE routingtable, MIN_LINK_METRIC_IN_ROUTE 6000, MAXGRAPHAGE 30000, DEBUG 4);
+routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE routingtable, ROUTINGALGORITHM routingalgo, DEBUG 2);
 
 #ifdef ROUTINGDSR
 #ifdef DSRLPR
   lpr::LPRLinkProbeHandler(LINKSTAT $linkstat, ETXMETRIC $metric);
 #endif
 
-  routing::DSR($id, $lt, $metric, $route_maint);
+  routing::DSR($id, $lt, $metric, routingmaint);
 
 #define BRN_PORT_ROUTING BRN_PORT_DSR
 #define HAVEROUTING
@@ -67,7 +71,7 @@ elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKST
 
 #ifndef HAVEROUTING
 #define ROUTINGDSR
-  routing::DSR($id, $lt, $metric, $route_maint);
+  routing::DSR($id, $lt, $metric, routingmaint);
 #define BRN_PORT_ROUTING BRN_PORT_DSR
 #endif
 
