@@ -14,6 +14,7 @@
 //input::
 //  0: brn
 //  1: client
+//  2: high priority stuff
 
 elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid,
 #ifdef VLAN_ENABLE
