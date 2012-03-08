@@ -29,6 +29,14 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 
 #ifdef CST
+
+//define CST_PROCFILE for simulation. Path is not really used, but no path means no hw channel stats 
+#ifdef SIMULATION
+#ifndef CST_PROCFILE
+#define CST_PROCFILE /simulation
+#endif
+#endif
+
 #ifdef CST_PROCFILE
   cst::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCFILE CST_PROCFILE, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
 #else
