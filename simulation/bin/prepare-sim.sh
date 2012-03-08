@@ -19,7 +19,9 @@ case "$SIGN" in
 esac
 
 add_include() {
-  echo "#include \"brn/helper.inc\""
+  if [ "x$1" = "x0" ]; then
+    echo "#include \"brn/helper.inc\""
+  fi
   cat <&0
   echo ""
   echo "#include \"brn/helper_tools.inc\""  
@@ -182,6 +184,9 @@ case "$1" in
 		  if [ "x$WIFITYPE" = "x" ] || [ "x$WIFITYPE" = "x0" ] || [ "x$WIFITYPE" = "xDEFAULT" ]; then
 		    WIFITYPE=806
 		  fi
+		  if [ "x$WIFITYPE" != "x805" ] && [ "x$WIFITYPE" != "x806" ]; then
+		    WIFITYPE=806
+		  fi
 		else
 		  #read wificonfig for aifs, cwmin etc.
 		  #Hint: already done
@@ -238,8 +243,10 @@ case "$1" in
 
 		#CPPOPTS="$CPPOPTS -DCWMINPARAM=\"$CWMIN\""#-DCWMAXPARAM=\\\"$CWMAX\\\" -DAIFSPARAM=\\\"$AIFS\\\""
 		#echo $CPPOPTS
+		
+		HAS_BRNINCLUDE=`cat $CLICK | grep '#include "brn/helper.inc"' | wc -l`
 
-                ( cd $CONFIGDIR; cat $CLICK | add_include | cpp -I$DIR/../../measurement/etc/click $CPPOPTS -DCWMINPARAM="\"$CWMIN\"" -DCWMAXPARAM="\"$CWMAX\"" -DAIFSPARAM="\"$AIFS\"" | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" | grep -v "^#" > $CLICKFINALNAME )
+                ( cd $CONFIGDIR; cat $CLICK | add_include $HAS_BRNINCLUDE | cpp -I$DIR/../../measurement/etc/click $CPPOPTS -DCWMINPARAM="\"$CWMIN\"" -DCWMAXPARAM="\"$CWMAX\"" -DAIFSPARAM="\"$AIFS\"" | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" | grep -v "^#" > $CLICKFINALNAME )
 
               else
                 CLICKFINALNAME="-"

@@ -14,6 +14,7 @@
 //input::
 //  0: brn
 //  1: client
+//  2: high priority stuff
 
 elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid,
 #ifdef VLAN_ENABLE
@@ -49,6 +50,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 #endif
 
   toStation::BRN2ToStations(ASSOCLIST ap/assoclist);
+  toAP::BRN2ToThisNode(NODEIDENTITY id);
   toMe::BRN2ToThisNode(NODEIDENTITY id);
 
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
@@ -122,6 +124,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 #endif
   -> wififrame_clf :: Classifier( 1/40%40,  // wep frames
                                   0/00%0f,  // management frames
+                                  1/01%03,  // tods
                                       - );
 
   wififrame_clf[0]
@@ -137,17 +140,42 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> ap;
 
   wififrame_clf[2]
-    -> fbssid::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo);
-
-    fbssid[1]    
+    //-> Print("Filter",TIMESTAMP true)
+    -> fbssid::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
     -> WifiDecap()
 //  -> nbdetect
-//  -> Print("Data")
+    //-> Print("Data",TIMESTAMP true)
     -> toStation[2]    //no station, no broadcast
-    -> toMe[0]         //it's me
-    -> brn_ether_clf :: Classifier( 12/8086, - );
+    -> toAP[0]         //it's me
+    -> brn_ap_clf :: Classifier( 12/8086, - )
+    -> [0]output;
+
+  toStation[0]
+    //-> Print("For a Station",TIMESTAMP true)
+    -> clientwifi::WifiEncap(0x02, WIRELESS_INFO ap/winfo)
+  //-> Print("Und wieder raus",TIMESTAMP true)
+    -> wifioutq;
+
+  toStation[1]                
+    //-> Print("Broadcast",TIMESTAMP true)
+    -> brn_ap_clf;
     
-  brn_ether_clf[0]
+    toAP[1] 
+    //-> Print("a")
+    -> brn_ap_clf;
+    
+    toAP[2]
+    //-> Print("b")
+    -> [2]output;
+    
+    brn_ap_clf[1] -> [3]output;
+        
+  wififrame_clf[3]
+    -> WifiDecap()
+    -> toMe[1]          //it's broadcast
+    -> brn_bc_clf :: Classifier( 12/8086, - );
+  
+  brn_bc_clf[0]
     -> lp_clf :: Classifier( 14/BRN_PORT_LINK_PROBE, - )
 #ifdef LINKSTAT_ENABLE
     -> BRN2EtherDecap()
@@ -159,52 +187,30 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> Discard;
 #endif
 
-  toStation[0]
-  //-> Print("For a Station")
-  -> clientwifi::WifiEncap(0x02, WIRELESS_INFO ap/winfo)
-  -> wifioutq;
-
-   toStation[1]                
-  //-> Print("Broadcast")
-  -> brn_ether_clf;
-
- 
-  brn_ether_clf[1]                        //For  me or broadcast and no BRN
-  -> Discard;
-  
-  Idle
-  -> bc_clf::Classifier( 0/ffffffffffff,
-                            - )
-  -> [4]output;
-  
-  bc_clf[1]
-  -> [3]output;
-  
-  fbssid[0]
-//  -> Print("From Client", TIMESTAMP true)
-  -> WifiDecap()
-  -> bc_clf;
-  
-  lp_clf[1]                               //brn, but no lp
-  -> brn_bc_clf::Classifier( 0/ffffffffffff,
-                             - )
+  lp_clf[1]
   -> [1]output;
   
   brn_bc_clf[1]
-  -> [0]output;
-                               
-  toMe[1]         //broadcast 
-  -> brn_ether_clf;
+  -> [4]output;
 
+  toMe[0]         //it's me
+  -> brn_ether_clf :: Classifier( 12/8086, - )
+  -> [0]output;
+  
+  brn_ether_clf[1]                        //For  me or broadcast and no BRN
+  -> Discard;
+  
+  
   toMe[2]         //Foreign
   -> foreign_brn_ether_clf :: Classifier( 12/8086, - )
   //-> Print("BRN for a foreign station")
-  -> [2]output;
+  -> Discard;//[2]output;
      
   foreign_brn_ether_clf[1]
   //-> Print("For a foreign station")
-  -> [5]output;
-                            
+  -> Discard; //-> [5]output;
+    
+                          
   input[1] -> fromNodetoStation::BRN2ToStations(ASSOCLIST ap/assoclist);
   
   fromNodetoStation[0]  //For Station
@@ -219,5 +225,6 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   Idle -> [1]ap[1] -> Discard;
   Idle -> [2]ap[2] -> Discard;
  
+  Idle -> [5]output;
 } 
 

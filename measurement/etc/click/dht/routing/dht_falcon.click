@@ -12,6 +12,8 @@ elementclass DHT_FALCON { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $s
   dhtrouting :: DHTRoutingFalcon(FRT dhtroutingtable, LEAVEORGANIZER dhtleaveorganizer, RESPONSIBLE 1, ENABLERANGEQUERIES false, DEBUG $debug);
   dhtroutingpeek :: FalconRoutingPeek(FRT dhtroutingtable, ROUTINGPEEK $routing_peek, DEBUG $debug);
 
+  dhtpassivemon::FalconPassiveMonitoring(FRT dhtroutingtable, DEBUG $debug);
+
   input[0] //-> Print("R-in",100)
     -> frc::FalconRoutingClassifier();
 
@@ -40,9 +42,15 @@ elementclass DHT_FALCON { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $s
     -> dhtnws
     // -> Print("R-NWS-out",100)
     -> [0]output;
-
+    
   dhtroutingpeek -> [0]output;
-   
+
+  frc[4]
+    //-> Print("FalconPassive in",100)
+    -> dhtpassivemon
+    // -> Print("FalconPassive out",100)
+    -> [0]output;
+     
   ||
   
  ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $starttime, UPDATEINT $updateint, DEBUG $debug |
@@ -57,6 +65,8 @@ elementclass DHT_FALCON { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $s
   dhtlprh :: FalconLinkProbeHandler(FRT dhtroutingtable, LINKSTAT $lt, REGISTERHANDLER true, NODESPERLP 255, DELAY $starttime, DEBUG $debug);
 
   dhtrouting :: DHTRoutingFalcon(FRT dhtroutingtable, LEAVEORGANIZER dhtleaveorganizer, RESPONSIBLE 1, ENABLERANGEQUERIES false, DEBUG $debug);
+
+  dhtpassivemon::FalconPassiveMonitoring(FRT dhtroutingtable, DEBUG $debug);
 
   input[0] //-> Print("R-in",100)
     -> frc::FalconRoutingClassifier();
@@ -85,6 +95,12 @@ elementclass DHT_FALCON { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $s
     //-> Print("R-NWS-in",100)
     -> dhtnws
     // -> Print("R-NWS-out",100)
+    -> [0]output;
+	
+  frc[4]
+    //-> Print("FalconPassive in",100)
+    -> dhtpassivemon
+    // -> Print("FalconPassive out",100)
     -> [0]output;
 
 }
