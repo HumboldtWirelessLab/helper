@@ -3,6 +3,17 @@
 
 #include "rawdev.click"
 
+/*
+ * Input:
+ * 0: ??
+ *
+ * Output:
+ * 0: pkts from raw device
+ * 1: pkts from raw device are decaped and passed ???
+ */
+
+
+
 elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifndef CST_PROCINTERVAL
@@ -18,6 +29,14 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 
 #ifdef CST
+
+//define CST_PROCFILE for simulation. Path is not really used, but no path means no hw channel stats 
+#ifdef SIMULATION
+#ifndef CST_PROCFILE
+#define CST_PROCFILE /simulation
+#endif
+#endif
+
 #ifdef CST_PROCFILE
   cst::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCFILE CST_PROCFILE, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
 #else
@@ -30,25 +49,24 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef USE_RTS_CTS
   pli::PacketLossInformation();
 #ifdef PLE
-  ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli, DEVICE $device, DEBUG 2);
+  ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, DEVICE $device, DEBUG 2);
 #endif
 #endif
 #endif
 
+
+  // RAWDEV from include rawdev.click
   rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
 #if defined(SIMULATION) || (WIFITYPE == 802)
   -> WifiSeq()                                                      // Set sequencenumber for simulation
 #endif
-#ifdef PLE
-  -> ple
-#endif
 #ifndef DISABLE_TOS2QUEUEMAPPER
 #ifdef SIMULATION
 #ifdef CST
 #ifdef USE_RTS_CTS
-  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli, DEBUG 4)
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli, DEBUG 2)
 #else
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, DEBUG 2)
 #endif //PLE
@@ -61,7 +79,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 //#endif
 #endif
 #ifdef USE_RTS_CTS
-  -> Brn2_SetRTSCTS(PLI pli)
+  ->setrtscts::Brn2_SetRTSCTS(PLI pli)
 #endif
 #ifdef SETCHANNEL
   -> sc::BRN2SetChannel(DEVICE $device, CHANNEL 0)
@@ -88,6 +106,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> cinfo
 #ifdef PLE
   -> ple
+  //-> co_cst
 #endif
 #endif
 #ifdef CERR

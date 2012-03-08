@@ -6,13 +6,14 @@
 Welcome to HWL's documentation!
 ===============================
 
-Contents:
+Inhalt:
 
 .. toctree::
    :maxdepth: 2
 
    installation
-
+   click_elemente
+   ns_click_interaction
 
 .. Indices and tables
 .. ==================
