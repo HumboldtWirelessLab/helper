@@ -57,7 +57,7 @@ case "$1" in
 	sleep 1
 
 	NUM=`echo $DEVICE | sed "s#obd##g"`
-	ARCH=$NODEARCH $DIR/../openbeacon/obd-$NODEARCH -O $NUM -d < /dev/null > /dev/null 2>&1 &
+	ARCH=$NODEARCH $DIR/../openbeacon/obd-$NODEARCH -O $NUM -path /testbedhome/testbed/tmp/openbeacon/$MADDR -d < /dev/null > /dev/null 2>&1 &
 
 	;;
     "config_post_start")
