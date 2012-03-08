@@ -447,7 +447,12 @@ case "$MODE" in
 		fi
 		
 		if [ -f /usr/bin/time ]; then
-			GETTIMESTATS="/usr/bin/time --quiet -f %E -o $FINALRESULTDIR/time.stats"
+		        QUIETSUPPORT=`/usr/bin/time --help | grep "quiet" | wc -l`
+			if [ $QUIETSUPPORT -gt 0 ]; then
+			    GETTIMESTATS="/usr/bin/time --quiet -f %E -o $FINALRESULTDIR/time.stats"
+			else
+			    GETTIMESTATS="/usr/bin/time -f %E -o $FINALRESULTDIR/time.stats"
+			fi
 		else
 			GETTIMESTATS=""
 		fi
