@@ -468,7 +468,8 @@ case "$MODE" in
 			if [ "x$VALGRIND" = "x1" ]; then
 				NS_FULL_PATH=`which ns`
 				# run NS (under valgrind)
-				( cd $FINALRESULTDIR; $GETTIMESTATS valgrind --track-origins=yes --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
+				#--track-origins=yes
+				( cd $FINALRESULTDIR; $GETTIMESTATS valgrind --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
 			else
 				if [ "x$PROFILE" = "x1" ]; then
 					( cd $FINALRESULTDIR; $GETTIMESTATS ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
