@@ -469,7 +469,15 @@ case "$MODE" in
 				NS_FULL_PATH=`which ns`
 				# run NS (under valgrind)
 				#--track-origins=yes
-				( cd $FINALRESULTDIR; $GETTIMESTATS valgrind --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
+				#--gen-suppressions=all
+				#--suppressions=$DIR/../etc/ns/ns.supp
+				if [ "x$NOSUPP" = "x1" ]; then
+				  SUPPRESSION=""
+				else
+				  SUPPRESSION="--suppressions=$DIR/../etc/ns/ns.supp"
+				fi
+				( cd $FINALRESULTDIR; echo "$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1" > run_again.sh)
+				( cd $FINALRESULTDIR; $GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
 			else
 				if [ "x$PROFILE" = "x1" ]; then
 					( cd $FINALRESULTDIR; $GETTIMESTATS ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
