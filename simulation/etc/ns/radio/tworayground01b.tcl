@@ -20,6 +20,7 @@ Antenna/OmniAntenna set Gr_ 1.0
 
 ##FHSS (IEEE802.11)
 
+#CaptureTreshold (CPTresh) in db
 Phy/WirelessPhy set CPThresh_ 10.0
 #Phy/WirelessPhy set CSThresh_ 1.559e-11
 #Phy/WirelessPhy set RXThresh_ 3.652e-10
