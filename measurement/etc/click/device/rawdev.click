@@ -23,11 +23,19 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
   -> Print("NODENAME: To Device", 100, TIMESTAMP true)
 #endif
 #ifdef PACKET_REUSE
+#ifdef SIMULATION
+  -> simpacketreuse::PullTee()
+  -> toraw::TORAWDEVICE($devname);
+  
+  simpacketreuse[1]
+  -> [1]output;
+#else
   -> toraw::TORAWDEVICE($devname)
   -> [1]output;
 
   toraw[1]
   -> [1]output;
+#endif
 #else
   -> TORAWDEVICE($devname);
 #endif
