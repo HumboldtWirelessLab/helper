@@ -84,6 +84,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef SETCHANNEL
   -> sc::BRN2SetChannel(DEVICE $device, CHANNEL 0)
 #endif
+  -> __WIFIENCAP__
 
 #if WIFITYPE == 805                                                 /***  for ath2 add priority scheduler to prefer operation packet ***/
   -> [1]op_prio_s::PrioSched();                                     /**/
