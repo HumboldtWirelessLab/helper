@@ -69,7 +69,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli, DEBUG 2)
 #else
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, DEBUG 2)
-#endif //PLE
+#endif //RTS_CTS
 #else //CST
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM )
 #endif //CST
@@ -84,7 +84,6 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef SETCHANNEL
   -> sc::BRN2SetChannel(DEVICE $device, CHANNEL 0)
 #endif
-  -> __WIFIENCAP__
 
 #if WIFITYPE == 805                                                 /***  for ath2 add priority scheduler to prefer operation packet ***/
   -> [1]op_prio_s::PrioSched();                                     /**/
