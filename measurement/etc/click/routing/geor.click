@@ -7,10 +7,13 @@
 elementclass GEOR {ID $ID, LT $LT, LINKSTAT $LS, DEBUG $debug  |
 
   gps::GPS();
-  grt::GeorTable(GPS gps, LINKTABLE $LT, DEBUG $debug);
-  glp::GeorLinkProbeHandler(LINKSTAT $LS, GEORTABLE grt);
-  gqu::GeorQuerier(NODEID $ID, GEORTABLE grt, DEBUG $debug);
-  gfwd::GeorForwarder(NODEID id, GEORTABLE grt, DEBUG $debug);
+
+  gpsmap::GPSMap();
+  gpslph::GPSLinkprobeHandler(LINKSTAT $LS, GPS gps, GPSMAP gpsmap);
+  
+  grt::GeorTable(GPS gps, GPSMAP gpsmap, LINKTABLE $LT, DEBUG 2);
+  gqu::GeorQuerier(NODEID $ID, GEORTABLE grt, DEBUG 2);
+  gfwd::GeorForwarder(NODEID id, GEORTABLE grt, DEBUG 2);
 
   Idle
   -> [1]gqu;
