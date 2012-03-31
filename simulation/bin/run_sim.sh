@@ -269,7 +269,7 @@ case "$MODE" in
 			FIELDSIZE=$POS_Y_MAX
 		fi
 		
-		if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ]; then
+		if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ] || [ "x$NODEPLACEMENT" = "xfile" ]; then
 			if [ $POS_X_MAX -lt $FIELDSIZE ]; then
 				POS_X_MAX=$FIELDSIZE
 			fi
