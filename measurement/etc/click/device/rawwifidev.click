@@ -29,6 +29,14 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 
 #ifdef CST
+
+//define CST_PROCFILE for simulation. Path is not really used, but no path means no hw channel stats 
+#ifdef SIMULATION
+#ifndef CST_PROCFILE
+#define CST_PROCFILE /simulation
+#endif
+#endif
+
 #ifdef CST_PROCFILE
   cst::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCFILE CST_PROCFILE, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
 #else
@@ -61,7 +69,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli, DEBUG 2)
 #else
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, DEBUG 2)
-#endif //PLE
+#endif //RTS_CTS
 #else //CST
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM )
 #endif //CST

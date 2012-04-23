@@ -269,7 +269,7 @@ case "$MODE" in
 			FIELDSIZE=$POS_Y_MAX
 		fi
 		
-		if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ]; then
+		if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ] || [ "x$NODEPLACEMENT" = "xfile" ]; then
 			if [ $POS_X_MAX -lt $FIELDSIZE ]; then
 				POS_X_MAX=$FIELDSIZE
 			fi
@@ -447,7 +447,12 @@ case "$MODE" in
 		fi
 		
 		if [ -f /usr/bin/time ]; then
-			GETTIMESTATS="/usr/bin/time -f %E -o $FINALRESULTDIR/time.stats"
+		        QUIETSUPPORT=`/usr/bin/time --help | grep "quiet" | wc -l`
+			if [ $QUIETSUPPORT -gt 0 ]; then
+			    GETTIMESTATS="/usr/bin/time --quiet -f %E -o $FINALRESULTDIR/time.stats"
+			else
+			    GETTIMESTATS="/usr/bin/time -f %E -o $FINALRESULTDIR/time.stats"
+			fi
 		else
 			GETTIMESTATS=""
 		fi
@@ -463,7 +468,16 @@ case "$MODE" in
 			if [ "x$VALGRIND" = "x1" ]; then
 				NS_FULL_PATH=`which ns`
 				# run NS (under valgrind)
-				( cd $FINALRESULTDIR; $GETTIMESTATS valgrind --leak-check=full --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
+				#--track-origins=yes
+				#--gen-suppressions=all
+				#--suppressions=$DIR/../etc/ns/ns.supp
+				if [ "x$NOSUPP" = "x1" ]; then
+				  SUPPRESSION=""
+				else
+				  SUPPRESSION="--suppressions=$DIR/../etc/ns/ns.supp"
+				fi
+				( cd $FINALRESULTDIR; echo "$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1" > run_again.sh)
+				( cd $FINALRESULTDIR; $GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
 			else
 				if [ "x$PROFILE" = "x1" ]; then
 					( cd $FINALRESULTDIR; $GETTIMESTATS ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
