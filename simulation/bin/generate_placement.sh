@@ -25,11 +25,19 @@ case "$1" in
     "random")
           NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
           NODECOUNT=`echo $NODES | wc -w`
+    
+	  if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
+	    NODEDIST=$3
+	    SIDELEN=`echo "sqrt(${NODECOUNT})*${NODEDIST}" | bc`
+	  else
+	    SIDELEN=$3
+	  fi
+    
           for n in $NODES; do
 	    N=`head -1 /dev/urandom | od -N 2 -t uL | head -n 1 | awk '{print $2}'`
-	    X=`expr $N % $3`
+	    X=`expr $N % $SIDELEN`
 	    N=`head -1 /dev/urandom | od -N 2 -t uL | head -n 1 | awk '{print $2}'`
-	    Y=`expr $N % $3`
+	    Y=`expr $N % $SIDELEN`
 	    echo "$n $X $Y 0"
 	  done
 	  ;;

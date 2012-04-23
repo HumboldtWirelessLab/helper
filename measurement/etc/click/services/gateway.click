@@ -27,7 +27,7 @@
 
 elementclass Gateway {
     ETHER_ADDR $my_wlan,
-    LINKTABLE $lt,
+    ROUTINGMAINTENANCE $routingmaint,
     UPDATE_GATEWAYS_INTERVAL $up_gws,
     UPDATE_DHT_INTERVAL $up_gw,
     PREFIX $addr_prefix,
@@ -40,7 +40,7 @@ elementclass Gateway {
     table :: ARPTable();
     localsolve :: ARPTable();
     clients :: StoreIPEthernet(mac_ip)
-    setgwflow :: BRNSetGatewayOnFlow(gateway, flows, $lt, mac_ip, buffer, $addr_prefix); // implements AggregateListener
+    setgwflow :: BRNSetGatewayOnFlow(gateway, flows, mac_ip, buffer, $addr_prefix, $routingmaint); // implements AggregateListener
     buffer :: BRNPacketBuffer(setgwflow, 50);
 
     gateway :: BRNGateway($my_wlan, setgwflow, UPDATE_GATEWAYS_INTERVAL $up_gws, UPDATE_DHT_INTERVAL $up_gw,DHTSTORAGE $dhtstorage);
@@ -83,7 +83,7 @@ elementclass Gateway {
     -> StoreIPEthernet(localsolve) //robert
     -> CheckIPHeader(14)
     -> from_clients :: IPClassifier(udp && dst port 1194, tcp or udp, -)   // pass criteria for flow and non-flow packets
-    -> setgw :: BRNSetGateway(gateway, $lt) // non-flow packets
+    -> setgw :: BRNSetGateway(gateway, $routingmaint) // non-flow packets
     -> [1]output;
 
     from_clients[2] // also non-flow
@@ -152,7 +152,7 @@ elementclass Gateway {
     //-> Print(" Packet to Internet ")
     -> before_local_gw :: IPClassifier(udp && src port 1194, tcp or udp, -)
     // supercise packet (this node may not a gateway be anymore)
-    -> [1]gws :: BRNGatewaySupervisor(gateway, $lt);
+    -> [1]gws :: BRNGatewaySupervisor(gateway);
 
     before_local_gw[2]
     -> [1]gws;
