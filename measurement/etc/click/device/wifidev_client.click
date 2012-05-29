@@ -15,7 +15,10 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
 
   auth_info :: WirelessInfo(SSID $ssid, BSSID 00:00:00:00:00:00 , CHANNEL 5);
   infra_wifiencap ::  WifiEncap(0x01, WIRELESS_INFO auth_info);
-         
+
+  wep_encap::WepEncap(KEY "weizenbaum", KEYID 0, ACTIVE true, DEBUG true);
+  wep_decap::WepDecap(KEY "weizenbaum", KEYID 0);
+
   client::ADHOC_OR_INFRASTRUCTURE_CLIENT(DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid,
                                          CHANNEL 5, WIFIENCAP infra_wifiencap, WIRELESS_INFO auth_info, ACTIVESCAN $active);
 
@@ -30,9 +33,16 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
   -> WifiDupeFilter()
 #endif
   //-> Print("Client Raw", TIMESTAMP true)
+  -> wepframe_clf :: Classifier (1/40%40, -); // 0/08%0c  steht in wepencap.cc, seltsam
+
+  wepframe_clf[1]
   -> wififrame_clf :: Classifier( 0/00%0f,  // management frames
                                   1/02%03,  //fromds
                                       - ); 
+
+  wepframe_clf
+	  -> wep_decap
+	  -> wififrame_clf;
 
   wififrame_clf[0]
     -> client
@@ -56,7 +66,13 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
   input[0]
 //    -> Print("Send")
     -> infra_wifiencap
+    -> wep_enable::Switch(0)
+
     //-> Print("Send 1")
     -> wifioutq;
+
+  wep_enable[1]
+     		-> wep_encap
+     		-> wifioutq;
   
 } 
