@@ -16,6 +16,22 @@
 //  1: client
 //  2: high priority stuff
 
+/*
+ * Dieses Device besitzt aus historischen Gründen mehrere Funktionen. Es behandelt Pakete
+ * aus den unterschiedlichsten Netzwerkschichten, um z. B. das Leistungsverhalten zu verbessern
+ * oder besondere Informationen (z. B. Statistik, Analyse) zu erhalten. Daher sind die
+ * Herkunftsort von Paketen, die über das Device transportiert werden sollen, aus 5
+ * verschiedenen Quellen:
+ * 1. Linkstat: Linkprobing-Pakete
+ * 2. Interferenzgraph: Pakete werden erzeugt, um die Stärke von Interferenz auszumessen
+ * 		// todo: mittels 3. realisieren
+ * 3. UpperLayer-Wififrames: Hier kommen wififrames von oben
+ * 4. Mesh: Pakete, die für das Maschennetzwerk sind.
+ * 5. Client: Pakete für Clienten.
+ */
+
+
+
 elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid,
 #ifdef VLAN_ENABLE
                           CHANNEL $channel, LT $lt, VLANTABLE $vlt |
@@ -55,6 +71,9 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
   wifioutq::NotifierQueue(50);
+
+  wep_encap::WepEncap(KEY "weizenbaum", KEYID 0, ACTIVE true, DEBUG true);
+  wep_decap::WepDecap(KEY "weizenbaum", KEYID 0);
 
 #ifdef IG_ENABLE
   prios::PrioSched()
@@ -97,6 +116,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   input[2]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  -> wep_encap
   -> [0]prios;
 
   wifioutq
@@ -122,13 +142,21 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 #ifndef DISABLE_WIFIDUBFILTER
   -> WifiDupeFilter()
 #endif
-  -> wififrame_clf :: Classifier( 1/40%40,  // wep frames
-                                  0/00%0f,  // management frames
-                                  1/01%03,  // tods
-                                      - );
+  -> wepframe_clf :: Classifier (1/40%40, -); // 0/08%0c
+
+   wepframe_clf[1]
+   -> wififrame_clf :: Classifier( 1/40%40,	 // discard of not decodable frames
+								   0/00%0f,  // management frames
+                                   1/01%03,  //tods
+                                       - );
+
+   wepframe_clf
+ 	  -> wep_decap
+ 	  -> wififrame_clf;
+
 
   wififrame_clf[0]
-    -> Discard;
+                -> Discard;
 
   wififrame_clf[1]
     -> fb::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
@@ -154,7 +182,12 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     //-> Print("For a Station",TIMESTAMP true)
     -> clientwifi::WifiEncap(0x02, WIRELESS_INFO ap/winfo)
   //-> Print("Und wieder raus",TIMESTAMP true)
+  	-> wep_enable::Switch(0)
     -> wifioutq;
+
+  wep_enable[1]
+     		-> wep_encap
+     		-> wifioutq;
 
   toStation[1]                
     //-> Print("Broadcast",TIMESTAMP true)
