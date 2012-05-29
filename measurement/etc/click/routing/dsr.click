@@ -23,8 +23,6 @@
 
 
 
-
-
 elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
 
   dsr_decap :: BRN2DSRDecap();
