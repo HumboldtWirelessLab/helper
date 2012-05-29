@@ -482,7 +482,15 @@ case "$MODE" in
 				if [ "x$PROFILE" = "x1" ]; then
 					( cd $FINALRESULTDIR; $GETTIMESTATS ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
 				else
-					( cd $FINALRESULTDIR; $GETTIMESTATS ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+					if [ "x$GDB" = "x1" ]; then
+						NS_FULL_PATH=`which ns`
+						echo "run" > $FINALRESULTDIR/gdb.cmd
+						( cd $FINALRESULTDIR; gdb -x gdb.cmd --args $NS_FULL_PATH $TCLFILE )
+						rm -f $FINALRESULTDIR/gdb.cmd
+						exit 0
+					else
+						( cd $FINALRESULTDIR; $GETTIMESTATS ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+					fi
 				fi
 			fi
 		else
