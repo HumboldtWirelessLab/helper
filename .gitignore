@@ -7,3 +7,4 @@ src/jClickClient/classes/*
 *.class
 nodes/bin/click-*
 nodes/bin/sync_gateway-*
+docs/sphinx/_build/
