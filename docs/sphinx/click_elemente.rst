@@ -85,6 +85,8 @@ Weiterführende Links
 --------------------
 *
 
+
+
 OpenSSL
 =======
 Bei der Verwendung der Funktionen aus der SSL-Library ist es notwendig, dem Compiler mitzuteilen, dass er die ssl-lib mitlinken soll. Dies geschieht durch das Hinzufügen der folgenden Zeile an das Ende der Quelldatei eines Elementes, in dem die SSL-Includes zur Anwendung kommen::
