@@ -41,3 +41,13 @@ Wer eine genauere Analyse des Netzwerkverkehrs machen möchte, der sollte sich d
 
 	#define RAWDUMP
 	#define RAWDEV_DEBUG
+	
+	
+Problembehandlung
+=================
+In den äußersten Fällen, da plötzlich Fehler unangemeldet auftreten und bei allen Debugging-Anstrengungen hartnäckig bestehen bleiben, hilft ein kompletter Neubau::
+	
+	make clean
+	make elemlist all
+	
+ 
