@@ -42,7 +42,7 @@ if [ "$USED_SIMULATOR" != "jist" ] && [ "$USED_SIMULATOR" != "ns" ]; then
   exit 0
 fi
 
-echo "sim is $USED_SIMULATOR"
+if [ "x$LOGLEVEL" = "x1" ]; then echo "sim is $USED_SIMULATOR"; fi
 
 case "$1" in
 	"help")

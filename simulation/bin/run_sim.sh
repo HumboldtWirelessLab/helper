@@ -18,6 +18,10 @@ case "$SIGN" in
 	;;
 esac
 
+if [ "x$LOGLEVEL" = "x" ]; then
+  LOGLEVEL=1
+fi
+
 #Function used to get params for control part TODO: try to use arrays
 function get_params() {
 	shift 6
@@ -95,19 +99,26 @@ if [ "x$3" = "x" ]; then
 	FINALRESULTDIR=$FINALRESULTDIR/$i
 else
 	if [ -e $FINALRESULTDIR/$3 ]; then
-		echo "Measurement already exits"
-		
 		i=$3
-		while [ -e "./$i" ]; do i=$((i+1)); done
-		echo "Use $FINALRESULTDIR/$i"
+	        if [ "x$FORCE_DIR" = "x" ]; then
+		  echo "Measurement already exits"
+		
+		  while [ -e "./$i" ]; do i=$((i+1)); done
+		  
+		  if [ $LOGLEVEL -gt 0 ]; then echo "Use $FINALRESULTDIR/$i"; fi
+
+		fi
+		
 		FINALRESULTDIR=$FINALRESULTDIR/$i
-		#exit 0
 	else
 		FINALRESULTDIR=$FINALRESULTDIR/$3
 	fi
 fi
 
-mkdir $FINALRESULTDIR
+if [ ! -e $FINALRESULTDIR ]; then
+  mkdir $FINALRESULTDIR
+fi
+
 chmod 777 $FINALRESULTDIR
 
 MODE=sim
