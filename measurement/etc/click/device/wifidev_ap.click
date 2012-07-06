@@ -1,5 +1,6 @@
 #include "rawwifidev.click"
 #include "wifi/access_point.click"
+#include "wep_painted.click"
 
 //output:
 //  0: To me and BRN
@@ -72,8 +73,8 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
   wifioutq::NotifierQueue(50);
 
-  wep_encap::WepEncap(KEY "weizenbaum", KEYID 0, ACTIVE true, DEBUG true);
-  wep_decap::WepDecap(KEY "weizenbaum", KEYID 0);
+  wep::WepPainted(KEY "weizenbaum", ACTIVE true, DEBUG false);
+
 
 #ifdef IG_ENABLE
   prios::PrioSched()
@@ -116,7 +117,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   input[2]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
-  -> wep_encap
+  -> wep
   -> [0]prios;
 
   wifioutq
@@ -142,23 +143,12 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 #ifndef DISABLE_WIFIDUBFILTER
   -> WifiDupeFilter()
 #endif
-  -> wepframe_clf :: Classifier (1/40%40, -); // 0/08%0c
-
-   wepframe_clf[1]
-   -> wififrame_clf :: Classifier( 1/40%40,	 // discard of not decodable frames
-								   0/00%0f,  // management frames
+  -> [1]wep[1]
+   -> wififrame_clf :: Classifier(0/00%0f,  // management frames
                                    1/01%03,  //tods
                                        - );
 
-   wepframe_clf
- 	  -> wep_decap
- 	  -> wififrame_clf;
-
-
   wififrame_clf[0]
-                -> Discard;
-
-  wififrame_clf[1]
     -> fb::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
     -> ap
     -> wifioutq;
@@ -167,7 +157,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> Classifier( 16/ffffffffffff )
     -> ap;
 
-  wififrame_clf[2]
+  wififrame_clf[1]
     //-> Print("Filter",TIMESTAMP true)
     -> fbssid::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
     -> WifiDecap()
@@ -178,16 +168,13 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> brn_ap_clf :: Classifier( 12/8086, - )
     -> [0]output;
 
+
   toStation[0]
     //-> Print("For a Station",TIMESTAMP true)
     -> clientwifi::WifiEncap(0x02, WIRELESS_INFO ap/winfo)
   //-> Print("Und wieder raus",TIMESTAMP true)
-  	-> wep_enable::Switch(0)
+  	-> wep
     -> wifioutq;
-
-  wep_enable[1]
-     		-> wep_encap
-     		-> wifioutq;
 
   toStation[1]                
     //-> Print("Broadcast",TIMESTAMP true)
@@ -203,7 +190,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     
     brn_ap_clf[1] -> [3]output;
         
-  wififrame_clf[3]
+  wififrame_clf[2]
     -> WifiDecap()
     -> toMe[1]          //it's broadcast
     -> brn_bc_clf :: Classifier( 12/8086, - );
