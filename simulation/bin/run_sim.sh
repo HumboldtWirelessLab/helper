@@ -297,6 +297,15 @@ case "$MODE" in
 		echo "set nodecount $NODECOUNT"	>> $TCLFILE
 		echo "set stoptime $TIME" >> $TCLFILE
 		
+		if [ "x$SEED" != "x" ]; then
+		    echo "\$defaultRNG seed $SEED" >> $TCLFILE
+		    echo "set arrivalRNG [new RNG]" >> $TCLFILE
+		    echo "set sizeRNG [new RNG]" >> $TCLFILE
+		    
+#		    echo "set seed $SEED" >> $TCLFILE
+#		    echo "set seed $SEED" > /dev/null
+		fi
+
 		if [ "x$RESULTDIR" = "x" ]; then
 			RESULTDIR=.
 		fi
