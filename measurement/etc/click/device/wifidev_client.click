@@ -26,7 +26,7 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
    * entschlüsselbar ist, weil vielleicht verschiedene Schlüssel verwendet wurden
    * zwischen den Kommunikanten, dann wird das Paket einfach verworfen.
    */
-  wep::WepPainted(KEY "weizenbaum", ACTIVE false, DEBUG true);
+  wep::WepPainted(KEY "weizenbaum", ACTIVE true, DEBUG true);
 
 
   client::ADHOC_OR_INFRASTRUCTURE_CLIENT(DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid,

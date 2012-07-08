@@ -73,7 +73,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
   wifioutq::NotifierQueue(50);
 
-  wep::WepPainted(KEY "weizenbaum", ACTIVE false, DEBUG true);
+  wep::WepPainted(KEY "weizenbaum", ACTIVE true, DEBUG true);
 
 
 #ifdef IG_ENABLE

@@ -23,11 +23,11 @@ elementclass WepPainted {KEY $key, ACTIVE $active, DEBUG $debug |
 	wep_encap::WepEncap(KEY $key, KEYID 0, ACTIVE $active, DEBUG $debug);
 
 	input[0]
-	    -> wep_encap_checkpaint::CheckPaint(COLOR 43)
-		-> wep_encap
+	    -> wep_encap_checkpaint::CheckPaint(COLOR 42) // If painted, then DONT encrypt
 	    -> [0]output;
 
 	wep_encap_checkpaint[1]
+	    -> wep_encap
 	    -> [0]output;
 
 	input[1]
@@ -37,9 +37,9 @@ elementclass WepPainted {KEY $key, ACTIVE $active, DEBUG $debug |
 		-> Discard;
 
 	wep_clf[1]
+	    -> Paint(COLOR 42) // If not wep frames, then paint
 		-> [1]output;
 
 	wep_decap_clf[1] // successful decap
-	    -> Paint(COLOR 43)
 		-> [1]output;
 }
