@@ -42,6 +42,13 @@ case "$1" in
       NODE=`expr $NODE + 1`
     done < $NODEPLACEMENTFILE
 
+    if [ -f $DIR/../etc/ns/distances/$RADIO ]; then
+      . $DIR/../etc/ns/distances/$RADIO
+      if [ "x$FIELDSIZE" = "xRXRANGE" ]; then
+        FIELDSIZE=$RXRANGE
+      fi
+    fi
+
     echo ""
     FIELDSIZE=`expr $FIELDSIZE + 1`
     
