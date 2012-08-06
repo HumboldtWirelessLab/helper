@@ -3,10 +3,14 @@ Click-Skripte bauen
 Vorwissen: Click-Paper
 
 Bevor man beginnt ein Click-Skript zu entwickeln, sollte man erst einmal einen Entwurf machen, in dem man festhält, welches Ziel man in der Simulation verfolgt. Das Skript, welches man am Ende entwickelt, liefert den Netzwerkknoten, auf dem es läuft, einen vollständigen Netzwerkstack. Dementsprechend müssen Netzwerkgeräte, Routing-Protokolle, u. Ä. in den Entwurft mit einbezogen werden. Die Vorüberlegungen beinhalten:
+
 * Welche Elemente oder Elementklassen dafür benötigt werden und
+
 * wie diese Elemente miteinander verbunden sind. 
 
 Höchst wahrscheinlich benötigt man ein Wifi-Device, welches stellvertretend für die physikalische Schicht steht. Sodann wird ein Routing-Protokoll benötigt, stellvertretend für den Vermittlungsschicht.
+
+*Achtung: Unsere Click-Architektur verwendet Ethernet-Routing und unterscheidet sich daher von üblichen Schichtenmodellen. Das bedeutet, dass bei der Verknüpfung eines Wifi-Devices mit einem Routing-Modul die Elemente BRN2EtherEncap(), BRN2EtherDecap(), BRN2Encap(), BRNDecap() verwendet werden müssen. Näheres dazu im nächsten Abschnitt.*
 
 Elemente zum Senden und Empfangen im BRN2-Netzwerk
 ==================================================
