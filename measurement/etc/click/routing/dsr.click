@@ -74,6 +74,9 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
 #endif
   -> [0]src_forwarder;                                      // src routed packets (unicast)
 
+  querier[2]                                                // packet has already reach the final dest
+  -> [0]output;
+
   src_forwarder[0]
 #ifdef DEBUG_DSR
   -> SetTimestamp()
