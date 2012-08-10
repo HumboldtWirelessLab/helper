@@ -37,8 +37,8 @@ if [ "x$USED_SIMULATOR" = "x" ]; then
   USED_SIMULATIOR=ns
 fi
 
-if [ "$USED_SIMULATOR" != "jist" ] && [ "$USED_SIMULATOR" != "ns" ]; then
-  echo "USED_SIMULATOR is unknown ($USED_SIMUALTOR). Use ns or jist."
+if [ "$USED_SIMULATOR" != "jist" ] && [ "$USED_SIMULATOR" != "ns" ] && [ "$USED_SIMULATOR" != "ns3" ]; then
+  echo "USED_SIMULATOR is unknown ($USED_SIMUALTOR). Use ns, ns3 or jist."
   exit 0
 fi
 
@@ -123,7 +123,7 @@ case "$1" in
 			  fi
 			fi
 
-		        if [ "x$USED_SIMULATOR" = "xns" ]; then
+		        if [ "x$USED_SIMULATOR" = "xns" ] || [ "x$USED_SIMULATOR" = "xns3" ]; then
 			  DEVICE_TMPL=`echo $CDEV | grep "dev" | wc -l`
 			  if [ $DEVICE_TMPL -eq 0 ]; then
 			    CDEV=eth0
