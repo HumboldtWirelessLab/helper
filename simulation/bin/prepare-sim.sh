@@ -187,6 +187,8 @@ case "$1" in
 		  if [ "x$WIFITYPE" != "x805" ] && [ "x$WIFITYPE" != "x806" ]; then
 		    WIFITYPE=806
 		  fi
+		  
+		  WIFITYPE=806
 		else
 		  #read wificonfig for aifs, cwmin etc.
 		  #Hint: already done
