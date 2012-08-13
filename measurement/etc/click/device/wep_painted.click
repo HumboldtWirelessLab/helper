@@ -6,7 +6,17 @@
  */
 
 /*
- * Packet oriented wep encryption mechanism.
+ * Packet oriented wep encryption mechanism 
+ * 
+ * Behaviour:
+ * Through painting we mark the packets
+ * which have not been encrypted coming from network. Vice versa we mark the 
+ * packets which we don't want to be encrypted for network. 
+ *
+ * Without painting a frame will have to pass the normal wep routines.
+ * This means that wep frames coming from network will either be decrypted
+ * or if decryption of wep frame fails then discarded. Packets directed
+ * to the network will be wep framed.
  *
  * Input:
  * 	0: to WepEncap
