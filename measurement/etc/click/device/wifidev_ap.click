@@ -81,7 +81,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   -> wifidevice;
 
   qc_suppressor::Suppressor();
-  q::NotifierQueue(500)
+  q::NotifierQueue(500);
 
   qc::BRN2PacketQueueControl(QUEUESIZEHANDLER q.length, QUEUERESETHANDLER q.reset, MINP 100 , MAXP 500, SUPPRESSORHANDLER qc_suppressor.active0,DISABLE_QUEUE_RESET false, TXFEEDBACK_REUSE false, UNICAST_RETRIES 0)
   -> EtherEncap(0x0800, $etheraddress , ff:ff:ff:ff:ff:ff)
