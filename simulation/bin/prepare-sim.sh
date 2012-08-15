@@ -18,6 +18,8 @@ case "$SIGN" in
 	;;
 esac
 
+. $DIR/../../measurement/etc/wifitypes
+
 add_include() {
   if [ "x$1" = "x0" ]; then
     echo "#include \"brn/helper.inc\""
@@ -182,18 +184,18 @@ case "$1" in
 		  cp $WIFICONFIG $RESULTDIR
 		  
 		  if [ "x$WIFITYPE" = "x" ] || [ "x$WIFITYPE" = "x0" ] || [ "x$WIFITYPE" = "xDEFAULT" ]; then
-		    WIFITYPE=806
+		    WIFITYPE=$WIFITYPE_EXTRA
 		  fi
-		  if [ "x$WIFITYPE" != "x805" ] && [ "x$WIFITYPE" != "x806" ]; then
-		    WIFITYPE=806
+		  if [ "x$WIFITYPE" != "x$WIFITYPE_EXTRA" ] && [ "x$WIFITYPE" != "x$WIFITYPE_ATH" ] && [ "x$WIFITYPE" != "x$WIFITYPE_ATH2" ]; then
+		    WIFITYPE=$WIFITYPE_EXTRA
 		  fi
-		  
-		  WIFITYPE=806
+#TODO: don't force to use extra encap		  
+		  WIFITYPE=$WIFITYPE_EXTRA
 		else
 		  #read wificonfig for aifs, cwmin etc.
 		  #Hint: already done
 		  #but overwrite wifitype, since ns2 only support wifiextra
-		  WIFITYPE=806
+		  WIFITYPE=$WIFITYPE_EXTRA
 		fi
 		
 		CPPOPTS=""
