@@ -18,6 +18,8 @@ case "$SIGN" in
 	;;
 esac
 
+. $DIR/../../measurement/etc/wifitypes
+
 if [ "x$LOGLEVEL" = "x" ]; then
   LOGLEVEL=1
 fi
