@@ -18,6 +18,8 @@ case "$SIGN" in
 	;;
 esac
 
+. $DIR/../../measurement/etc/wifitypes
+
 case "$1" in
 	"help")
 		echo "Use $0 convert des-file"
@@ -99,10 +101,11 @@ case "$1" in
 		  echo "node.$NODE.config = $NODENAME"
 		  echo "node.$NODE.click = $NODECLICK"
 
-		  WIFITYPE=802
+#TODO: don't force to use extra encap
+		  WIFITYPE=$WIFITYPE_EXTRA
 
 		  if [ "x$WIFITYPE" = "x" ]; then
-		    echo "node.$NODE.wifitype = 806"
+		    echo "node.$NODE.wifitype = $WIFITYPE_EXTRA"
 		  else
 		    echo "node.$NODE.wifitype = $WIFITYPE"
 		  fi
