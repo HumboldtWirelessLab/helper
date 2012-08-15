@@ -23,6 +23,11 @@
 #endif
 
 #define ns 800
+#define encaptype_wifi 801
+#define encaptype_prism 802
+#define encaptype_radiotap 803
+#define encaptype_atheros 804
+#define encaptype_atheros_2 805
 #define extra 806
 #define openbeacon 807
 

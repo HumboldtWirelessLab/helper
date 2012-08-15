@@ -99,6 +99,8 @@ case "$1" in
 		  echo "node.$NODE.config = $NODENAME"
 		  echo "node.$NODE.click = $NODECLICK"
 
+		  WIFITYPE=802
+
 		  if [ "x$WIFITYPE" = "x" ]; then
 		    echo "node.$NODE.wifitype = 806"
 		  else
