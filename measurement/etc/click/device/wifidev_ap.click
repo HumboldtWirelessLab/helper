@@ -73,8 +73,9 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
   wifioutq::NotifierQueue(50);
 
+#ifdef USE_WEP
   wep::WepPainted(KEY "weizenbaum", ACTIVE true, DEBUG true);
-
+#endif
 
 #ifdef IG_ENABLE
   prios::PrioSched()
@@ -98,6 +99,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   input[2]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
   -> [0]prios;
 
   wifioutq
@@ -117,7 +119,9 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   input[2]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+#ifdef USE_WEP
   -> wep
+#endif
   -> [0]prios;
 
   wifioutq
@@ -131,6 +135,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   input[0] 
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
   -> wifioutq;
   
   wifidevice[0]
@@ -143,7 +148,9 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 #ifndef DISABLE_WIFIDUBFILTER
   -> WifiDupeFilter()
 #endif
+#ifdef USE_WEP
   -> [1]wep[1]
+#endif
    -> wififrame_clf :: Classifier(0/00%0f,  // management frames
                                    1/01%03,  //tods
                                        - );
@@ -151,6 +158,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   wififrame_clf[0]
     -> fb::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
     -> ap
+    -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
     -> wifioutq;
 
   fb[1]
@@ -173,7 +181,10 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     //-> Print("For a Station",TIMESTAMP true)
     -> clientwifi::WifiEncap(0x02, WIRELESS_INFO ap/winfo)
   //-> Print("Und wieder raus",TIMESTAMP true)
-  	-> wep
+#ifdef USE_WEP
+    -> wep
+#endif
+    -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
     -> wifioutq;
 
   toStation[1]                
