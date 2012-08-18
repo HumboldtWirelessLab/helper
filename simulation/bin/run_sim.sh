@@ -191,10 +191,18 @@ case "$MODE" in
 		
 		. $SIMDES
 		
-		if [ -f $DIR/../etc/ns/distances/$RADIO ]; then
-			. $DIR/../etc/ns/distances/$RADIO
+		if  [ "x$POSTFIX" = "xjist" ]; then
+			. $DIR/../etc/jist/distances/default
 			if [ "x$FIELDSIZE" = "xRXRANGE" ]; then
-				FIELDSIZE=$RXRANGE
+                                FIELDSIZE=$RXRANGE
+                        fi
+
+		else
+			if [ -f $DIR/../etc/ns/distances/$RADIO ]; then
+				. $DIR/../etc/ns/distances/$RADIO
+				if [ "x$FIELDSIZE" = "xRXRANGE" ]; then
+					FIELDSIZE=$RXRANGE
+				fi
 			fi
 		fi
 		

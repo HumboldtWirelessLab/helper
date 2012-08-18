@@ -28,7 +28,7 @@ elementclass GEOR {$ID, $LT, $LS |
   
   gfwd[1]
   -> BRN2EtherEncap(USEANNO true)
-  -> Print("GOT PACKET")
+//  -> Print("GOT PACKET")
   -> [0]output;
   
   gfwd[2]

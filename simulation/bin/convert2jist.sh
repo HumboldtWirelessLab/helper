@@ -89,10 +89,19 @@ case "$1" in
 		      if [ -f ./$NODECONFIG ]; then
 		        NODECONFIG=./$NODECONFIG
                       else
-		        NODECONFIG="$DIR/../../nodes/etc/wifi/monitor.default"
+			if [ -f $CONFIGDIR/$NODECONFIG ]; then
+			  NODECONFIG=$CONFIGDIR/$NODECONFIG
+			else
+		          NODECONFIG="$DIR/../../nodes/etc/wifi/monitor.default"
+                        fi
 		      fi
 		    fi
 		  fi
+
+		  #TODO: fix this
+		  if [ -f ./$NODECONFIG ]; then
+                    NODECONFIG=./$NODECONFIG
+                  fi
 
 		  . $NODECONFIG
 
