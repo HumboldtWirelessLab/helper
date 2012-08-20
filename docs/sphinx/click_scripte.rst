@@ -1,6 +1,6 @@
 Click-Skripte bauen
 *******************
-Vorwissen: Click-Paper
+Vorwissen: Click-Paper (http://read.cs.ucla.edu/click/publications)
 
 Zuvor eine historische Notiz, die dem Leser den Ursprung einiger hier verwendeter Elemente erklären soll.
 
