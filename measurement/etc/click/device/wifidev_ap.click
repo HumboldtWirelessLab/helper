@@ -135,6 +135,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   input[0] 
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  -> SetTXPower(0)
   -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
   -> wifioutq;
   
@@ -184,6 +185,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 #ifdef USE_WEP
     -> wep
 #endif
+    -> SetTXPower(0)
     -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
     -> wifioutq;
 
@@ -212,7 +214,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> BRN2EtherDecap()
     -> link_stat
     -> EtherEncap(0x8086, deviceaddress, ff:ff:ff:ff:ff:ff)
-    -> power::SetTXPower(15)
+    -> power::SetTXPower(0) //15
     -> brnwifi;
 #else
     -> Discard;
