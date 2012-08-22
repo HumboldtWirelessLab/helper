@@ -62,7 +62,7 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
   -> querier[0]
 #ifdef DEBUG_DSR
   -> SetTimestamp()
-  -> Print("NODENAME: DSR: querry", 100, TIMESTAMP true)
+  -> Print("NODENAME: DSR: query", 100, TIMESTAMP true)
 #endif
  -> BRN2EtherEncap() 
  -> [1]output;                                             // rreq packets (broadcast)
