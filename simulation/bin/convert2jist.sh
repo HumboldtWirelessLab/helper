@@ -18,6 +18,8 @@ case "$SIGN" in
 	;;
 esac
 
+. $DIR/../../measurement/etc/wifitypes
+
 case "$1" in
 	"help")
 		echo "Use $0 convert des-file"
@@ -31,6 +33,8 @@ case "$1" in
     echo "sim.nonodes = $NONODES"
     echo -n "radio.placementopts = ";
     NODE=1
+    MAX_X=0
+    MAX_Y=0
     while read line; do
       X=`echo $line | awk '{print $2}'`
       Y=`echo $line | awk '{print $3}'`
@@ -40,6 +44,12 @@ case "$1" in
         echo -n "$X,$Y"
       fi
       NODE=`expr $NODE + 1`
+      if [ $X -gt $MAX_X ]; then
+        MAX_X=$X
+      fi
+      if [ $Y -gt $MAX_Y ]; then
+        MAX_Y=$Y
+      fi
     done < $NODEPLACEMENTFILE
 
     if [ -f $DIR/../etc/ns/distances/$RADIO ]; then
@@ -51,6 +61,15 @@ case "$1" in
 
     echo ""
     FIELDSIZE=`expr $FIELDSIZE + 1`
+    
+    if [ $FIELDSIZE -lt $MAX_X ]; then
+      FIELDSIZE=$MAX_X
+      FIELDSIZE=`expr $FIELDSIZE + 1`
+    fi
+    if [ $FIELDSIZE -lt $MAX_Y ]; then
+      FIELDSIZE=$MAX_Y
+      FIELDSIZE=`expr $FIELDSIZE + 1`
+    fi
     
     echo "field.size.x = $FIELDSIZE"
     echo "field.size.y = $FIELDSIZE"
@@ -70,10 +89,19 @@ case "$1" in
 		      if [ -f ./$NODECONFIG ]; then
 		        NODECONFIG=./$NODECONFIG
                       else
-		        NODECONFIG="$DIR/../../nodes/etc/wifi/monitor.default"
+			if [ -f $CONFIGDIR/$NODECONFIG ]; then
+			  NODECONFIG=$CONFIGDIR/$NODECONFIG
+			else
+		          NODECONFIG="$DIR/../../nodes/etc/wifi/monitor.default"
+                        fi
 		      fi
 		    fi
 		  fi
+
+		  #TODO: fix this
+		  if [ -f ./$NODECONFIG ]; then
+                    NODECONFIG=./$NODECONFIG
+                  fi
 
 		  . $NODECONFIG
 
@@ -82,8 +110,11 @@ case "$1" in
 		  echo "node.$NODE.config = $NODENAME"
 		  echo "node.$NODE.click = $NODECLICK"
 
+#TODO: don't force to use extra encap
+		  WIFITYPE=$WIFITYPE_EXTRA
+
 		  if [ "x$WIFITYPE" = "x" ]; then
-		    echo "node.$NODE.wifitype = 806"
+		    echo "node.$NODE.wifitype = $WIFITYPE_EXTRA"
 		  else
 		    echo "node.$NODE.wifitype = $WIFITYPE"
 		  fi

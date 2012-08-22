@@ -18,6 +18,8 @@ case "$SIGN" in
 	;;
 esac
 
+. $DIR/../../measurement/etc/wifitypes
+
 if [ "x$LOGLEVEL" = "x" ]; then
   LOGLEVEL=1
 fi
@@ -36,8 +38,8 @@ if [ "x$1" = "xhelp" ]; then
 fi
 
 if [ $# -gt 0 ]; then
-	if [ ! "x$1" = "xjist" ] && [ ! "x$1" = "xns" ]; then
-		echo "Use $0 [ns|jist] des-file"
+	if [ ! "x$1" = "xjist" ] && [ ! "x$1" = "xns" ] && [ ! "x$1" = "xns3" ]; then
+		echo "Use $0 [ns|ns3|jist] des-file"
 		exit 0
 	fi
 	
@@ -127,8 +129,11 @@ case "$MODE" in
 	"sim")
 		if [ "x$USED_SIMULATOR" = "xjist" ]; then
 			POSTFIX=jist
+		else if [ "x$USED_SIMULATOR" = "xns3" ]; then
+			POSTFIX=ns3
 		else
 			POSTFIX=ns2
+		fi
 		fi
 		
 		DESCRIPTIONFILENAME=`basename $DESCRIPTIONFILE`
@@ -186,10 +191,18 @@ case "$MODE" in
 		
 		. $SIMDES
 		
-		if [ -f $DIR/../etc/ns/distances/$RADIO ]; then
-			. $DIR/../etc/ns/distances/$RADIO
+		if  [ "x$POSTFIX" = "xjist" ]; then
+			. $DIR/../etc/jist/distances/default
 			if [ "x$FIELDSIZE" = "xRXRANGE" ]; then
-				FIELDSIZE=$RXRANGE
+                                FIELDSIZE=$RXRANGE
+                        fi
+
+		else
+			if [ -f $DIR/../etc/ns/distances/$RADIO ]; then
+				. $DIR/../etc/ns/distances/$RADIO
+				if [ "x$FIELDSIZE" = "xRXRANGE" ]; then
+					FIELDSIZE=$RXRANGE
+				fi
 			fi
 		fi
 		
@@ -513,10 +526,20 @@ case "$MODE" in
 					fi
 				fi
 			fi
-		else
+		else if [ "x$USED_SIMULATOR" = "xjist" ]; then
 			( cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties )
 			# run simulation with jist
 			( cd $FINALRESULTDIR; $GETTIMESTATS $DIR/start-jist-sim.sh $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
+		else #ns3
+			( cd $FINALRESULTDIR; $DIR/convert2ns3.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$NAME.cc )
+			# run simulation with jist
+			if [ "x$NS3_HOME" != "x" ] && [ -e $NS3_HOME/ ]; then
+			   ( rm -rf $NS3_HOME/scratch/$NAME; mkdir $NS3_HOME/scratch/$NAME; cp $FINALRESULTDIR/$NAME.cc $NS3_HOME/scratch/$NAME; cd $NS3_HOME; ./waf ) > $LOGDIR/ns3_build.log 2>&1 
+			   ( cd $NS3_HOME; ./waf --run $NAME > $LOGDIR/$LOGFILE 2>&1 ) > $LOGDIR/$LOGFILE 2>&1
+			   ( cp $NS3_HOME/scratch/$NAME/* $FINALRESULTDIR ) >> $LOGDIR/ns3_build.log 2>&1
+			fi
+			exit 0
+		fi
 		fi
 		
 		# if the simulation was correctly execruted start the automatized evaluation of the experiment

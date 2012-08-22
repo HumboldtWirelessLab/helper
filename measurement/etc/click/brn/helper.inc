@@ -22,16 +22,31 @@
 #define WIFITYPE 805
 #endif
 
-#define ns 800
-#define extra 806
-#define openbeacon 807
+#define wifitype_ns         800
+#define wifitype_wifi       801
+#define wifitype_prism      802
+#define wifitype_radiotap   803
+#define wifitype_ath        804
+#define wifitype_ath2       805
+#define wifitype_extra      806
+#define wifitype_openbeacon 807
 
-#if WIFITYPE == 801
+#if WIFITYPE == wifitype_ns
+#define __WIFIENCAP__ AddEtherNsclick()
+#define __WIFIDECAP__ Strip(14)
+#endif
+
+#if WIFITYPE == wifitype_wifi
 #define __WIFIENCAP__ Null()
 #define __WIFIDECAP__ Null()
 #endif
 
-#if WIFITYPE == 802
+#if WIFITYPE == wifitype_prism
+#define __WIFIENCAP__ Prism2Encap()
+#define __WIFIDECAP__ Prism2Decap()
+#endif
+
+#if WIFITYPE == wifitype_radiotap
 #define __WIFIENCAP__ BrnRadiotapEncap()
 #define __WIFIDECAP__ BrnRadiotapDecap(DEBUG false)
 
@@ -39,17 +54,12 @@
 #define PCAP_STRIP_SIZE 0
 #endif
 
-#if WIFITYPE == 803
-#define __WIFIENCAP__ Prism2Encap()
-#define __WIFIDECAP__ Prism2Decap()
-#endif
-
-#if WIFITYPE == 804
+#if WIFITYPE == wifitype_ath
 #define __WIFIENCAP__ AthdescEncap()
 #define __WIFIDECAP__ AthdescDecap()
 #endif
 
-#if WIFITYPE == 805
+#if WIFITYPE == wifitype_ath2
 #define __WIFIENCAP__ Ath2Encap(ATHENCAP true)
 
 #ifdef CST
@@ -59,18 +69,12 @@
 #endif
 #endif
 
-#if WIFITYPE == ns
-#define __WIFIENCAP__ AddEtherNsclick()
-#define __WIFIDECAP__ Strip(14)
-#endif
-
-#if WIFITYPE == extra
+#if WIFITYPE == wifitype_extra
 #define __WIFIENCAP__ ExtraEncap()
 #define __WIFIDECAP__ ExtraDecap()
 #endif
 
-
-#if WIFITYPE == 807
+#if WIFITYPE == wifitype_openbeacon
 #ifdef RAWDEV_DEBUG
 #define __WIFIENCAP__ OpenBeaconEncap(SRC 13:F3:F3:F3:F3:F3) -> OpenBeaconPrint()
 #define __WIFIDECAP__ OpenBeaconPrint() -> OpenBeaconDecap()
@@ -82,9 +86,14 @@
 #define SOCKETDEVICE
 #endif
 
-#undef ns
-#undef extra
-#undef openbeacon
+#undef wifitype_ns
+#undef wifitype_wifi
+#undef wifitype_prism
+#undef wifitype_radiotap
+#undef wifitype_ath
+#undef wifitype_ath2
+#undef wifitype_extra
+#undef wifitype_openbeacon
 
 
 #ifndef PCAP_ENCAP_TYPE
