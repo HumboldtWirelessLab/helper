@@ -18,6 +18,8 @@ case "$SIGN" in
 	;;
 esac
 
+. $DIR/../../measurement/etc/wifitypes
+
 add_include() {
   if [ "x$1" = "x0" ]; then
     echo "#include \"brn/helper.inc\""
@@ -37,8 +39,8 @@ if [ "x$USED_SIMULATOR" = "x" ]; then
   USED_SIMULATIOR=ns
 fi
 
-if [ "$USED_SIMULATOR" != "jist" ] && [ "$USED_SIMULATOR" != "ns" ]; then
-  echo "USED_SIMULATOR is unknown ($USED_SIMUALTOR). Use ns or jist."
+if [ "$USED_SIMULATOR" != "jist" ] && [ "$USED_SIMULATOR" != "ns" ] && [ "$USED_SIMULATOR" != "ns3" ]; then
+  echo "USED_SIMULATOR is unknown ($USED_SIMUALTOR). Use ns, ns3 or jist."
   exit 0
 fi
 
@@ -123,7 +125,7 @@ case "$1" in
 			  fi
 			fi
 
-		        if [ "x$USED_SIMULATOR" = "xns" ]; then
+		        if [ "x$USED_SIMULATOR" = "xns" ] || [ "x$USED_SIMULATOR" = "xns3" ]; then
 			  DEVICE_TMPL=`echo $CDEV | grep "dev" | wc -l`
 			  if [ $DEVICE_TMPL -eq 0 ]; then
 			    CDEV=eth0
@@ -182,16 +184,18 @@ case "$1" in
 		  cp $WIFICONFIG $RESULTDIR
 		  
 		  if [ "x$WIFITYPE" = "x" ] || [ "x$WIFITYPE" = "x0" ] || [ "x$WIFITYPE" = "xDEFAULT" ]; then
-		    WIFITYPE=806
+		    WIFITYPE=$WIFITYPE_EXTRA
 		  fi
-		  if [ "x$WIFITYPE" != "x805" ] && [ "x$WIFITYPE" != "x806" ]; then
-		    WIFITYPE=806
+		  if [ "x$WIFITYPE" != "x$WIFITYPE_EXTRA" ] && [ "x$WIFITYPE" != "x$WIFITYPE_ATH" ] && [ "x$WIFITYPE" != "x$WIFITYPE_ATH2" ]; then
+		    WIFITYPE=$WIFITYPE_EXTRA
 		  fi
+#TODO: don't force to use extra encap		  
+		  WIFITYPE=$WIFITYPE_EXTRA
 		else
 		  #read wificonfig for aifs, cwmin etc.
 		  #Hint: already done
 		  #but overwrite wifitype, since ns2 only support wifiextra
-		  WIFITYPE=806
+		  WIFITYPE=$WIFITYPE_EXTRA
 		fi
 		
 		CPPOPTS=""

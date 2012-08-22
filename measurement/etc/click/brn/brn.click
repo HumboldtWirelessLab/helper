@@ -5,9 +5,11 @@
 #define DEBUGLEVEL 2
 #endif
 
+#define BRN_DEFAULT_TTL                 128   
+#define BRN_DEFAULT_TOS                   0
 
-#define BRN_ETHERTYPE                    8086
-#define BRN_ETHERTYPE_HEX                0x8086
+#define BRN_ETHERTYPE                  8086
+#define BRN_ETHERTYPE_HEX            0x8086
 
 
 /*Basics and Services*/

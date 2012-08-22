@@ -17,6 +17,7 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
   auth_info :: WirelessInfo(SSID $ssid, BSSID 00:00:00:00:00:00 , CHANNEL 5);
   infra_wifiencap ::  WifiEncap(0x01, WIRELESS_INFO auth_info);
 
+#ifdef USE_WEP
   /*
    * Damit andere Arbeitsgruppen von Arbeiten mit WEP betroffen sind, sollte im WepEncap
    * ACTIVE standardmäßig auf false stehen.
@@ -28,6 +29,7 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
    */
   wep::WepPainted(KEY "weizenbaum", ACTIVE true, DEBUG true);
 
+#endif
 
   client::ADHOC_OR_INFRASTRUCTURE_CLIENT(DEVICE $device, ETHERADDRESS $etheraddress, SSID $ssid,
                                          CHANNEL 5, WIFIENCAP infra_wifiencap, WIRELESS_INFO auth_info, ACTIVESCAN $active);
@@ -46,7 +48,9 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
 
 
 
+#ifdef USE_WEP
   -> [1]wep[1]
+#endif
   -> wififrame_clf :: Classifier( 0/00%0f,  // management frames
                                   1/02%03,  //fromds
                                       - ); 
@@ -54,6 +58,8 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
 
   wififrame_clf[0]
     -> client
+    -> SetTXPower(0)
+    -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
     -> wifioutq
     -> rawdevice;
 
@@ -74,9 +80,13 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
   input[0]
 //    -> Print("Send")
     -> infra_wifiencap
+#ifdef USE_WEP
     -> wep
+#endif
 
     //-> Print("Send 1")
+    -> SetTXPower(0)
+    -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
     -> wifioutq;
   
 } 

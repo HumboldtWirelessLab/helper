@@ -1,12 +1,17 @@
 /*
- * wep_painted.click
+ * wep.click
  *
  *  Created on: 06.07.2012
- *      Author: aureliano
+ *  modified: 20.08.2012
+ *      Author: kuehne@informatik.hu-berlin.de
  */
 
 /*
- * Packet oriented wep encryption mechanism.
+ *
+ * Behaviour:
+ * This element tries to decrypt and encrypt wep frames. 
+ * If successful: forward
+ * otherwise: discard. 
  *
  * Input:
  * 	0: to WepEncap
@@ -17,17 +22,14 @@
  *  1: from network
  */
 
-elementclass WepPainted {KEY $key, ACTIVE $active, DEBUG $debug |
+elementclass Wep {KEY $key, ACTIVE $active, DEBUG $debug |
 
 	wep_decap::WepDecap(KEY $key, KEYID 0);
 	wep_encap::WepEncap(KEY $key, KEYID 0, ACTIVE $active, DEBUG $debug);
 
 	input[0]
-	    -> wep_encap_checkpaint::CheckPaint(COLOR 42) // If painted, then DONT encrypt
-	    -> [0]output;
-
-	wep_encap_checkpaint[1]
 	    -> wep_encap
+	    //-> Print("encrypted ............",100, TIMESTAMP true)
 	    -> [0]output;
 
 	input[1]
@@ -37,9 +39,9 @@ elementclass WepPainted {KEY $key, ACTIVE $active, DEBUG $debug |
 		-> Discard;
 
 	wep_clf[1]
-	    -> Paint(COLOR 42) // If not wep frames, then paint
 		-> [1]output;
 
 	wep_decap_clf[1] // successful decap
+		//-> Print("decrypted .............",100, TIMESTAMP true)
 		-> [1]output;
 }
