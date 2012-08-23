@@ -66,11 +66,11 @@ elementclass ACCESS_POINT { DEVICE $device, ETHERADDRESS $etheraddress, SSID $ss
     -> Discard; 
 
     mgt_cl[5]
-    -> Print("Dissas")
+//  -> Print("Dissas")
     -> assoc_resp;
 
     mgt_cl[6]
-  -> Print("authReq")
+//  -> Print("authReq")
     -> OpenAuthResponder(WIRELESS_INFO winfo)
     -> [0]output;
     

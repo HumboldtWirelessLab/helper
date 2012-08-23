@@ -1,6 +1,6 @@
 #include "rawwifidev.click"
 #include "wifi/adhoc_or_infrastructure_client.click"
-#include "wep_painted.click"
+#include "wep.click"
 
 //output:
 //  0: Unicast/broadcast
