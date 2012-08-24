@@ -86,6 +86,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
   -> __WIFIENCAP__
 
+#ifndef NOATHOPERATION
 #if WIFITYPE == 805                                                 /***  for ath2 add priority scheduler to prefer operation packet ***/
   -> [1]op_prio_s::PrioSched();                                     /**/
                                                                     /**/
@@ -95,6 +96,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> ath_op_q::NotifierQueue(10)                                    /**/
   -> op_prio_s                                                      /**/
 #endif                                                              /***  end of ath2                                                **/
+#endif
   -> rawdev;
 
   rawdev
@@ -115,6 +117,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> [0]output;
 
 
+#ifndef NOATHOPERATION
 #if WIFITYPE == 805
   dev_decap[1]
   -> rawwifidev_too_small_cnt::Counter
@@ -123,6 +126,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   dev_decap[2]
   //-> Print("Post encap operation",TIMESTAMP true)
   -> ath_op;
+#endif
 #endif
 
 #ifdef PACKET_REUSE

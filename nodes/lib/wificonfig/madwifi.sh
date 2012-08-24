@@ -217,6 +217,7 @@ case "$1" in
 
 	    echo "$IFCONFIG $DEVICE mtu $MTU txqueuelen $TXQUEUE_LEN"
             ${IFCONFIG} $PHYDEV mtu $MTU txqueuelen $TXQUEUE_LEN
+            ${IFCONFIG} $DEVICE mtu $MTU txqueuelen $TXQUEUE_LEN
 
 	    sleep $PRE_START_SLEEP
 
@@ -329,8 +330,8 @@ case "$1" in
 	      echo "iwpriv $DEVICE wmm $WMM"
 	      ${IWPRIV} $DEVICE wmm $WMM
 	    else
-	      echo "iwpriv $DEVICE wmm 0"
-	      ${IWPRIV} $DEVICE wmm 0
+	      echo "iwpriv $DEVICE wmm $DEFAULT_WMM"
+	      ${IWPRIV} $DEVICE wmm $DEFAULT_WMM
 	    fi
 
 	    sleep $POST_START_SLEEP
@@ -465,6 +466,7 @@ case "$1" in
 		QUEUE=0
 		for c in $CWMIN; do
 		    ${IWPRIV} $DEVICE cwmin $QUEUE 0 $c
+		    ${IWPRIV} $DEVICE cwmin $QUEUE 1 $c
 		    QUEUE=`expr $QUEUE + 1`
 		    sleep $POST_START_SLEEP
 		done
@@ -474,6 +476,7 @@ case "$1" in
 		QUEUE=0
 		for c in $CWMAX; do
 		    ${IWPRIV} $DEVICE cwmax $QUEUE 0 $c
+		    ${IWPRIV} $DEVICE cwmax $QUEUE 1 $c
 		    QUEUE=`expr $QUEUE + 1`
 		    sleep $POST_START_SLEEP
 		done
@@ -483,6 +486,7 @@ case "$1" in
 		QUEUE=0
 		for c in $AIFS; do
 		    ${IWPRIV} $DEVICE aifs $QUEUE 0 $c
+		    ${IWPRIV} $DEVICE aifs $QUEUE 1 $c
 		    QUEUE=`expr $QUEUE + 1`
 		    sleep $POST_START_SLEEP
 		done
