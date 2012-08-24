@@ -18,6 +18,12 @@ case "$SIGN" in
 	;;
 esac
 
+. $DIR/../../measurement/etc/wifitypes
+
+if [ "x$LOGLEVEL" = "x" ]; then
+  LOGLEVEL=1
+fi
+
 #Function used to get params for control part TODO: try to use arrays
 function get_params() {
 	shift 6
@@ -32,8 +38,8 @@ if [ "x$1" = "xhelp" ]; then
 fi
 
 if [ $# -gt 0 ]; then
-	if [ ! "x$1" = "xjist" ] && [ ! "x$1" = "xns" ]; then
-		echo "Use $0 [ns|jist] des-file"
+	if [ ! "x$1" = "xjist" ] && [ ! "x$1" = "xns" ] && [ ! "x$1" = "xns3" ]; then
+		echo "Use $0 [ns|ns3|jist] des-file"
 		exit 0
 	fi
 	
@@ -95,19 +101,26 @@ if [ "x$3" = "x" ]; then
 	FINALRESULTDIR=$FINALRESULTDIR/$i
 else
 	if [ -e $FINALRESULTDIR/$3 ]; then
-		echo "Measurement already exits"
-		
 		i=$3
-		while [ -e "./$i" ]; do i=$((i+1)); done
-		echo "Use $FINALRESULTDIR/$i"
+	        if [ "x$FORCE_DIR" = "x" ]; then
+		  echo "Measurement already exits"
+		
+		  while [ -e "./$i" ]; do i=$((i+1)); done
+		  
+		  if [ $LOGLEVEL -gt 0 ]; then echo "Use $FINALRESULTDIR/$i"; fi
+
+		fi
+		
 		FINALRESULTDIR=$FINALRESULTDIR/$i
-		#exit 0
 	else
 		FINALRESULTDIR=$FINALRESULTDIR/$3
 	fi
 fi
 
-mkdir $FINALRESULTDIR
+if [ ! -e $FINALRESULTDIR ]; then
+  mkdir $FINALRESULTDIR
+fi
+
 chmod 777 $FINALRESULTDIR
 
 MODE=sim
@@ -116,8 +129,11 @@ case "$MODE" in
 	"sim")
 		if [ "x$USED_SIMULATOR" = "xjist" ]; then
 			POSTFIX=jist
+		else if [ "x$USED_SIMULATOR" = "xns3" ]; then
+			POSTFIX=ns3
 		else
 			POSTFIX=ns2
+		fi
 		fi
 		
 		DESCRIPTIONFILENAME=`basename $DESCRIPTIONFILE`
@@ -175,10 +191,18 @@ case "$MODE" in
 		
 		. $SIMDES
 		
-		if [ -f $DIR/../etc/ns/distances/$RADIO ]; then
-			. $DIR/../etc/ns/distances/$RADIO
+		if  [ "x$POSTFIX" = "xjist" ]; then
+			. $DIR/../etc/jist/distances/default
 			if [ "x$FIELDSIZE" = "xRXRANGE" ]; then
-				FIELDSIZE=$RXRANGE
+                                FIELDSIZE=$RXRANGE
+                        fi
+
+		else
+			if [ -f $DIR/../etc/ns/distances/$RADIO ]; then
+				. $DIR/../etc/ns/distances/$RADIO
+				if [ "x$FIELDSIZE" = "xRXRANGE" ]; then
+					FIELDSIZE=$RXRANGE
+				fi
 			fi
 		fi
 		
@@ -286,6 +310,15 @@ case "$MODE" in
 		echo "set nodecount $NODECOUNT"	>> $TCLFILE
 		echo "set stoptime $TIME" >> $TCLFILE
 		
+		if [ "x$SEED" != "x" ]; then
+		    echo "\$defaultRNG seed $SEED" >> $TCLFILE
+		    echo "set arrivalRNG [new RNG]" >> $TCLFILE
+		    echo "set sizeRNG [new RNG]" >> $TCLFILE
+		    
+#		    echo "set seed $SEED" >> $TCLFILE
+#		    echo "set seed $SEED" > /dev/null
+		fi
+
 		if [ "x$RESULTDIR" = "x" ]; then
 			RESULTDIR=.
 		fi
@@ -493,10 +526,20 @@ case "$MODE" in
 					fi
 				fi
 			fi
-		else
+		else if [ "x$USED_SIMULATOR" = "xjist" ]; then
 			( cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties )
 			# run simulation with jist
 			( cd $FINALRESULTDIR; $GETTIMESTATS $DIR/start-jist-sim.sh $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
+		else #ns3
+			( cd $FINALRESULTDIR; $DIR/convert2ns3.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$NAME.cc )
+			# run simulation with jist
+			if [ "x$NS3_HOME" != "x" ] && [ -e $NS3_HOME/ ]; then
+			   ( rm -rf $NS3_HOME/scratch/$NAME; mkdir $NS3_HOME/scratch/$NAME; cp $FINALRESULTDIR/$NAME.cc $NS3_HOME/scratch/$NAME; cd $NS3_HOME; ./waf ) > $LOGDIR/ns3_build.log 2>&1 
+			   ( cd $NS3_HOME; ./waf --run $NAME > $LOGDIR/$LOGFILE 2>&1 ) > $LOGDIR/$LOGFILE 2>&1
+			   ( cp $NS3_HOME/scratch/$NAME/* $FINALRESULTDIR ) >> $LOGDIR/ns3_build.log 2>&1
+			fi
+			exit 0
+		fi
 		fi
 		
 		# if the simulation was correctly execruted start the automatized evaluation of the experiment

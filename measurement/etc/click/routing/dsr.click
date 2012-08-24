@@ -62,7 +62,7 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
   -> querier[0]
 #ifdef DEBUG_DSR
   -> SetTimestamp()
-  -> Print("NODENAME: DSR: querry", 100, TIMESTAMP true)
+  -> Print("NODENAME: DSR: query", 100, TIMESTAMP true)
 #endif
  -> BRN2EtherEncap() 
  -> [1]output;                                             // rreq packets (broadcast)
@@ -73,6 +73,9 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
   -> Print("NODENAME: DSR: src_forwarder", 100, TIMESTAMP true)
 #endif
   -> [0]src_forwarder;                                      // src routed packets (unicast)
+
+  querier[2]                                                // packet has already reach the final dest
+  -> [0]output;
 
   src_forwarder[0]
 #ifdef DEBUG_DSR

@@ -37,8 +37,8 @@ elementclass ACCESS_POINT { DEVICE $device, ETHERADDRESS $etheraddress, SSID $ss
                              0/40%f0, //probe req
                              0/50%f0, //probe resp
                              0/80%f0, //beacon
-                             0/a0%f0, //assoc
-                             0/b0%f0, //disassoc
+                             0/a0%f0, //disassoc
+                             0/b0%f0, //authreq
                                 -  );
 
     mgt_cl[0]
@@ -67,7 +67,7 @@ elementclass ACCESS_POINT { DEVICE $device, ETHERADDRESS $etheraddress, SSID $ss
 
     mgt_cl[5]
 //  -> Print("Dissas")
-    -> Discard;
+    -> assoc_resp;
 
     mgt_cl[6]
 //  -> Print("authReq")

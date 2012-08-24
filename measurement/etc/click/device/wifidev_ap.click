@@ -1,5 +1,6 @@
 #include "rawwifidev.click"
 #include "wifi/access_point.click"
+#include "wep.click"
 
 //output:
 //  0: To me and BRN
@@ -72,15 +73,16 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
   wifioutq::NotifierQueue(50);
 
-  wep_encap::WepEncap(KEY "weizenbaum", KEYID 0, ACTIVE true, DEBUG true);
-  wep_decap::WepDecap(KEY "weizenbaum", KEYID 0);
+#ifdef USE_WEP
+  wep::WepPainted(KEY "weizenbaum", ACTIVE true, DEBUG true);
+#endif
 
 #ifdef IG_ENABLE
   prios::PrioSched()
   -> wifidevice;
 
   qc_suppressor::Suppressor();
-  q::NotifierQueue(500)
+  q::NotifierQueue(500);
 
   qc::BRN2PacketQueueControl(QUEUESIZEHANDLER q.length, QUEUERESETHANDLER q.reset, MINP 100 , MAXP 500, SUPPRESSORHANDLER qc_suppressor.active0,DISABLE_QUEUE_RESET false, TXFEEDBACK_REUSE false, UNICAST_RETRIES 0)
   -> EtherEncap(0x0800, $etheraddress , ff:ff:ff:ff:ff:ff)
@@ -97,6 +99,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   input[2]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
   -> [0]prios;
 
   wifioutq
@@ -116,7 +119,9 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   input[2]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
-  -> wep_encap
+#ifdef USE_WEP
+  -> wep
+#endif
   -> [0]prios;
 
   wifioutq
@@ -130,6 +135,8 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   input[0] 
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  -> SetTXPower(0)
+  -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
   -> wifioutq;
   
   wifidevice[0]
@@ -142,32 +149,24 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 #ifndef DISABLE_WIFIDUBFILTER
   -> WifiDupeFilter()
 #endif
-  -> wepframe_clf :: Classifier (1/40%40, -); // 0/08%0c
-
-   wepframe_clf[1]
-   -> wififrame_clf :: Classifier( 1/40%40,	 // discard of not decodable frames
-								   0/00%0f,  // management frames
+#ifdef USE_WEP
+  -> [1]wep[1]
+#endif
+   -> wififrame_clf :: Classifier(0/00%0f,  // management frames
                                    1/01%03,  //tods
                                        - );
 
-   wepframe_clf
- 	  -> wep_decap
- 	  -> wififrame_clf;
-
-
   wififrame_clf[0]
-                -> Discard;
-
-  wififrame_clf[1]
     -> fb::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
     -> ap
+    -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
     -> wifioutq;
 
   fb[1]
     -> Classifier( 16/ffffffffffff )
     -> ap;
 
-  wififrame_clf[2]
+  wififrame_clf[1]
     //-> Print("Filter",TIMESTAMP true)
     -> fbssid::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
     -> WifiDecap()
@@ -178,16 +177,17 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> brn_ap_clf :: Classifier( 12/8086, - )
     -> [0]output;
 
+
   toStation[0]
     //-> Print("For a Station",TIMESTAMP true)
     -> clientwifi::WifiEncap(0x02, WIRELESS_INFO ap/winfo)
   //-> Print("Und wieder raus",TIMESTAMP true)
-  	-> wep_enable::Switch(0)
+#ifdef USE_WEP
+    -> wep
+#endif
+    -> SetTXPower(0)
+    -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
     -> wifioutq;
-
-  wep_enable[1]
-     		-> wep_encap
-     		-> wifioutq;
 
   toStation[1]                
     //-> Print("Broadcast",TIMESTAMP true)
@@ -203,7 +203,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     
     brn_ap_clf[1] -> [3]output;
         
-  wififrame_clf[3]
+  wififrame_clf[2]
     -> WifiDecap()
     -> toMe[1]          //it's broadcast
     -> brn_bc_clf :: Classifier( 12/8086, - );
@@ -214,7 +214,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> BRN2EtherDecap()
     -> link_stat
     -> EtherEncap(0x8086, deviceaddress, ff:ff:ff:ff:ff:ff)
-    -> power::SetTXPower(15)
+    -> power::SetTXPower(0) //15
     -> brnwifi;
 #else
     -> Discard;
