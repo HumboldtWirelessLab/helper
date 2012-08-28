@@ -70,7 +70,7 @@ case "$1" in
 #	       exit 1
 #	     fi
 	    DEV_PREFIX=`echo $DEVICE | cut -b 1-3`
-	    if [ "x$DEV_PREFIX" = "xath" ]; then
+	    if [ "x$DEV_PREFIX" = "xbth" ]; then
 	      exit 1
 #	      exit 0
 	    else
