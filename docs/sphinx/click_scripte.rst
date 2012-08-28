@@ -1,5 +1,5 @@
-Click-Skripte bauen
-*******************
+Click-Skripte bauen für Networking
+**********************************
 Vorwissen: Click-Paper (http://read.cs.ucla.edu/click/publications)
 
 Zuvor eine historische Notiz, die dem Leser den Ursprung einiger hier verwendeter Elemente erklären soll.
@@ -47,6 +47,20 @@ Neben der Verwendung von BRN2Encap im Click-Script, lässt sich dieser Header au
 		
 In diesem Beispiel enthält das tls nicht nur die Packet-Generierungsfunktion *Packet::make()* sondern auch *BRNProtocol::add_brn_header()* und *BRNPacketAnno::set_ether_anno()*.
 
+
+Aufbau eines BRN-Basispakets
+============================
+
+Aufbau::
+
+	+-----------------------------------------------------------+
+	|      |       | Typ    ||  Src  |  Dst   |     ||          | 
+	| Dst  |  Src  | 00086  ||  Port |  Port  |  ?  || Payload  |
+	|      |       |        ||       |        |     ||          |
+	+-----------------------------------------------------------+
+	   \______ Ether_______/   \_______BRN________/
+	   
+Beim Einsatz von DSR wird aus dem Ether-Header ein DSR-Header gemacht.
 
 Besonderheiten in der BRN-Architektur
 =====================================
