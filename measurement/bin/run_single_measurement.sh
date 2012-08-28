@@ -294,6 +294,13 @@ if [ "x$RUNMODE" = "x" ]; then
     RUNMODE=UNKNOWN
 fi
 
+###############################
+######### STATUSDIR ###########
+###############################
+
+rm -rf status
+mkdir status
+
 #####################
 ### master stuff ####
 #####################
@@ -332,13 +339,6 @@ for node in $NODELIST; do
 done
 
 echo "done." >&6
-
-###############################
-######### STATUSDIR ###########
-###############################
-
-rm -rf status
-mkdir status
 
 ###############################
 ##### START PREPARE NODES #####
@@ -498,6 +498,8 @@ for state in  $STATES; do
       rm $MSCREENFILENAME
     fi
 
+    touch $MSCREENFILENAME
+
     CURRENTMODE="RUN CLICK AND APPLICATION"
     RUN_CLICK_APPLICATION=0
 
@@ -513,14 +515,14 @@ for state in  $STATES; do
         CLICKSCRIPT=`echo "$CONFIGLINE" | awk '{print $7}'`
         LOGFILE=`echo "$CONFIGLINE" | awk '{print $8}'`
 
-        if [ $CURRENTMSCREENNUM -eq 1 ]; then
-          screen -d -m -S $MEASUREMENTSCREENNAME
-          sleep 0.2
-        fi
-
-        echo "$node $nodedevice $MEASUREMENTSCREENNAME" >> $MSCREENFILENAME
-
         if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
+
+          if [ $CURRENTMSCREENNUM -eq 1 ]; then
+            screen -d -m -S $MEASUREMENTSCREENNAME
+            sleep 0.2
+          fi
+
+          echo "$node $nodedevice $MEASUREMENTSCREENNAME" >> $MSCREENFILENAME
 
           RUN_CLICK_APPLICATION=1
 
