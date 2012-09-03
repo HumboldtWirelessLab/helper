@@ -4,13 +4,13 @@
 // [0]output - ethernet (802.3) frames to external nodes/clients or me (no BRN protocol)
 // [1]output - BRN GEOR packets to internal nodes (BRN GEOR protocol)
 
-elementclass GEOR {$ID, $LT, $LS |
+elementclass GEOR {ID $ID, LT $LT, LINKSTAT $LS, DEBUG $debug  |
 
   gps::GPS();
-  grt::GeorTable(GPS gps, LINKTABLE $LT, DEBUG 2);
+  grt::GeorTable(GPS gps, LINKTABLE $LT, DEBUG $debug);
   glp::GeorLinkProbeHandler(LINKSTAT $LS, GEORTABLE grt);
-  gqu::GeorQuerier(NODEID $ID, GEORTABLE grt, DEBUG 2);
-  gfwd::GeorForwarder(NODEID id, GEORTABLE grt, DEBUG 2);
+  gqu::GeorQuerier(NODEID $ID, GEORTABLE grt, DEBUG $debug);
+  gfwd::GeorForwarder(NODEID id, GEORTABLE grt, DEBUG $debug);
 
   Idle
   -> [1]gqu;

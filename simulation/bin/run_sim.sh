@@ -532,7 +532,7 @@ case "$MODE" in
 			( cd $FINALRESULTDIR; $GETTIMESTATS $DIR/start-jist-sim.sh $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
 		else #ns3
 			( cd $FINALRESULTDIR; $DIR/convert2ns3.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$NAME.cc )
-			# run simulation with jist
+			# run simulation with NS3
 			if [ "x$NS3_HOME" != "x" ] && [ -e $NS3_HOME/ ]; then
 			   ( rm -rf $NS3_HOME/scratch/$NAME; mkdir $NS3_HOME/scratch/$NAME; cp $FINALRESULTDIR/$NAME.cc $NS3_HOME/scratch/$NAME; cd $NS3_HOME; ./waf ) > $LOGDIR/ns3_build.log 2>&1 
 			   ( cd $NS3_HOME; ./waf --run $NAME > $LOGDIR/$LOGFILE 2>&1 ) > $LOGDIR/$LOGFILE 2>&1

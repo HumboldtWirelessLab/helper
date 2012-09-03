@@ -26,13 +26,19 @@ if [ "x$WORKDIR" = "x" ]; then
     WORKDIR=$pwd
 fi
 
-if [ -f $2 ]; then
-    DISCRIPTIONFILE=$2
-    .  $DISCRIPTIONFILE
+if [ "x$2" = "x" ]; then
+  echo "Prepare measurement: 2. arg is missing"
 else
-     echo "$2 : No such file !"
-     exit 0;
+  DESCRIPTIONFILE=$2
+
+  if [ -f $DESCRIPTIONFILE ]; then
+    . $DESCRIPTIONFILE
+  else
+     echo "$DESCRIPTIONFILE : No such file !"
+     DESCRIPTIONFILE=""
+  fi
 fi
+
 
 add_include() {
   if [ "x$1" = "x" ]; then
@@ -52,11 +58,16 @@ case "$1" in
 		echo "Tool wich prepares the final skripts for a measurement (run_single_measurement). Replaces Variables ind the skript (like NODENAME, NODEDEVICE, ...)"
 		;;
 	"prepare")
-		SIMDIS=$2
-		. $SIMDIS
+		if [ "x$DESCRIPTIONFILE" = "x" ]; then
+		  echo "No desc"
+		  exit 0
+		fi
 
-		SIMDISBASENAME=`basename $SIMDIS`
-		cat $SIMDIS | sed "s#$NODETABLE#$RESULTDIR/$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $RESULTDIR/$SIMDISBASENAME.$POSTFIX
+		SIMDES=$DESCRIPTIONFILE
+		. $SIMDES
+
+		SIMDESBASENAME=`basename $SIMDES`
+		cat $SIMDES | sed "s#$NODETABLE#$RESULTDIR/$NODETABLE.$POSTFIX#g" | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" > $RESULTDIR/$SIMDESBASENAME.$POSTFIX
 
 		if [ "x$REMOTEDUMP" = "xyes" ]; then
       if [ "x$DUMPPORTBASE" = "x" ]; then
@@ -95,10 +106,16 @@ case "$1" in
 
 			    ISGROUP=`echo $CNODE | grep "group:" | wc -l`
 			    ISRANDOM=`echo $CNODE | grep "random:" | wc -l`
-			    
+
 			    if [ "x$ISGROUP" = "x1" ]; then
-			      GROUP=`echo $CNODE | sed "s#group:##g"`
-			      CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#"`
+			      GROUP=`echo $CNODE | sed "s#:# #g" | awk '{print $2}'`
+
+			      LIMIT=`echo $CNODE | sed "s#:# #g" | awk '{print $3}'`
+			      if [ "x$LIMIT" = "x" ]; then
+			         CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#"`
+			      else
+			         CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#" | head -n $LIMIT`
+			      fi
 			      #echo "NODES: $CNODE"
 			    elif [ "x$ISRANDOM" = "x1" ]; then	
 			      PARAMS=(`echo $CNODE | sed "s#:# #g"`)
@@ -117,9 +134,7 @@ case "$1" in
 			      if [ "x${PARAMS[4]}" != "x" ]; then 
 			      	EXTRAPARAMS ="-paramlist ${PARAMS[4]}"
 			      fi
-			      
-			      
-			      
+
 			      CNODES=`cd ../../helper/src/subnetworkDiscovery/; java SubnetworkDiscovery $NODE_NUMBER $ALGORITHM $FILE $EXTRAPARAMS`
 			    else
 			      CNODES=$CNODE
@@ -146,7 +161,7 @@ case "$1" in
 					        WIFICONFIGFINALNAME="$DIR/../../nodes/etc/wifi/$WIFICONFIG"
 				        else
 					        if [ -f $WIFICONFIG ]; then
-                    . $WIFICONFIG
+					          . $WIFICONFIG
 					          WIFICONFIGFINALNAME="$WIFICONFIG"
 					        else
 					          echo "Error: WIFICONFIG doesn't exist"
@@ -154,11 +169,10 @@ case "$1" in
 				                fi
 				        fi
                                       fi
-					
+
 				      if [ "x$WIFITYPE" = "xDEFAULT" ] || [ "x$WIFITYPE" = "x0" ]; then
-				      
-				        WIFITYPE=
-				      fi	
+				        WIFITYPE=0
+				      fi
                                       CPPOPTS="$CPPOPTS -DWIFITYPE=$WIFITYPE"
                               else
 				      WIFICONFIGFINALNAME="-"
@@ -223,6 +237,8 @@ case "$1" in
                      CPPOPTS="$CPPOPTS -DCONTROLSOCKET"
                   fi
                 fi
+
+                #echo "$CPPOPTS"
 
                 HELPER_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "helper.inc" | wc -l)`
 
