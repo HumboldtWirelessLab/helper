@@ -1,6 +1,6 @@
 #include "rawwifidev.click"
 #include "wifi/access_point.click"
-#include "wep_painted.click"
+#include "wep.click"
 
 //output:
 //  0: To me and BRN
