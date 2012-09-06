@@ -104,13 +104,29 @@ Beim Einsatz von DSR wird aus dem Ether-Header ein DSR-Header gemacht.
 Besonderheiten in der BRN-Architektur
 =====================================
 
-Das
-Click-Skript wird beim Aufruf mit run_sim.sh vorbereitet. Dabei werden einige
+Das Click-Skript wird beim Aufruf mit run_sim.sh vorbereitet. Dabei werden einige
 Variablen durch spezifische Informationen über das Netzwerkgerät, den Knoten,
 etc. ersetzt. Die wichtigsten Informationen stehen in der mes-Datei (oder auch
 Nodetable genannt).
 
+Hilfsscripte
+============
 
+Mittlerweile existieren eine Reihe von Hilfsscripten welche häufig benötigte
+Funktionalität implementieren. Diese script finden sich im *helper* repository
+unter *helper/measurement/etc/click* und können mit *#include* Anweisungen
+eingebunden werden. Wichtige Script sind zum Beispiel:
+
+    * brn/brn.click Definition von Konstanten, insbesondere die Konstanten welche
+im BRN Header gesetzt werden um die unterschiedlichen Protokolle
+auseinanderzuhalten (z.B. BRN_PORT_DSR). Diese Konstanten können von
+*Classifier* Elementen verwendet werden, um einzelne Pakete unterschiedlicher
+Protokolle getrennt zu behandeln.
+    * brn/helper.inc Definition diverser Macros um in unterschiedlichen
+Szenarien (z.B. Simulation vs. Testbed) das Wifi Device jeweils richtig zu
+bedienen.
+    * routing/routing.click Abstraktion der unterschiedlichen Routingprotokolle.
+Stellt ein einheitliches Interface für alle Routingprotokolle zur Verfügung.
 
 Simulation & Debugging
 ======================
