@@ -118,15 +118,36 @@ unter *helper/measurement/etc/click* und können mit *#include* Anweisungen
 eingebunden werden. Wichtige Script sind zum Beispiel:
 
     * brn/brn.click Definition von Konstanten, insbesondere die Konstanten welche
-im BRN Header gesetzt werden um die unterschiedlichen Protokolle
-auseinanderzuhalten (z.B. BRN_PORT_DSR). Diese Konstanten können von
-*Classifier* Elementen verwendet werden, um einzelne Pakete unterschiedlicher
-Protokolle getrennt zu behandeln.
-    * brn/helper.inc Definition diverser Macros um in unterschiedlichen
-Szenarien (z.B. Simulation vs. Testbed) das Wifi Device jeweils richtig zu
-bedienen.
+      im BRN Header gesetzt werden um die unterschiedlichen Protokolle
+      auseinanderzuhalten (z.B. BRN_PORT_DSR). Diese Konstanten können von
+      *Classifier* Elementen verwendet werden, um einzelne Pakete unterschiedlicher
+      Protokolle getrennt zu behandeln.
+
+    * device/wifidev_linkstat Definition von WIFIDEV einer Abstraktion der WLAN
+      Karte, welche sich unter anderem um das Link Probing kümmert. Die Zuordnung
+      der Ein- und Ausgänge ist:
+
+      output:
+
+        * 0: To me and BRN
+        * 1: Broadcast and BRN
+        * 2: Foreign and BRN
+        * 3: To me and NO BRN
+        * 4: BROADCAST and NO BRN
+        * 5: Foreign and NO BRN
+        * 6: Feedback BRN
+        * 7: Feedback Other
+
+      input:
+
+        * 0: brn
+        * 1: client
+        * 2: high priority stuff ( higher than linkprobes)
+
+    * brn/helper.inc Definition von Macros FROMDEVICE und TODEVICE für
+      unterschiedliche Szenarien (z.B. Simulation)
     * routing/routing.click Abstraktion der unterschiedlichen Routingprotokolle.
-Stellt ein einheitliches Interface für alle Routingprotokolle zur Verfügung.
+      Stellt ein einheitliches Interface für alle Routingprotokolle zur Verfügung.
 
 Simulation & Debugging
 ======================
