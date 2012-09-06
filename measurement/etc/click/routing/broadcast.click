@@ -14,7 +14,7 @@
 
 elementclass BROADCAST {ID $id, LT $lt |
 
-  bcf::BROADCASTFLOODING(ID $id, LT $lt);  
+  bcf::BROADCASTFLOODING(ID $id, LT $lt);
   bcr::BROADCASTROUTING(ID $id);
 
   input[0]
@@ -24,11 +24,11 @@ elementclass BROADCAST {ID $id, LT $lt |
   bc_clf[0]
   //-> Print("BC: broadcast")
   -> [0]bcf;
-  
+
   bc_clf[1]
   //-> Print("BC: unicast")
   -> [0]bcr;
-     
+
   input[1]
   -> bcr_clf::Classifier( 0/BRN_PORT_FLOODING,     //Flooding
                           0/BRN_PORT_BCASTROUTING, //BroadcastRouting
@@ -43,33 +43,33 @@ elementclass BROADCAST {ID $id, LT $lt |
   bcr_clf[2]
   -> Print("Unknown type in broadcast")
   -> Discard;
-  
+
 
   input[2]
-  -> Discard; 
- 
- 
+  -> Discard;
+
+
   bcf[0]
   //-> Print("Local Copy")
   -> bcrouting_clf::Classifier( 12/BRN_ETHERTYPE 14/BRN_PORT_BCASTROUTING,  //BrnBroadcastRouting
                                     - );
-  
+
   bcrouting_clf[0]
   -> BRN2EtherDecap()
   //-> Print("broadcastrouting")
   -> [1]bcr;
 
-  bcrouting_clf[1]                    
+  bcrouting_clf[1]
   //-> Print("SimpleFlood-Ether-OUT")
   -> [0]output;
 
   bcf[1]
   //-> Print("Forward Copy")
   -> [1]output;
-  
+
   bcr[0]
   -> [0]output;
-  
+
   bcr[1]
   //-> Print("Flood")
   -> [0]bcf;
