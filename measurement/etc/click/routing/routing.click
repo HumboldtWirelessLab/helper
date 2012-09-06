@@ -81,7 +81,7 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
   input[1]         //BRN
     -> [1]routing;
 
-  input[2]        //BRN-Feddback
+  input[2]        //BRN-Feedback
     -> [2]routing;
 
   input[3]        //Overhear
