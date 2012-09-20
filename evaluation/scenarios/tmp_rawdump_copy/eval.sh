@@ -32,15 +32,17 @@ if [ -f $RESULTDIR/nodes.mac ]; then
     for DEVICE in $DEVICES; do
 
     if [ ! -f $RESULTDIR/$NODE.$DEVICE.raw.dump ]; then
-      scp -i $DIR/../../../host/etc/keys/id_dsa root@$NODE:/tmp/$NODE.$DEVICE.raw.dump $RESULTDIR > /dev/null 2>&1
-      ssh -i $DIR/../../../host/etc/keys/id_dsa root@$NODE "/bin/rm -f /tmp/$NODE.$DEVICE.raw.dump"
+      if [ "x$MODE" = "xsim" ]; then
+        if [ -f /tmp/$NODE.$DEVICE.raw.dump ]; then
+          echo "/tmp/$NODE.$DEVICE.raw.dump"
+          mv /tmp/$NODE.$DEVICE.raw.dump $RESULTDIR
+        fi
+      else
+        scp -i $DIR/../../../host/etc/keys/id_dsa root@$NODE:/tmp/$NODE.$DEVICE.raw.dump $RESULTDIR > /dev/null 2>&1
+        ssh -i $DIR/../../../host/etc/keys/id_dsa root@$NODE "/bin/rm -f /tmp/$NODE.$DEVICE.raw.dump"
+      fi
     fi
-#if [ -f /tmp/$NODE.$DEVICE.raw.dump ]; then
-#  echo "/tmp/$NODE.$DEVICE.raw.dump"
-#  mv /tmp/$NODE.$DEVICE.raw.dump $RESULTDIR
-#fi
-
-  done 
+  done
   done
 
 fi
