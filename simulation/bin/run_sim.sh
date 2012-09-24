@@ -193,19 +193,25 @@ case "$MODE" in
 		
 		if  [ "x$POSTFIX" = "xjist" ]; then
 			. $DIR/../etc/jist/distances/default
-			if [ "x$FIELDSIZE" = "xRXRANGE" ]; then
-                                FIELDSIZE=$RXRANGE
-                        fi
-
 		else
 			if [ -f $DIR/../etc/ns/distances/$RADIO ]; then
 				. $DIR/../etc/ns/distances/$RADIO
-				if [ "x$FIELDSIZE" = "xRXRANGE" ]; then
-					FIELDSIZE=$RXRANGE
-				fi
 			fi
 		fi
-		
+
+                if [ "x$FIELDSIZE" = "xRXRANGE" ]; then
+                  FIELDSIZE=$RXRANGE
+                fi
+                if [ "x$FIELDSIZE" = "xMAXRXRANGE" ]; then
+                  FIELDSIZE=$MAXRXRANGE
+                fi
+                if [ "x$FIELDSIZE" = "xCSRANGE" ]; then
+                  FIELDSIZE=$CSRANGE
+                fi
+                if [ "x$FIELDSIZE" = "xNORXRANGE" ]; then
+                  FIELDSIZE=$NORXRANGE
+                fi
+
 		if [ "x$POSTFIX" = "xns2" ]; then
 			TCLFILE="$FINALRESULTDIR/$NAME.tcl"
 			WIFICONFIGFILE=`cat $NODETABLE | grep -v "#" | head -n 1 | awk '{print $5}'`
@@ -544,7 +550,7 @@ case "$MODE" in
 		
 		# if the simulation was correctly execruted start the automatized evaluation of the experiment
 		if [ $? -eq 0 ]; then
-			MODE=sim SIM=ns2 CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
+			MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
 		else
 			exit 1
 		fi
