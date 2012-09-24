@@ -27,7 +27,7 @@ elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKST
 #endif
 
 routingtable::BrnRoutingTable(DEBUG 2, ACTIVE true, DROP 0 /* 1/20 = 5% */, SLICE 500 /* 500ms */, TTL 10 /* 10*500ms */);
-routingalgo::Dijkstra(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE routingtable, MIN_LINK_METRIC_IN_ROUTE 6000, MAXGRAPHAGE 30000, DEBUG 2);
+routingalgo::Dijkstra(NODEIDENTITY $id, LINKTABLE $lt, MIN_LINK_METRIC_IN_ROUTE 6000, MAXGRAPHAGE 30000, DEBUG 2);
 routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE routingtable, ROUTINGALGORITHM routingalgo, DEBUG 2);
 
 #ifdef ROUTINGDSR
