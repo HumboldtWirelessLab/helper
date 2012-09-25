@@ -83,13 +83,16 @@ case "$1" in
 
 		#Prepare click
 		echo -n "" > $RESULTDIR/$NODETABLE.$POSTFIX
+		
+		cp $DIR/../etc/templates/gen_clickscripts.sh $RESULTDIR/gen_clickscripts.sh
+
 		while read line; do
-      ISCOMMENT=`echo $line | grep "#" | wc -l`
-	    NOSPACELINE=`echo $line | sed -e "s#[[:space:]]##g"`
-		    
-	    if [ ! "x$NOSPACELINE" = "x" ]; then
-        if [ $ISCOMMENT -eq 0 ]; then
-			    
+		ISCOMMENT=`echo $line | grep "#" | wc -l`
+		NOSPACELINE=`echo $line | sed -e "s#[[:space:]]##g"`
+		
+		if [ ! "x$NOSPACELINE" = "x" ]; then
+			if [ $ISCOMMENT -eq 0 ]; then
+			
 			    #read CNODE CDEV CMODDIR CMODOPT WIFICONFIG CCMODDIR CLICK CCLOG CAPP CAPPL <<< $line
 			    CNODE=`echo $line | awk '{print $1}'`
 			    CDEV=`echo $line | awk '{print $2}'`
@@ -171,7 +174,7 @@ case "$1" in
                                       fi
 
 				      if [ "x$WIFITYPE" = "xDEFAULT" ] || [ "x$WIFITYPE" = "x0" ]; then
-				        WIFITYPE=0
+				        WIFITYPE="\$WIFITYPEDEFAULT"
 				      fi
                                       CPPOPTS="$CPPOPTS -DWIFITYPE=$WIFITYPE"
                               else
@@ -245,10 +248,15 @@ case "$1" in
                 CPPOPTS="$CPPOPTS -I$CONFIGDIR"
 
                 #echo $CPPOPTS
+
+                MODDIR=`echo "$CMODDIR" | sed $DIRSEDARG`
+                echo "WIFITYPEDEFAULT=\`get_wifitype $CNODE $CDEV $MODDIR $CMODOPT $RESULTDIR/status/all_nodeinfo.log\`" >> $RESULTDIR/gen_clickscripts.sh
                 if [ $HELPER_INC -gt 0 ]; then
-                  ( cd $CONFIGDIR; cat $CLICK | add_include no | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v "^#" >> $CLICKFINALNAME )
+                  echo "( cd $CONFIGDIR; cat $CLICK | add_include no | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v '^#' >> $CLICKFINALNAME )" >> $RESULTDIR/gen_clickscripts.sh
+                  #( cd $CONFIGDIR; cat $CLICK | add_include no | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v "^#" >> $CLICKFINALNAME )
                 else
-                  ( cd $CONFIGDIR; cat $CLICK | add_include | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v "^#" >> $CLICKFINALNAME )
+                  echo "( cd $CONFIGDIR; cat $CLICK | add_include | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v '^#' >> $CLICKFINALNAME )" >> $RESULTDIR/gen_clickscripts.sh
+                  #( cd $CONFIGDIR; cat $CLICK | add_include | cpp -I$DIR/../etc/click $CPPOPTS | sed $DUMPSEDARG | sed $DIRSEDARG | grep -v "^#" >> $CLICKFINALNAME )
                 fi
               else
                 if [ ! -e $CLICK ]; then
@@ -266,7 +274,7 @@ case "$1" in
         fi
       fi
    done < $CONFIGDIR/$NODETABLE
-		
+
 		if [ "x$REMOTEDUMP" = "xyes" ]; then
 		  REMOTEDUMPTIME=`expr $TIME + 5`
 		  echo "Script(wait $REMOTEDUMPTIME, stop);" >> $RESULTDIR/remotedump.click
@@ -274,6 +282,7 @@ case "$1" in
 				
 		;;
 	"afterwards")
+		HELPERDIR=$DIR/../../ sh $RESULTDIR/gen_clickscripts.sh
 		;;
 		
 	*)
