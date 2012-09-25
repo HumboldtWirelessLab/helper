@@ -49,5 +49,7 @@
 /*Info*/
 #define BRN_PORT_NODEINFO                3c
 #define BRN_PORT_CHANNELSTATSINFO        3d
+/*Application*/
+#define BRN_PORT_SHAMIR                  3e
 
 #endif
