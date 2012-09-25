@@ -156,6 +156,10 @@ case "$1" in
 	    if [ "x$WIFITYPE" = "x" ]; then
 		WIFITYPE=$DEFAULT_WIFITYPE
 	    fi
+	    if [ "x$WIFITYPE" = "x0" ]; then
+		WIFITYPE=805
+	    fi
+
 	    echo "echo $WIFITYPE > /proc/sys/net/$DEVICE/dev_type"
 	    echo $WIFITYPE > /proc/sys/net/$DEVICE/dev_type
 

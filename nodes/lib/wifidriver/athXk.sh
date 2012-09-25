@@ -21,9 +21,13 @@ esac
 case "$1" in
     "responsible")
 		#check whether ath_pci.ko exists. if so, then his script is responsible 
-                KERNELVERSION=`uname -r`
-                NODEARCH=`$DIR/../../bin/system.sh get_arch`
-		
+                if [ "x$KERNELVERSION" = "x" ]; then
+                  KERNELVERSION=`uname -r`
+                fi
+                if [ "x$NODEARCH" = "x" ]; then
+                  NODEARCH=`$DIR/../../bin/system.sh get_arch`
+                fi
+
                 FINMODULSDIR=`echo $MODULSDIR | sed -e "s#KERNELVERSION#$KERNELVERSION#g" -e "s#NODEARCH#$NODEARCH#g"`
 #                echo "$MODULSDIR <--> $FINMODULSDIR"
 		if [ -f ${FINMODULSDIR}/ath9k.ko ] || [ -f ${FINMODULSDIR}/ath5k.ko ]; then
@@ -35,10 +39,10 @@ case "$1" in
 		fi
 		;;
     "device_name")
-		IS_TMPL=`echo $DEVICE | grep "DEV_" | wc -l`
+		IS_TMPL=`echo $DEVICE | grep "DEV" | wc -l`
 		
 		if [ $IS_TMPL -ne 0 ]; then
-		  NUM=`echo $DEVICE | sed "s#DEV_##g"`
+		  NUM=`echo $DEVICE | sed "s#DEV##g"`
 		  echo "wlan$NUM"
 		else
 		  echo $DEVICE
@@ -94,7 +98,7 @@ case "$1" in
 		done
 		;;
     "wifi_type")
-		echo "802"
+		echo "803"
 		;;
     *)
 		echo "unknown options"
