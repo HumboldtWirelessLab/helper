@@ -164,6 +164,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   //-> Print("ChannelStats")
   -> BRN2EtherDecap()
   -> BRN2Decap()
+//  -> cocst::CooperativeChannelStats(CHANNELSTATS wifidevice/cst, NEIGHBOURS true, INTERVAL 1000, DEBUG 4)
   -> cocst::CooperativeChannelStats(CHANNELSTATS wifidevice/cst, NEIGHBOURS true, INTERVAL 1000, DEBUG 2)
   -> cocst_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
   -> cocst_rate::SetTXRate(RATE 2, TRIES 1)
