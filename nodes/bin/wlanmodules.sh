@@ -28,7 +28,7 @@ for s in `ls $DIR/../lib/wifidriver/`; do
   #echo "Check $DIR/../lib/wifidriver/$s"
   export MODOPTIONS=$MODOPTIONS
   export MODULSDIR=$MODULSDIR
-  $DIR/../lib/wifidriver/$s responsible
+  KERNELVERSION=$KERNELVERSION NODEARCH=$NODEARCH $DIR/../lib/wifidriver/$s responsible
   RESULT=$?
   if [ $RESULT -eq 0 ]; then
     RESPONSIBLE=$DIR/../lib/wifidriver/$s
