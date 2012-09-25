@@ -498,7 +498,7 @@ case "$MODE" in
 		
 		# Final stage: valgrind-check and experiment evaluation
 		if [ "x$USED_SIMULATOR" = "xns" ]; then
-			
+			echo "Running NS2"
 			# check running NS with a memory debugger and profiler
 			which valgrind > /dev/null
 			if [ $? -ne 0 ]; then
@@ -533,10 +533,12 @@ case "$MODE" in
 				fi
 			fi
 		else if [ "x$USED_SIMULATOR" = "xjist" ]; then
+			echo "Running Jist"
 			( cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties )
 			# run simulation with jist
 			( cd $FINALRESULTDIR; $GETTIMESTATS $DIR/start-jist-sim.sh $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
 		else #ns3
+			echo "Running NS3"
 			( cd $FINALRESULTDIR; $DIR/convert2ns3.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$NAME.cc )
 			# run simulation with NS3
 			if [ "x$NS3_HOME" != "x" ] && [ -e $NS3_HOME/ ]; then
@@ -550,6 +552,7 @@ case "$MODE" in
 		
 		# if the simulation was correctly execruted start the automatized evaluation of the experiment
 		if [ $? -eq 0 ]; then
+			echo "Evaluation..."
 			MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
 		else
 			exit 1
