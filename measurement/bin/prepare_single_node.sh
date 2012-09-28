@@ -120,7 +120,7 @@ if [ -f $CONFIGFILE ]; then
       NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh rmmod >> status/$LOGMARKER\_killclick.log 2>&1
     else
       if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-        run_on_node $node "$DIR/../../nodes/bin/click.sh stop" "/" $DIR/../etc/keys/id_dsa
+        run_on_node $node "$DIR/../../nodes/bin/click.sh stop" "/" $DIR/../../host/etc/keys/id_dsa
       fi
     fi
 
@@ -331,7 +331,7 @@ if [ "x$MODE" = "xwireless" ]; then
     NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
     for device in $NODEDEVICELIST; do
-      run_on_node $node "RUNMODE=DRIVER MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$device $DIR/../../nodes/lib/standalone/standalone.sh setup" "/" $DIR/../etc/keys/id_dsa
+      run_on_node $node "RUNMODE=DRIVER MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$device $DIR/../../nodes/lib/standalone/standalone.sh setup" "/" $DIR/../../host/etc/keys/id_dsa
     done
 
   done
