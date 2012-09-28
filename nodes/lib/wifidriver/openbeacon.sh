@@ -21,9 +21,13 @@ esac
 case "$1" in
     "responsible")
 		#check whether ath_pci.ko exists. if so, then his script is responsible 
-                KERNELVERSION=`uname -r`
-                NODEARCH=`$DIR/../../bin/system.sh get_arch`
-		
+		if [ "x$KERNELVERSION" = "x" ]; then
+		  KERNELVERSION=`uname -r`
+		fi
+		if [ "x$NODEARCH" = "x" ]; then
+		  NODEARCH=`$DIR/../../bin/system.sh get_arch`
+		fi
+
                 FINMODULSDIR=`echo $MODULSDIR | sed -e "s#KERNELVERSION#$KERNELVERSION#g" -e "s#NODEARCH#$NODEARCH#g"`
 		if [ -f ${FINMODULSDIR}/cdc-acm.ko ]; then
 		    exit 0
@@ -32,10 +36,10 @@ case "$1" in
 		fi
 		;;
     "device_name")
-                IS_TMPL=`echo $DEVICE | grep "DEV_" | wc -l`
+                IS_TMPL=`echo $DEVICE | grep "DEV" | wc -l`
 		    
 	        if [ $IS_TMPL -ne 0 ]; then
-	            NUM=`echo $DEVICE | sed "s#DEV_##g"`
+	            NUM=`echo $DEVICE | sed "s#DEV##g"`
 	            echo "obd$NUM"
 	        else
 	            echo "$DEVICE"

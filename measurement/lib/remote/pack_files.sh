@@ -22,7 +22,8 @@ case "$1" in
     "pack")
 	ARCH=`cat $2 | awk '{print $1}' | sort -u`
 	BASEDIR=`(cd $DIR/../../..; pwd)`
-	PACK_BASEDIR=/tmp/pack_files/
+	RND=$RANDOM
+	PACK_BASEDIR=/tmp/pack_files_$RND/
 	PACK_DIR=$PACK_BASEDIR/$BASEDIR
 	PACK_FILE=pack_file.tar.bz2
 	PACK_LOG=/dev/null
@@ -131,9 +132,9 @@ case "$1" in
 	  fi
 	fi
 	
-	(cd $PACK_BASEDIR/; tar cfvj ../$PACK_FILE *) > $PACK_LOG 2>&1
-	cp $PACK_BASEDIR/../$PACK_FILE .
-	rm -rf $PACK_DIR
+	(cd $PACK_BASEDIR/; tar cfvj ../$PACK_FILE\_$RND *) > $PACK_LOG 2>&1
+	mv $PACK_BASEDIR/../$PACK_FILE\_$RND ./$PACK_FILE
+	rm -rf $PACK_DIR $PACK_BASEDIR
 
         ;;
     *)

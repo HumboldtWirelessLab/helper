@@ -389,7 +389,7 @@ for state in  $STATES; do
     for node in $NODELIST; do
       if [ -f status/$node\_nodeinfo.log ]; then
         cat status/$node\_nodeinfo.log  >> status/all_nodeinfo.log
-      fi    
+      fi
       if [ -f status/$node\_wifinodeinfo.log ]; then
         cat status/$node\_wifinodeinfo.log | awk '{print $2" "$3}' >> status/all_wireless_nodeinfo.log.tmp
       fi
@@ -398,10 +398,11 @@ for state in  $STATES; do
     cat status/all_wireless_nodeinfo.log.tmp | sort -u > status/all_wireless_nodeinfo.log
 
     #rebuild click config if needed (e.g. devicetype,...)
-    $DIR/prepare_measurement.sh afterwards
+    RESULTDIR=$FINALRESULTDIR $DIR/prepare_measurement.sh afterwards
 
     #REPLACE DEVICE TMPL
     #TODO: enable multidevice clickscripts
+    REWRITER=yes
 
     if [ "x$REWRITER" = "xyes" ]; then
     echo -n "" > $CONFIGFILE.tmp
@@ -412,7 +413,7 @@ for state in  $STATES; do
       ARCH=`cat status/all_nodeinfo.log | grep "$NODE[[:space:]]" | awk '{print $2}'`
       DEVNAME=`echo $line | awk '{print $2}'`
       MODULSPATH=`echo $line | awk '{print $3}' | sed -e "s#NODEARCH#$ARCH#g" -e "s#KERNELVERSION#$KERNEL#g"`
-      IS_TMPL=`echo $DEVNAME | grep "DEV_" | wc -l`
+      IS_TMPL=`echo $DEVNAME | grep "DEV" | wc -l`
 
       CLICKFILE=`echo $line | awk '{print $7}'`
 
@@ -438,6 +439,7 @@ for state in  $STATES; do
 
     fi
     #end REPLACE DEVICE TMPL
+
 
     REMOTENODECOUNT=`cat status/all_wireless_nodes.log | grep -v "^$" | wc -l`
     if [ $REMOTENODECOUNT -gt 0 ]; then
