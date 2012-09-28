@@ -401,6 +401,7 @@ for state in  $STATES; do
     $DIR/prepare_measurement.sh afterwards
 
     #REPLACE DEVICE TMPL
+    #TODO: enable multidevice clickscripts
 
     if [ "x$REWRITER" = "xyes" ]; then
     echo -n "" > $CONFIGFILE.tmp
@@ -427,6 +428,8 @@ for state in  $STATES; do
           cat $CLICKFILE | sed -e "s#$DEVNAME#$FINALDEVICE#g" > $NEW_CLICKFILE
           rm $CLICKFILE
         fi
+      else
+        echo $line >> $CONFIGFILE.tmp
       fi
 
     done < $CONFIGFILE
