@@ -106,11 +106,13 @@ else
 		  echo "Measurement already exits"
 		
 		  while [ -e "./$i" ]; do i=$((i+1)); done
-		  
+
 		  if [ $LOGLEVEL -gt 0 ]; then echo "Use $FINALRESULTDIR/$i"; fi
 
+		else
+		  rm -rf $FINALRESULTDIR/$i
 		fi
-		
+
 		FINALRESULTDIR=$FINALRESULTDIR/$i
 	else
 		FINALRESULTDIR=$FINALRESULTDIR/$3
