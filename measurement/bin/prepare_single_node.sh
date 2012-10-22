@@ -305,7 +305,7 @@ if [ "x$MODE" = "xwireless" ]; then
   NODELIST="$NODELIST" $DIR/../../host/bin/system.sh test_node_check >> status/$LOGMARKER\_environment.log 2>&1
 
   #TODO: get name from elsewhere
-  FILENAME="pack_file.tar.bz2" 
+  FILENAME="pack_file.tar.bz2"
 
   echo "copy"  >> status/$LOGMARKER\_environment.log 2>&1 
   FILE="$FILENAME" TARGETDIR=/tmp NODELIST="$NODELIST" $DIR/../../host/bin/environment.sh scp_remote >> status/$LOGMARKER\_environment.log 2>&1
