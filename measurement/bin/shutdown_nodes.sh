@@ -54,7 +54,7 @@ if [ "x$FILE" = "xdb" ]; then
     echo -n "$CNODE "
     NODELIST="$CNODE" $DIR/../../host/bin/environment.sh mount
     NODELIST=$CNODE $DIR/../../host/bin/click.sh stop
-    NODEDEVICES=`echo "" | ssh root@$CNODE "PATH=/bin/:/sbin/:/usr/bin:/usr/sbin/; iwconfig 2> /dev/null" | grep "IEEE" | awk '{print $1}'`
+    NODEDEVICES=`echo "" | ssh root@$CNODE -F $DIR/../../host/etc/keys/ssh_config -i $DIR/../../host/etc/keys/id_dsa "PATH=/bin/:/sbin/:/usr/bin:/usr/sbin/; iwconfig 2> /dev/null" | grep "IEEE" | awk '{print $1}'`
     for d in $NODEDEVICES; do
       echo -n "$d "
       NODE=$CNODE DEVICES=$d $DIR/../../host/bin/wlandevices.sh delete

@@ -39,14 +39,14 @@ case "$1" in
 		      echo "Reboot not allowed !"
 		    else
 		      echo "Reboot"
-		      run_on_node $node "if [ -f /sbin/reboot ]; then /sbin/reboot; else reboot; fi" "/" $DIR/../etc/keys/id_dsa
+		      run_on_node $node "if [ -f /sbin/reboot ]; then /sbin/reboot; else reboot; fi" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		    fi
 		done
 		;;
 	"status")	
 		for node in $NODELIST; do
 		    echo "$node"
-		    run_on_node $node "uptime" "/" $DIR/../etc/keys/id_dsa
+		    run_on_node $node "uptime" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		;;
 	"waitfornodes")
@@ -74,10 +74,10 @@ case "$1" in
 			SSH_RUNNING=`nmap --host-timeout 2s -p22 $node 2>/dev/null | grep 22 | grep tcp | awk '{print $2}'`
 		    done
 
-		    ARCH=`run_on_node $node "uname -m" "/" $DIR/../etc/keys/id_dsa 2> /dev/null`
+		    ARCH=`run_on_node $node "uname -m" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config 2> /dev/null`
 		    while [ "x$ARCH" = "x" ]; do
  			sleep 10;
-			ARCH=`run_on_node $node "uname -m" "/" $DIR/../etc/keys/id_dsa 2> /dev/null`
+			ARCH=`run_on_node $node "uname -m" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config 2> /dev/null`
 		    done
 
 		done
@@ -86,7 +86,7 @@ case "$1" in
 		for node in $NODELIST; do
 		    WNDR=""
 		    while [ "x$WNDR" = "x" ]; do
-			WNDR=`run_on_node $node "cat /proc/cpuinfo | grep 'WNDR' | wc -l" "/" $DIR/../etc/keys/id_dsa`
+			WNDR=`run_on_node $node "cat /proc/cpuinfo | grep 'WNDR' | wc -l" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config`
 			if [ "x$WNDR" = "x" ]; then
 			    sleep 1
 			fi
@@ -94,9 +94,9 @@ case "$1" in
 		    if [ $WNDR -gt 0 ]; then
 		      ARCH="mips-wndr3700"
 		    else
-		      ARCH=`run_on_node $node "uname -m" "/" $DIR/../etc/keys/id_dsa`
+		      ARCH=`run_on_node $node "uname -m" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config`
 		    fi
-		    KERNEL=`run_on_node $node "uname -r" "/" $DIR/../etc/keys/id_dsa`
+		    KERNEL=`run_on_node $node "uname -r" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config`
 		    echo "$node $ARCH $KERNEL"
 		done
 		;;
@@ -106,7 +106,7 @@ case "$1" in
 		      echo "$node wired"
 		    fi
 
-		    DEFAULT=`run_on_node $node "/sbin/route -n 2>&1 | grep '^0.0.0.0' | grep '192.168.3'" "/" $DIR/../etc/keys/id_dsa | awk '{print $8}'`
+		    DEFAULT=`run_on_node $node "/sbin/route -n 2>&1 | grep '^0.0.0.0' | grep '192.168.3'" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config | awk '{print $8}'`
 
 		    if [ "x$DEFAULT" = "xeth0" ]; then 
 		      echo "$node wired"
@@ -117,7 +117,7 @@ case "$1" in
 		;;
 	"olsrbackbone")	
 		for node in $NODELIST; do
-		    OLSRD=`run_on_node $node "ps | grep olsrd | grep -v grep" "/" $DIR/../etc/keys/id_dsa | wc -l`
+		    OLSRD=`run_on_node $node "ps | grep olsrd | grep -v grep" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config | wc -l`
 		    
 		    if [ "x$OLSRD" = "x0" ]; then 
 		      echo "no"
@@ -146,7 +146,7 @@ case "$1" in
 		  START_TEST="0 0 0"
 		  
 		  while [ "$START_TEST" != "$node 1 1" ]; do
-		    run_on_node $node "./node_check.sh start &" "/tmp" $DIR/../etc/keys/id_dsa
+		    run_on_node $node "./node_check.sh start &" "/tmp" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		    START_TEST=`NODELIST="$NODELIST" $0 test_node_check`
 		    echo "$START_TEST"
 		  done
@@ -168,8 +168,8 @@ case "$1" in
 	        fi
 
 		for node in $NODELIST; do
-		    PID_EX=`run_on_node $node "ls /tmp/run/node_check.pid 2> /dev/null | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
-		    PROC_EX=`run_on_node $node "ps | grep node_check | grep -v grep 2> /dev/null | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+		    PID_EX=`run_on_node $node "ls /tmp/run/node_check.pid 2> /dev/null | wc -l" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config | awk '{print $1}'`
+		    PROC_EX=`run_on_node $node "ps | grep node_check | grep -v grep 2> /dev/null | wc -l" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config | awk '{print $1}'`
 		    echo "$node $PID_EX $PROC_EX"
 		done
 		;;
@@ -187,7 +187,7 @@ case "$1" in
 	        fi
 
 		for node in $NODELIST; do
-		    run_on_node $node "if [ -f /tmp/brn_driver ]; then rm -f /tmp/brn_driver; fi" "/" $DIR/../etc/keys/id_dsa
+		    run_on_node $node "if [ -f /tmp/brn_driver ]; then rm -f /tmp/brn_driver; fi" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		;;
 	*)
@@ -195,4 +195,4 @@ case "$1" in
 		;;
 esac
 
-exit 0		
+exit 0

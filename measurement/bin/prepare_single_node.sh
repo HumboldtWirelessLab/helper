@@ -120,14 +120,14 @@ if [ -f $CONFIGFILE ]; then
       NODELIST="$node" MODULSDIR=$CLICKMODDIR $DIR/../../host/bin/click.sh rmmod >> status/$LOGMARKER\_killclick.log 2>&1
     else
       if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-        run_on_node $node "$DIR/../../nodes/bin/click.sh stop" "/" $DIR/../../host/etc/keys/id_dsa
+        run_on_node $node "$DIR/../../nodes/bin/click.sh stop" "/" $DIR/../../host/etc/keys/id_dsa $DIR/../../host/etc/keys/ssh_config
       fi
     fi
 
     APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
 
     if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-      run_on_node $node "$APPLICATION  stop" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_killclick.log 2>&1
+      run_on_node $node "$APPLICATION  stop" "/" $DIR/../../host/etc/keys/id_dsa $DIR/../../host/etc/keys/ssh_config >> status/$LOGMARKER\_killclick.log 2>&1
     fi
     echo " done" >> status/$LOGMARKER\_killclick.log 2>&1
   done
@@ -174,8 +174,8 @@ abort_measurement() {
 
   if [ "x$MODE" = "xwireless" ]; then
     for node in $NODELIST; do
-      scp -i $DIR/../../host/etc/keys/id_dsa -r root@$node:$FINALRESULTDIR/ $FINALRESULTDIR/../ > status/$LOGMARKER\_copy_result.log 2>&1
-      run_on_node $node "rm -rf $FINALRESULTDIR/" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_copy_result.log 2>&1
+      scp -i $DIR/../../host/etc/keys/id_dsa -F $DIR/../../host/etc/keys/ssh_config -r root@$node:$FINALRESULTDIR/ $FINALRESULTDIR/../ > status/$LOGMARKER\_copy_result.log 2>&1
+      run_on_node $node "rm -rf $FINALRESULTDIR/" "/" $DIR/../../host/etc/keys/id_dsa $DIR/../../host/keys/ssh_config >> status/$LOGMARKER\_copy_result.log 2>&1
       echo "Done" >> status/$LOGMARKER\_copy_result.log 2>&1
     done
   fi
@@ -331,7 +331,7 @@ if [ "x$MODE" = "xwireless" ]; then
     NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 
     for device in $NODEDEVICELIST; do
-      run_on_node $node "RUNMODE=DRIVER MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$device $DIR/../../nodes/lib/standalone/standalone.sh setup" "/" $DIR/../../host/etc/keys/id_dsa
+      run_on_node $node "RUNMODE=DRIVER MODULSDIR=$MODULSDIR MODOPTIONS=$MODOPTIONS CONFIG=$CONFIG DEVICE=$device $DIR/../../nodes/lib/standalone/standalone.sh setup" "/" $DIR/../../host/etc/keys/id_dsa $DIR/../../host/etc/keys/ssh_config
     done
 
   done
@@ -430,7 +430,7 @@ if [ $RUNMODENUM -le 3 ]; then
     echo "OLSR: $OLSR" > status/$LOGMARKER\_olsr_status.log 2>&1
     if [ "x$OLSR" = "xyes" ]; then
       for node in $NODELIST; do
-         run_on_node $node "$DIR/../../nodes/lib/backbone/backbone.sh stop_backbone" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_olsr_status.log 2>&1
+         run_on_node $node "$DIR/../../nodes/lib/backbone/backbone.sh stop_backbone" "/" $DIR/../../host/etc/keys/id_dsa $DIR/../../host/etc/keys/ssh_config >> status/$LOGMARKER\_olsr_status.log 2>&1
       done
     fi
 
@@ -461,7 +461,7 @@ if [ $RUNMODENUM -le 3 ]; then
     else
       if [ "x$OLSR" = "xyes" ]; then
         for node in $NODELIST; do
-          run_on_node $node "$DIR/../../nodes/lib/backbone/backbone.sh start_backbone" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_olsr_status.log 2>&1
+          run_on_node $node "$DIR/../../nodes/lib/backbone/backbone.sh start_backbone" "/" $DIR/../../host/etc/keys/id_dsa $DIR/../../host/etc/keys/ssh_config >> status/$LOGMARKER\_olsr_status.log 2>&1
         done
       fi
     fi
@@ -597,7 +597,7 @@ if [ $RUNMODENUM -le 5 ]; then
 	    fi
 
 	    if [ "x$WANTNODELIST" = "xyes" ]; then
-	      MADDR=`run_on_node $node "DEVICE=$nodedevice $DIR/../../nodes/bin/wlandevice.sh getmac" "/" $DIR/../../host/etc/keys/id_dsa`
+	      MADDR=`run_on_node $node "DEVICE=$nodedevice $DIR/../../nodes/bin/wlandevice.sh getmac" "/" $DIR/../../host/etc/keys/id_dsa $DIR/../../host/etc/keys/ssh_config`
 	      echo "$node $nodedevice $MADDR" >> $FINALRESULTDIR/nodelist_$NODELIST
 	    fi
 
@@ -648,7 +648,7 @@ CURRENTMODE="PRELOAD CLICK"
 if [ "x$MODE" != "xwireless" ]; then
   for node in $NODELIST; do
     NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-    NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa`
+    NODEARCH=`get_arch $node $DIR/../../host/etc/keys/id_dsa $DIR/../../host/etc/keys/ssh_config`
 
     LOADCLICK=0
     for nodedevice in $NODEDEVICELIST; do
@@ -667,13 +667,13 @@ if [ "x$MODE" != "xwireless" ]; then
 
       if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
         echo "Application preload on $node" >> status/$LOGMARKER\_preload.log
-        run_on_node $node "cat $APPLICATION > /dev/null" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
+        run_on_node $node "cat $APPLICATION > /dev/null" "/" $DIR/../../host/etc/keys/id_dsa $DIR/../../host/etc/keys/ssh_config >> status/$LOGMARKER\_preload.log 2>&1
       fi
     done
 
     if [ "x$LOADCLICK" = "x1" ]; then
       echo "Click preload on $node" >> status/$LOGMARKER\_preload.log
-      run_on_node $node "export CLICKPATH=$NODEBINDIR/../etc/click;echo \"Script(wait 0,stop);\" | $NODEBINDIR/click-align-$NODEARCH | $NODEBINDIR/click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_preload.log 2>&1
+      run_on_node $node "export CLICKPATH=$NODEBINDIR/../etc/click;echo \"Script(wait 0,stop);\" | $NODEBINDIR/click-align-$NODEARCH | $NODEBINDIR/click-$NODEARCH" "/" $DIR/../../host/etc/keys/id_dsa $DIR/../../host/etc/keys/ssh_config >> status/$LOGMARKER\_preload.log 2>&1
     fi
   done
 fi
@@ -702,8 +702,8 @@ kill_everything
 
 if [ "x$MODE" = "xwireless" ]; then
   for node in $NODELIST; do
-    scp -i $DIR/../../host/etc/keys/id_dsa -r root@$node:$FINALRESULTDIR/ $FINALRESULTDIR/../ > status/$LOGMARKER\_copy_result.log 2>&1
-    run_on_node $node "rm -rf $FINALRESULTDIR/" "/" $DIR/../../host/etc/keys/id_dsa >> status/$LOGMARKER\_copy_result.log 2>&1
+    scp -i $DIR/../../host/etc/keys/id_dsa -F $DIR/../../host/etc/keys/ssh_config -r root@$node:$FINALRESULTDIR/ $FINALRESULTDIR/../ > status/$LOGMARKER\_copy_result.log 2>&1
+    run_on_node $node "rm -rf $FINALRESULTDIR/" "/" $DIR/../../host/etc/keys/id_dsa $DIR/../../host/etc/keys/ssh_config >> status/$LOGMARKER\_copy_result.log 2>&1
   done
 fi
 

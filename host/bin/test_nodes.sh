@@ -42,7 +42,7 @@ if [ "x$1" = "xall" ]; then
 	echo "wgt$N no no"
       else
 	echo -n "yes"
-	DIR=`echo -n | ssh -i $DIR/../etc/keys/id_dsa root@wgt$N pwd 2>&1`
+	DIR=`echo -n | ssh -F $DIR/../etc/keys/ssh_config -i $DIR/../etc/keys/id_dsa root@wgt$N pwd 2>&1`
 	if [ "x$DIR" = "x" ]; then
 	  echo " SSH not(!!) available"
 	  echo "wgt$N yes no"
@@ -76,7 +76,7 @@ else
 	echo "$i no no"
       else
 	echo -n "yes"
-	LSDIR=`echo -n | ssh -i $DIR/../etc/keys/id_dsa root@$i pwd 2>&1`
+	LSDIR=`echo -n | ssh -F $DIR/../etc/keys/ssh_config -i $DIR/../etc/keys/id_dsa root@$i pwd 2>&1`
 	if [ "x$LSDIR" = "x" ]; then
 	  echo " SSH not(!!) available"
 	  echo "$i yes no"
