@@ -166,7 +166,7 @@ case "$1" in
 		;;
 	"unpack_remote")
 		FILENAME=`basename $FILE`
-		FINALFILE=`bzcat $TARGETDIR/$FILENAME | tar -t | tail -n 1`
+		FINALFILE=`bzcat $FILE | tar -t | tail -n 1`
 		echo "Testfile is $FINALFILE"
  
 		for node in $NODELIST; do
