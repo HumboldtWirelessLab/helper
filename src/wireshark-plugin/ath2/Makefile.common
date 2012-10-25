@@ -1,0 +1,7 @@
+# Makefile.common for ath2plugin
+PLUGIN_NAME = ath2
+
+# the dissector sources (without any helpers)
+DISSECTOR_SRC = \
+	ath2_proto.c
+
