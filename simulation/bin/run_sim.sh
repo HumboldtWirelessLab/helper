@@ -353,8 +353,8 @@ case "$MODE" in
 				mac_raw=`expr $i + 1`
 				m1=`expr $mac_raw / 256`
 				m2=`expr $mac_raw % 256`
-				m1h=$(echo "obase=16; $m1" | bc | tr [A-F] [a-f])
-				m2h=$(echo "obase=16; $m2" | bc | tr [A-F] [a-f])
+				m1h=$(echo "obase=16; $m1" | bc)
+				m2h=$(echo "obase=16; $m2" | bc)
 				if [ $m1 -lt 16 ]; then
 					m1h="0$m1h"
 				fi
@@ -555,6 +555,8 @@ case "$MODE" in
 		# if the simulation was correctly execruted start the automatized evaluation of the experiment
 		if [ $? -eq 0 ]; then
 			echo "Evaluation..."
+			echo "#!/bin/sh" > $FINALRESULTDIR/eval_again.sh
+			echo "MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT" >> $FINALRESULTDIR/eval_again.sh
 			MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
 		else
 			exit 1
