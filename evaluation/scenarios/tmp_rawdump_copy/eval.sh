@@ -38,8 +38,8 @@ if [ -f $RESULTDIR/nodes.mac ]; then
           mv /tmp/$NODE.$DEVICE.raw.dump $RESULTDIR
         fi
       else
-        scp -i $DIR/../../../host/etc/keys/id_dsa root@$NODE:/tmp/$NODE.$DEVICE.raw.dump $RESULTDIR > /dev/null 2>&1
-        ssh -i $DIR/../../../host/etc/keys/id_dsa root@$NODE "/bin/rm -f /tmp/$NODE.$DEVICE.raw.dump"
+        scp -F $DIR/../../../host/etc/keys/ssh_config -i $DIR/../../../host/etc/keys/id_dsa root@$NODE:/tmp/$NODE.$DEVICE.raw.dump $RESULTDIR > /dev/null 2>&1
+        ssh -F $DIR/../../../host/etc/keys/ssh_config -i $DIR/../../../host/etc/keys/id_dsa root@$NODE "/bin/rm -f /tmp/$NODE.$DEVICE.raw.dump"
       fi
     fi
   done

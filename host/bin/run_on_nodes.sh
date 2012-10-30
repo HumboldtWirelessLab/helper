@@ -21,5 +21,5 @@ esac
 . $DIR/functions.sh
 
 for node in $NODELIST; do
-  run_on_node $node "$1" "." $DIR/../etc/keys/id_dsa
+  run_on_node $node "$1" "." $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 done
