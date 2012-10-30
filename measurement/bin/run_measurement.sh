@@ -81,7 +81,7 @@ if [ "x$GPS" = "xyes" ] || [ "x$GPS" = "xsingle" ] || [ "x$LOS" = "xyes" ]; then
     if [ $GPSD -eq 0 ]; then
       echo -n "Warning: no GPS ! Exit (y/n) ? "
       read key
-    
+
       if [ "x$key" = "xy" ]; then
         exit 0
       fi
@@ -103,10 +103,10 @@ if [ "x$GPS" = "xyes" ] || [ "x$GPS" = "xsingle" ] || [ "x$LOS" = "xyes" ]; then
           cat $pwd/$FIRSTNODE\_gps.info > $FINALRESULTDIR/$n\_gps.info
         else
           echo "Get GPS -Data"
-    
+
           echo -n "Get Position for $n ! Press any key !"
           read key
-	
+
           $DIR/../../host/bin/gps.sh getdata > $FINALRESULTDIR/$n\_gps.info
         fi
       fi
@@ -114,7 +114,7 @@ if [ "x$GPS" = "xyes" ] || [ "x$GPS" = "xsingle" ] || [ "x$LOS" = "xyes" ]; then
 
     if [ "x$LOS" = "xyes" ]; then
       key=0
-    
+
       while [ $key -le 0 ] || [ $key -gt 10 ]; do
 	echo -n "LOS ? 1(full) 2(full,very small obstacle) 3(full,small obstacles) ..... 8(obstacle,very small los) 9(obstacle, nolos) 10(fat obstacle) (1-10): "
 	read key
@@ -123,9 +123,9 @@ if [ "x$GPS" = "xyes" ] || [ "x$GPS" = "xsingle" ] || [ "x$LOS" = "xyes" ]; then
 	    key=0
 	fi
       done
-    
+
       echo "LOS=$key" > $FINALRESULTDIR/$n.info
-    fi  
+    fi 
   done
 fi
 
@@ -205,8 +205,11 @@ if [ "x$TESTONLY" = "x" ]; then
   echo "MODE=testbed CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.real RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh" >> $FINALRESULTDIR/eval_again.sh
 
   if [ $? -eq 0 ]; then
+    if [ "x$EVAL_LOG_OUT" = "x" ]; then
+      EVAL_LOG_OUT=1
+    fi
     #echo "MODE=testbed CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.real RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh"
-    MODE=testbed CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.real RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh
+    MODE=testbed CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.real RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
   fi
 
 fi

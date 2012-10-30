@@ -12,8 +12,19 @@ fi
 
 THRESHOLD=10000
 
-cat $RESULTDIR/measurement.log | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5}' | sed -e "s#-##g" | awk '{print "node"strtonum("0x"$1)" node"strtonum("0x"$2)}' | sort -u > $EVALUATIONSDIR/links.all
-cat $RESULTDIR/measurement.log | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | sed -e "s#-##g" | awk '{print "node"strtonum("0x"$1)" node"strtonum("0x"$2)" "$3}' |sort -u > $EVALUATIONSDIR/linksmetric.all
+if [ -f $RESULTDIR/measurement.xml ]; then
+  DATAFILE=$RESULTDIR/measurement.xml
+else
+  if [ -f $EVALUATIONSDIR/measurement.xml ]; then
+    DATAFILE=$EVALUATIONSDIR/measurement.xml
+  else
+    DATAFILE=$RESULTDIR/measurement.log
+  fi
+fi
+
+
+cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5}' | sed -e "s#-##g" | awk '{print "node"strtonum("0x"$1)" node"strtonum("0x"$2)}' | sort -u > $EVALUATIONSDIR/links.all
+cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | sed -e "s#-##g" | awk '{print "node"strtonum("0x"$1)" node"strtonum("0x"$2)" "$3}' |sort -u > $EVALUATIONSDIR/linksmetric.all
 
 FULLSED=""
 while read line; do
