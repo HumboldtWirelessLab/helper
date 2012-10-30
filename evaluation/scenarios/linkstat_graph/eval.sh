@@ -10,8 +10,6 @@ if [ ! -e $EVALUATIONSDIR ]; then
   mkdir -p $EVALUATIONSDIR
 fi
 
-THRESHOLD=10000
-
 if [ -f $RESULTDIR/measurement.xml ]; then
   DATAFILE=$RESULTDIR/measurement.xml
 else
@@ -22,45 +20,86 @@ else
   fi
 fi
 
-
-cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5}' | sed -e "s#-##g" | awk '{print "node"strtonum("0x"$1)" node"strtonum("0x"$2)}' | sort -u > $EVALUATIONSDIR/links.all
-cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | sed -e "s#-##g" | awk '{print "node"strtonum("0x"$1)" node"strtonum("0x"$2)" "$3}' |sort -u > $EVALUATIONSDIR/linksmetric.all
+THRESHOLD=3000
 
 FULLSED=""
 while read line; do
   SRCN=`echo $line | awk '{print $1}'` 
-  SRCM=`echo $line | awk '{print $2}' | sed -e "s#-##g"`
-  
+  SRCM=`echo $line | awk '{print $3}'`
+
   FULLSED="$FULLSED -e s#$SRCM#$SRCN#g"
 done < $RESULTDIR/nodes.mac
 
-#echo $FULLSED
+
+cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5}' | sort -u > $EVALUATIONSDIR/links.all
+cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | sort -u > $EVALUATIONSDIR/linksmetric.all
 
 echo "digraph G {" > $EVALUATIONSDIR/linksmetric.dot.tmp
+echo "digraph G {" > $EVALUATIONSDIR/links.dot.tmp
+
+NODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}' | sort -u`
+
+if [ -e $RESULTDIR/placementfile.plm ]; then
+  USE_NEATO=1
+  for n in $NODES; do
+    NODENAME=`cat $RESULTDIR/nodes.mac | grep $n | awk '{print $1}'`
+    X=`cat $RESULTDIR/placementfile.plm | grep "$NODENAME " | awk '{print $2}'`
+    X=`calc $X / 50 | sed "s#^[[:space:]]*~##g"`
+    Y=`cat $RESULTDIR/placementfile.plm | grep "$NODENAME " | awk '{print $3}'`
+    Y=`calc $Y / 50 | sed "s#^[[:space:]]*~##g"`
+    echo "\"$n\" [pos=\"$X,$Y!\"];" >> $EVALUATIONSDIR/links.dot.tmp
+    echo "\"$n\" [pos=\"$X,$Y!\"];" >> $EVALUATIONSDIR/linksmetric.dot.tmp
+  done
+else
+  USE_NEATO=0
+fi
+
 while read line; do
   SRC=`echo $line | awk '{print $1}'`
   DST=`echo $line | awk '{print $2}'`
-    
+
   METRIC=`cat $EVALUATIONSDIR/linksmetric.all | grep "$SRC $DST" | awk '{print $3}' | sort | head -n 1`
-  
+
   if [ $METRIC -lt $THRESHOLD ]; then
     echo "\"$SRC\" -> \"$DST\"  [label=\"$METRIC\"];" >> $EVALUATIONSDIR/linksmetric.dot.tmp
   fi
-  
+
 done < $EVALUATIONSDIR/links.all
 
-echo "}" >> $EVALUATIONSDIR/linksmetric.dot.tmp
-
-cat $EVALUATIONSDIR/linksmetric.dot.tmp | sed $FULLSED > $EVALUATIONSDIR/linksmetric.dot
-dot -Tpng $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.png
-
-
-echo "digraph G {" > $EVALUATIONSDIR/links.dot.tmp
 
 cat  $EVALUATIONSDIR/links.all | sort -u | awk '{print "\"" $1 "\" -> \"" $2 "\" [label=\"1\"];"}' >> $EVALUATIONSDIR/links.dot.tmp
+
+echo "}" >> $EVALUATIONSDIR/linksmetric.dot.tmp
 echo "}" >> $EVALUATIONSDIR/links.dot.tmp
 
-cat $EVALUATIONSDIR/links.dot.tmp | sed $FULLSED > $EVALUATIONSDIR/links.dot
-dot -Tpng $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.png
 
-rm -f $EVALUATIONSDIR/links.dot.tmp $EVALUATIONSDIR/links.dot $EVALUATIONSDIR/linksmetric.dot.tmp $EVALUATIONSDIR/linksmetric.dot
+cat $EVALUATIONSDIR/links.dot.tmp | sed $FULLSED > $EVALUATIONSDIR/links.dot
+cat $EVALUATIONSDIR/linksmetric.dot.tmp | sed $FULLSED > $EVALUATIONSDIR/linksmetric.dot
+
+if [ $USE_NEATO -eq 0 ]; then
+  dot -Tpng $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.png
+  dot -Tpng $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.png
+else
+  neato -Teps $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.eps 2> /dev/null
+  if [ $? -ne 0 ]; then
+    rm -f $EVALUATIONSDIR/links.eps
+    neato -Tpng $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.png 2> /dev/null
+    if [ $? -ne 0 ]; then
+      rm -f $EVALUATIONSDIR/links.png
+      echo "No Images"
+    fi
+  fi
+
+  neato -Teps $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.eps 2> /dev/null
+
+  if [ $? -ne 0 ]; then
+    rm -f $EVALUATIONSDIR/linksmetric.eps
+    neato -Tpng $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.png 2> /dev/null
+    if [ $? -ne 0 ]; then
+      rm -f $EVALUATIONSDIR/linksmetric.png
+    fi
+  fi
+fi
+
+rm -f $EVALUATIONSDIR/links.dot.tmp $EVALUATIONSDIR/links.dot $EVALUATIONSDIR/linksmetric.dot.tmp $EVALUATIONSDIR/linksmetric.dot $EVALUATIONSDIR/links.all $EVALUATIONSDIR/linksmetric.all
+#$EVALUATIONSDIR/conn.mat
