@@ -87,7 +87,7 @@ case "$1" in
 			    echo "$EXTRANFS already mounted"
 			fi
 		    else
-			echo "NFSHOME not set, so no mount."
+			echo "EXTRANFS not set, so no mount."
 		    fi
 		done
 		;;
