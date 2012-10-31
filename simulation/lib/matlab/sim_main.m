@@ -16,8 +16,8 @@ is_ism_5_ghz = 0; % 0:= off; 1:= on % only 802.11a
 is_ism_2_4_and_5_ghz = 0; % 0:= off; 1:= on % only 802.11n
 
 bandwidth = 0; % used for 802.11n as follows: 0:= 20 MHz; 1:=40MHz
-mcs = 1; % used for 802.11n as follows:mcs;  mcs index number is mapped to the data rate
-rts_cts_on = 0  ; % 0:= do not use; 1:=use RTS/CTS (exists at 802.11g and higher)
+number_of_antennas = 1; % Antennas:= Default-Value = 1 for 802.11n there can be more
+rts_cts_on = 1  ; % 0:= do not use; 1:=use RTS/CTS (exists at 802.11g and higher)
 
 %---------------------- 802.11n Parameter --------------------------------
 short_guard_interval = 0; % 0:= off, 1:= on for use
@@ -28,7 +28,7 @@ is_a_mpdu_used = 0; % 0:= off, 1:= on for use
 number_of_msdus_in_a_msdus = 0;
 number_of_mpdus_in_a_mpdus = 0;
 
-%------------ Support rates for each Standard ----------------------------------------
+%------------ Supported rates for each Standard ----------------------------------------
 vector_rates_80211 = [1,2];
 vector_rates_80211b_hr_dsss = [5.5,11];
 vector_rates_80211b = [vector_rates_80211,vector_rates_80211b_hr_dsss];
@@ -38,15 +38,18 @@ vector_rates_80211a = sort([vector_rates_80211a_mandatory,vector_rates_80211a_op
 vector_rates_80211g_erp_pbcc = [22,33];
 vector_rates_80211g_erp_ofdm = vector_rates_80211a;
 vector_rates_80211g = sort([vector_rates_80211,vector_rates_80211b_hr_dsss,vector_rates_80211g_erp_pbcc, vector_rates_80211g_erp_ofdm]);
+[ matrix_data_rates_80211n ] = func_80211n_data_rates_supported_get();
+vector_rates_80211n = unique(matrix_data_rates_80211n)';
 %vector_rates_80211g = sort([6,12,18,24,36,48,54]);
 %------------ Rate Configuration ----------------------------------------
-vector_rates= sort([6,11,12,24,36,48,54]); %vector_rates_80211g; %vector_rates_80211a_mandatory;%vector_rates_80211; % vector_rates_80211a;
+%vector_rates= sort([6,11,12,24,36,48,54]); %vector_rates_80211g; %vector_rates_80211a_mandatory;%vector_rates_80211; % vector_rates_80211a;
+vector_rates = min(vector_rates_80211);
 vector_rates_ack = min(vector_rates_80211);
 vector_rates_rts = min(vector_rates_80211);%vector_rates_80211a_mandatory;%[1,2];
 vector_rates_cts=  min(vector_rates_80211);%vector_rates_80211a_mandatory;%[1,2];
 %vector_rate_min_for_efficiency_calc = 20;
 %----------------- MSUD-Size Configuration -------------------------------
-vector_msdu = [0,500,1000,1500,2000,2500,3000,3500,4000]; %[Bytes]; size depend from higher layer; assuming a TCP/IP-Layer which limit the payload to 1500; important:"calculate in byte"
+vector_msdu = [0,500,1000,1500,2000,2500,3000,3500,4000, 6000, 8000]; %[Bytes]; size depend from higher layer; assuming a TCP/IP-Layer which limit the payload to 1500; important:"calculate in byte"
 %------------------------Contention Window Params --------------------------------------------------------------------------
 %[vector_backoff] = func_cw_vector_get(test_find_backoff_optimal_on, no_backoff_window_size_max);
 % ------------------ Simulation Configuration  --------------------------------------------------
@@ -88,6 +91,17 @@ if (simulation_start)
     vector_cw_birthday_problem = 2:1:no_backoff_window_size_max+1;
     vector_birthday_problem_neighbours = 1:1:no_neighbours_max;
     [matrix_birthday_problem_collision_likelihood_packet_loss] = func_birhtday_problem_packetloss(vector_birthday_problem_neighbours,vector_cw_birthday_problem);
+    packet_loss_upper_limit = 0.1; %10percent packet loss
+    [matrix_neighbour_backoff,counter_of_successful_conditions] = func_birthday_problem_search_backoff_neighbours(matrix_birthday_problem_collision_likelihood_packet_loss,packet_loss_upper_limit);    
+    vector_birthday_problem_approximation_neighbours = vector_birthday_problem_neighbours;
+    if (no_neighbours_max > max(counter_of_successful_conditions))
+        no_neighbours_max = max(counter_of_successful_conditions);
+        vector_birthday_problem_approximation_neighbours = 1:1:max(counter_of_successful_conditions);
+        [ matrix_neighbour_backoff_shorten ] = func_birthday_problem_vector_shorten(matrix_neighbour_backoff,max(counter_of_successful_conditions));
+    end
+    %[matrix_birthday_problem_collision_likelihood_packet_loss_2] = func_birhtday_problem_packetloss(vector_birthday_problem_approximation,vector_cw_birthday_problem);
+    [backoff_windows_slot_approximation] = func_backkoff_approximation(packet_loss_upper_limit,vector_birthday_problem_approximation_neighbours);
+    
     %matrix_birthday_problem_collision_likelihood = matrix_birthday_problem_collision_likelihood';
     %matrix_tmt_msdu =zeros(size(vector_rates,2),size(vector_msdu,2));
     matrix_tmt_neighbours = zeros(size(vector_rates,2),size(vector_msdu,2),no_neighbours_max);
@@ -97,6 +111,7 @@ if (simulation_start)
     matrix_results_bandwidth_efficient = zeros(size(vector_rates,2),size(vector_msdu,2),no_neighbours_max);
     matrix_tmt_backoff_birthday_problem = zeros(size(vector_rates,2),size(vector_msdu,2),no_neighbours_max);
     matrix_tmt_backoff_birthday_problem_approximation = zeros(size(vector_rates,2),size(vector_msdu,2),no_neighbours_max);
+    matrix_duration_delay = zeros(size(vector_rates,2),size(vector_msdu,2));
     sifs_time = 0;
     difs_time = 0;
     slot_time = 0;
@@ -151,11 +166,12 @@ if (simulation_start)
             %--------------------------- IEEE 802.11n - OFDM -----------------------------------
             %elseif ((~isempty(find(vector_rates_80211g == vector_rates(1,index_rates), 1))) && is_ism_2_4_and_5_ghz == 1)
             elseif ((~isempty(find(vector_rates_80211n == vector_rates(1,index_rates), 1))) && is_ism_2_4_and_5_ghz == 1)
+                mcs_index = func_80211n_mapping_data_rate_2_mcs_index(vector_rates(1,index_rates),number_of_antennas);
                 [sifs_time, difs_time,slot_time ] = func_phy_ieee80211n_get_sifs_difs_2();
                 [ vector_cw ] =  func_ieee80211n_contention_window_get();
                 [mac_frame,output_xml] = func_mac_ieee_80211n(vector_msdu(1,index_msdu), is_Address4_requiered, is_ht_required,is_frame_body_8_kb,is_a_msdu_used, number_of_msdus_in_a_msdus, is_a_mpdu_used, number_of_mpdus_in_a_mpdus);
-                [plcp_framing_mac_bits,plcp_framing_mac_duration, output_xml_mac] = func_phy_ieee80211n_2(mcs,mac_frame,short_guard_interval, bandwidth,greenfield );
-                [plcp_framing_ack_bits,plcp_framing_ack_duration, output_xml_ack] = func_phy_ieee80211n_2(mcs,ack_frame,short_guard_interval, bandwidth,greenfield );
+                [plcp_framing_mac_bits,plcp_framing_mac_duration, output_xml_mac] = func_phy_ieee80211n_2(mcs_index,mac_frame,short_guard_interval, bandwidth,greenfield );
+                [plcp_framing_ack_bits,plcp_framing_ack_duration, output_xml_ack] = func_phy_ieee80211n_2(mcs_index,ack_frame,short_guard_interval, bandwidth,greenfield );
                 [plcp_framing_bits_rts,plcp_framing_duration_rts, output_xml_rts] = func_phy_ieee80211n_2(vector_rates_rts(1,1),rts_frame,greenfield_use, dsss_ofdm_use);
                 [plcp_framing_bits_cts,plcp_framing_duration_cts, output_xml_cts] = func_phy_ieee80211n_2(vector_rates_cts(1,1),cts_frame,greenfield_use, dsss_ofdm_use);
             else
@@ -166,6 +182,8 @@ if (simulation_start)
                 plcp_framing_duration_rts = 0;
                 plcp_framing_duration_cts = 0;
             end
+            delay_per_msdu_without_ack = 0;
+            delay_per_msdu_with_ack = 0;
             if (plcp_framing_mac_duration ~= 0)
                 time_to_wait_for_ack = sifs_time  + plcp_framing_ack_duration;
                 delay_per_msdu_without_ack = difs_time + plcp_framing_mac_duration +  time_to_wait_for_ack;%[sec]; case: collision: without ack-frame
@@ -175,10 +193,8 @@ if (simulation_start)
                     delay_per_msdu_without_ack = difs_time + plcp_framing_duration_rts + time_to_wait_for_cts ;%[sec]; case: collision: without ack-frame
                     delay_per_msdu_with_ack = delay_per_msdu_without_ack + sifs_time +  plcp_framing_mac_duration + time_to_wait_for_ack;%[sec]; case: successful transmission            
                 end
-            else
-                delay_per_msdu_without_ack = 0;
-                delay_per_msdu_with_ack = 0;
             end
+            matrix_duration_delay(index_rates,index_msdu) = delay_per_msdu_without_ack / packet_loss_upper_limit;
             if (simulation_of_collision == 0)
                 for n=1:1:number_of_neighbours
                     for k=1:1:backoff_window_size_max
@@ -213,6 +229,7 @@ if (simulation_start)
                     matrix_tmt_backoff_birthday_problem(index_rates,index_msdu,n) = vector_birthday_problem_collision_likelihood(n,1) * 100; %[percent]
                     matrix_tmt_backoff_birthday_problem_approximation(index_rates,index_msdu,n) = func_backkoff_approximation(matrix_tmt_collisions_percent(index_rates,index_msdu,n),n);
                     matrix_tmt_collisions_percent(index_rates,index_msdu,n) = matrix_tmt_collisions_percent(index_rates,index_msdu,n) * 100; %[percent]
+                    
                 end
             else
                 for n=1:1:no_neighbours_max
@@ -222,6 +239,7 @@ if (simulation_start)
                     matrix_results_bandwidth_efficient(index_rates,index_msdu,n) = 0;
                     matrix_tmt_backoff_birthday_problem(index_rates,index_msdu,n) = 0;
                     matrix_tmt_backoff_birthday_problem_approximation(index_rates,index_msdu,n) = 0;
+
                 end
             end
         end

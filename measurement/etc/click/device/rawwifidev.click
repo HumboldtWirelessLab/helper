@@ -65,7 +65,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
-#if defined(SIMULATION) || (WIFITYPE == 802)
+#if defined(SIMULATION) || (WIFITYPE == 803)
   -> WifiSeq()                                                      // Set sequencenumber for simulation
 #endif
 #ifndef DISABLE_TOS2QUEUEMAPPER

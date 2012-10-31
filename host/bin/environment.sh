@@ -43,14 +43,14 @@ case "$1" in
 		    fi
 
 		    if [ ! "x$NFSHOME" = "x" ]; then
-			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config | awk '{print $1}'`
 			echo "Check mount ($NFSHOME). Result: ->$ALREADY_MOUNTED<-"
 			if [ "x$ALREADY_MOUNTED" = "x0" ]; then
 			    if [ "x$NFSOPTIONS" = "x" ]; then
 				NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
 			    fi
-			    run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa
-			    run_on_node $node "if [ -f /sbin/mount ]; then /sbin/mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME; else mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME; fi" "/" $DIR/../etc/keys/id_dsa
+			    run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
+			    run_on_node $node "if [ -f /sbin/mount ]; then /sbin/mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME; else mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME; fi" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 			else
 			  echo "$NFSHOME already mounted"
 			fi
@@ -76,18 +76,18 @@ case "$1" in
 
 		    if [ ! "x$EXTRANFS" = "x" ] && [ ! "x$EXTRANFSTARGET" = "x" ] &&  [ ! "x$EXTRANFSSERVER" = "x" ]; then
 
-		    	ALREADY_MOUNTED=`run_on_node $node "mount | grep $EXTRANFS | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+		    	ALREADY_MOUNTED=`run_on_node $node "mount | grep $EXTRANFS | wc -l" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config | awk '{print $1}'`
 			if [ "x$ALREADY_MOUNTED" = "x0" ]; then
 			    if [ "x$NFSOPTIONS" = "x" ]; then
 				NFSOPTIONS="nolock,soft,vers=2,proto=udp,wsize=16384,rsize=16384"
 			    fi
-			    run_on_node $node "mkdir -p $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa
-			    run_on_node $node "if [ -f /sbin/mount ]; then /sbin/mount -t nfs -o $NFSOPTIONS $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET; else mount -t nfs -o $NFSOPTIONS $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET; fi" "/" $DIR/../etc/keys/id_dsa
+			    run_on_node $node "mkdir -p $EXTRANFSTARGET" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
+			    run_on_node $node "if [ -f /sbin/mount ]; then /sbin/mount -t nfs -o $NFSOPTIONS $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET; else mount -t nfs -o $NFSOPTIONS $EXTRANFSSERVER:$EXTRANFS $EXTRANFSTARGET; fi" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 			else
 			    echo "$EXTRANFS already mounted"
 			fi
 		    else
-			echo "NFSHOME not set, so no mount."
+			echo "EXTRANFS not set, so no mount."
 		    fi
 		done
 		;;
@@ -105,14 +105,14 @@ case "$1" in
 		    fi
 
 		    if [ ! "x$NFSHOME" = "x" ]; then
-			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config | awk '{print $1}'`
 
 			if [ "x$ALREADY_MOUNTED" != "x0" ]; then
 			  echo "$NFSHOME already mounted. Umount to clean everything and to save space"
-			  run_on_node $node "umount $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			  run_on_node $node "umount $NFSHOME" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 			fi
 
-			run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 			
 			MOUNTED_SUCC=0;
 			
@@ -121,10 +121,10 @@ case "$1" in
 			  if [ "x$MOUNTED_SUCC" != "x0" ]; then
 			    echo "$NFSHOME mounted successfull"
 			  else
-			    run_on_node $node "mount -t tmpfs none $NFSHOME" "/" $DIR/../etc/keys/id_dsa
+			    run_on_node $node "mount -t tmpfs none $NFSHOME" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 			  fi
 
-			  MOUNTED_SUCC=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa | awk '{print $1}'`
+			  MOUNTED_SUCC=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config | awk '{print $1}'`
 
 			done
 
@@ -141,10 +141,10 @@ case "$1" in
 		    FILEBASENAME=`basename $FILE`
 
 		    while [ $SCP_SUCC -eq 0 ]; do
-		      echo "scp -i $DIR/../etc/keys/id_dsa $FILE root@$node:$TARGETDIR"
-		      scp -i $DIR/../etc/keys/id_dsa $FILE root@$node:$TARGETDIR
+		      echo "scp -i $DIR/../etc/keys/id_dsa -F $DIR/../etc/keys/ssh_config $FILE root@$node:$TARGETDIR"
+		      scp -i $DIR/../etc/keys/id_dsa -F $DIR/../etc/keys/ssh_config $FILE root@$node:$TARGETDIR
 		      sleep 1
-		      REMOTEMD5SUM=$(run_on_node $node "export PATH=\$PATH:/bin:/sbin/:/usr/bin:/usr/sbin; md5sum $TARGETDIR/$FILEBASENAME" "/" $DIR/../etc/keys/id_dsa)
+		      REMOTEMD5SUM=$(run_on_node $node "export PATH=\$PATH:/bin:/sbin/:/usr/bin:/usr/sbin; md5sum $TARGETDIR/$FILEBASENAME" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config)
 		      REMOTEMD5SUM=`echo $REMOTEMD5SUM | awk '{print $1}'`
 		      echo "MD5SUM: $MD5SUM REMOTE: $REMOTEMD5SUM"
 		      if [ "x$REMOTEMD5SUM" == "x$MD5SUM" ]; then
@@ -156,7 +156,7 @@ case "$1" in
 	"scp_check")
 		RESULT=1;
 		for node in $NODELIST; do
-		    NODERESULT=`run_on_node $node "ls $TARGETDIR/$FILE 2> /dev/null" "/" $DIR/../etc/keys/id_dsa | wc -l`
+		    NODERESULT=`run_on_node $node "ls $TARGETDIR/$FILE 2> /dev/null" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config | wc -l`
 		    if [ $NODERESULT -eq 0 ]; then
 		      RESULT=`expr $RESULT + 1`
 		    fi
@@ -166,7 +166,7 @@ case "$1" in
 		;;
 	"unpack_remote")
 		FILENAME=`basename $FILE`
-		FINALFILE=`bzcat $TARGETDIR/$FILENAME | tar -t | tail -n 1`
+		FINALFILE=`bzcat $FILE | tar -t | tail -n 1`
 		echo "Testfile is $FINALFILE"
  
 		for node in $NODELIST; do
@@ -174,8 +174,8 @@ case "$1" in
 
 		    while [ "x$SUCC_UNPACK" == "x0" ]; do
 		      echo "bzcat $TARGETDIR/$FILENAME | tar xvf -"
-		      run_on_node $node "export PATH=\$PATH:/bin:/sbin/:/usr/bin:/usr/sbin; bzcat $TARGETDIR/$FILENAME | tar xvf -" "/" $DIR/../etc/keys/id_dsa
-		      SUCC_UNPACK=`run_on_node $node "export PATH=\$PATH:/bin:/sbin/:/usr/bin:/usr/sbin; ls $FINALFILE 2> /dev/null" "/" $DIR/../etc/keys/id_dsa`
+		      run_on_node $node "export PATH=\$PATH:/bin:/sbin/:/usr/bin:/usr/sbin; bzcat $TARGETDIR/$FILENAME | tar xvf -" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
+		      SUCC_UNPACK=`run_on_node $node "export PATH=\$PATH:/bin:/sbin/:/usr/bin:/usr/sbin; ls $FINALFILE 2> /dev/null" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config`
 		      SUCC_UNPACK=`echo $SUCC_UNPACK | wc -l`
 		    done
 		    echo "Unpack successful"
@@ -184,13 +184,13 @@ case "$1" in
 	"watchdogstart")
 		for node in $NODELIST; do
 		    echo "$node"
-		    run_on_node $node "/etc/init.d/watchdog start" "/" $DIR/../etc/keys/id_dsa
+		    run_on_node $node "/etc/init.d/watchdog start" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		;;
 	"settime")
 		for node in $NODELIST; do
 		    echo "Set time on $node."
-		    run_on_node $node "$DIR/../../nodes/bin/time.sh settime" "/" $DIR/../etc/keys/id_dsa
+		    run_on_node $node "$DIR/../../nodes/bin/time.sh settime" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		;;
 	*)
