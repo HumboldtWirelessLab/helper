@@ -103,7 +103,7 @@ case "$1" in
         if [ -f /usr/bin/led_ctrl.sh ]; then
           /usr/bin/led_ctrl.sh measurement
         fi
-        (export CLICKPATH=$DIR/../etc/click; CLICKPATH=$DIR/../etc/click $DIR/click-align-$ARCH $2 | $DIR/click-$ARCH  > $3 2>&1 )
+        (export CLICKPATH=$DIR/../etc/click; CLICKPATH=$DIR/../etc/click $DIR/click-align-$ARCH $2 | $DIR/click-$ARCH  > $3 2>&1; RES=$?; if [ $RES -ne 0 ]; then echo "Failed" >> $3; fi; echo "Exit with $RES" >> $3 )
         ;;
     "stop")
         ARCH=`$DIR/system.sh get_arch`

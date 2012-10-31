@@ -10,10 +10,10 @@ node_available() {
 }
 
 run_on_node() {
-    echo -n "" | ssh -i $4 root@$1 "(cd $3;$2)"
+    echo -n "" | ssh -F $5 -i $4 root@$1 "(cd $3;$2)"
 }
 
 get_arch() {
-     ARCH=`run_on_node $1 "uname -m" "/" $2`
+     ARCH=`run_on_node $1 "uname -m" "/" $2 $3`
      echo "$ARCH"
 }

@@ -37,37 +37,37 @@ case "$1" in
 	"create")
 		for device in $DEVICES; do
 		    echo "create $NODE $device with $CONFIG"
-		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh create" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
+		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh create" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		;;
 	"delete")
 		for device in $DEVICES; do
 		    echo "delete $NODE $device"
-		    run_on_node $NODE "DEVICE=$device ./wlandevice.sh delete" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
+		    run_on_node $NODE "DEVICE=$device ./wlandevice.sh delete" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		;;
 	"config_pre_start")
 		for device in $DEVICES; do
 		    echo "config $NODE $device"
-		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh config_pre_start" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
+		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh config_pre_start" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		;;
 	"start")
 		for device in $DEVICES; do
 		    echo "start $NODE $device"
-		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh start" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
+		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh start" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		;;
 	"config_post_start")
 		for device in $DEVICES; do
 		    echo "config $NODE $device"
-		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh config_post_start" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
+		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh config_post_start" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		;;
 	"getiwconfig")
 		for device in $DEVICES; do
 		    echo "getinfo $NODE $device"
-		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh getiwconfig" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa
+		    run_on_node $NODE "CONFIG=$CONFIG DEVICE=$device ./wlandevice.sh getiwconfig" "$DIR/../../nodes/bin/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		;;
 	*)

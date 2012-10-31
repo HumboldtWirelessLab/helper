@@ -33,13 +33,13 @@ case "$1" in
 	"setmarker")
 		for node in $NODELIST; do
 		    echo "$node"
-		    run_on_node $node "touch $MARKER; if [ -f /usr/bin/led_ctrl.sh ]; then /usr/bin/led_ctrl.sh setup; fi" "/" $DIR/../etc/keys/id_dsa
+		    run_on_node $node "touch $MARKER; if [ -f /usr/bin/led_ctrl.sh ]; then /usr/bin/led_ctrl.sh setup; fi" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		;;
 	"statusmarker")	
 	        FAILEDNODES=""
 		for node in $NODELIST; do
-		    RESULT=`run_on_node $node "ls $MARKER" "/" $DIR/../etc/keys/id_dsa 2>&1`
+		    RESULT=`run_on_node $node "ls $MARKER" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config 2>&1`
 		    if [ ! "x$RESULT" = "x$MARKER" ]; then
 		        FAILEDNODES="$FAILEDNODES $node"
 		    fi
@@ -54,7 +54,7 @@ case "$1" in
 	"clearmarker")	
 		for node in $NODELIST; do
 		    echo "$node"
-		    run_on_node $node "rm -rf $MARKER" "/" $DIR/../etc/keys/id_dsa
+		    run_on_node $node "rm -rf $MARKER" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		
 		echo "ok"
