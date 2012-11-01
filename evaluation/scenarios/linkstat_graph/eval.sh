@@ -31,8 +31,8 @@ while read line; do
 done < $RESULTDIR/nodes.mac
 
 
-cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5}' | sort -u > $EVALUATIONSDIR/links.all
-cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | sort -u > $EVALUATIONSDIR/linksmetric.all
+cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5}' | grep -v "=" | sort -u > $EVALUATIONSDIR/links.all
+cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | grep -v "=" | sort -u > $EVALUATIONSDIR/linksmetric.all
 
 echo "digraph G {" > $EVALUATIONSDIR/linksmetric.dot.tmp
 echo "digraph G {" > $EVALUATIONSDIR/links.dot.tmp
@@ -79,6 +79,8 @@ cat $EVALUATIONSDIR/linksmetric.dot.tmp | sed $FULLSED > $EVALUATIONSDIR/linksme
 if [ $USE_NEATO -eq 0 ]; then
   dot -Tpng $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.png
   dot -Tpng $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.png
+  dot -Teps $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.eps
+  dot -Teps $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.eps
 else
   neato -Teps $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.eps 2> /dev/null
   if [ $? -ne 0 ]; then
