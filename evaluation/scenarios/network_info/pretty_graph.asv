@@ -1,0 +1,72 @@
+disp('Loading ...');
+gr = load('graph.txt');
+
+% test only
+%gr = gr(1:10,1:10);
+
+gr = zeros(8, 8);
+gr(1,:) = [];
+
+% make graph symmetric
+for col=1:size(gr,2)
+    for row=col:size(gr,1)
+        if (col ~= row)
+            gr(row, col) = min(gr(row, col), gr(col, row));
+            gr(col, row) = gr(row, col);
+        end
+    end
+end
+
+all_nodes = 1:size(gr,1);
+open_nodes = 1:size(gr,1);
+
+max_cliques = maximalCliques2(gr);
+
+[v, id] = sort(sum(max_cliques), 'descend');
+
+idx = 1;
+idxN = 1;
+gr_ng = {};
+while (~isempty(open_nodes))
+
+    node_ids = all_nodes' .* max_cliques(:, id(idx));
+    node_ids(node_ids == 0) = [];
+    
+    % check if node_ids is contained in open_nodes
+    if (sum(ismember(open_nodes, node_ids)) == size(node_ids,1))
+        open_nodes = setdiff(open_nodes, node_ids);
+        gr_ng{idxN} = node_ids;
+        idxN = idxN + 1;
+    end
+    
+    idx = idx + 1;
+    
+    if (idx >= size(id,2))
+        break;
+    end
+end
+
+% add remaining open nodes
+for ii=1:size(open_nodes,2)
+    gr_ng{idxN} = open_nodes(ii);
+    idxN = idxN + 1;    
+end
+
+% create new adjacency matrix
+
+adj_ng = zeros(size(gr_ng,2), size(gr_ng,2));
+
+for row=1:size(adj_ng,1)
+    nbs = find(sum(gr(gr_ng{row},:)) > 0); % nbs of this hyper node
+    % place edge to each of them
+    for ii=1:size(nbs,2)
+        for kk=1:size(gr_ng,2)
+            if (sum(ismember(gr_ng{kk}, nbs(ii))) == 1)
+                adj_ng(row, nbs(ii)) = 1;
+            end
+        end
+    end
+end
+
+% new adjacency matrix
+adj_ng
