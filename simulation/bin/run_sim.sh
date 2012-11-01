@@ -502,7 +502,7 @@ case "$MODE" in
 		if [ "x$USED_SIMULATOR" = "xns" ]; then
 			echo "Running NS2"
 			# check running NS with a memory debugger and profiler
-			which valgrind > /dev/null
+			which valgrind > /dev/null 2> /dev/null
 			if [ $? -ne 0 ]; then
 				VALGRIND=0
 			fi
