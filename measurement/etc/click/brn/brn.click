@@ -47,9 +47,9 @@
 #define BRN_PORT_FRAGMENTATION           36
 #define BRN_PORT_FLOWCONTROL             37
 /*Info*/
-#define BRN_PORT_NODEINFO                3c
-#define BRN_PORT_CHANNELSTATSINFO        3d
+#define BRN_PORT_CHANNELSTATSINFO        3c
 /*Application*/
 #define BRN_PORT_SHAMIR                  3e
+#define BRN_PORT_SEISMO_COOPERATIVE      3f
 
 #endif
