@@ -1,0 +1,1 @@
+show_network_stats('example/graph.txt')
