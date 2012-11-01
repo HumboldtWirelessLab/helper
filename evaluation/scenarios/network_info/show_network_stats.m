@@ -1,7 +1,9 @@
+function show_network_stats(graphfile)
+
 clear;
 
 disp('Loading ...');
-gr = load('graph.txt');
+gr = load(graphfile);
 
 % test only
 % testCL = [2,3,4,5,6,7,8,10,12,13,14,15,16,17,18,21,22,23,24,25,26,29,31,32,33,34,35,37,38,39,40,41,42,43,44,45,46,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67];
@@ -212,3 +214,5 @@ if (show_mcg)
     end
 end    
 
+
+end
