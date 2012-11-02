@@ -46,5 +46,5 @@ status = eval(cmnd);                 %  get NEATO to layout
 % figure; clf; axis square      %  now plot 
 % [x, y, h] = graph_draw(adj, 'node_labels', labels, 'fontsize', fontsz, ...
 %                        'node_shapes', zeros(size(x,2),1), 'X', x, 'Y', y);
-% delete(tmpLAYOUT); delete(tmpDOTfile);     % clean up temporary files 
+delete(tmpLAYOUT); delete(tmpDOTfile);     % clean up temporary files 
 
