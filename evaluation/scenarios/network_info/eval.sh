@@ -39,6 +39,32 @@ else
   fi
 fi
 
+xsltproc $DIR/bcaststats.xslt $DATAFILE > $EVALUATIONSDIR/bcaststats.csv
+
+BCASTSIZE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $3}' | sort -u`
+BCASTRATE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $4}' | sort -u`
+BCASTNODES=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $1}' | sort -u`
+
+for r in $BCASTRATE; do
+  for s in $BCASTSIZE; do
+   GRAPHFILE="$EVALUATIONSDIR/graph_psr_$r""_""$s.txt"
+   for n in $BCASTNODES; do
+     for m in $BCASTNODES; do
+        METRIC=`cat $EVALUATIONSDIR/bcaststats.csv | grep -e "^$n,$m,$s,$r" | awk -F , '{print $9}' | head -n 1`
+
+        if [ "x$METRIC" = "x" ]; then
+          METRIC=0
+        fi
+
+        echo -n "$METRIC " >> $GRAPHFILE
+      done
+      echo "" >> $GRAPHFILE
+    done
+  done
+done
+
+exit 0
+
 THRESHOLD=3000
 
 cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | grep -v "=" | sort -u > $EVALUATIONSDIR/linksmetric.all
