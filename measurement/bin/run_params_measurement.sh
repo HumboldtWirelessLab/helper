@@ -83,7 +83,7 @@ recursive() {
 
 case "$1" in
     "help")
-	echo "Use $0 collectionfile"
+	echo "Use $0 [sim|measurement] desfile"
 	echo "Skript to run measurement with different parameters (e.g. TXPOWER, CHANNEL,...). The collectionfile include the parameter and the name of the templatefiles (configfile with Vars as parameters)."
 	;;
     "run"|"sim")
@@ -148,7 +148,7 @@ case "$1" in
      	  fi
      	  echo "Run $CURRUN. params"
 		  NOW=`pwd`
-		  ( cd $acdir; SIMULATION=$SIMULATION FIRSTRUNMODE=$FIRSTRUNMODE MULTIRUNMODE=$MULTIRUNMODE MULTIMODE="LOOP" RUNS=$MULTIREPEAT MULTIWAIT=$MULTIWAIT $DIR/run_multiple_measurments.sh $2; cd $NOW)
+		  ( cd $acdir; SIMULATION=$SIMULATION TESTONLY=$TESTONLY FIRSTRUNMODE=$FIRSTRUNMODE MULTIRUNMODE=$MULTIRUNMODE MULTIMODE="LOOP" RUNS=$MULTIREPEAT MULTIWAIT=$MULTIWAIT $DIR/run_multiple_measurments.sh $2; cd $NOW)
 		  let "CURRUN=$CURRUN + 1"
 		  
 		  #TODO think about
