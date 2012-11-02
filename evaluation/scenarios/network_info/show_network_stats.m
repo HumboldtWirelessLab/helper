@@ -1,6 +1,6 @@
 function show_network_stats(graphfile)
 
-clear;
+%clear;
 
 disp('Loading ...');
 gr = load(graphfile);
@@ -16,8 +16,8 @@ rfchannel = 1;
 
 % Plot params
 show_lnk_asym = 1;
-show_ng = 1;
-show_sp = 1;
+show_ng = 0;
+show_sp = 0;
 show_mcg = 1;
 
 addpath(path,'./scheduling');
@@ -37,11 +37,11 @@ if (show_lnk_asym)
 
     f = figure('Position',[200 200 1200 450]);
 
-    adj = gr * 100; % PDR from 0 to 100
+    adj = gr; % * 100; % PDR from 0 to 100
     metric_asyms = [];
     for ii=1:size(adj,1) % for each node
         idx = find(adj(ii,:) > 0);
-        m_asym = adj(idx,ii) - adj(ii,idx)';
+        m_asym = abs(adj(idx,ii) - adj(ii,idx)');
         metric_asyms = [metric_asyms; m_asym];
     end
 
@@ -66,7 +66,7 @@ if (show_ng)
 
     f = figure('Position',[200 200 1200 450]);
 
-    adj = gr * 100; % PDR from 0 to 100
+    adj = gr;% * 100; % PDR from 0 to 100
     succv = [90 50 10];
     for succ_i=1:size(succv,2)
         subplot(1,3,succ_i);
@@ -99,7 +99,7 @@ end
 if (show_sp)
 
     f = figure('Position',[200 200 1200 450]);
-    adj = gr * 100; % PDR from 0 to 100
+    adj = gr; %* 100; % PDR from 0 to 100
     
     %
     % consider ETX metric
@@ -112,6 +112,11 @@ if (show_sp)
             etx_v = Inf; 
          else
             etx_v = 100*(x*y);
+         end
+         if (etx_v < 100)
+             x
+             y
+             etx_v
          end
          assert(etx_v >= 100);
          adj(ri,ci) = etx_v;
@@ -158,8 +163,9 @@ if (show_mcg)
 
     f = figure('Position',[200 200 1200 450]);
 
-    adj = gr * 100; % PDR from 0 to 100
-    succv = 50;%[90 50 10];
+    adj = gr;% * 100; % PDR from 0 to 100
+%   succv = [90 10 50];
+    succv = [50];
     for succ_i=1:size(succv,2)
         subplot(1,size(succv,2),succ_i);
         disp('*****************');
@@ -194,6 +200,8 @@ if (show_mcg)
 
               %cl_nodes = [2,3,4,5,6,7,8,10,12,13,14,15,16,17,18,21,22,23,24,25,26,29,31,32,33,34,35,37,38,39,40,41,42,43,44,45,46,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67];
               grTmp = gr(cl_nodes,cl_nodes);
+              grTmp(grTmp < succv(succ_i)) = 0;
+              grTmp(grTmp >= succv(succ_i)) = 1;
               pretty_graph(kk, grTmp);
               system(['dot -Tps _GtDout', int2str(kk), '.dot -o CL', int2str(kk), '.ps']);
            end
