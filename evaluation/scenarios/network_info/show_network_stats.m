@@ -57,6 +57,9 @@ if (show_lnk_asym)
     title(['CDFPlot of Link Asymmetry']);
     xlabel('Link Asymmetry (abs(PDRfwd - PDRrev))');
     ylabel('CDF of links');
+
+    print(strcat(basedir,'linkasymmetry.png'),'-dpng');
+
 end
 
 %
@@ -90,6 +93,9 @@ if (show_ng)
         title(['CDFPlot of Node Degree, PSR-THR=', int2str(thr)]);
         xlabel('Node Degree');
         ylabel('CDF of nodes');
+
+        print(strcat(basedir,'nodedegree_psr_',num2str(succv(succ_i)),'.png'),'-dpng');
+
     end
 end
 
@@ -153,6 +159,9 @@ if (show_sp)
         title(['Histogram of Route Length (ETX), #nodes=', int2str(size(nodelst,2))]);
         xlabel('Route Length (no. of hops)');
         ylabel('# Occurence');
+
+        print(strcat(basedir,'shortestpath.png'),'-dpng');
+
    end
 end
 
@@ -164,8 +173,7 @@ if (show_mcg)
     f = figure('Position',[200 200 1200 450]);
 
     adj = gr;% * 100; % PDR from 0 to 100
-%   succv = [90 10 50];
-    succv = [50];
+    succv = [90 10 50];
     for succ_i=1:size(succv,2)
         subplot(1,size(succv,2),succ_i);
         disp('*****************');
@@ -202,8 +210,10 @@ if (show_mcg)
               grTmp = gr(cl_nodes,cl_nodes);
               grTmp(grTmp < succv(succ_i)) = 0;
               grTmp(grTmp >= succv(succ_i)) = 1;
-              pretty_graph(kk, grTmp);
-              system(['dot -Tps _GtDout', int2str(kk), '.dot -o ',basedir,'/CL', int2str(kk), '.ps']);
+              pretty_graph(kk, grTmp, basedir);
+              system(['dot -Tps ' basedir '_GtDout', int2str(kk), '.dot -o ',basedir,'CL', int2str(kk), '.ps']);
+              delete([ basedir '_GtDout', int2str(kk), '.dot']);
+              delete([ basedir '_LAYout', int2str(kk), '.dot']);
            end
            jj = jj + 1;
         end
@@ -218,6 +228,8 @@ if (show_mcg)
         title(strcat('Connected Comp. Size (SR>', int2str(succv(succ_i)),'%)'), 'FontSize',9);
         xlabel('#Cluster');
         ylabel('Nodes');
+        print(strcat(basedir,'mcc_psr_',num2str(succv(succ_i)),'.png'),'-dpng');
+
         %set(gca,'XTickLabel',str);
     end
 end

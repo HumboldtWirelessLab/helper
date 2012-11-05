@@ -1,4 +1,4 @@
-function pretty_graph(CL_ID, gr)
+function pretty_graph(CL_ID, gr, basedir)
 
 %    addpath(path,'./graphviz');
 
@@ -98,5 +98,5 @@ function pretty_graph(CL_ID, gr)
     adj_ng
 
     % create dot file
-    draw_dot(CL_ID, adj_ng, gr_ng_labels);
+    draw_dot(CL_ID, adj_ng, gr_ng_labels, basedir);
 end
