@@ -54,15 +54,24 @@ else
   USE_NEATO=0
 fi
 
+CURRLINE=1
+
 while read line; do
   SRC=`echo $line | awk '{print $1}'`
   DST=`echo $line | awk '{print $2}'`
 
   METRIC=`cat $EVALUATIONSDIR/linksmetric.all | grep "$SRC $DST" | awk '{print $3}' | sort | head -n 1`
 
-  if [ $METRIC -lt $THRESHOLD ]; then
-    echo "\"$SRC\" -> \"$DST\"  [label=\"$METRIC\"];" >> $EVALUATIONSDIR/linksmetric.dot.tmp
+  if [ "x$SRC" != "x" ] && [ "x$DST" != "x" ] && [ "x$METRIC" != "x" ]; then
+
+    if [ $METRIC -lt $THRESHOLD ]; then
+      echo "\"$SRC\" -> \"$DST\"  [label=\"$METRIC\"];" >> $EVALUATIONSDIR/linksmetric.dot.tmp
+    fi
+  else
+    echo "ERROR! Incomplete linkinfo: SRC: $SRC DST: $DST METRIC: $METRIC Line: $CURRLINE !"
   fi
+
+  let CURRLINE=CURRLINE+1
 
 done < $EVALUATIONSDIR/links.all
 
