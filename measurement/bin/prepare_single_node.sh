@@ -451,7 +451,11 @@ if [ $RUNMODENUM -le 3 ]; then
             if [ "x$RECOMMENDMODOPTIONS" != "x" ]; then
               MODOPTIONS=$RECOMMENDMODOPTIONS
             else
-              MODOPTIONS=modoptions.default
+              if [ "x$OLSR" = "xyes" ]; then
+                MODOPTIONS=modoptions.default.olsr
+              else
+                MODOPTIONS=modoptions.default
+              fi
             fi
           fi
 
