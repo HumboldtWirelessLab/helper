@@ -361,7 +361,7 @@ case "$MODE" in
 				if [ $m2 -lt 16 ]; then
 					m2h="0$m2h"
 				fi
-				echo "$node $nodedevice 00-00-00-00-$m1h-$m2h $i" >> $FINALRESULTDIR/nodes.mac
+				echo "$node $nodedevice 00-00-00-00-$m1h-$m2h $mac_raw" >> $FINALRESULTDIR/nodes.mac
 				if [ "x$NODEMAC_SEDARG" = "x" ]; then
 					NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#FIRSTNODE:eth#00-00-00-00-$m1h-$m2h#g"
 					NODENAME_SEDARG="$NODENAME_SEDARG -e s#FIRSTNODE#$node#g"
@@ -422,6 +422,7 @@ case "$MODE" in
 					ELEMENT=`echo $line | awk '{print $5}'`
 					HANDLER=`echo $line | awk '{print $6}'`
 					NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$NODENAME[[:space:]]" | awk '{print $4}'`
+					NODENUM=`expr $NODENUM - 1`
 					
 					# if "ALL" is used, take all nodes of nodelist, else just the respective node
 					if [ "x$HANDLERNODES" = "xALL" ]; then
@@ -436,6 +437,7 @@ case "$MODE" in
 					for n in $HANDLERNODES; do
 						
 						NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$n[[:space:]]" | awk '{print $4}'`
+						NODENUM=`expr $NODENUM - 1`
 						if [ "x$TIME" != "x" ]; then
 							
 							# the write handler
