@@ -1,4 +1,4 @@
-function draw_dot(CL_ID, adj, labels)
+function draw_dot(CL_ID, adj, labels, basedir)
 %
 % [x, y, labels] = draw_dot(adj, lables)   draw a graph defined by adjacency matrix 
 %  
@@ -12,8 +12,8 @@ function draw_dot(CL_ID, adj, labels)
    if isequal(triu(adj,1),tril(adj,-1)'), directed = 0; else, directed = 1; end 
 adj = double(adj > 0);    % make sure it is a binary matrix cast to double type
       % to be platform independant no use of directories in temporary filenames
-tmpDOTfile = ['_GtDout', int2str(CL_ID), '.dot'];           
-tmpLAYOUT  = ['_LAYout', int2str(CL_ID), '.dot']; 
+tmpDOTfile = [ basedir '_GtDout', int2str(CL_ID), '.dot'];           
+tmpLAYOUT  = [ basedir '_LAYout', int2str(CL_ID), '.dot']; 
 graph_to_dot(adj, 'directed', directed, 'node_label', labels, 'filename', tmpDOTfile); % save in file
 if ispc, shell = 'dos'; else, shell = 'unix'; end                %  Which OS ?
  %cmnd = strcat(shell,'(''neato -V'')');    % request version to check NEATO is there
@@ -46,5 +46,5 @@ status = eval(cmnd);                 %  get NEATO to layout
 % figure; clf; axis square      %  now plot 
 % [x, y, h] = graph_draw(adj, 'node_labels', labels, 'fontsize', fontsz, ...
 %                        'node_shapes', zeros(size(x,2),1), 'X', x, 'Y', y);
-delete(tmpLAYOUT); delete(tmpDOTfile);     % clean up temporary files 
+%delete(tmpLAYOUT); delete(tmpDOTfile);     % clean up temporary files 
 
