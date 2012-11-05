@@ -48,6 +48,7 @@ BCASTNODES=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $1}' | sort -u
 for r in $BCASTRATE; do
   for s in $BCASTSIZE; do
    GRAPHFILE="$EVALUATIONSDIR/graph_psr_$r""_""$s.txt"
+   echo -n "" > $GRAPHFILE
    for n in $BCASTNODES; do
      for m in $BCASTNODES; do
         METRIC=`cat $EVALUATIONSDIR/bcaststats.csv | grep -e "^$n,$m,$s,$r" | awk -F , '{print $9}' | head -n 1`
@@ -62,8 +63,6 @@ for r in $BCASTRATE; do
     done
   done
 done
-
-exit 0
 
 THRESHOLD=3000
 
