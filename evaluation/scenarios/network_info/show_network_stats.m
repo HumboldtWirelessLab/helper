@@ -211,7 +211,7 @@ if (show_mcg)
               grTmp(grTmp < succv(succ_i)) = 0;
               grTmp(grTmp >= succv(succ_i)) = 1;
               pretty_graph(kk, grTmp, basedir);
-              system(['dot -Tps ' basedir '_GtDout', int2str(kk), '.dot -o ',basedir,'CL', int2str(kk), '.ps']);
+              system(['dot -Tps ' basedir '_GtDout', int2str(kk), '.dot -o ',basedir,'CL', int2str(kk), '_', int2str(succv(succ_i)), '.ps']);
               delete([ basedir '_GtDout', int2str(kk), '.dot']);
               delete([ basedir '_LAYout', int2str(kk), '.dot']);
            end

@@ -39,31 +39,6 @@ else
   fi
 fi
 
-xsltproc $DIR/bcaststats.xslt $DATAFILE > $EVALUATIONSDIR/bcaststats.csv
-
-BCASTSIZE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $3}' | sort -u`
-BCASTRATE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $4}' | sort -u`
-BCASTNODES=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $1}' | sort -u`
-
-for r in $BCASTRATE; do
-  for s in $BCASTSIZE; do
-   GRAPHFILE="$EVALUATIONSDIR/graph_psr_$r""_""$s.txt"
-   echo -n "" > $GRAPHFILE
-   for n in $BCASTNODES; do
-     for m in $BCASTNODES; do
-        METRIC=`cat $EVALUATIONSDIR/bcaststats.csv | grep -e "^$n,$m,$s,$r" | awk -F , '{print $9}' | head -n 1`
-
-        if [ "x$METRIC" = "x" ]; then
-          METRIC=0
-        fi
-
-        echo -n "$METRIC " >> $GRAPHFILE
-      done
-      echo "" >> $GRAPHFILE
-    done
-  done
-done
-
 FULLSED=""
 while read line; do
   SRCN=`echo $line | awk '{print $1}'`
@@ -120,6 +95,7 @@ BCASTNODES=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $1}' | sort -u
 for r in $BCASTRATE; do
   for s in $BCASTSIZE; do
     GRAPHFILE="$EVALUATIONSDIR/graph_psr_$r""_""$s.txt"
+    echo -n "" > $GRAPHFILE
 
     if [ ! -f $GRAPHFILE ]; then
       for n in $BCASTNODES; do
