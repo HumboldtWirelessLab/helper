@@ -1,4 +1,4 @@
-function show_network_stats(graphfile, basedir)
+function show_network_stats(graphfile, basedir, params)
 
 %clear;
 
@@ -45,20 +45,22 @@ if (show_lnk_asym)
         metric_asyms = [metric_asyms; m_asym];
     end
 
-    %hist(node_deg, 1:max(node_deg));
-    %grid on;
-    %title(['Histogram of Node Degree, PSR-THR=', int2str(thr)]);
-    %xlabel('Node Degree');
-    %ylabel('# Occurence');
+    if (~isempty(metric_asyms))
+      %hist(node_deg, 1:max(node_deg));
+      %grid on;
+      %title(['Histogram of Node Degree, PSR-THR=', int2str(thr)]);
+      %xlabel('Node Degree');
+      %ylabel('# Occurence');
 
-    [h,stats] = cdfplot(metric_asyms);
-    set(h,'LineWidth',2);
-    grid on;
-    title(['CDFPlot of Link Asymmetry']);
-    xlabel('Link Asymmetry (abs(PDRfwd - PDRrev))');
-    ylabel('CDF of links');
+      [h,stats] = cdfplot(metric_asyms);
+      set(h,'LineWidth',2);
+      grid on;
+      title(['CDFPlot of Link Asymmetry']);
+      xlabel('Link Asymmetry (abs(PDRfwd - PDRrev))');
+      ylabel('CDF of links');
 
-    print(strcat(basedir,'linkasymmetry.png'),'-dpng');
+      print(strcat(basedir,'linkasymmetry_', params,'.png'),'-dpng');
+    end
 
 end
 
@@ -87,16 +89,18 @@ if (show_ng)
         %xlabel('Node Degree');
         %ylabel('# Occurence');
 
-        [h,stats] = cdfplot(node_deg);
-        set(h,'LineWidth',2);
-        grid on;
-        title(['CDFPlot of Node Degree, PSR-THR=', int2str(thr)]);
-        xlabel('Node Degree');
-        ylabel('CDF of nodes');
+        if (~isempty(node_deg))
+          [h,stats] = cdfplot(node_deg);
+          set(h,'LineWidth',2);
+          grid on;
+          title(['CDFPlot of Node Degree, PSR-THR=', int2str(thr)]);
+          xlabel('Node Degree');
+          ylabel('CDF of nodes');
 
-        print(strcat(basedir,'nodedegree_psr_',num2str(succv(succ_i)),'.png'),'-dpng');
+        end
 
     end
+    print(strcat(basedir,'nodedegree_', params,'.png'),'-dpng');
 end
 
 %
@@ -160,9 +164,10 @@ if (show_sp)
         xlabel('Route Length (no. of hops)');
         ylabel('# Occurence');
 
-        print(strcat(basedir,'shortestpath.png'),'-dpng');
-
+        print(strcat(basedir,'shortestpath_', params, '.png'),'-dpng');
    end
+
+
 end
 
 %
@@ -173,7 +178,7 @@ if (show_mcg)
     f = figure('Position',[200 200 1200 450]);
 
     adj = gr;% * 100; % PDR from 0 to 100
-    succv = [90 10 50];
+    succv = [90 50 10];
     for succ_i=1:size(succv,2)
         subplot(1,size(succv,2),succ_i);
         disp('*****************');
@@ -211,7 +216,7 @@ if (show_mcg)
               grTmp(grTmp < succv(succ_i)) = 0;
               grTmp(grTmp >= succv(succ_i)) = 1;
               pretty_graph(kk, grTmp, basedir);
-              system(['dot -Tps ' basedir '_GtDout', int2str(kk), '.dot -o ',basedir,'CL', int2str(kk), '_', int2str(succv(succ_i)), '.ps']);
+              system(['dot -Tps ' basedir '_GtDout', int2str(kk), '.dot -o ',basedir,'CL', int2str(kk), '_', params, '_' ,int2str(succv(succ_i)), '.ps']);
               delete([ basedir '_GtDout', int2str(kk), '.dot']);
               delete([ basedir '_LAYout', int2str(kk), '.dot']);
            end
@@ -228,10 +233,10 @@ if (show_mcg)
         title(strcat('Connected Comp. Size (SR>', int2str(succv(succ_i)),'%)'), 'FontSize',9);
         xlabel('#Cluster');
         ylabel('Nodes');
-        print(strcat(basedir,'mcc_psr_',num2str(succv(succ_i)),'.png'),'-dpng');
 
         %set(gca,'XTickLabel',str);
     end
+    print(strcat(basedir,'mcc_', params ,'.png'),'-dpng');
 end
 
 end

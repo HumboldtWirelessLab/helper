@@ -25,6 +25,12 @@ esac
 
 . $CONFIGFILE
 
+###############################################################################
+# Get datafile
+###############################################################################
+
+echo "Get Datafile"
+
 if [ ! -e $EVALUATIONSDIR ]; then
   mkdir -p $EVALUATIONSDIR
 fi
@@ -39,6 +45,11 @@ else
   fi
 fi
 
+###############################################################################
+# create sed arg  for nodenamereplacement
+###############################################################################
+echo "Create sed arg"
+
 FULLSED=""
 while read line; do
   SRCN=`echo $line | awk '{print $1}'`
@@ -47,11 +58,20 @@ while read line; do
   FULLSED="$FULLSED -e s#^$SRCID\$#$SRCN#g"
 done < $RESULTDIR/nodes.mac
 
+###############################################################################
+# create linkmetric.all
+###############################################################################
+echo "Create linkmetric matrix"
+
 THRESHOLD=3000
 
-cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | grep -v "=" | sort -u > $EVALUATIONSDIR/linksmetric.all
+if [ ! -f $EVALUATIONSDIR/linksmetric.all ]; then
+  cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | grep -v "=" | sort -u > $EVALUATIONSDIR/linksmetric.all
+fi
 
 NODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}' | sort -u`
+
+echo "Create linkgraph (Threshold: $THRESHOLD)"
 
 if [ ! -f $EVALUATIONSDIR/graph.txt ]; then
   echo -n "" > $EVALUATIONSDIR/graph.txt
@@ -64,7 +84,11 @@ if [ ! -f $EVALUATIONSDIR/graph.txt ]; then
       if [ "x$METRIC" = "x" ]; then
         LINK=0
       else
-        LINK=1
+        if [ $METRIC -lt $THRESHOLD ]; then
+          LINK=1
+        else
+          LINK=0
+        fi
       fi
 
       echo -n "$LINK " >> $EVALUATIONSDIR/graph.txt
@@ -73,20 +97,36 @@ if [ ! -f $EVALUATIONSDIR/graph.txt ]; then
   done
 fi
 
-(cd $DIR; matlab -nosplash -nodesktop -nojvm -r "partitions('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/');exit" 1> /dev/null)
+echo "Create partitions files"
 
-#create cluster file for hole network
-cat $RESULTDIR/nodes.mac | awk '{print $4}' > $EVALUATIONSDIR/cluster_0.csv
+(cd $DIR; matlab -nosplash -nodesktop -nojvm -r "try,partitions('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+
+if [ $? -ne 0 ]; then
+  echo "Ohh, matlab error."
+fi
+
+echo "Create clusterfiles and nodedegree!"
+
+if [ ! -f $EVALUATIONSDIR/cluster_0.csv ]; then
+  #create cluster file for hole network
+  cat $RESULTDIR/nodes.mac | awk '{print $4}' > $EVALUATIONSDIR/cluster_0.csv
+fi
 
 ( cd $EVALUATIONSDIR; for i in `ls cluster_*.csv`; do N=`echo $i | sed "s#csv#grp#g"`; cat $i | sed $FULLSED > $N; done )
 
 for i in `(cd $EVALUATIONSDIR; ls cluster_*.csv)`; do
-  (cd $DIR; matlab -nosplash -nodesktop -nojvm -r "nodedegree('$EVALUATIONSDIR/$i', '$EVALUATIONSDIR/graph.txt', '$EVALUATIONSDIR/');exit" 1> /dev/null)
+  CLUSTERID=`echo $i | sed "s#_# #g" | sed "s#\.# #g" | awk '{print $2}'`
+  echo "Cluster: $CLUSTERID"
+  (cd $DIR; matlab -nosplash -nodesktop -nojvm -r "try,nodedegree('$EVALUATIONSDIR/$i', '$EVALUATIONSDIR/graph.txt', '$EVALUATIONSDIR/', $CLUSTERID ),catch,exit(1),end,exit(0)" 1> /dev/null)
 done
+
+echo "Create bcaststats!"
 
 if [ ! -f $EVALUATIONSDIR/bcaststats.csv ]; then
   xsltproc $DIR/bcaststats.xslt $DATAFILE > $EVALUATIONSDIR/bcaststats.csv
 fi
+
+echo "Networkstats!"
 
 BCASTSIZE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $3}' | sort -u`
 BCASTRATE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $4}' | sort -u`
@@ -95,9 +135,9 @@ BCASTNODES=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $1}' | sort -u
 for r in $BCASTRATE; do
   for s in $BCASTSIZE; do
     GRAPHFILE="$EVALUATIONSDIR/graph_psr_$r""_""$s.txt"
-    echo -n "" > $GRAPHFILE
 
     if [ ! -f $GRAPHFILE ]; then
+      echo -n "" > $GRAPHFILE
       for n in $BCASTNODES; do
         for m in $BCASTNODES; do
           METRIC=`cat $EVALUATIONSDIR/bcaststats.csv | grep -e "^$n,$m,$s,$r" | awk -F , '{print $9}' | head -n 1`
@@ -112,7 +152,7 @@ for r in $BCASTRATE; do
       done
     fi
 
-    (cd $DIR; matlab -nosplash -nodesktop -nojvm -r "show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/');exit" 1> /dev/null)
+    (cd $DIR; matlab -nosplash -nodesktop -nojvm -r "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)")
 
   done
 done
