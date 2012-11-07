@@ -62,7 +62,12 @@ recursive() {
 	    #echo "foo $MDIR $acfile"
 	    if [ -f $MDIR/$acfile ]; then
         	cat $MDIR/$acfile | sed $SEDARG > $MDIR/PARAMS_$CONFIGS/$acfile
+	    else
+		if [ "x$acfile" = "xevaluation" ]; then
+		  cp -r $MDIR/$acfile $MDIR/PARAMS_$CONFIGS/$acfile
+		fi
 	    fi
+
 	    #echo "foo2"
 	  fi
         fi
