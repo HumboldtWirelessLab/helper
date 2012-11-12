@@ -14,7 +14,8 @@
 
 
 
-elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
+
+#ifdef CST
 
 #ifndef CST_PROCINTERVAL
 #define CST_PROCINTERVAL 1000
@@ -28,19 +29,37 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #define CST_STATS_DURATION 1000
 #endif
 
-#ifdef CST
-
 //define CST_PROCFILE for simulation. Path is not really used, but no path means no hw channel stats 
-#ifdef SIMULATION
 #ifndef CST_PROCFILE
+
+#ifdef SIMULATION
 #define CST_PROCFILE /simulation
+#else
+
+#if WIFITYPE == 802
+
+#if DEVICENUMBER == 0
+#define CST_PROCFILE "/sys/devices/pci0000\:00/0000\:00\:11.0/stats/channel_utility"
+#else
+#define CST_PROCFILE "/sys/devices/pci0000\:00/0000\:00\:12.0/stats/channel_utility"
+#endif
+
+#else
+
+#define CST_PROCFILE "/proc/net/madwifi/NODEDEVICE/channel_utility"
+
+#endif
+#endif
 #endif
 #endif
 
+elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
+
+#ifdef CST
 #ifdef CST_PROCFILE
-  cst::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCFILE CST_PROCFILE, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
+  CST::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCFILE CST_PROCFILE, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
 #else
-  cst::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
+  CST::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
 #endif
 #endif
 
