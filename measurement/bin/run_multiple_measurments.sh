@@ -76,7 +76,7 @@ while [ "x$key" = "xy" ]; do
       NEXT=`expr $HIGHESTDIR + 1`
 
       if [ $SIMULATION -eq 0 ]; then
-        RUNMODE=$RUNMODE $DIR/run_measurement.sh $DISFILE $NEXT
+        TESTONLY=$TESTONLY RUNMODE=$RUNMODE $DIR/run_measurement.sh $DISFILE $NEXT
         RUNMODE=$MULTIRUNMODE
       else
         $DIR/../../simulation/bin/run_sim.sh ns $DISFILE $NEXT

@@ -631,6 +631,7 @@ if [ $MEASUREMENT_ABORT -eq 0 ]; then
 
       sleep 0.2
       if [ "x$LOCALPROCESS" != "x" ]; then
+        chmod u+x $LOCALPROCESS
         #echo "Debug: export PATH=$DIR/../../host/bin:$PATH;NODELIST=\"$NODELIST\" $LOCALPROCESS start >> $FINALRESULTDIR/localapp.log 2>&1"
         screen -S $LOCALSCREENNAME -X screen -t localprocess
         sleep 0.1

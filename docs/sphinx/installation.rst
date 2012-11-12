@@ -7,30 +7,34 @@ Installation
 Vorbereitungen
 --------------
 
-#. Benötigte Software installieren: gcc, g++, autoconf, libx11-dev, libxt-dev, libxmu-dev, flex, bison, git
-
-   gcc und g++ müssen zur Zeit in Version 4.4 vorliegen.
-   Zum Übersetzen der Software sollten also die Pakete gcc-4.4 und g++-4.4 installiert werden und temporär
-   die symbolischen Links in /usr/bin auf die entsprechenden binaries gesetzt werden::
-
-        sudo rm /usr/bin/gcc
-        sudo rm /usr/bin/g++
-        sudo ln -s /usr/bin/gcc-4.4 /usr/bin/gcc
-        sudo ln -s /usr/bin/g++-4.4 /usr/bin/g++
+#. Benötigte Software installieren: 
+    #. gcc 
+    #. g++ 
+    #. autoconf
+    #. libx11-dev
+    #. libxt-dev
+    #. libxmu-dev
+    #. flex
+    #. bison
+    #. git
+    #. bc - GNU bc - Rechnersprache mit beliebiger Genauigkeit
 
 #. Account auf gitsar bei Robert beantragen
 
 #. Folgende Einträge in der .ssh/config vornehmen: ::
 
     Host gruenau
-        User username
-        HostName gruenau.informatik.hu-berlin.de
+        User <username> 
+        HostName <hostname>.informatik.hu-berlin.de
 
     Host gitsar
-        User username
         ProxyCommand ssh -q gruenau netcat sar 2222
+        User git
 
-Am komfortabelsten funktioniert die Verbindung beim Einsatz von
+Der <username> entspricht dem Informatik-Email-Account-Namen <username>@informatik.hu-berlin.de
+Der <hostname> kann z. B. entweder gruenau oder gruenau2 sein (siehe https://www2.informatik.hu-berlin.de/rbg/Intern_SSL/pools.shtml).
+
+Am komfortabelstenfunktioniert die Verbindung beim Einsatz von
 `SSH-Keys und dem ssh-agent <http://mah.everybody.org/docs/ssh>`_, da man dann
 nur einmal die Passphrase für den SSH Schlüssel eingeben muss.
 

@@ -132,10 +132,12 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
     -> link_stat
 //  -> Print("Linkprobe_out",320)
     -> lp_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
+#ifndef DISABLE_LP_POWER
 #if WIFITYPE == 805
     -> lp_power::BrnSetTXPower(DEVICE $device, POWER 61)
 #else
     -> lp_power::BrnSetTXPower(DEVICE $device, POWER 16)
+#endif
 #endif
     -> lp_wifiencap::WifiEncap(0x00, 0:0:0:0:0:0)
     -> lp_queue::FrontDropQueue(2)

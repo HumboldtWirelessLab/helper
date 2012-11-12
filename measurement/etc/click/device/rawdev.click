@@ -18,6 +18,7 @@
 elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 
   input[0]
+  -> rawdev_suppressor::Suppressor()
 #ifdef RAWDEV_DEBUG
   -> SetTimestamp()
   -> Print("NODENAME: To Device", 100, TIMESTAMP true)
