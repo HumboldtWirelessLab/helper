@@ -30,9 +30,11 @@ for node_i=1:size(gr,1)
     nodelst{node_i} = node_i;
 end
 
+
 %
 % Link Asymmetry
 %
+disp('Link Asymmetry');
 if (show_lnk_asym)
 
     f = figure('Position',[200 200 1200 450]);
@@ -66,7 +68,8 @@ end
 
 %
 % Node degree
-%    
+%
+disp('Node degree');
 if (show_ng)
 
     f = figure('Position',[200 200 1200 450]);
@@ -106,6 +109,7 @@ end
 %
 % Shortest Path
 %
+disp('Shortest path');
 if (show_sp)
 
     f = figure('Position',[200 200 1200 450]);
@@ -172,7 +176,8 @@ end
 
 %
 % Maximum connected component
-%    
+%
+disp('Maximum connected component');
 if (show_mcg)
 
     f = figure('Position',[200 200 1200 450]);
