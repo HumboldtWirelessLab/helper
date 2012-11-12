@@ -151,9 +151,11 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   lp_clf[1]                               //brn, but no lp
 #ifdef CST
 #ifdef SIMULATION
+#ifdef COOPCST
   -> co_cst_clf :: Classifier( 14/BRN_PORT_CHANNELSTATSINFO, - );
-  
+
   co_cst_clf[1]
+#endif
 #endif
 #endif
   //-> Print("Data, no LP")
@@ -162,6 +164,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
 #ifdef CST
 #ifdef SIMULATION
+#ifdef COOPCST
   co_cst_clf[0]
   //-> Print("ChannelStats")
   -> BRN2EtherDecap()
@@ -171,6 +174,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> cocst_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
   -> cocst_rate::SetTXRate(RATE 2, TRIES 1)
   -> brnwifi;
+#endif
 #endif
 #endif
 
