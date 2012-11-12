@@ -26,6 +26,10 @@
 //#define DEFAULT_LINKPROBE_PROBES         "2 500 HT20 15 500 HT20 0 500 4 300 HT40 7 500"
 #endif
 
+#ifndef DEFAULT_DATARATE
+#define DEFAULT_DATARATE 2
+#endif
+
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
 	
 	availablerates::BrnAvailableRates(DEFAULT 2 4 11 22 12 18 24 36 48 72 96 108); //rates, that are used by that node
@@ -63,7 +67,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #else
   -> data_power::BrnSetTXPower(DEVICE $device, POWER 16)
 #endif
-  -> data_rate::SetTXRate(RATE 2, TRIES 11)
+  -> data_rate::SetTXRate(RATE DEFAULT_DATARATE, TRIES 11)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
 //  -> SetTimestamp()
 //  -> Print("NODENAME: In Queue", 100, TIMESTAMP true)
