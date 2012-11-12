@@ -1,0 +1,38 @@
+function schout = loadobj(schin)
+%LOADOBJ for task class
+
+%   Author(s): M. Kutil
+%   Copyright (c) 2004 CTU FEE
+%   $Revision: 727 $  $Date: 2007-03-13 16:34:55 +0100 (út, 13 III 2007) $
+
+% This file is part of Scheduling Toolbox.
+% 
+% Scheduling Toolbox is free software; you can redistribute it and/or
+% modify it under the terms of the GNU General Public License as
+% published by the Free Software Foundation; either version 2 of the
+% License, or (at your option) any later version.
+% 
+% Scheduling Toolbox is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+% General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with Scheduling Toolbox; if not, write to the Free Software
+% Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+% USA
+ 
+if isa(schin,'schedobj')
+    schout = schin;
+else %taskin is ol version
+    switch schin.version
+        case 0
+            schin.GrParam = grparam;
+        otherwise
+            error('Wrong version');
+    end
+    schin.version = 0.01;
+
+    schout = class(schin,'schedobj');
+end
+%end .. @task/loadobj

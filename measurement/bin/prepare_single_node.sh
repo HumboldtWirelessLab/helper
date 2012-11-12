@@ -419,6 +419,11 @@ echo "0" > status/$LOGMARKER\_environment.state
 ##################################
 ###### Load Wifi-Moduls ##########
 ##################################
+
+if [ "x$MODE" != "xwireless" ] && [ "x$OLSR" != "xyes" ]; then
+    wait_for_master_state wirlessfinished $LOGMARKER
+fi
+
 CRUNMODENUM=3
 
 if [ $RUNMODENUM -le 3 ]; then
@@ -446,7 +451,11 @@ if [ $RUNMODENUM -le 3 ]; then
             if [ "x$RECOMMENDMODOPTIONS" != "x" ]; then
               MODOPTIONS=$RECOMMENDMODOPTIONS
             else
-              MODOPTIONS=modoptions.default
+              if [ "x$OLSR" = "xyes" ]; then
+                MODOPTIONS=modoptions.default.olsr
+              else
+                MODOPTIONS=modoptions.default
+              fi
             fi
           fi
 
@@ -693,6 +702,8 @@ echo "0" > status/$LOGMARKER\_preload.state
 
 CRUNMODENUM=8
 CURRENTMODE="RUN CLICK"
+
+#TODO: Check node during measurement and abort/warn if node failed
 
 wait_for_master_state measurement $LOGMARKER
 
