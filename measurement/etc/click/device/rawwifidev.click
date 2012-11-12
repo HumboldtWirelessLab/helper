@@ -14,7 +14,8 @@
 
 
 
-elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
+
+#ifdef CST
 
 #ifndef CST_PROCINTERVAL
 #define CST_PROCINTERVAL 1000
@@ -28,32 +29,50 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #define CST_STATS_DURATION 1000
 #endif
 
-#ifdef CST
-
 //define CST_PROCFILE for simulation. Path is not really used, but no path means no hw channel stats 
-#ifdef SIMULATION
 #ifndef CST_PROCFILE
+
+#ifdef SIMULATION
 #define CST_PROCFILE /simulation
+#else
+
+#if WIFITYPE == 802
+
+#if DEVICENUMBER == 0
+#define CST_PROCFILE "/sys/devices/pci0000\:00/0000\:00\:11.0/stats/channel_utility"
+#else
+#define CST_PROCFILE "/sys/devices/pci0000\:00/0000\:00\:12.0/stats/channel_utility"
+#endif
+
+#else
+
+#define CST_PROCFILE "/proc/net/madwifi/NODEDEVICE/channel_utility"
+
+#endif
+#endif
 #endif
 #endif
 
+elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
+
+#ifdef CST
 #ifdef CST_PROCFILE
-  cst::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCFILE CST_PROCFILE, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
+  CST::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCFILE CST_PROCFILE, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
 #else
-  cst::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
+  CST::ChannelStats(DEVICE $device, STATS_DURATION CST_STATS_DURATION, PROCINTERVAL CST_PROCINTERVAL, NEIGHBOUR_STATS true, FULL_STATS false, SAVE_DURATION CST_SAVE_DURATION );
 #endif
 #endif
 
 #ifdef SIMULATION
+#ifdef COLLINFO
   cinfo::CollisionInfo();
+#endif
 #ifdef USE_RTS_CTS
   pli::PacketLossInformation();
 #ifdef PLE
 #ifdef PLE_COCST
   ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, COOPCHANNELSTATS cocst, DEVICE $device, HNWORST false, DEBUG 4);
-//  ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, COOPCHANNELSTATS cocst, DEVICE $device, HNWORST false, DEBUG 2);
 #else
-  //ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, DEVICE $device, HNWORST false, DEBUG 4);
   ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, DEVICE $device, HNWORST false, DEBUG 2);
 #endif
 #endif
@@ -65,7 +84,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
-#if defined(SIMULATION) || (WIFITYPE == 802)
+#if defined(SIMULATION) || (WIFITYPE == 803)
   -> WifiSeq()                                                      // Set sequencenumber for simulation
 #endif
 #ifndef DISABLE_TOS2QUEUEMAPPER
@@ -74,7 +93,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef USE_RTS_CTS
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli, DEBUG 2)
 #else
-  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, DEBUG 2)
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, DEBUG 2)
 #endif //RTS_CTS
 #else //CST
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM )
@@ -111,7 +130,9 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> cst                                                            //add channel stats if requested
 #endif
 #ifdef SIMULATION
+#ifdef COLLINFO
   -> cinfo
+#endif
 #ifdef PLE
   -> ple
   //-> co_cst
