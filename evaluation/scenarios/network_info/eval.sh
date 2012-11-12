@@ -162,7 +162,9 @@ for r in $BCASTRATE; do
       done
     fi
 
-    (cd $DIR; matlab -nosplash -nodesktop -r "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/','$r\_$s'),catch,exit(1),end,exit(0)")
+    PARAMS="$r""_""$s"
+
+    (cd $DIR; matlab -nosplash -nodesktop -r "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/','$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
   done
 done
