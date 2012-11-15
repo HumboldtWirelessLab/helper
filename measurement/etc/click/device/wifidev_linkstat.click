@@ -4,11 +4,7 @@
 //  0: To me and BRN
 //  1: Broadcast and BRN
 //  2: Foreign and BRN
-//  3: To me and NO BRN
-//  4: BROADCAST and NO BRN
-//  5: Foreign and NO BRN
-//  6: Feedback BRN
-//  7: Feedback Other
+//  3: Feedback BRN
 //
 //input::
 //  0: brn
@@ -113,8 +109,12 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #endif
 #ifdef BRNFEEDBACK
   -> txfb_brn_clf :: Classifier( 12/BRN_ETHERTYPE, - )
+  -> brnfb_lsclf :: Classifier( 14/BRN_PORT_LINK_PROBE, - )
+  -> Discard;
+
+  brnfb_lsclf[1]
   -> [3]output;
-  
+
   txfb_brn_clf[1]
 #endif
   -> Discard;
