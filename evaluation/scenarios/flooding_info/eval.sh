@@ -61,5 +61,5 @@ cat $EVALUATIONSDIR/flood_reach.csv | sed "s#,# #g" > $EVALUATIONSDIR/flood_reac
 
 for i in `(cd $EVALUATIONSDIR/; ls graph_psr_*)`; do
   PARAMS=`echo $i | sed "s#graph_psr_##g" | sed "s#\.txt##g"`
-  (cd $DIR; matlab -nosplash -nodesktop -r "flood_vs_linkprobing('$EVALUATIONSDIR/flood2hop_pdr.mat', '$EVALUATIONSDIR/flood2hop_pkt_cnt.mat', '$EVALUATIONSDIR/$i', '$EVALUATIONSDIR/', '$PARAMS')")
+  (cd $DIR; matlab -nosplash -nodesktop -r "try,flood_vs_linkprobing('$EVALUATIONSDIR/flood2hop_pdr.mat', '$EVALUATIONSDIR/flood2hop_pkt_cnt.mat', '$EVALUATIONSDIR/$i', '$EVALUATIONSDIR/', '$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
 done
