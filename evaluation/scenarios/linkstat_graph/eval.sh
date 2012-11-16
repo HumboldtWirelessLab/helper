@@ -85,29 +85,32 @@ echo "}" >> $EVALUATIONSDIR/links.dot.tmp
 cat $EVALUATIONSDIR/links.dot.tmp | sed $FULLSED > $EVALUATIONSDIR/links.dot
 cat $EVALUATIONSDIR/linksmetric.dot.tmp | sed $FULLSED > $EVALUATIONSDIR/linksmetric.dot
 
-if [ $USE_NEATO -eq 0 ]; then
-  dot -Tpng $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.png
-  dot -Tpng $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.png
-  dot -Teps $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.eps
-  dot -Teps $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.eps
-else
-  neato -Teps $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.eps 2> /dev/null
-  if [ $? -ne 0 ]; then
-    rm -f $EVALUATIONSDIR/links.eps
-    neato -Tpng $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.png 2> /dev/null
+if [ ! -f $EVALUATIONSDIR/linksmetric.png ] || [ ! -f $EVALUATIONSDIR/linksmetric.eps ] || [ ! -f $EVALUATIONSDIR/links.png ] || [ ! -f $EVALUATIONSDIR/links.eps ]; then
+
+  if [ $USE_NEATO -eq 0 ]; then
+    dot -Tpng $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.png
+    dot -Tpng $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.png
+    dot -Teps $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.eps
+    dot -Teps $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.eps
+  else
+    neato -Teps $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.eps 2> /dev/null
     if [ $? -ne 0 ]; then
-      rm -f $EVALUATIONSDIR/links.png
-      echo "No Images"
+      rm -f $EVALUATIONSDIR/links.eps
+      neato -Tpng $EVALUATIONSDIR/links.dot > $EVALUATIONSDIR/links.png 2> /dev/null
+      if [ $? -ne 0 ]; then
+        rm -f $EVALUATIONSDIR/links.png
+        echo "No Images"
+      fi
     fi
-  fi
 
-  neato -Teps $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.eps 2> /dev/null
+    neato -Teps $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.eps 2> /dev/null
 
-  if [ $? -ne 0 ]; then
-    rm -f $EVALUATIONSDIR/linksmetric.eps
-    neato -Tpng $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.png 2> /dev/null
     if [ $? -ne 0 ]; then
-      rm -f $EVALUATIONSDIR/linksmetric.png
+      rm -f $EVALUATIONSDIR/linksmetric.eps
+      neato -Tpng $EVALUATIONSDIR/linksmetric.dot > $EVALUATIONSDIR/linksmetric.png 2> /dev/null
+      if [ $? -ne 0 ]; then
+        rm -f $EVALUATIONSDIR/linksmetric.png
+      fi
     fi
   fi
 fi

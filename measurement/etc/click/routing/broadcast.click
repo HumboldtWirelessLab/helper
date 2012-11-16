@@ -76,6 +76,8 @@ elementclass BROADCAST {ID $id, LT $lt |
 
   Idle -> [2]bcr;
   Idle -> [2]bcf;
+  Idle -> [3]bcf;
+  Idle -> [4]bcf;
 
   input[3]
   -> overhear_bcr_clf::Classifier( 0/BRN_PORT_FLOODING,  //Flooding
