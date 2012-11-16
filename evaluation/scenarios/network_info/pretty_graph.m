@@ -202,8 +202,3 @@ function [gr_ng] = pretty_graph(CL_ID, gr, basedir, mygr, cl_nodes)
     % create dot file
     draw_dot(CL_ID, adj_ng, gr_ng_labels, basedir);
 
-
-
-
-
-end
