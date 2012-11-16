@@ -127,7 +127,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   rawdev
   -> dev_decap::__WIFIDECAP__
 #ifdef CST
-  -> cst                                                            //add channel stats if requested
+  -> CST                                                            //add channel stats if requested
 #endif
 #ifdef SIMULATION
 #ifdef COLLINFO
