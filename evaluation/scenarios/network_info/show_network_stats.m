@@ -15,10 +15,10 @@ txpower = 19;
 rfchannel = 1;
 
 % Plot params
-show_lnk_asym = 1;
-show_ng = 1;
-show_sp = 1;
-show_mcg = 1;
+show_lnk_asym = 0;
+show_ng = 0;
+show_sp = 0;
+show_mcc = 1;
 
 addpath(path,'./scheduling');
 addpath(path,'./graphviz');
@@ -168,11 +168,11 @@ end
 %
 % Maximum connected component
 %    
-if (show_mcg)
+if (show_mcc)
 
     f = figure('Position',[200 200 1200 450]);
 
-    adj = gr;% * 100; % PDR from 0 to 100
+    adj = gr; % * 100; % PDR from 0 to 100
     succv = [90 10 50];
     for succ_i=1:size(succv,2)
         subplot(1,size(succv,2),succ_i);
@@ -180,37 +180,51 @@ if (show_mcg)
         %cmap = colormap(lines);
         jj = 1;
 
-        s.connected_graphs.connected_graph{succ_i}.Attributes.min_pdr = succv(succ_i);
+        s.connected_graphs.connected_graph{succ_i}.Attributes.min_pdr = succv(succ_i); % min_pdr either 90, 10 or 50 percent
         bdata = [];
         mygr = adj;
-        mygr(mygr < succv(succ_i)) = 0;
+        mygr(mygr < succv(succ_i)) = 0; % set all channels with success rate < 90 percent to 0
 
-        if (max(max(mygr)) > 0)
+
+        if (max(max(mygr)) > 0) % max(maxima jeder spalte) 
            %mygrsp = sparse(mygr);
            %[S,C] = graphconncomp(mygrsp);
            g = graph('adj',mygr);
-           C = tarjan(g);
+           C = tarjan(g); % C[i] = cluster to which i belongs
 
            s.connected_graphs.connected_graph{succ_i}.clusters.Attributes.bitrate = bitrate;
            s.connected_graphs.connected_graph{succ_i}.clusters.Attributes.number = max(C);
-           for kk=1:max(C)
-              bdata(jj,kk) = size(find(C==kk),2);
-              cluster_nodes = nodelst(find(C==kk));
+
+           for kk=1:max(C) % for all groups
+              bdata(jj,kk) = size(find(C==kk),2); % b[jj][kk]: how many nodes belong to group kk
+              cluster_nodes = nodelst(find(C==kk)); % nodes in the group
+
               s.connected_graphs.connected_graph{succ_i}.clusters.cluster{kk}.Attributes.id = kk;
               s.connected_graphs.connected_graph{succ_i}.clusters.cluster{kk}.Attributes.size = size(find(C==kk),2);
+              
               cl_nodes = [];
-              for pp=1:size(cluster_nodes,2)
+
+              for pp=1:size(cluster_nodes,2)  % for each node in the group
                 s.connected_graphs.connected_graph{succ_i}.clusters.cluster{kk}.node{pp}.Text = cluster_nodes{pp};
                 cl_nodes = [cl_nodes cluster_nodes{pp}];
               end
-              disp(['SR=', int2str(succv(succ_i)), ',C=', int2str(kk), ',N=[', int2str(cl_nodes), ']']);
+
+              disp(['SR=', int2str(succv(succ_i)), ',C=', int2str(kk), ',N=[', int2str(cl_nodes), ']']);  
+              % SR = Success Rate, C = Cluster, N = List of vertices that belong to that group (?)
               % run dot to generate network graph for each cluster
 
               %cl_nodes = [2,3,4,5,6,7,8,10,12,13,14,15,16,17,18,21,22,23,24,25,26,29,31,32,33,34,35,37,38,39,40,41,42,43,44,45,46,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67];
               grTmp = gr(cl_nodes,cl_nodes);
               grTmp(grTmp < succv(succ_i)) = 0;
               grTmp(grTmp >= succv(succ_i)) = 1;
-              pretty_graph(kk, grTmp, basedir);
+
+              % set SR to 1
+              mygr(mygr >= succv(succ_i)) = 1;
+
+
+              pretty_graph(kk, grTmp, basedir, mygr, cl_nodes);
+
+
               system(['dot -Tps ' basedir '_GtDout', int2str(kk), '.dot -o ',basedir,'CL', int2str(kk), '_', int2str(succv(succ_i)), '.ps']);
               delete([ basedir '_GtDout', int2str(kk), '.dot']);
               delete([ basedir '_LAYout', int2str(kk), '.dot']);
@@ -231,6 +245,8 @@ if (show_mcg)
         print(strcat(basedir,'mcc_psr_',num2str(succv(succ_i)),'.png'),'-dpng');
 
         %set(gca,'XTickLabel',str);
+
+        exit;
     end
 end
 
