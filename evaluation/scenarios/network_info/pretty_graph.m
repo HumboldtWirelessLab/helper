@@ -111,11 +111,13 @@ function [gr_ng] = pretty_graph(CL_ID, gr, basedir, mygr, cl_nodes)
             % create node degree table for the clique
             nd_dgr = gr_ng{1, kk};
 
+            mygr(nd_dgr, nd_dgr)
+
             for ll=1:size(nd_dgr,1)
                 nd_dgr(ll,2) = sum(mygr(nd_dgr(ll,1),:));
             end
 
-            nd_dgr = sortrows(nd_dgr,2);
+            nd_dgr = sortrows(nd_dgr,2)
 
             nd_dgr
 
@@ -171,15 +173,15 @@ function [gr_ng] = pretty_graph(CL_ID, gr, basedir, mygr, cl_nodes)
             for row=1:size(adj_ng2,1)
                 % nbs of this hyper node
                 if (size(gr_ng{row},1) > 1)
-                    nbs = find(sum(gr(gr_ng{row},:)) > 0);
+                    nbs2 = find(sum(gr(gr_ng{row},:)) > 0);
                 else
-                    nbs = find(gr(gr_ng{row},:) > 0);
+                    nbs2 = find(gr(gr_ng{row},:) > 0);
                 end
-                nbs = setdiff(nbs, gr_ng{row});
+                nbs2 = setdiff(nbs2, gr_ng{row});
                 % place edge to each of them
-                for ii=1:size(nbs,2)
+                for ii=1:size(nbs2,2)
                     for kk=1:size(gr_ng,2)
-                        if (sum(ismember(gr_ng{kk}, nbs(ii))) == 1)
+                        if (sum(ismember(gr_ng{kk}, nbs2(ii))) == 1)
                             adj_ng2(row, kk) = 1;
                         end
                     end
