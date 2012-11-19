@@ -110,13 +110,14 @@ public class DegreePlacementGenerator {
     dp.initDegreeCounter(options.degree);
 
     DegreePlacement.Position p = dp.getRandPositionWithDegree(0);
-    dp.setNodeInField(p._x, p._y, 15);
+    dp.setNodeInField(p._x, p._y, options.radius);
 
     for ( int i = 1; i < options.nodes; i++) {
-     // System.out.println("N: " + max_degree + " h: " + dp.getMaxDegree());
-      int d = rnd.nextInt(Math.min(options.degree,dp.getMaxDegree())) + 1;
+      int d = rnd.nextInt(Math.min(options.degree,dp.getCurrentMaxDegree())) + 1;
+      System.out.println("N: " + options.degree + " h: " + dp.getMaxDegree() + " choose: " + d);
+
       p = dp.getRandPositionWithDegree(d);
-      dp.setNodeInField(p._x, p._y, 15);
+      dp.setNodeInField(p._x, p._y, options.radius );
     }
 
     dp.printField();

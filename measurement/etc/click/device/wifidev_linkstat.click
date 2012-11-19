@@ -4,11 +4,7 @@
 //  0: To me and BRN
 //  1: Broadcast and BRN
 //  2: Foreign and BRN
-//  3: To me and NO BRN
-//  4: BROADCAST and NO BRN
-//  5: Foreign and NO BRN
-//  6: Feedback BRN
-//  7: Feedback Other
+//  3: Feedback BRN
 //
 //input::
 //  0: brn
@@ -24,6 +20,10 @@
 #define DEFAULT_LINKPROBE_TAU             100000
 #define DEFAULT_LINKPROBE_PROBES  "2 100 2 1000"
 //#define DEFAULT_LINKPROBE_PROBES         "2 500 HT20 15 500 HT20 0 500 4 300 HT40 7 500"
+#endif
+
+#ifndef DEFAULT_DATARATE
+#define DEFAULT_DATARATE 2
 #endif
 
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
@@ -63,7 +63,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #else
   -> data_power::BrnSetTXPower(DEVICE $device, POWER 16)
 #endif
-  -> data_rate::SetTXRate(RATE 2, TRIES 11)
+  -> data_rate::SetTXRate(RATE DEFAULT_DATARATE, TRIES 11)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
 //  -> SetTimestamp()
 //  -> Print("NODENAME: In Queue", 100, TIMESTAMP true)
@@ -109,8 +109,12 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #endif
 #ifdef BRNFEEDBACK
   -> txfb_brn_clf :: Classifier( 12/BRN_ETHERTYPE, - )
+  -> brnfb_lsclf :: Classifier( 14/BRN_PORT_LINK_PROBE, - )
+  -> Discard;
+
+  brnfb_lsclf[1]
   -> [3]output;
-  
+
   txfb_brn_clf[1]
 #endif
   -> Discard;
@@ -132,10 +136,12 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
     -> link_stat
 //  -> Print("Linkprobe_out",320)
     -> lp_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
+#ifndef DISABLE_LP_POWER
 #if WIFITYPE == 805
     -> lp_power::BrnSetTXPower(DEVICE $device, POWER 61)
 #else
     -> lp_power::BrnSetTXPower(DEVICE $device, POWER 16)
+#endif
 #endif
     -> lp_wifiencap::WifiEncap(0x00, 0:0:0:0:0:0)
     -> lp_queue::FrontDropQueue(2)
@@ -149,9 +155,11 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   lp_clf[1]                               //brn, but no lp
 #ifdef CST
 #ifdef SIMULATION
+#ifdef COOPCST
   -> co_cst_clf :: Classifier( 14/BRN_PORT_CHANNELSTATSINFO, - );
-  
+
   co_cst_clf[1]
+#endif
 #endif
 #endif
   //-> Print("Data, no LP")
@@ -160,6 +168,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
 #ifdef CST
 #ifdef SIMULATION
+#ifdef COOPCST
   co_cst_clf[0]
   //-> Print("ChannelStats")
   -> BRN2EtherDecap()
@@ -169,6 +178,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> cocst_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
   -> cocst_rate::SetTXRate(RATE 2, TRIES 1)
   -> brnwifi;
+#endif
 #endif
 #endif
 
