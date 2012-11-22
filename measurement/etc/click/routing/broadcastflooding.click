@@ -10,10 +10,17 @@
 //[0]output: Local copy (broadcast)
 //[1]output: To other brn nodes
 
+#ifndef FLOODING_DEBUG
+#define FLOODING_DEBUG 2
+#endif
+
 elementclass BROADCASTFLOODING {ID $id, LT $lt |
 
 #ifdef PRO_FL
-  flp::ProbabilityFlooding(NODEIDENTITY $id, LINKTABLE $lt, MAXNBMETRIC 200);
+#ifndef PROBABILITYFLOODING_FWDPROBALILITY
+#define PROBABILITYFLOODING_FWDPROBALILITY 90
+#endif
+  flp::ProbabilityFlooding(NODEIDENTITY $id, LINKTABLE $lt, MAXNBMETRIC 200, MINNEIGHBOURS 3, FWDPROBALILITY PROBABILITYFLOODING_FWDPROBALILITY, DEBUG FLOODING_DEBUG);
 #else
   flp::SimpleFlooding();
 #endif
