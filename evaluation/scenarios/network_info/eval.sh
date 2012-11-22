@@ -111,6 +111,12 @@ if [ $? -ne 0 ]; then
   echo "Ohh, matlab error."
 fi
 
+
+echo "Get Bridges and Articulation points"
+
+(cd $DIR; matlab -nosplash -nodesktop -r "try,get_bridges_and_articulation_points('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/','none'),catch,exit(1),end,exit(0)" 1> /dev/null)
+
+
 echo "Create clusterfiles and nodedegree!"
 
 if [ ! -f $EVALUATIONSDIR/cluster_0.csv ]; then
