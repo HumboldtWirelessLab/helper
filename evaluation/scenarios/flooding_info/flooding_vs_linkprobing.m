@@ -1,8 +1,10 @@
-function flood_vs_linkprobing( floodfilename, floodpktfile, bcastfilename, basedir, params )
+function flooding_vs_linkprobing( floodfilename, floodpktfile, bcastfilename, basedir, params )
 
   flooddata=load(floodfilename,'-ASCII');
   floodpktdata=load(floodpktfile,'-ASCII');
   bcastdata=load(bcastfilename,'-ASCII');
+
+  lp_bc_diff=bcastdata-flooddata;
 
   flooddata=reshape(flooddata,size(flooddata,1)*size(flooddata,1),1);
   floodpktdata=reshape(floodpktdata,size(floodpktdata,1)*size(floodpktdata,1),1);
@@ -29,7 +31,11 @@ function flood_vs_linkprobing( floodfilename, floodpktfile, bcastfilename, based
   ylabel('Linkprobing');
   title('PDR Flooding vs. Linkprobing');
 
-  print(strcat(basedir,'flood_vs_linkprobing_', params ,'.png'),'-dpng');
+  print(strcat(basedir,'flooding_vs_linkprobing_',params ,'.png'),'-dpng');
+  csvwrite(strcat(basedir,'flooding_vs_linkprobing_diff_',params,'.csv'),lp_bc_diff);
+
+  lp_bc_diff=reshape(lp_bc_diff,size(lp_bc_diff,1)*size(lp_bc_diff,1),1);
+  
 
 end
 
