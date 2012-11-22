@@ -102,6 +102,26 @@ if (simulation_start)
     %[matrix_birthday_problem_collision_likelihood_packet_loss_2] = func_birhtday_problem_packetloss(vector_birthday_problem_approximation,vector_cw_birthday_problem);
     [backoff_windows_slot_approximation] = func_backkoff_approximation(packet_loss_upper_limit,vector_birthday_problem_approximation_neighbours);
     
+    % Backoff-Delay Calculation
+    %vector_backoff_delay = zeros(1,size(vector_birthday_problem_neighbours,2));
+    vector_backoff_delay_old = zeros(1,size(vector_birthday_problem_approximation_neighbours,2));
+    for zt=1:1:size(vector_birthday_problem_approximation_neighbours,2) ;
+        vector_backoff_delay_old(1,vector_birthday_problem_approximation_neighbours(1,zt)) = matrix_birthday_problem_collision_likelihood_packet_loss(zt,15);
+    end
+    vector_backoff_delay = zeros(1,size(vector_birthday_problem_approximation_neighbours,2));
+    for bd=1:1:size(vector_birthday_problem_approximation_neighbours,2)
+        vector_backoff_delay(1,vector_birthday_problem_approximation_neighbours(1,bd)) = func_medium_access_delay(bd, packet_loss_upper_limit, 15);
+    end
+    hold all
+    plot(vector_birthday_problem_approximation_neighbours,vector_backoff_delay)
+    %plot(vector_birthday_problem_approximation_neighbours,vector_backoff_delay_old)
+    %plot(vector_birthday_problem_approximation_neighbours,backoff_windows_slot_approximation)
+    plot(vector_birthday_problem_approximation_neighbours,matrix_neighbour_backoff_shorten)
+    grid on
+    xlabel('#Nachbarn')
+    ylabel('Backoff [Slots]')
+    legend('Backoff-Delay', 'Geburtstagsparadoxon','Location','NorthEastOutside')
+    
     %matrix_birthday_problem_collision_likelihood = matrix_birthday_problem_collision_likelihood';
     %matrix_tmt_msdu =zeros(size(vector_rates,2),size(vector_msdu,2));
     matrix_tmt_neighbours = zeros(size(vector_rates,2),size(vector_msdu,2),no_neighbours_max);
