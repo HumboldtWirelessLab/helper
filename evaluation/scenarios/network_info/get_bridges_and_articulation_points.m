@@ -26,7 +26,7 @@ for i = 1:size(graph,1)-1
 		    graph(j,i) = 0;
 		
 		    if (cluster_size < cnt_partitions(graph) )
-			bridges = [bridges [i,j]];
+			bridges = [bridges ; [i,j]];
 		    end
 		    graph(i,j) = a;
 		    graph(j,i) = b;
@@ -46,7 +46,7 @@ for i = 1:size(graph,1)
 	graph([1:end],i) = 0;
 
 	if ((cluster_size+1) < cnt_partitions(graph))
-		artp = [artp i];
+		artp = [artp ; i];
 	end
 	
 	graph(i,:) = a;
