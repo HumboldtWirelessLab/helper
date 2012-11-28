@@ -1,4 +1,4 @@
-function [counter_slots_global,packets_delivery_counter,packets_delivery_counter_global, counter_collision_global,retries_min_mean_neighbours,retries_max_mean_neighbours, retries_avg_mean_neighbours ] = func_backoff_calculation_4(vector_cw, number_of_stations,packet_delivery_limit, seed_value)
+function [counter_slots_global,packets_delivery_counter,packets_delivery_counter_global, counter_collision_global,retries_min_mean_neighbours,retries_max_mean_neighbours, retries_avg_mean_neighbours ] = func_backoff_calculation(vector_cw, number_of_stations,packet_delivery_limit, seed_value)
 
 if (seed_value >= 0)
     %see http://blogs.mathworks.com/loren/2008/11/05/new-ways-with-random-numbers-part-i/
