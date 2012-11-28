@@ -1,4 +1,4 @@
-function [sifs_time, difs_time,slot_time ] = func_phy_ieee80211g_get_sifs_difs_2(greenfield_on)
+function [sifs_time, difs_time,slot_time ] = func_phy_ieee80211g_get_sifs_difs(greenfield_on)
     if (greenfield_on == 1) 
         slot_time = 9e-6; %[sec], 9 microseconds,  chapter 14, ERP Physical Medium Dependent (PMD) Layer, Table 14-3. ERP PHY parameters
     else
