@@ -32,5 +32,5 @@ while ( ~isempty(find(cluster(:) == 0)) )
     cluster_id = cluster_id + 1;
 
 end
-    cluster_size = cluster_id;
+    cluster_size = cluster_id - 1;
 end

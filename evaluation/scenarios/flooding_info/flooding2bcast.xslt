@@ -27,7 +27,9 @@
 	<xsl:variable name="smac" select="../../@node" />
 	<xsl:value-of select="../../../../flowstats[@node=$smac]/txflow/@packet_size" /><xsl:text>,0,0,0,0,0,</xsl:text>
 	<xsl:value-of select="../../../../flowstats[@node=$smac]/txflow/@packet_count" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="../@value" /><xsl:value-of select="$newline" />
+	<xsl:value-of select="../@value" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="../@fwd" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="../@sent" /><xsl:value-of select="$newline" />
     </xsl:template>
 
 </xsl:stylesheet>
