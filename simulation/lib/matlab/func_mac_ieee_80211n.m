@@ -4,10 +4,10 @@
     % Tannenbaum,Computernetzwerke, Seite 309ff)
 %-----------------------------------------------------------------------
 
-function [mpdu,output_xml] = func_mac_ieee_80211n(msdu, is_Address4_requiered, is_ht_required,is_frame_body_8_kb,is_a_msdu_used, number_of_msdus_in_a_msdus, is_a_mpdu_used, number_of_mpdus_in_a_mpdus)
+function [mpdu,output_xml] = func_mac_ieee_80211n(msdu_size, is_Address4_requiered, is_ht_required,is_frame_body_8_kb,is_a_msdu_used, number_of_msdus_in_a_msdus, is_a_mpdu_used, number_of_mpdus_in_a_mpdus)
     output_xml = ' ';
     mac_frame_body_size_max = 7955; %[Byte],see Perahia and Stacey, 2008, page 267, Figure Figure 11.1 MAC frame format. Reproduced with permission from IEEE (2007b)
-    if (msdu >= 0 && msdu <= mac_frame_body_size_max) 
+    if (msdu_size >= 0 && msdu_size <= mac_frame_body_size_max) 
     %---------- Mac-Frame-Format; see 802.11n-2009-Spec, Seite 12; 7.1.2 General frame format ---------------
         mac_frame_control = 2; %[Bytes]
         mac_frame_duration_id = 2; %[Bytes]
@@ -27,7 +27,7 @@ function [mpdu,output_xml] = func_mac_ieee_80211n(msdu, is_Address4_requiered, i
             mac_frame_header = mac_frame_header + mac_frame_address_4;
         end
         if (is_a_msdu_used == 0) % A-MSDU is off
-            mpdu = mac_frame_header + msdu + mac_frame_fcs;
+            mpdu = mac_frame_header + msdu_size + mac_frame_fcs;
         else
             %---- A-MSDU (Aggregated MAC Service Data Unit); see 802.11n-2009-Spec,Seite 12; 7.1.2 General frame format --------
             if (is_frame_body_8_kb == 1)
@@ -48,7 +48,7 @@ function [mpdu,output_xml] = func_mac_ieee_80211n(msdu, is_Address4_requiered, i
                 a_msdu_mac_header = a_msdu_mac_header  + mac_frame_ht_control;
             end
     
-            [a_msdu, subframes_in_a_msdu_max, a_msdu_subframe_header, a_msdu_subframe_pad_bytes] = func_number_of_subframes_in_a_msdu_2(a_msdu_size_max, msdu,  number_of_msdus_in_a_msdus);
+            [a_msdu, subframes_in_a_msdu_max, a_msdu_subframe_header, a_msdu_subframe_pad_bytes] = func_number_of_subframes_in_a_msdu(a_msdu_size_max, msdu_size,  number_of_msdus_in_a_msdus);
     
             %a_msdu_subframe_single_size = a_msdu_mac_header + a_msdu_subframe_header + msdu;
             mpdu =   a_msdu_mac_header + a_msdu + mac_frame_fcs;
@@ -61,7 +61,7 @@ function [mpdu,output_xml] = func_mac_ieee_80211n(msdu, is_Address4_requiered, i
           
          if (is_a_mpdu_used)
             %[a_mpdu_frame, a_mpdu_subframe,  a_mpdu_subframe_padding, number_of_msdus_in_a_mpdu] = func_a_mpdu_calculation_2(mac_frame_a_msdu, number_of_a_mpdus);
-            [a_mpdu_frame, a_mpdu_subframe,  a_mpdu_subframe_padding , number_of_mpdus_in_a_mpdus,ratio_current_max] = func_a_mpdu_calculation_2(mpdu, number_of_mpdus_in_a_mpdus);
+            [a_mpdu_frame, a_mpdu_subframe,  a_mpdu_subframe_padding , number_of_mpdus_in_a_mpdus,ratio_current_max] = func_a_mpdu_calculation(mpdu, number_of_mpdus_in_a_mpdus);
             if (a_mpdu_frame > 0)
                 mpdu = a_mpdu_frame;
             end
