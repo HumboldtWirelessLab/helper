@@ -8,16 +8,17 @@
 % - Bound-checking
 % - type-checking: no types
 
-clear;
-close all;
+function collaborative_detector(events, detected, offset, range)
+
+%clear;
+%close all;
 
 
+%offset = 0;
+%range = 5;
 
-offset = 0;
-range = 5;
-
-events = [1 19 21 58 113 161 196 239 268 295 318 384 411 445 486];
-detected = [1 18 22 60 113 164 172 196 239 293 318 349 384 445 486];
+%events = [1 19 21 58 113 161 196 239 268 295 318 384 411 445 486];
+%detected = [1 18 22 60 113 164 172 196 239 293 318 349 384 445 486];
 
 
 events = (events+offset);
@@ -26,7 +27,6 @@ detected = (detected);
 cnt_false_pos = 0;
 cnt_false_neg = 0;
 cnt_true_pos = 0;
-
 
 % bound-checking
 if any(events<0) || any(detected<0)
@@ -67,8 +67,8 @@ for i=1:length(events)
 	end
 end
 
-
-
 disp(cnt_true_pos);
 disp(cnt_false_pos);
 disp(cnt_false_neg);
+
+end
