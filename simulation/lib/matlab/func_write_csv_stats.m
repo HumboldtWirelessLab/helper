@@ -1,4 +1,4 @@
-function func_write_csv_stats(matrix_results_packets_delivery_counter_global,matrix_results_counter_slots_global,matrix_results_collision_avg,matrix_results_collision_min,matrix_results_collision_min_counter,matrix_results_collision_max,matrix_results_collision_max_counter,matrix_results_retries_avg,matrix_results_retries_min,matrix_results_retries_min_counter,matrix_results_retries_max,matrix_results_retries_max_counter)
+function func_write_csv_stats(folder_name, matrix_results_packets_delivery_counter_global,matrix_results_counter_slots_global,matrix_results_collision_avg,matrix_results_collision_min,matrix_results_collision_min_counter,matrix_results_collision_max,matrix_results_collision_max_counter,matrix_results_retries_avg,matrix_results_retries_min,matrix_results_retries_min_counter,matrix_results_retries_max,matrix_results_retries_max_counter)
     filename_xml_1 = 'sim_packets_delivery_counter_global.csv';
     filename_xml_2 = 'sim_counter_slots_global.csv';
     filename_xml_3 ='sim_collision_avg.csv';
@@ -12,7 +12,7 @@ function func_write_csv_stats(matrix_results_packets_delivery_counter_global,mat
     filename_xml_10 = 'sim_retries_min_counter.csv';
     filename_xml_11 = 'sim_retries_max.csv';
     filename_xml_12 = 'sim_retries_max_counter.csv';
-
+    
     
     csvwrite(filename_xml_1,matrix_results_packets_delivery_counter_global) 
     csvwrite(filename_xml_2 ,matrix_results_counter_slots_global) 

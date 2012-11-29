@@ -1,4 +1,4 @@
-function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80211a_2(rate,mac_frame)
+function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80211a(rate,mac_frame)
     % 802.11a
     mac_frame_length_min = 0;%[bytes]
     mac_frame_length_max = 4095; %[bytes], see Gast, 2005, chapter 13, Characteristics of the OFDM PHY, Table 13-5. OFDM PHY parameters

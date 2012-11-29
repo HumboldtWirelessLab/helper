@@ -2,7 +2,7 @@
 % short_guard_interval; 0:= off, 1:= on for use
 % bandwidth;  0:= 20 MHz; 1:=40MHz
 % greenfield;  0:= off; 1:=on
-function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80211n_2(mcs,mac_frame,short_guard_interval, bandwidth,greenfield )
+function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80211n(mcs,mac_frame,short_guard_interval, bandwidth,greenfield )
     mac_frame_length_min = 0;  %[bytes], see Perahia and Stacey, 2008, page 78
     mac_frame_length_max = 65535; %[bytes], see Perahia and Stacey, 2008, page 78
     plcp_framing_duration = 0;
