@@ -32,7 +32,7 @@ elementclass BROADCAST {ID $id, LT $lt |
   input[1]
   -> bcr_clf::Classifier( 0/BRN_PORT_FLOODING,     //Flooding
                           0/BRN_PORT_BCASTROUTING, //BroadcastRouting
-	                      -  ); //other
+                          -  ); //other
 
   bcr_clf[0]
   -> [1]bcf;
