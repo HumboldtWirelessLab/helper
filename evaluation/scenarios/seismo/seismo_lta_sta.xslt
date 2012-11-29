@@ -9,13 +9,10 @@
       <!--<xsl:value-of select="."/>-->
     </xsl:template>
 
-    <xsl:template match="seismodetection_cooperative/node/alarm">
+    <xsl:template match="seismodetection_stalta/alarmlist/alarm">
 	<xsl:value-of select="../../@id" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="../@id" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="@id" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="@start" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="@end" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="@packet_count" /><xsl:value-of select="$newline" />
+	<xsl:value-of select="@end" /><xsl:value-of select="$newline" />
     </xsl:template>
 
 </xsl:stylesheet>
