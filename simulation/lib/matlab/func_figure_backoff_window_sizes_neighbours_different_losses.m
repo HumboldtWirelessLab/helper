@@ -10,9 +10,17 @@ for t = 1:1:size(vector_of_successful_conditions,1)
     [ vector_shorten] = func_test_vector_shorten_2(vector, vector_of_successful_conditions(t,1));
 %plot(v_neighbours,w_approximate,'-x')
    hplots(t,1) = plot(no_neighbours,vector_shorten,'-x');
+   set(hplots(t,1),'LineWidth',2);
 end
-ylabel('Backoff-Fenstergröße');
-xlabel('Anzahl von Nachbarn');
+ylabel('\bfBackoff-Fenstergröße');
+%ylabel('\bfBackoff-Fenstergrqe');
+xlabel('\bfAnzahl von Nachbarn');
+h_xlabel = get(gca,'XLabel');
+set(h_xlabel,'FontSize',16); 
+
+h_ylabel = get(gca,'YLabel');
+set(h_ylabel,'FontSize',16); 
+
 grid on
 neighbours_max_2 = max(vector_of_successful_conditions) + 10;
 Ticks_x = 0:5:neighbours_max_2;%number_of_stations_max;
@@ -24,7 +32,8 @@ set(gca, 'XTickMode', 'manual', 'XTick', Ticks_x, 'xlim', [0;neighbours_max_2]);
 %set(gca, 'YTickMode', 'manual', 'YTick', Ticks_y, 'ylim', [0,max_value+ 1 + 0.5]); 
 legend_txt  = cell(1,size(vector_packet_loss,2));
  for i=1:1:size(vector_packet_loss,2)
-        string = num2str(vector_packet_loss(1,i) * 100);
+        %string = num2str(vector_packet_loss(1,i) * 100);
+        string = sprintf('%s', num2str(vector_packet_loss(1,i) * 100));
         legend_txt(1,i) = {string};
  end
  %hl = legend(legend_txt,'Location','BestOutside');
@@ -46,7 +55,9 @@ legend_txt  = cell(1,size(vector_packet_loss,2));
  %end
  
     handler_legend = legend(hplots,legend_txt,'Location','NorthEastOutside');
-    set(get(handler_legend,'title'),'String',{'Paketverlust [%]'}) 
+    set(get(handler_legend,'title'),'String',{'\bfPaketverlust [%]'}) 
+    set(handler_legend,'FontSize',12)
+    set(get(handler_legend,'title'),'FontSize',13);
     hleg_copy = copyobj(handler_legend,handler_figure);
     delete(handler_legend);
     % Now move the first set of plots and legend to a second figure
@@ -102,27 +113,36 @@ for k=0:1:max_y
 end
 
 
-%hplots_standard = zeros(size(vector_backoff_window_sizes_standard,2),1);   
 hplots_standard(1,1) = plot(x,initial_attempt,'blue');
+set(hplots_standard(1,1),'LineWidth',2);
 hplots_standard(2,1) = plot(x,retransmission_first,'magenta');
+set(hplots_standard(2,1),'LineWidth',2)
 hplots_standard(3,1) = plot(x,retransmission_second,'cyan');
+set(hplots_standard(3,1),'LineWidth',2)
 hplots_standard(4,1) = plot(x,retransmission_third,'red');
+set(hplots_standard(4,1),'LineWidth',2)
 hplots_standard(5,1) = plot(x,retransmission_fourth,'green');
+set(hplots_standard(5,1),'LineWidth',2)
 hplots_standard(6,1) = plot(x,retransmission_fifth,'black');
+set(hplots_standard(6,1),'LineWidth',2)
 hplots_standard(7,1) = plot(x,retransmission_sixth,'black');
+set(hplots_standard(7,1),'LineWidth',2)
 
 try_init = sprintf('initialer Versuch (%d)',vector_backoff_window_sizes_standard(1,1));
 try_first = sprintf('1. Wiederholung (%d)',vector_backoff_window_sizes_standard(1,2));
-try_second = sprintf('2.Wiederholung (%d)',vector_backoff_window_sizes_standard(1,3));
-try_third = sprintf('3.Wiederholung (%d)',vector_backoff_window_sizes_standard(1,4));
-try_fourth = sprintf('4.Wiederholung (%d)',vector_backoff_window_sizes_standard(1,5));
-try_fifth = sprintf('5.Wiederholung (%d)',vector_backoff_window_sizes_standard(1,6));
-try_sixth = sprintf('6.Wiederholung (%d)',vector_backoff_window_sizes_standard(1,7));
+try_second = sprintf('2. Wiederholung (%d)',vector_backoff_window_sizes_standard(1,3));
+try_third = sprintf('3. Wiederholung (%d)',vector_backoff_window_sizes_standard(1,4));
+try_fourth = sprintf('4. Wiederholung (%d)',vector_backoff_window_sizes_standard(1,5));
+try_fifth = sprintf('5. Wiederholung (%d)',vector_backoff_window_sizes_standard(1,6));
+try_sixth = sprintf('6. Wiederholung (%d)',vector_backoff_window_sizes_standard(1,7));
 legend_standard_txt = {try_init try_first try_second try_third try_fourth try_fifth try_sixth};
    hleg2 = legend(hplots_standard,legend_standard_txt,'Location','SouthEastOutside');
     %hleg2 = legend(hplots_standard,{'initialer Versuch' '1. Wiederholung' '2.Wiederholung' '3. Wiederholung' '4. Wiederholung' '5. bis n-te Wiederholung' '6. Wiederholung'},'Location','SouthEastOutside');
    %hleg2 = legend([hia(1) hrfirst(1) hrsecond(1) hrthird(1) hrfourth(1) hrfifth(1)],{'initialer Versuch' '1. Wiederholung' '2.Wiederholung' '3. Wiederholung' '4. Wiederholung' '5. bis n-te Wiederholung'},'Location','SouthEastOutside');
-    set(get(hleg2,'title'),'String',{'Standard-Backoff-Fenstergrößen [Slots]'}) 
+    %set(get(hleg2,'title'),'String',{'\bfStandard-Backoff-Fenstergrqen [Slots]'}) 
+    set(get(hleg2,'title'),'String',{'\bfStandard-Backoff-Fenstergrößen [Slots]'})
+    set(hleg2,'FontSize',12)
+    set(get(hleg2,'title'),'FontSize',13);
    % Second set of plots
     %hplots2 =  line([vector_line_x_min vector_line_x_max], [vector_line_y vector_line_y],'Marker','none','LineStyle','--');
     %hleg2 = legend(hplots2,{'initialer Versuch' '1. Wiederholung' '2.Wiederholung' '3. Wiederholung' '4. Wiederholung' '5. bis n-te Wiederholung'},'Location','EastOutside');

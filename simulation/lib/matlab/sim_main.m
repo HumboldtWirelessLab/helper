@@ -74,8 +74,8 @@ end
  vector_backoff_window_sizes_standard = func_cw_vector_get(test_find_backoff_optimal_on,letter_of_standards{1,2}, no_backoff_window_size_max,use_greenfield);
 %[handler_figure] = func_figure_birthday_problem_neighbours_backoff_window_sizes(figure_number,vector_neighbours, vector_backoff_window_sizes_per_neighbour,vector_backoff_window_sizes_standard);
 [ handler_figure ] = func_figure_backoff_window_sizes_neighbours_different_losses(figure_number,matrix_packetloss_neighbours_2_backoff_window_sizes_calc,vector_packet_loss_upper_limit,vector_of_successful_conditions,vector_backoff_window_sizes_standard);
-figure_number = figure_number + 1;
-[ handler_figure_2 ] = func_figure_backoff_window_sizes_neighbours_different_losses(figure_number,matrix_packetloss_neighbours_2_backoff_window_sizes_approx,vector_packet_loss_upper_limit,vector_of_successful_conditions,vector_backoff_window_sizes_standard);
+%figure_number = figure_number + 1;
+%[ handler_figure_2 ] = func_figure_backoff_window_sizes_neighbours_different_losses(figure_number,matrix_packetloss_neighbours_2_backoff_window_sizes_approx,vector_packet_loss_upper_limit,vector_of_successful_conditions,vector_backoff_window_sizes_standard);
 
 %[ handler_fig_2 ] = func_figure_backoff_window_sizes_neighbours_different_losses(figure_number,vector_birthday_problem_neighbours,matrix_packetloss_neighbours_2_backoff_window_sizes_approx,packet_loss_upper_limit,vector_of_successful_conditions,vector_backoff_window_sizes_standard);
 figure_number = figure_number + 1;
@@ -129,10 +129,11 @@ debug_saveas = 0;
 if(debug_saveas == 1)
         directory = 'evaluation/';
     [s,mess,messid] = mkdir(directory);
+    format ='png';
     filename_1 = sprintf('%sbackoff_neighbours_calc.png',directory);
     filename_2 = sprintf('%sbackoff_neighbours_approx.png',directory);
     filename_3 = sprintf('%sbackoff_neighbours_calc_approx.png',directory);
-    format ='png';
+    
     saveas(handler_figure,filename_1,format)
     saveas(handler_figure_2,filename_2,format)
     saveas(handler_figure_3,filename_3,format)
