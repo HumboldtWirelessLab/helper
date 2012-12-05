@@ -1,13 +1,6 @@
-function [counter_slots_global,packets_delivery_counter,packets_delivery_counter_global, counter_collision_global,retries_min_mean_neighbours,retries_max_mean_neighbours, retries_avg_mean_neighbours ] = func_backoff_calculation(vector_cw, number_of_stations,packet_delivery_limit, seed_value)
+function [counter_slots_global,packets_delivery_counter,packets_delivery_counter_global, counter_collision_global,retries_min_mean_neighbours,retries_max_mean_neighbours, retries_avg_mean_neighbours ] = func_backoff_calculation(vector_cw, number_of_stations,packet_delivery_limit)
 
-if (seed_value >= 0)
-    %see http://blogs.mathworks.com/loren/2008/11/05/new-ways-with-random-numbers-part-i/
-    %see http://blogs.mathworks.com/loren/2008/11/13/new-ways-with-random-numbers-part-ii/
-    stream0 = RandStream('mt19937ar','Seed',seed_value); % Mersenne Twister, change seed value 
-    RandStream.setDefaultStream(stream0);
-elseif (seed_value == -1)
-    rng shuffle % creates a different seed each time; see http://www.mathworks.de/help/techdoc/math/bs1qb_i.html
-end
+
 
 counter_backoff_random_row = 1;
 %counter_backoff_random_output_row = 1;
