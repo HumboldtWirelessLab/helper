@@ -27,7 +27,9 @@ function [likelihood_packet_loss] = func_birhtday_problem_packetloss(vector_neig
                     product_term = (product_term * ((i - k + 1)/i));
                     if ((~isempty(find(vector_neighbours == k, 1)) || counter_nieghobur_add == k ) && k > 1)
                      %if (~isempty(find(vector_neighbours == k, 1)))
+                     if ( 1 - product_term ~= 1)
                         likelihood_packet_loss(counter2,counter) = 1 - product_term;
+                     end
                         %table_neighbours(counter2,counter) = k;
                         counter2 = counter2 + 1;
                     end

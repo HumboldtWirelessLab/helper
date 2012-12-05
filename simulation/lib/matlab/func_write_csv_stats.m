@@ -1,17 +1,18 @@
 function func_write_csv_stats(folder_name, matrix_results_packets_delivery_counter_global,matrix_results_counter_slots_global,matrix_results_collision_avg,matrix_results_collision_min,matrix_results_collision_min_counter,matrix_results_collision_max,matrix_results_collision_max_counter,matrix_results_retries_avg,matrix_results_retries_min,matrix_results_retries_min_counter,matrix_results_retries_max,matrix_results_retries_max_counter)
-    filename_xml_1 = 'sim_packets_delivery_counter_global.csv';
-    filename_xml_2 = 'sim_counter_slots_global.csv';
-    filename_xml_3 ='sim_collision_avg.csv';
-    filename_xml_4 ='sim_collision_min.csv';
-    filename_xml_5 ='sim_collision_min_counter.csv';
-    filename_xml_6 = 'sim_collision_max.csv';
-    filename_xml_7 = 'sim_collision_max_counter.csv';
     
-    filename_xml_8 = 'sim_retries_avg.csv';
-    filename_xml_9 = 'sim_retries_min.csv';
-    filename_xml_10 = 'sim_retries_min_counter.csv';
-    filename_xml_11 = 'sim_retries_max.csv';
-    filename_xml_12 = 'sim_retries_max_counter.csv';
+    filename_xml_1 = sprintf('%s/sim_packets_delivery_counter_global.csv',folder_name);
+    filename_xml_2 = sprintf('%s/sim_counter_slots_global.csv',folder_name);
+    filename_xml_3 = sprintf('%s/sim_collision_avg.csv',folder_name);
+    filename_xml_4 = sprintf('%s/sim_collision_min.csv',folder_name);
+    filename_xml_5 = sprintf('%s/sim_collision_min_counter.csv',folder_name);
+    filename_xml_6 = sprintf('%s/sim_collision_max.csv',folder_name);
+    filename_xml_7 = sprintf('%s/sim_collision_max_counter.csv',folder_name);
+    
+    filename_xml_8 = sprintf('%s/sim_retries_avg.csv',folder_name);
+    filename_xml_9 = sprintf('%s/sim_retries_min.csv',folder_name);
+    filename_xml_10 = sprintf('%s/sim_retries_min_counter.csv',folder_name);
+    filename_xml_11 = sprintf('%s/sim_retries_max.csv',folder_name);
+    filename_xml_12 = sprintf('%s/sim_retries_max_counter.csv',folder_name);
     
     
     csvwrite(filename_xml_1,matrix_results_packets_delivery_counter_global) 

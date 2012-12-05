@@ -12,9 +12,9 @@ for t = 1:1:size(vector_of_successful_conditions,1)
    hplots(t,1) = plot(no_neighbours,vector_shorten,'-x');
    set(hplots(t,1),'LineWidth',2);
 end
-ylabel('\bfBackoff-Fenstergröße');
+ylabel('\bfBackoff-Fenstergröße [Slots]');
 %ylabel('\bfBackoff-Fenstergrqe');
-xlabel('\bfAnzahl von Nachbarn');
+xlabel('\bfAnzahl von 802.11-Nachbarstationen');
 h_xlabel = get(gca,'XLabel');
 set(h_xlabel,'FontSize',16); 
 
@@ -26,10 +26,10 @@ neighbours_max_2 = max(vector_of_successful_conditions) + 10;
 Ticks_x = 0:5:neighbours_max_2;%number_of_stations_max;
 %neighbours_max = neighbours_max + 0.5;
 set(gca, 'XTickMode', 'manual', 'XTick', Ticks_x, 'xlim', [0;neighbours_max_2]); 
-%max_value = max(max(w_approximate)) + 15;
-%Ticks_y = 0:50:max_value;
-%set(gca, 'YTick',Ticks_y)
-%set(gca, 'YTickMode', 'manual', 'YTick', Ticks_y, 'ylim', [0,max_value+ 1 + 0.5]); 
+max_value = 3100;%max(max(matrix_1)) + 1;
+Ticks_y = 0:250:max_value;
+set(gca, 'YTick',Ticks_y)
+set(gca, 'YTickMode', 'manual', 'YTick', Ticks_y, 'ylim', [0,max_value+ 1 + 0.5]); 
 legend_txt  = cell(1,size(vector_packet_loss,2));
  for i=1:1:size(vector_packet_loss,2)
         %string = num2str(vector_packet_loss(1,i) * 100);

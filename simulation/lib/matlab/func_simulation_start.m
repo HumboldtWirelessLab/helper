@@ -22,13 +22,14 @@ matrix_results_retries_avg = zeros(no_neighbours_max,size(vector_backoff,2));
         for  no_backoff_window_size=1:1:size(vector_backoff,2)
             for no_of_neighbours=1:1:no_neighbours_max
                 no_of_stations_current = no_of_neighbours + 1;% number of neighbours + (one station more, myself)
-                vector_cw = zeros(1,2);
+                vector_cw = zeros(1,1);
                 vector_cw(1,1) = vector_backoff(1,no_backoff_window_size);
-                vector_cw(1,2) = vector_backoff(1,no_backoff_window_size);
-                criterion_abort =  no_of_neighbours/ vector_cw(1,1); 
+                %vector_cw(1,2) = vector_backoff(1,no_backoff_window_size);
+                %criterion_abort =  no_of_neighbours/ vector_cw(1,1); 
+                criterion_abort =   no_of_stations_current/ vector_cw(1,1); 
                 %criterion_abort== 0, does not exist, because CW-value >= number_of_neighbours
                 %criterion_abort== 1, means, that 100% packet loss 
-                if (criterion_abort > 0 && criterion_abort < 1) 
+                if (criterion_abort > 0 && criterion_abort <= 1) 
                     [counter_slots_global,packets_delivery_counter,packets_delivery_counter_global, counter_collision_global,retries_min_mean_neighbours,retries_max_mean_neighbours, retries_avg_mean_neighbours ] = func_backoff_calculation(vector_cw, no_of_stations_current,packet_delivery_limit,no_sim);
                     
                     [first_time,minimal, counter_min,maximal,counter_max,avg, counter_avg ] = func_statistics_calc(first_time_collision(no_of_neighbours,no_backoff_window_size),  matrix_results_collision_min(no_of_neighbours,no_backoff_window_size), matrix_results_collision_min_counter(no_of_neighbours,no_backoff_window_size), matrix_results_collision_max(no_of_neighbours,no_backoff_window_size),matrix_results_collision_max_counter(no_of_neighbours,no_backoff_window_size), matrix_results_collision_avg(no_of_neighbours,no_backoff_window_size),no_sim, counter_collision_global);

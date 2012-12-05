@@ -26,7 +26,8 @@ retries_current = zeros(1,number_of_stations);
 counter_retries = 1;
 packets_delivery_counter = 0;
 counter_slots_global = 0;
-backoff_random = int32((vector_cw(1,1)-1)* rand(1,number_of_stations));
+%backoff_random = int32((vector_cw(1,1)-1)* rand(1,number_of_stations));
+backoff_random = int32(vector_cw(1,1) * rand(1,number_of_stations));
 vector_backoff_random_current = zeros(1,size(backoff_random,2));
 for z=1:1:size(backoff_random,2)
     vector_backoff_random_current(1,z) = backoff_random(counter_backoff_random_row,z);
@@ -122,7 +123,9 @@ for j=1:1:size(vector_backoff_random_current,2)
         end
         %if
         %vector_backoff_random_current(1,j) = floor( vector_cw(1,retries(counter_retries,j)+1)*rand(1,1));
-     vector_backoff_random_current(1,j) =int32(( vector_cw(1,retries(counter_retries,j)+1)-1)*rand(1,1));    
+     %vector_backoff_random_current(1,j) =int32(( vector_cw(1,retries(counter_retries,j)+1)-1)*rand(1,1));
+     %vector_backoff_random_current(1,j) =int32(( vector_cw(1,retries(counter_retries,j)+1))*rand(1,1));
+     vector_backoff_random_current(1,j) =int32(vector_cw(1,1) * rand(1,1));
     end
    
 end
