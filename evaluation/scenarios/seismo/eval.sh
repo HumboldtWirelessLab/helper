@@ -35,7 +35,7 @@ else
 fi
 
 FULLSED=""
-FULLIDSED="-e s#FF-FF-FF-FF-FF-FF#255#g -e s#00-00-00-00-00-00#0#g"
+FULLIDSED="-e s#FF-FF-FF-FF-FF-FF#255#g -e s#FF-FF-FF-FF-FF-FE#254#g -e s#00-00-00-00-00-00#0#g"
 while read line; do
   SRCN=`echo $line | awk '{print $1}'` 
   SRCM=`echo $line | awk '{print $3}'`

@@ -1,4 +1,4 @@
-function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80211b_2(rate,mac_frame,greenfield)
+function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80211b(rate,mac_frame,greenfield)
     
     byte = 8; %[bit]
     kb = 1000;%[byte]   

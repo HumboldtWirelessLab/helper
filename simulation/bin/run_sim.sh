@@ -406,6 +406,7 @@ case "$MODE" in
 		
 		cat $DIR/../etc/ns/script_02.tcl >> $TCLFILE
 		
+		#echo "Handle Control file"
 		# Evaluate the control file (*.ctl)
 		if [ "x$CONTROLFILE" != "x" ]; then
 			if [ "x$USED_SIMULATOR" = "xjist" ]; then
@@ -421,11 +422,9 @@ case "$MODE" in
 					MODE=`echo $line | awk '{print $4}'`
 					ELEMENT=`echo $line | awk '{print $5}'`
 					HANDLER=`echo $line | awk '{print $6}'`
-					NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$NODENAME[[:space:]]" | awk '{print $4}'`
-					NODENUM=`expr $NODENUM - 1`
 					
 					# if "ALL" is used, take all nodes of nodelist, else just the respective node
-					if [ "x$HANDLERNODES" = "xALL" ]; then
+					if [ "x$NODENAME" = "xALL" ]; then
 						HANDLERNODES=$NODELIST
 					else
 						HANDLERNODES=$NODENAME
@@ -478,6 +477,8 @@ case "$MODE" in
 		fi
 		
 		cat $DIR/../etc/ns/script_03.tcl >> $TCLFILE
+		
+		#echo "Finish setup"
 		
 		# Prepare result directories
 		if [ ! -e $LOGDIR ]; then

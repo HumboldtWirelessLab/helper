@@ -1,4 +1,4 @@
-function [mac_frame, rts_frame, cts_frame, ack_frame] = ieee_80211_mac(msdu, is_Address4_requiered)
+function [mac_frame, rts_frame, cts_frame, ack_frame] = func_ieee_80211_mac(msdu_size, is_Address4_requiered)
 % 802.11 MAC Layer (general) for 802.11 a/b/g
 
     % MAC-Header; see Gast, 2005, chapter 4, Data Frames, Figure 4-1. Generic data frame
@@ -20,11 +20,11 @@ function [mac_frame, rts_frame, cts_frame, ack_frame] = ieee_80211_mac(msdu, is_
     mac_frame_body_maximum = 2312; %Frame-Body-Maximum-Size = 2312; in excel sheet max = 2304 bytes without 8 Byte LLC (maybe)
     
     
-    if (msdu > mac_frame_body_maximum)
+    if (msdu_size > mac_frame_body_maximum)
         %Muss fragmentiert werden
     end
     
-    mac_frame = mac_frame_header + msdu + mac_frame_fcs; %total MAC-Frame
+    mac_frame = mac_frame_header + msdu_size + mac_frame_fcs; %total MAC-Frame
     
     rts_frame = mac_header_frame_control + mac_header_duration_id + mac_header_address1 +  mac_header_address2 + mac_frame_fcs;% see Gast, 2005, chapter 4, Control Frames, Request to Send (RTS), Figure 4-13. RTS frame
     
