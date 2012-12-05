@@ -24,8 +24,8 @@ for t = 1:1:size(vector_of_successful_conditions,1)
     
 end
 %ylabel('\bf{Backoff-Fenstergrqe}');
-ylabel('\bf{Backoff-Fenstergröße}');
-xlabel('\bf{Anzahl von Nachbarn}');
+ylabel('\bf{Backoff-Fenstergröße [Slots]}');
+xlabel('\bf{Anzahl von 802.11-Nachbarstationen}');
 h_xlabel = get(gca,'XLabel');
 set(h_xlabel,'FontSize',16); 
 
@@ -33,6 +33,10 @@ h_ylabel = get(gca,'YLabel');
 set(h_ylabel,'FontSize',16); 
 grid on
 neighbours_max_2 = max(vector_of_successful_conditions) + 10;
+max_value = 3100;%max(max(matrix_1)) + 1;
+Ticks_y = 0:250:max_value;
+set(gca, 'YTick',Ticks_y)
+set(gca, 'YTickMode', 'manual', 'YTick', Ticks_y, 'ylim', [0,max_value+ 1 + 0.5]); 
 Ticks_x = 0:5:neighbours_max_2;%number_of_stations_max;
 %neighbours_max = neighbours_max + 0.5;
 set(gca, 'XTickMode', 'manual', 'XTick', Ticks_x, 'xlim', [0;neighbours_max_2]); 

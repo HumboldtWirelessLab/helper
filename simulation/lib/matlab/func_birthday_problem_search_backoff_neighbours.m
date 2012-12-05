@@ -7,10 +7,12 @@ function [vector_backoff_per_neighbour,counter_of_successful_conditions] = func_
  counter_of_successful_conditions = 0;
  for i=1:1:number_of_neighbours_max
      for j = 1:1:number_of_backoff_window_max
-         if ((matrix_birthday_problem_collision_likelihood_packet_loss(i,j) <=packet_loss_upper_limit) && first_time == 0)
-             vector_backoff_per_neighbour(i,1) = j;
-             first_time = 1;
-             counter_of_successful_conditions = i;
+         if (matrix_birthday_problem_collision_likelihood_packet_loss(i,j) > 0 && matrix_birthday_problem_collision_likelihood_packet_loss(i,j) <= 1)
+            if ((matrix_birthday_problem_collision_likelihood_packet_loss(i,j) <=packet_loss_upper_limit) && first_time == 0)
+                vector_backoff_per_neighbour(i,1) = j;
+                first_time = 1;
+                counter_of_successful_conditions = i;
+            end
          end
      end
      first_time = 0;

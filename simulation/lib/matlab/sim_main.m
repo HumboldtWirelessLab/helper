@@ -3,17 +3,20 @@ close all;
 
 % ------------------ Simulation Configuration  --------------------------------------------------
 simulation_start = 0; % 0:= off (when only a new simulation of collision is started), 1:= start simulation(default)
-simulation_of_collision = 1; % 0:= off (default), 1:= read from csv-file, 2:= new simulation
-packet_delivery_limit = 100;
-number_of_simulation = 1000;
-folder_name = 'messungen/2012-09-08';
-write_simulation_results_2_csv = 0;% 0:= off (default), 1:= write simulation results into csv-file
+simulation_of_collision = 2; % 0:= off (default), 1:= read from csv-file, 2:= new simulation
+packet_delivery_limit = 10;
+number_of_simulation = 10;
+no_backoff_window_size_max =300;
+no_neighbours_max = 10;
+%folder_name = 'messungen/2012-09-08';
+folder_name = 'messungen/2012-12-05';
+write_simulation_results_2_csv = 1;% 0:= off (default), 1:= write simulation results into csv-file
+
 %----------- Birthday Problem Configuration  -------------------------
 %packet_loss_upper_limit = 0.1; %10percent packet loss
 vector_packet_loss_upper_limit = [0.1, 0.2, 0.3, 0.4, 0.5];
 %----------- Simulation and Birthday Problem Configuration  -------------------------
-no_backoff_window_size_max =3000;
-no_neighbours_max = 100;
+
 
 %----------- General IEEE 802.11 MAC-Layer Configuration  -------------------------
 use_ism_bandwith_ghz = 0; % 0:= 2,4 GHz; 1:= 5 GHz; 2:= 2,4 GHz and 5 GHz
@@ -73,6 +76,8 @@ end
     test_find_backoff_optimal_on = 0;  
  vector_backoff_window_sizes_standard = func_cw_vector_get(test_find_backoff_optimal_on,letter_of_standards{1,2}, no_backoff_window_size_max,use_greenfield);
 %[handler_figure] = func_figure_birthday_problem_neighbours_backoff_window_sizes(figure_number,vector_neighbours, vector_backoff_window_sizes_per_neighbour,vector_backoff_window_sizes_standard);
+debug_figures = 0;
+if (debug_figures == 1)
 [ handler_figure ] = func_figure_backoff_window_sizes_neighbours_different_losses(figure_number,matrix_packetloss_neighbours_2_backoff_window_sizes_calc,vector_packet_loss_upper_limit,vector_of_successful_conditions,vector_backoff_window_sizes_standard);
 %figure_number = figure_number + 1;
 %[ handler_figure_2 ] = func_figure_backoff_window_sizes_neighbours_different_losses(figure_number,matrix_packetloss_neighbours_2_backoff_window_sizes_approx,vector_packet_loss_upper_limit,vector_of_successful_conditions,vector_backoff_window_sizes_standard);
@@ -80,20 +85,54 @@ end
 %[ handler_fig_2 ] = func_figure_backoff_window_sizes_neighbours_different_losses(figure_number,vector_birthday_problem_neighbours,matrix_packetloss_neighbours_2_backoff_window_sizes_approx,packet_loss_upper_limit,vector_of_successful_conditions,vector_backoff_window_sizes_standard);
 figure_number = figure_number + 1;
 [ handler_figure_3 ] = func_figure_backoff_window_sizes_neighbours_different_losses_2(figure_number,matrix_packetloss_neighbours_2_backoff_window_sizes_calc,matrix_packetloss_neighbours_2_backoff_window_sizes_approx,vector_packet_loss_upper_limit,vector_of_successful_conditions,vector_backoff_window_sizes_standard);
-
+end
  %func_figure_backoff_window_sizes_neighbours_different_losses_2(figure_number,vector_birthday_problem_neighbours,matrix_packetloss_neighbours_2_backoff_window_sizes_calc,matrix_packetloss_neighbours_2_backoff_window_sizes_approx,packet_loss_upper_limit,vector_of_successful_conditions,vector_backoff_window_sizes_standard);
 %(figure_number,v_neighbours,matrix_1,matrix_2,vector_packet_loss,vector_of_successful_conditions,vector_backoff_window_sizes_standard)
 
 
-debug_test = 0; 
-if (debug_test == 1);
+
         
 %------------------------contention window params --------------------------------------------------------------------------
 test_find_backoff_optimal_on = 2; % 0:= off; 1:= on
 %letter_of_standard = letter_of_standards(1,1)
 [vector_backoff] = func_cw_vector_get(test_find_backoff_optimal_on,letter_of_standards{1,1}, no_backoff_window_size_max,use_greenfield);
-[matrix_collision,no_neighbours_max,no_backoff_window_size_max, matrix_counter_slots] = func_simulation(simulation_of_collision,vector_backoff,no_neighbours_max,packet_delivery_limit,number_of_simulation,folder_name,write_simulation_results_2_csv);         
+%---------------------------- Simulation ----------------------------------
+[matrix_collision,no_neighbours_max,no_backoff_window_size_max, matrix_counter_slots] = func_simulation(simulation_of_collision,vector_backoff,no_neighbours_max,packet_delivery_limit,number_of_simulation,folder_name,write_simulation_results_2_csv);  
+%-------------------------------------------------------------------------
+matrix_collision_percent = matrix_collision ./ packet_delivery_limit;
+matrix_packetloss_neighbours_2_backoff_window_sizes_sim = zeros(size(vector_packet_loss_upper_limit,2),no_neighbours_max);
+for i=1:1:size(vector_packet_loss_upper_limit,2)
+    %[vector_backoff_per_neighbour,counter_of_successful_conditions] = func_birthday_problem_search_backoff_neighbours(matrix_collision_percent,vector_packet_loss_upper_limit(1,i));
+    [vector_backoff_per_neighbour,counter_of_successful_conditions] = func_birthday_problem_search_backoff_neighbours(matrix_collision_percent,vector_packet_loss_upper_limit(1,i));
+        for t=1:1:size(vector_birthday_problem_neighbours,2) % Voraussetzung table_backoff_windows und table_neighbours haben die gleiche Anzahl von Elementen
+            matrix_packetloss_neighbours_2_backoff_window_sizes_sim(i,t) = vector_backoff_per_neighbour(t,1);
+        end
+end
+
+debug_sim_fig = 0;
+if (debug_sim_fig ==1)
+figure_number = figure_number + 1;
+[ handler_figure_4 ] = func_figure_collision_calculation_simulation(figure_number,matrix_birthday_problem_collision_likelihood_packet_loss*100,matrix_collision_percent*100);
+figure_number = figure_number + 1;
+[ handler_figure_5 ] = func_figure_simulation_neighbours_backoff_window_size(figure_number,vector_birthday_problem_neighbours,matrix_packetloss_neighbours_2_backoff_window_sizes_sim,vector_packet_loss_upper_limit);
+end
+
+debug_bereinigt = 0;
+if (debug_bereinigt == 1)
+matrix_collision_percent_2 = zeros(size(matrix_collision_percent));
+for i=1:1:size(matrix_collision_percent,1)
+    for t=1:1:size(matrix_collision_percent,2)
+        if (matrix_collision_percent(i,t) < 1 && matrix_collision_percent(i,t) >= 0)
+            matrix_collision_percent_2(i,t) = matrix_collision_percent(i,t) * 100;
+        end
+    end
+end
+figure_number = figure_number + 1;
+[ handler_figure_5 ] = func_figure_collision_calculation_simulation(figure_number,matrix_birthday_problem_collision_likelihood_packet_loss*100,matrix_collision_percent_2);
+end
 % ------------------------------ Start calculation ------------------------     
+debug_test = 0; 
+if (debug_test == 1);
 if (simulation_start)
     %------------------ MAC-Layer calculation without msdu_size -------------------
     % MAC-Frame IEEE 802.11 und IEEE 802.11a/b/g

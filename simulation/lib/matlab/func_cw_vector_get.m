@@ -47,7 +47,7 @@ function [vector_backoff  ] = func_cw_vector_get(test_find_backoff_optimal_on,le
      vector_backoff = vector_backoff_eliminate;
    elseif(test_find_backoff_optimal_on == 2)
        vector_backoff = zeros(1,no_backoff_window_size_max); % vector_backoff init
-        for s=2:1:no_backoff_window_size_max
+        for s=1:1:no_backoff_window_size_max
             vector_backoff(1,s) = s; 
         end
     end
