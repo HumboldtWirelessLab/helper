@@ -1,4 +1,4 @@
-function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80211g_2(rate,mac_frame,greenfield, dsss_ofdm_use)
+function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80211g(rate,mac_frame,greenfield, dsss_ofdm_use)
 %ieee 802.11g, be careful, because sifs are shorter then 802.11a therefore exist an signal-extension
 
     mac_frame_length_min = 1; %[bytes], see 802.11g Standard, page 17, Table 123A TXVECTOR parameters

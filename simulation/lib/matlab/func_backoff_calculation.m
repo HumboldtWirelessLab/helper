@@ -1,13 +1,6 @@
-function [counter_slots_global,packets_delivery_counter,packets_delivery_counter_global, counter_collision_global,retries_min_mean_neighbours,retries_max_mean_neighbours, retries_avg_mean_neighbours ] = func_backoff_calculation_4(vector_cw, number_of_stations,packet_delivery_limit, seed_value)
+function [counter_slots_global,packets_delivery_counter,packets_delivery_counter_global, counter_collision_global,retries_min_mean_neighbours,retries_max_mean_neighbours, retries_avg_mean_neighbours ] = func_backoff_calculation(vector_cw, number_of_stations,packet_delivery_limit)
 
-if (seed_value >= 0)
-    %see http://blogs.mathworks.com/loren/2008/11/05/new-ways-with-random-numbers-part-i/
-    %see http://blogs.mathworks.com/loren/2008/11/13/new-ways-with-random-numbers-part-ii/
-    stream0 = RandStream('mt19937ar','Seed',seed_value); % Mersenne Twister, change seed value 
-    RandStream.setDefaultStream(stream0);
-elseif (seed_value == -1)
-    rng shuffle % creates a different seed each time; see http://www.mathworks.de/help/techdoc/math/bs1qb_i.html
-end
+
 
 counter_backoff_random_row = 1;
 %counter_backoff_random_output_row = 1;
@@ -26,7 +19,8 @@ retries_current = zeros(1,number_of_stations);
 counter_retries = 1;
 packets_delivery_counter = 0;
 counter_slots_global = 0;
-backoff_random = int32((vector_cw(1,1)-1)* rand(1,number_of_stations));
+%backoff_random = int32((vector_cw(1,1)-1)* rand(1,number_of_stations));
+backoff_random = int32(vector_cw(1,1) * rand(1,number_of_stations));
 vector_backoff_random_current = zeros(1,size(backoff_random,2));
 for z=1:1:size(backoff_random,2)
     vector_backoff_random_current(1,z) = backoff_random(counter_backoff_random_row,z);
@@ -122,7 +116,9 @@ for j=1:1:size(vector_backoff_random_current,2)
         end
         %if
         %vector_backoff_random_current(1,j) = floor( vector_cw(1,retries(counter_retries,j)+1)*rand(1,1));
-     vector_backoff_random_current(1,j) =int32(( vector_cw(1,retries(counter_retries,j)+1)-1)*rand(1,1));    
+     %vector_backoff_random_current(1,j) =int32(( vector_cw(1,retries(counter_retries,j)+1)-1)*rand(1,1));
+     %vector_backoff_random_current(1,j) =int32(( vector_cw(1,retries(counter_retries,j)+1))*rand(1,1));
+     vector_backoff_random_current(1,j) =int32(vector_cw(1,1) * rand(1,1));
     end
    
 end
