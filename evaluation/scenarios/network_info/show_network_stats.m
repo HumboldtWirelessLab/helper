@@ -18,7 +18,7 @@ rfchannel = 1;
 show_lnk_asym = 0;
 show_ng = 0;
 show_sp = 0;
-show_mcc = 1;
+show_mcg = 1;
 
 addpath(path,'./scheduling');
 addpath(path,'./graphviz');
