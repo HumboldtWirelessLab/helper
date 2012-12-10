@@ -10,6 +10,12 @@
     </xsl:template>
 
     <xsl:template match="/">
+            <source count="0" />
+        <received count="325" />
+        <sent count="97" />
+        <forward count="97" />
+        <passive count="0" />
+
 	<xsl:value-of select="count(//flooding)" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="sum(//flooding/forward/@count)" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="(sum(//flooding/forward/@count) div (count(//flooding) - 1))" /><xsl:text>,</xsl:text>

@@ -36,7 +36,7 @@ function [gr_ng] = pretty_graph(CL_ID, gr, basedir, mygr, cl_nodes)
     all_nodes = 1:size(gr,1);
     open_nodes = 1:size(gr,1);
 
-    max_cliques = maximalCliques2(gr);
+    max_cliques = maximalCliques(gr);
 
     [v, id] = sort(sum(max_cliques), 'descend');
 
