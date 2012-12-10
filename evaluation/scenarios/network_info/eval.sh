@@ -59,6 +59,15 @@ while read line; do
 done < $RESULTDIR/nodes.mac
 
 ###############################################################################
+# set evaluation sub dir
+###############################################################################
+EVALUATIONSDIR="$EVALUATIONSDIR""/network_info"
+if [ ! -e $EVALUATIONSDIR ]; then
+  mkdir -p $EVALUATIONSDIR
+fi
+
+
+###############################################################################
 # create linkmetric.all
 ###############################################################################
 echo "Create linkmetric matrix"
@@ -169,8 +178,10 @@ for r in $BCASTRATE; do
     fi
 
     PARAMS="$r""_""$s"
+    TARGET="$EVALUATIONSDIR/cluster_""$PARAMS""_"
 
     (cd $DIR; matlab -nosplash -nodesktop -r "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/','$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
+    (cd $DIR; matlab -nosplash -nodesktop -r "try,partitions_psr('$GRAPHFILE',[50 75 90],'$TARGET'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
   done
 done
