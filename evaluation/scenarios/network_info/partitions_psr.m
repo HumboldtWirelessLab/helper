@@ -4,7 +4,7 @@ g=load(graphfile);
 
 %size(g)
 
-for i=1:size(psr,1)
+for i=1:size(psr,2)
 
   p=psr(i);
 
