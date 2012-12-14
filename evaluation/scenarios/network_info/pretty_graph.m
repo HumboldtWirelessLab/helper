@@ -212,8 +212,7 @@ function [gr_ng] = pretty_graph(CL_ID, gr, basedir, mygr, cl_nodes)
             % new adjacency matrix
             %adj_ng2
 
-            disp('isequal(adj_ng, adj_ng2):');
-            isequal(adj_ng, adj_ng2)
+            % isequal(adj_ng, adj_ng2)
 
         end
 
