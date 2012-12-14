@@ -30,6 +30,11 @@ while read line; do
   FULLSED="$FULLSED -e s#$SRCM#$SRCN#g"
 done < $RESULTDIR/nodes.mac
 
+EVALUATIONSDIR="$EVALUATIONSDIR""/linkstat_graph"
+if [ ! -e $EVALUATIONSDIR ]; then
+  mkdir -p $EVALUATIONSDIR
+fi
+
 
 cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5}' | grep -v "=" | sort -u > $EVALUATIONSDIR/links.all
 cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | grep -v "=" | sort -u > $EVALUATIONSDIR/linksmetric.all
