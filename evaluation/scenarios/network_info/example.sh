@@ -18,4 +18,4 @@ case "$SIGN" in
       ;;
 esac
 
-(cd $DIR; matlab -nosplash -nodesktop -nojvm -r "networkinfo_example;exit")
+(cd $DIR; matlab -nosplash -nodesktop -nojvm -r "networkinfo_example;exit;")

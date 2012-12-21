@@ -45,6 +45,11 @@ while read line; do
   FULLIDSED="$FULLIDSED -e s#$SRCM#$SRCID#g"
 done < $RESULTDIR/nodes.mac
 
+EVALUATIONSDIR="$EVALUATIONSDIR""/seismo"
+if [ ! -e $EVALUATIONSDIR ]; then
+  mkdir -p $EVALUATIONSDIR
+fi
+
 xsltproc $DIR/seismo_cooperative.xslt $DATAFILE > $EVALUATIONSDIR/seismo_cooperative.csv
 xsltproc $DIR/seismo_lta_sta.xslt $DATAFILE > $EVALUATIONSDIR/seismo_lta_sta.csv
 

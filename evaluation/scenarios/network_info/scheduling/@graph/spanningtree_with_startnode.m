@@ -1,4 +1,4 @@
-function st = spanningtree(g,varargin)
+function st = spanningtree(g, start_node, varargin)
 %SPANNINGTREE finds spanning tree of the graph
 %
 % Synopsis
@@ -36,7 +36,7 @@ function st = spanningtree(g,varargin)
 % USA
 
 
-    if nargin > 1
+    if nargin > 2
         userParamPos = varargin{1};
     else
         userParamPos = 1;
@@ -44,12 +44,18 @@ function st = spanningtree(g,varargin)
 
     M = edge2param(g,userParamPos);     % matrix of edges weights
 
+    M(find(M(:, start_node) == 1)) = 0;
+
+    M = M + M';
+
     n = size(M,1);                      % count of nodes
     Mst = inf*ones(n);                  % matrix spanningtree
 
     L = 1:n;                            % set of subgraphs (each node is one supgraph at start)
 
+
     while 1,
+
         [minWeight,index] = min(M(:));  % edge with minimal weight
 
         if minWeight == inf,            % all edges were removed
@@ -65,6 +71,8 @@ function st = spanningtree(g,varargin)
 
         Mst(index) = minWeight;         % edge is added to spanningtree
     end;
+
+    Mst(find(Mst == 2)) = 1;
 
     st = graph(Mst);
     
