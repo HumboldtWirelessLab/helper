@@ -97,10 +97,23 @@ function [gr_ng] = pretty_graph(CL_ID, gr, basedir, mygr, cl_nodes)
     end
 
     % new adjacency matrix
-    adj_ng
+    %adj_ng
 
 
 
+    % gr_ng only contains indices of the clique nodes in 'cl_nodes'
+    % -> so find real node ids in cl_nodes with indices from gr_ng:
+
+    clique = [];
+
+    for hh = 1:size(gr_ng, 2)
+
+        cl_nodes_indices = gr_ng{1,hh};
+
+        for cc = 1:size(cl_nodes_indices, 1)
+            clique = union(clique, cl_nodes(cl_nodes_indices(cc)));
+        end
+    end
 
     if (size(cl_nodes, 2) > 1)
 
@@ -109,62 +122,70 @@ function [gr_ng] = pretty_graph(CL_ID, gr, basedir, mygr, cl_nodes)
         for kk=1:size(gr_ng, 2) % for each clique
 
             % create node degree table for the clique
-            nd_dgr = gr_ng{1, kk};
-
-            mygr(nd_dgr, nd_dgr)
+            nd_dgr = clique';
 
             for ll=1:size(nd_dgr,1)
-                nd_dgr(ll,2) = sum(mygr(nd_dgr(ll,1),:));
+                gr_index = find(cl_nodes == nd_dgr(ll,1));
+                nd_dgr(ll,2) = sum(gr(gr_index,:));
             end
 
-            nd_dgr = sortrows(nd_dgr,2)
-
-            nd_dgr
+            nd_dgr = sortrows(nd_dgr,2);
 
             % find out which are nodes are reached by the nodes of the clique
             connected_nodes = [];
-            clique          = gr_ng{1, kk};
-            clique          = clique';
 
             % for each node in the clique
-            for pp=1:size(clique, 2)
+            for pp=1:size(clique, 2);
 
-                for qq=1:size(mygr,2)
+                % get index in gr from cl_nodes
+                gr_node_index = find(cl_nodes == clique(pp));
 
-                    if ((mygr(clique(pp),qq) == 1) & ~(ismember(qq, connected_nodes)))
-                        connected_nodes = union(connected_nodes, qq);
+                for qq=1:size(gr,2)
+
+                    if ((gr(gr_node_index,qq) == 1) & ~(ismember(cl_nodes(qq), connected_nodes)))
+                        connected_nodes = union(connected_nodes, cl_nodes(qq));
                     end
                 end
             end
 
             % delete nodes from the clique in order of der node degree, starting with the ones with the least degree
+
+            myclique = clique;
+
+            % for each node build custom clique without it
             for rr=1:size(nd_dgr,1)
-                clique_tmp          = setdiff(clique, nd_dgr(rr, 1));
+                clique_tmp          = myclique;
+                clique_tmp          = setdiff(myclique, nd_dgr(rr, 1));
+
                 connected_nodes_tmp = [];
 
                 %find out which nodes are reached by the new clique (reduced by 1 node)
                 for tt=1:size(clique_tmp, 2)
 
-                    for uu=1:size(mygr,2)
+                    % get index in gr from cl_nodes
+                    gr_node_index_tmp = find(cl_nodes == clique_tmp(tt));
 
-                        if ((mygr(clique_tmp(tt), uu) == 1) & ~(ismember(uu, connected_nodes_tmp)))
-                           connected_nodes_tmp = union(connected_nodes_tmp, uu);
+                    for uu=1:size(gr,2)
+
+                        if ((gr(gr_node_index_tmp, uu) == 1) & ~(ismember(cl_nodes(uu), connected_nodes_tmp)))
+                           connected_nodes_tmp = union(connected_nodes_tmp, cl_nodes(uu));
                         end
                     end
                 end
 
+                % if connected nodes are the same, set the clique to the diminshed clique
                 if (isequal(connected_nodes, connected_nodes_tmp) == 1)
-                    clique = setdiff(clique_tmp, nd_dgr(rr,1));
-                    gr_ng{1, kk} = clique;
+                    myclique = clique_tmp;
                     unneeded_nodes = union(unneeded_nodes, nd_dgr(rr, 1));
                 end
+
             end
 
         end
 
-        if (size(unneeded_nodes,2) >= 1)
+        unneeded_nodes
 
-            unneeded_nodes
+        if (size(unneeded_nodes,2) >= 1)
 
             % create 2nd new adjacency matrix, to be sure
 
@@ -189,18 +210,14 @@ function [gr_ng] = pretty_graph(CL_ID, gr, basedir, mygr, cl_nodes)
             end
 
             % new adjacency matrix
-            adj_ng2
+            %adj_ng2
 
-            disp('isequal(adj_ng, adj_ng2):');
-            isequal(adj_ng, adj_ng2)
+            % isequal(adj_ng, adj_ng2)
 
         end
 
     end
 
 
-
-
     % create dot file
     draw_dot(CL_ID, adj_ng, gr_ng_labels, basedir);
-

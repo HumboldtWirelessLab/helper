@@ -45,12 +45,18 @@ while read line; do
   FULLIDSED="$FULLIDSED -e s#$SRCM#$SRCID#g"
 done < $RESULTDIR/nodes.mac
 
+EVALUATIONSDIR="$EVALUATIONSDIR""/flooding_info"
+if [ ! -e $EVALUATIONSDIR ]; then
+  mkdir -p $EVALUATIONSDIR
+fi
+
 xsltproc $DIR/flooding.xslt $DATAFILE > $EVALUATIONSDIR/floodingstats.csv
 xsltproc $DIR/flooding2bcast.xslt $DATAFILE | grep -v ",," > $EVALUATIONSDIR/floodingforwardstats.csv
 
 cat $EVALUATIONSDIR/floodingforwardstats.csv | sed "s#,# #g" | sed $FULLIDSED > $EVALUATIONSDIR/floodingforwardstats.mat
 
 (cd $DIR; matlab -nosplash -nodesktop -r "try,flooding2pdr('$EVALUATIONSDIR/floodingforwardstats.mat','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+#(cd $DIR; matlab -nosplash -nodesktop -r "flooding2pdr('$EVALUATIONSDIR/floodingforwardstats.mat','$EVALUATIONSDIR/'),exit(0)")
 cat $EVALUATIONSDIR/flooding_lasthop_fwd_pdr.csv | sed "s#,# #g" > $EVALUATIONSDIR/flooding_lasthop_fwd_pdr.mat
 cat $EVALUATIONSDIR/flooding_lasthop_fwd_pkt_cnt.csv | sed "s#,# #g" > $EVALUATIONSDIR/flooding_lasthop_fwd_pkt_cnt.mat
 cat $EVALUATIONSDIR/flooding_lasthop_tx_pdr.csv | sed "s#,# #g" > $EVALUATIONSDIR/flooding_lasthop_tx_pdr.mat
@@ -64,8 +70,8 @@ cat $EVALUATIONSDIR/flood_reach.csv | sed "s#,# #g" > $EVALUATIONSDIR/flood_reac
 cat $EVALUATIONSDIR/flooding_forward_probability.csv | sed "s#,# #g" > $EVALUATIONSDIR/flooding_forward_probability.mat
 
 
-for i in `(cd $EVALUATIONSDIR/; ls graph_psr_*)`; do
+for i in `(cd $EVALUATIONSDIR/../network_info; ls graph_psr_*)`; do
   PARAMS=`echo $i | sed "s#graph_psr_##g" | sed "s#\.txt##g"`
-  (cd $DIR; matlab -nosplash -nodesktop -r "try,flooding_vs_linkprobing('$EVALUATIONSDIR/flooding_lasthop_fwd_pdr.mat', '$EVALUATIONSDIR/flooding_lasthop_fwd_pkt_cnt.mat', '$EVALUATIONSDIR/$i', '$EVALUATIONSDIR/', '$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
+  (cd $DIR; matlab -nosplash -nodesktop -r "try,flooding_vs_linkprobing('$EVALUATIONSDIR/flooding_lasthop_fwd_pdr.mat', '$EVALUATIONSDIR/flooding_lasthop_fwd_pkt_cnt.mat', '$EVALUATIONSDIR/../network_info/$i', '$EVALUATIONSDIR/', '$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
   cat $EVALUATIONSDIR/flooding_vs_linkprobing_diff_$PARAMS.csv | sed "s#,# #g" > $EVALUATIONSDIR/flooding_vs_linkprobing_diff_$PARAMS.mat
 done

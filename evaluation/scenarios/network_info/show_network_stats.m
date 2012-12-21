@@ -18,7 +18,7 @@ rfchannel = 1;
 show_lnk_asym = 0;
 show_ng = 0;
 show_sp = 0;
-show_mcc = 1;
+show_mcg = 1;
 
 addpath(path,'./scheduling');
 addpath(path,'./graphviz');
@@ -231,8 +231,8 @@ if (show_mcg)
               % set SR to 1
               mygr(mygr >= succv(succ_i)) = 1;
 
-
               pretty_graph(kk, grTmp, basedir, mygr, cl_nodes);
+
 
 
               system(['dot -Tps ' basedir '_GtDout', int2str(kk), '.dot -o ',basedir,'CL', int2str(kk), '_', int2str(succv(succ_i)), '.ps']);
