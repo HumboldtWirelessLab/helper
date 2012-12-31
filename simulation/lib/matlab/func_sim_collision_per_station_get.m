@@ -1,4 +1,4 @@
-function [matrix_col_occured_mean_neighbour_backoff_per_station,matrix_likelihood_collisions_percent_per_station,matrix_col_occured_simulation_all_neighbour_backoff_per_station,matrix_likelihood_simulation_all_collisions_percent_per_station] = func_sim_collision_per_station_get(folder_name,number_of_simulation,packets_successful_delivered)
+function [matrix_col_occured_mean_neighbour_backoff_per_station,matrix_likelihood_collisions_percent_per_station,matrix_col_occured_simulation_all_neighbour_backoff_per_station,matrix_likelihood_simulation_all_collisions_percent_per_station] = func_sim_collision_per_station_get(folder_name,number_of_simulation,matrix_packets_delivered)
 %---------------------------------Filenames--------------------------------
     filename = 'sim_matrix_col_occured_sim_neighbour_backoff_global_per_station';
     filename_csv = sprintf('%s/%s',folder_name,filename);
@@ -16,7 +16,7 @@ function [matrix_col_occured_mean_neighbour_backoff_per_station,matrix_likelihoo
     end
      matrix_col_occured_mean_neighbour_backoff_per_station_mean = mean(matrix_col_occured_simulation_all_neighbour_backoff_per_station,1);
      
-    [matrix_likelihood_collisions_2] = func_sim_mean_per_station_calculation(matrix_col_occured_simulation_all_neighbour_backoff_per_station,packets_successful_delivered);
+    [matrix_likelihood_collisions_2] = func_sim_mean_per_station_calculation(matrix_col_occured_simulation_all_neighbour_backoff_per_station,matrix_packets_delivered);
     %[matrix_likelihood_simulation_all_collisions_percent_per_station] = func_matrix_3D_convert_2_percent(matrix_likelihood_collisions_2);
     matrix_likelihood_simulation_all_collisions_percent_per_station = matrix_likelihood_collisions_2;
     matrix_likelihood_collisions_percent_per_station_mean = mean(matrix_likelihood_simulation_all_collisions_percent_per_station,1);

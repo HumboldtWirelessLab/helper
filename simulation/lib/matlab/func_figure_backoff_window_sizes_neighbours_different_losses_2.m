@@ -28,9 +28,10 @@ ylabel('\bf{Backoff-Fenstergröße [Slots]}');
 xlabel('\bf{Anzahl von 802.11-Nachbarstationen}');
 h_xlabel = get(gca,'XLabel');
 set(h_xlabel,'FontSize',16); 
-
 h_ylabel = get(gca,'YLabel');
 set(h_ylabel,'FontSize',16); 
+set(gca,'FontSize',10,'fontweight','bold')
+set(gcf,'PaperPositionMode','auto'); % wichtig, damit sich die Beschriftungen auf der x-Achse nicht überlappen beim Speichern
 grid on
 neighbours_max_2 = max(vector_of_successful_conditions) + 10;
 max_value = 3100;%max(max(matrix_1)) + 1;
@@ -65,6 +66,8 @@ legend_txt  = cell(1,size(vector_packet_loss,2));
     hf3 = figure('visible', 'on');
     ax3 = axes('Parent',hf3,'visible','on');
     set(hf3,'units','normalized','outerposition',[0 0 1 1])   % Figure maximieren auf ganzen Bildschirm
+    set(gca,'FontSize',10,'fontweight','bold')
+    set(gcf,'PaperPositionMode','auto'); % wichtig, damit sich die Beschriftungen auf der x-Achse nicht überlappen beim Speichern
     hold(ax3, 'on');
     set(hplots,'Parent',ax3);
     set(hleg_copy,'Parent',hf3);
@@ -95,6 +98,8 @@ delete(hleg3);
  hf2 = figure('visible', 'on');
     ax2 = axes('Parent',hf2,'visible','on');
     set(hf2,'units','normalized','outerposition',[0 0 1 1])   % Figure maximieren auf ganzen Bildschirm
+    set(gca,'FontSize',10,'fontweight','bold')
+    set(gcf,'PaperPositionMode','auto'); % wichtig, damit sich die Beschriftungen auf der x-Achse nicht überlappen beim Speichern
     hold(ax2, 'on');
     set(hplots,'Parent',ax2);
     set(hleg_copy,'Parent',hf2);

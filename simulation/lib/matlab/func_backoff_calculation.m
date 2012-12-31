@@ -24,16 +24,18 @@ function [counter_slots_global,packets_delivery_counter_global, counter_collisio
     
     %init random backoff calculation
     option = 2;
+    option_standard = 0;
+    option_termination = 0;
     vector_backoff_random_current = func_interval_random_numbers_integers_get(0,vector_cw(1,1),number_of_stations,option);
-    
+    vector_station_has_packet_transmitted = zeros(1,number_of_stations);
     %counter_backoff_random_row = 1;    
     %backoff_random = zeros(1,size(vector_backoff_random_current,2));
     %for z=1:1:size(backoff_random,2)
     %    backoff_random(counter_backoff_random_row,z) = vector_backoff_random_current(1,z);
     %end
-
+    criterion_termination = 1;
     % Simualtion of collisions start here
-    while (packets_delivery_counter_global < packet_delivery_limit)
+    while (criterion_termination)
 
         %Search for minimum Backoff and 
         [minimum] = func_simulation_search_4_minimum(vector_backoff_random_current);
@@ -41,8 +43,8 @@ function [counter_slots_global,packets_delivery_counter_global, counter_collisio
         if(minimum > 0)
             vector_backoff_random_current = vector_backoff_random_current -  minimum;
             counter_slots_global = counter_slots_global + minimum;
-        elseif (minimum == 0)
-            counter_slots_global = counter_slots_global + 1;
+        %elseif (minimum == 0)
+        %    counter_slots_global = counter_slots_global + 1;
         end
         % Search for collisions
         counter_collision = func_simulation_search_4_collision(vector_backoff_random_current);
@@ -55,8 +57,26 @@ function [counter_slots_global,packets_delivery_counter_global, counter_collisio
 
 %        [vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station,packets_delivery_counter_global,retries,counter_retries,retries_current,retries_min,retries_max,counter_retries_min_frequencies,counter_retries_max_frequencies,retries_avg,retries_avg_counter,retries_min_first_time] = func_simulation_collision_statics_calc(vector_backoff_random_current,option,counter_collision,vector_collision_occurred_per_station,vector_packets_delivered_per_station,packets_delivery_counter_global,retries,counter_retries,retries_current,retries_min,retries_max,counter_retries_min_frequencies,counter_retries_max_frequencies,retries_avg,retries_avg_counter,retries_min_first_time,vector_cw);
         %[vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station] = func_simulation_stats_per_station_get(vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station,option);
-        [vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station] = func_simulation_stats_per_station_get(vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station,vector_cw,counter_collision,option);
-
+        if (option_standard == 1)
+            [vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station] = func_simulation_stats_per_station_standard_get(vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station,vector_cw,counter_collision,option);
+        else
+            [vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station,vector_station_has_packet_transmitted] = func_simulation_stats_per_station_get(vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station,vector_cw,counter_collision,vector_station_has_packet_transmitted,option);
+            counter_transmitted = 0;
+            for i=1:1:size(vector_station_has_packet_transmitted,2) %search for transmitted stations
+                if (vector_station_has_packet_transmitted(1,i) == 1)
+                    counter_transmitted = counter_transmitted + 1;
+                end
+            end
+            if (counter_transmitted == size(vector_station_has_packet_transmitted,2))
+                vector_backoff_random_current = func_interval_random_numbers_integers_get(0,vector_cw(1,1),number_of_stations,option);
+                vector_station_has_packet_transmitted = zeros(1,number_of_stations); 
+            end
+        end
+        if (option_termination == 1)
+            [criterion_termination] = func_backoff_calculation_terminate_global(packets_delivery_counter_global,packet_delivery_limit);
+        else
+            [criterion_termination] = func_backoff_calculation_terminate_per_station(vector_packets_delivered_per_station,packet_delivery_limit);
+        end
         %counter_collision = 0;
         %counter_backoff_random_row = counter_backoff_random_row + 1;
         %for z=1:1:size(vector_backoff_random_current,2)
