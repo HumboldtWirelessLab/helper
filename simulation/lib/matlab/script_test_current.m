@@ -1,6 +1,12 @@
-clear all; 
 close all;
-folder_name = 'messungen/2012-12-19';
+clear all; 
+folder_name_1 = 'messungen/v1';
+folder_name_2 = 'messungen/v2';
+folder_name_3 = 'messungen/v3';
+folder_name_4 = 'messungen/v4';
+folder_name_5 = 'messungen/v7';
+folder_name_6 = 'messungen/v8';
+folder_name =folder_name_1;
 number_of_simulation = 100;
 packets_successful_delivered = 100;
 debug = 1;
@@ -9,7 +15,8 @@ debug = 1;
 %[matrix_likelihood_collisions_percent_per_station,matrix_col_occured_neighbour_backoff_per_station] = func_sim_collision_per_station_get(folder_name,number_of_simulation,packets_successful_delivered);
 
 if (debug == 1)
-[matrix_col_occured_mean_neighbour_backoff_per_station,matrix_likelihood_collisions_percent_per_station,matrix_col_occured_simulation_all_neighbour_backoff_per_station,matrix_likelihood_simulation_all_collisions_percent_per_station] = func_sim_collision_per_station_get(folder_name,number_of_simulation,packets_successful_delivered);
+[matrix_packets_delivered] = func_sim_packets_delivered_global_get(folder_name,number_of_simulation);
+[matrix_col_occured_mean_neighbour_backoff_per_station,matrix_likelihood_collisions_percent_per_station,matrix_col_occured_simulation_all_neighbour_backoff_per_station,matrix_likelihood_simulation_all_collisions_percent_per_station] = func_sim_collision_per_station_get(folder_name,number_of_simulation,matrix_packets_delivered);
 %plot(matrix_col_occured_mean_neighbour_backoff_per_station');
 
 %------------------- Backoff with birthday problem   -------------------------------------
@@ -26,10 +33,12 @@ matrix_plot_1 = matrix_likelihood_collisions_percent_per_station * 100;
 matrix_plot_2 = matrix_birthday_problem_collision_likelihood_packet_loss * 100;
 
 figure_number = 1;
-[handler_figure_01] = func_figure_backoff_window_size_likelihood_sim_calc_comparison(figure_number,matrix_plot_1,matrix_plot_2,vector_birthday_problem_neighbours);
+%vector_neighbours_filter=1:5:size(vector_birthday_problem_neighbours,2);
+vector_neighbours_filter=[1,5,9,15,20,25];
+[handler_figure_01] = func_figure_backoff_window_size_likelihood_sim_calc_comparison(figure_number,matrix_plot_1,matrix_plot_2,vector_neighbours_filter);
 
 figure_number = figure_number + 1;
-[handler_figure] = func_figure_likelihood_sim_calc_comparison(figure_number,matrix_plot_1,matrix_plot_2,vector_birthday_problem_neighbours);
+[handler_figure] = func_figure_likelihood_sim_calc_comparison(figure_number,matrix_plot_1,matrix_plot_2,vector_neighbours_filter);
 figure_number = figure_number + 1;
 %[handler_figure_10] = func_figure_likelihood_sim_calc_comparison_points(figure_number,matrix_plot_1,matrix_plot_2);
 
@@ -52,7 +61,7 @@ if (debug==0)
     vector_backoff = 1:1:3000;
     simulation_of_collision = 2; %new simulation
     no_neighbours_max = 25;
-    write_on = 1;
+    write_on = 0;
     func_simulation(simulation_of_collision,vector_backoff,no_neighbours_max,packets_successful_delivered,number_of_simulation,folder_name,write_on);  
 end
 %matrix_packetloss_neighbours_2_backoff_window_sizes_approx =
