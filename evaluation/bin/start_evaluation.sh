@@ -49,6 +49,10 @@ if [ ! -e $EVALUATIONDIR ]; then
   mkdir -p $EVALUATIONDIR
 fi
 
+if [ "x$REWRITEEVALUATION" != "x" ]; then
+  EVALUATION=$REWRITEEVALUATION
+fi
+
 if [ "x$EVALUATION" != "x" ]; then
   for i in $EVALUATION; do
     if [ -e $DIR/../scenarios/$i ]; then
