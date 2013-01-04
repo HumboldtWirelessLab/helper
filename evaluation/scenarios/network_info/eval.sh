@@ -59,6 +59,15 @@ while read line; do
 done < $RESULTDIR/nodes.mac
 
 ###############################################################################
+# set evaluation sub dir
+###############################################################################
+EVALUATIONSDIR="$EVALUATIONSDIR""/network_info"
+if [ ! -e $EVALUATIONSDIR ]; then
+  mkdir -p $EVALUATIONSDIR
+fi
+
+
+###############################################################################
 # create linkmetric.all
 ###############################################################################
 echo "Create linkmetric matrix"
@@ -133,6 +142,15 @@ for i in `(cd $EVALUATIONSDIR; ls cluster_*.csv)`; do
 done
 
 ###############################################################################
+# placement (sim only)
+###############################################################################
+
+if [ "x$MODE" = "xsim" ]; then
+  cat $NODEPLACEMENTFILE | awk '{print $2" "$3" "$4}' > $EVALUATIONSDIR/nodes.plm
+  mkdir $EVALUATIONSDIR/clusterplacement/
+fi
+
+###############################################################################
 # bcaststats
 ###############################################################################
 
@@ -169,8 +187,22 @@ for r in $BCASTRATE; do
     fi
 
     PARAMS="$r""_""$s"
+    TARGET="$EVALUATIONSDIR/cluster_""$PARAMS""_"
 
     (cd $DIR; matlab -nosplash -nodesktop -r "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/','$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
+    (cd $DIR; matlab -nosplash -nodesktop -r "try,partitions_psr('$GRAPHFILE',[70 85],'$TARGET'),catch,exit(1),end,exit(0)" 1> /dev/null)
+
+    if [ "x$MODE" = "xsim" ]; then
+      CLUSTERSIZEFILE="$EVALUATIONSDIR/cluster_""$PARAMS""_psr_85_clustersize.csv"
+      MAX_CLUSTER=`cat $CLUSTERSIZEFILE | sed "s#,# #g" | tail -n 1 | awk '{print $1}'`
+      CLUSTERFILE="$EVALUATIONSDIR/cluster_""$PARAMS""_psr_85_cluster_"$MAX_CLUSTER".csv"
+      CLUSTERCSVFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".csv"
+      CLUSTERPLMFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".plm"
+      (cd $DIR; matlab -nosplash -nodesktop -r "try,partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE'),catch,exit(1),end,exit(0)" 1> /dev/null)
+      cat $CLUSTERCSVFILE | sed "s#,# #g" | awk '{print "sk"$0}' > $CLUSTERPLMFILE
+    fi
 
   done
 done
+
+

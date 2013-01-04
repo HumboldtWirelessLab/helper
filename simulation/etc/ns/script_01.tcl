@@ -1,3 +1,5 @@
+
+
 set wtopo	[new Topography]
 $wtopo load_flatgrid $xsize $ysize
 
@@ -69,12 +71,12 @@ set prop_ [new $netprop]
 # fewer than 255 nodes, and we aren't worrying about subnet masks.
 #
 
-set iptemplate "10.0.%d.%d"
-set mactemplate "00:00:00:00:%0x:%0x"
-for {set i 0} {$i < $nodecount} {incr i} {
-    set node_ip($i) [format $iptemplate [expr ($i+1)/256] [expr ($i+1)%256] ]
-    set node_mac($i) [format $mactemplate [expr ($i+1)/256] [expr ($i+1)%256] ]
-}
+#set iptemplate "10.0.%d.%d"
+#set mactemplate "00:00:00:00:%0x:%0x"
+#for {set i 0} {$i < $nodecount} {incr i} {
+#    set node_ip($i) [format $iptemplate [expr ($i+1)/256] [expr ($i+1)%256] ]
+#    set node_mac($i) [format $mactemplate [expr ($i+1)/256] [expr ($i+1)%256] ]
+#}
 
 #
 # We set the routing protocol to "Empty" so that ns-2 doesn't do
@@ -95,11 +97,12 @@ for {set i 0} {$i < $nodecount } {incr i} {
     # added a second interface it would be named "eth1", a third
     # "eth2" and so on.
     #
-    $node_($i) add-interface $chan_1_ $prop_ $netll $netmac \
-	  $netifq 1 $netphy $antenna $wtopo
+    $node_($i) add-interface $chan_1_ $prop_ $netll $netmac $netifq 1 $netphy $antenna $wtopo
 
     #
     # Now configure the interface eth0
+    #
+    #  mac and ip is set by run_sim.sh
     #
     #$node_($i) setip "eth0" $node_ip($i)
     $node_($i) setmac "eth0" $node_mac($i)
@@ -117,8 +120,10 @@ for {set i 0} {$i < $nodecount } {incr i} {
     # prepends this to the printed string so it's clear exactly
     # which node is doing the printing.
     #
-    [$node_($i) set classifier_] setnodename "node$i"
-    
+    # NODENAME is set by run_sim.sh
+    #
+    [$node_($i) set classifier_] setnodename $node_name($i)
+
     #
     # Load the appropriate Click router script for the node.
     # All nodes in this simulation are using the same script,

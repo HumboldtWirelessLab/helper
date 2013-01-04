@@ -42,6 +42,12 @@ while read line; do
   FULLSED="$FULLSED -e s#$SRCM#$SRCN#g"
 done < $RESULTDIR/nodes.mac
 
+EVALUATIONSDIR="$EVALUATIONSDIR""/flow_info"
+if [ ! -e $EVALUATIONSDIR ]; then
+  mkdir -p $EVALUATIONSDIR
+fi
+
+
 xsltproc $DIR/flowstats_rx.xslt $DATAFILE | grep -v ",," > $EVALUATIONSDIR/flowstats_rx.csv
 xsltproc $DIR/flowstats_tx.xslt $DATAFILE | grep -v ",," > $EVALUATIONSDIR/flowstats_tx.csv
 

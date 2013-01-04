@@ -3,14 +3,17 @@ close all;
 
 % ------------------ Simulation Configuration  --------------------------------------------------
 simulation_start = 0; % 0:= off (when only a new simulation of collision is started), 1:= start simulation(default)
-simulation_of_collision = 2; % 0:= off (default), 1:= read from csv-file, 2:= new simulation
-packet_delivery_limit = 10;
-number_of_simulation = 10;
-no_backoff_window_size_max =300;
-no_neighbours_max = 10;
+simulation_of_collision = 1; % 0:= off (default), 1:= read from csv-file, 2:= new simulation
+packet_delivery_limit = 100;
+number_of_simulation = 100;
+no_backoff_window_size_max =3000;
+no_neighbours_max = 20;
 %folder_name = 'messungen/2012-09-08';
-folder_name = 'messungen/2012-12-05';
-write_simulation_results_2_csv = 1;% 0:= off (default), 1:= write simulation results into csv-file
+%folder_name = 'messungen/2012-12-05';
+%folder_name = 'messungen/2012-12-08';
+%folder_name = 'messungen/2012-12-12';
+folder_name = 'messungen/2012-12-13';
+write_simulation_results_2_csv = 0;% 0:= off (default), 1:= write simulation results into csv-file
 
 %----------- Birthday Problem Configuration  -------------------------
 %packet_loss_upper_limit = 0.1; %10percent packet loss
@@ -85,6 +88,10 @@ if (debug_figures == 1)
 %[ handler_fig_2 ] = func_figure_backoff_window_sizes_neighbours_different_losses(figure_number,vector_birthday_problem_neighbours,matrix_packetloss_neighbours_2_backoff_window_sizes_approx,packet_loss_upper_limit,vector_of_successful_conditions,vector_backoff_window_sizes_standard);
 figure_number = figure_number + 1;
 [ handler_figure_3 ] = func_figure_backoff_window_sizes_neighbours_different_losses_2(figure_number,matrix_packetloss_neighbours_2_backoff_window_sizes_calc,matrix_packetloss_neighbours_2_backoff_window_sizes_approx,vector_packet_loss_upper_limit,vector_of_successful_conditions,vector_backoff_window_sizes_standard);
+%figure_number = figure_number + 1;
+%[hfig_1] = func_figure_birthday_problem_backoff_collision(figure_number,matrix_backoff_windows, likelihood, vector_neighbours, vector_backoff_window_sizes_standard);
+%figure_number = figure_number + 1;
+%[handler_fig] = func_figure_birthday_problem_neighbours_collision(figure_number,matrix_neighbours, likelihood, vector_backoff_window_sizes, vector_neighbours);
 end
  %func_figure_backoff_window_sizes_neighbours_different_losses_2(figure_number,vector_birthday_problem_neighbours,matrix_packetloss_neighbours_2_backoff_window_sizes_calc,matrix_packetloss_neighbours_2_backoff_window_sizes_approx,packet_loss_upper_limit,vector_of_successful_conditions,vector_backoff_window_sizes_standard);
 %(figure_number,v_neighbours,matrix_1,matrix_2,vector_packet_loss,vector_of_successful_conditions,vector_backoff_window_sizes_standard)
@@ -97,26 +104,43 @@ test_find_backoff_optimal_on = 2; % 0:= off; 1:= on
 %letter_of_standard = letter_of_standards(1,1)
 [vector_backoff] = func_cw_vector_get(test_find_backoff_optimal_on,letter_of_standards{1,1}, no_backoff_window_size_max,use_greenfield);
 %---------------------------- Simulation ----------------------------------
-[matrix_collision,no_neighbours_max,no_backoff_window_size_max, matrix_counter_slots] = func_simulation(simulation_of_collision,vector_backoff,no_neighbours_max,packet_delivery_limit,number_of_simulation,folder_name,write_simulation_results_2_csv);  
+[matrix_collision,matrix_collision_likelihood,no_neighbours_max,no_backoff_window_size_max, matrix_counter_slots] = func_simulation(simulation_of_collision,vector_backoff,no_neighbours_max,packet_delivery_limit,number_of_simulation,folder_name,write_simulation_results_2_csv);  
 %-------------------------------------------------------------------------
-matrix_collision_percent = matrix_collision ./ packet_delivery_limit;
+%matrix_collision_percent = matrix_collision ./ packet_delivery_limit;
 matrix_packetloss_neighbours_2_backoff_window_sizes_sim = zeros(size(vector_packet_loss_upper_limit,2),no_neighbours_max);
 for i=1:1:size(vector_packet_loss_upper_limit,2)
     %[vector_backoff_per_neighbour,counter_of_successful_conditions] = func_birthday_problem_search_backoff_neighbours(matrix_collision_percent,vector_packet_loss_upper_limit(1,i));
-    [vector_backoff_per_neighbour,counter_of_successful_conditions] = func_birthday_problem_search_backoff_neighbours(matrix_collision_percent,vector_packet_loss_upper_limit(1,i));
+    [vector_backoff_per_neighbour,counter_of_successful_conditions] = func_birthday_problem_search_backoff_neighbours(matrix_collision_likelihood,vector_packet_loss_upper_limit(1,i));
         for t=1:1:size(vector_birthday_problem_neighbours,2) % Voraussetzung table_backoff_windows und table_neighbours haben die gleiche Anzahl von Elementen
             matrix_packetloss_neighbours_2_backoff_window_sizes_sim(i,t) = vector_backoff_per_neighbour(t,1);
         end
 end
 
-debug_sim_fig = 0;
+
+debug_sim_fig = 1;
 if (debug_sim_fig ==1)
 figure_number = figure_number + 1;
-[ handler_figure_4 ] = func_figure_collision_calculation_simulation(figure_number,matrix_birthday_problem_collision_likelihood_packet_loss*100,matrix_collision_percent*100);
+% Simulation #Neighbours-Backoff-Window-Sizes for different Packetlosses
+[ handler_figure_4 ] = func_figure_simulation_neighbours_backoff_window_size(figure_number,vector_birthday_problem_neighbours,matrix_packetloss_neighbours_2_backoff_window_sizes_sim,vector_packet_loss_upper_limit);
+%figure_number = figure_number + 1;
+%[ handler_figure_5 ] = func_figure_simulation_neighbours_backoff_window_size(figure_number,vector_birthday_problem_neighbours,matrix_collision_percent,vector_packet_loss_upper_limit);
+%[ handler_figure_5 ] = func_figure_simulation_neighbours_backoff_window_size_collision(figure_number,matrix_collision_percent);
+%Birthday-Problem 
+%Compare Simulation and Calculation
 figure_number = figure_number + 1;
-[ handler_figure_5 ] = func_figure_simulation_neighbours_backoff_window_size(figure_number,vector_birthday_problem_neighbours,matrix_packetloss_neighbours_2_backoff_window_sizes_sim,vector_packet_loss_upper_limit);
+vector_neighbours_2 = 1:3:no_neighbours_max; %vector for different neighbours
+[matrix_birthday_problem_collision_likelihood_packet_loss_3,matrix_collision_percent_3] = func_birthday_problem_simulation_filter_neighbours(matrix_birthday_problem_collision_likelihood_packet_loss,matrix_collision_likelihood,vector_neighbours_2);
+[ handler_figure_6 ] = func_figure_collision_calculation_simulation(figure_number,vector_neighbours_2,matrix_birthday_problem_collision_likelihood_packet_loss_3*100,matrix_collision_percent_3*100);
+figure_number = figure_number + 1;
+[handler_7] = func_figure_birthday_problem_simulation_comparison(figure_number,vector_birthday_problem_neighbours,matrix_packetloss_neighbours_2_backoff_window_sizes_sim,matrix_packetloss_neighbours_2_backoff_window_sizes_calc);
 end
 
+%%TODO
+figure_number = figure_number + 1;
+matrix_birthday_problem_collision = 100 + (matrix_birthday_problem_collision_likelihood_packet_loss * 100);
+func_figure_comparison_2(figure_number,matrix_collision,matrix_birthday_problem_collision)
+
+[handler_figure_1] = func_figure_backoff_collision_mean_std(figure_number,matrix_1,vector_neighbours_filter,vector_backoff_filter,'Anzahl von Kollisionen');
 debug_bereinigt = 0;
 if (debug_bereinigt == 1)
 matrix_collision_percent_2 = zeros(size(matrix_collision_percent));
@@ -128,8 +152,10 @@ for i=1:1:size(matrix_collision_percent,1)
     end
 end
 figure_number = figure_number + 1;
-[ handler_figure_5 ] = func_figure_collision_calculation_simulation(figure_number,matrix_birthday_problem_collision_likelihood_packet_loss*100,matrix_collision_percent_2);
+[ handler_figure_6 ] = func_figure_collision_calculation_simulation(figure_number,matrix_birthday_problem_collision_likelihood_packet_loss*100,matrix_collision_percent_2);
 end
+
+
 % ------------------------------ Start calculation ------------------------     
 debug_test = 0; 
 if (debug_test == 1);
