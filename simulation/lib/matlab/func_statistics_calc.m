@@ -1,4 +1,4 @@
-function [first_time,minimal, counter_min,maximal,counter_max,avg, counter_avg ] = func_statistics_calc(first_time, min_value, counter_min_value, max_value, counter_max_value, avg_value,counter_avg_value, current_value )
+function [first_time,minimal, counter_min,maximal,counter_max,avg, counter_avg] = func_statistics_calc(first_time, min_value, counter_min_value, max_value, counter_max_value, avg_value,counter_avg_value, current_value)
     minimal = 0;
     counter_min = 0; 
     maximal = 0;
@@ -31,5 +31,8 @@ function [first_time,minimal, counter_min,maximal,counter_max,avg, counter_avg ]
         avg = avg_value + current_value;
         counter_avg = counter_avg_value + 1;
     end
+    
+        
+
 end
 

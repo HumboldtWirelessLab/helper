@@ -53,6 +53,8 @@ if [ "x$REWRITEEVALUATION" != "x" ]; then
   EVALUATION=$REWRITEEVALUATION
 fi
 
+EVALUATION="$EVALUATION $ADDEVALUATION"
+
 if [ "x$EVALUATION" != "x" ]; then
   for i in $EVALUATION; do
     if [ -e $DIR/../scenarios/$i ]; then

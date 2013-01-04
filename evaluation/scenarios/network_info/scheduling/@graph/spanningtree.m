@@ -43,6 +43,7 @@ function st = spanningtree(g,varargin)
     end
 
     M = edge2param(g,userParamPos);     % matrix of edges weights
+
     n = size(M,1);                      % count of nodes
     Mst = inf*ones(n);                  % matrix spanningtree
 
