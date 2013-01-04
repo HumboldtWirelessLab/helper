@@ -49,6 +49,10 @@ if [ ! -e $EVALUATIONDIR ]; then
   mkdir -p $EVALUATIONDIR
 fi
 
+if [ "x$REWRITEEVALUATION" != "x" ]; then
+  EVALUATION=$REWRITEEVALUATION
+fi
+
 EVALUATION="$EVALUATION $ADDEVALUATION"
 
 if [ "x$EVALUATION" != "x" ]; then

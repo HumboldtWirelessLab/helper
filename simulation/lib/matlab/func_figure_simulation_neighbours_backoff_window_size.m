@@ -16,7 +16,7 @@ xlabel('\bf Anzahl von 802.11-Nachbarstationen');
 ylabel('\bf Backoff-Fenstergröße [Slots]');
 h_xlabel = get(gca,'XLabel');
 set(h_xlabel,'FontSize',16); 
-
+set(gca,'FontSize',10,'fontweight','bold')
 h_ylabel = get(gca,'YLabel');
 set(h_ylabel,'FontSize',16); 
 legend_txt  = cell(1,size(vector_packet_loss,2));

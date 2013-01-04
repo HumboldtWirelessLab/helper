@@ -20,7 +20,7 @@ set(h_xlabel,'FontSize',16);
 
 h_ylabel = get(gca,'YLabel');
 set(h_ylabel,'FontSize',16); 
-
+set(gca,'FontSize',10,'fontweight','bold')
 grid on
 neighbours_max_2 = max(vector_of_successful_conditions) + 10;
 Ticks_x = 0:5:neighbours_max_2;%number_of_stations_max;
@@ -70,6 +70,8 @@ legend_txt  = cell(1,size(vector_packet_loss,2));
     hf2 = figure('visible', 'on');
     ax2 = axes('Parent',hf2,'visible','on');
     set(hf2,'units','normalized','outerposition',[0 0 1 1])   % Figure maximieren auf ganzen Bildschirm
+    set(gca,'FontSize',10,'fontweight','bold')
+    set(gcf,'PaperPositionMode','auto'); % wichtig, damit sich die Beschriftungen auf der x-Achse nicht überlappen beim Speichern
     hold(ax2, 'on');
     set(hplots,'Parent',ax2);
     set(hleg_copy,'Parent',hf2);
