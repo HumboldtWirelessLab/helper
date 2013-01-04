@@ -1,8 +1,8 @@
-function span_tree_dom_set_template(graphfile)
+function span_tree_dom_set_template(graphfile,min_pdr,node)
 
 graph = load(graphfile);
 
-min_pdr = 1;
+%min_pdr = 1;
 
 % trim links according to mininum pdr
 graph(find(graph < min_pdr))  = 0;
@@ -20,7 +20,7 @@ for row=1:size(graph,1),
 end
 
 %                          adj, min_pdr, start_node
-spanning_tree = span_tree(graph, -1,      1);
+spanning_tree = span_tree(graph, min_pdr, node);
 
 ds = dom_set(spanning_tree);
 

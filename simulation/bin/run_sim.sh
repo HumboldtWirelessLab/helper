@@ -263,7 +263,9 @@ case "$MODE" in
 		cat $DIR/../etc/ns/radio/$RADIO\.tcl >> $TCLFILE
 		
 		if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ] || [ "x$NODEPLACEMENT" = "xstring" ]; then
-			NODEPLACEMENTOPTS="$NODEPLACEMENTOPTS" RXRANGE=$MAXRXRANGE $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
+			#let TOPORXRANGE=MAXRXRANGE+20
+			TOPORXRANGE=$MAXRXRANGE
+			NODEPLACEMENTOPTS="$NODEPLACEMENTOPTS" RXRANGE=$TOPORXRANGE $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
 			FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
 		fi
 		

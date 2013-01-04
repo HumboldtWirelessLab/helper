@@ -51,11 +51,14 @@ fi
 echo "Create sed arg"
 
 FULLSED=""
+FULLMACSED=""
 while read line; do
   SRCN=`echo $line | awk '{print $1}'`
   SRCID=`echo $line | awk '{print $4}'`
+  SRCMAC=`echo $line | awk '{print $3}'`
 
   FULLSED="$FULLSED -e s#^$SRCID\$#$SRCN#g"
+  FULLMACSED="$FULLMACSED -e s#$SRCMAC#$SRCID#g"
 done < $RESULTDIR/nodes.mac
 
 ###############################################################################
@@ -76,6 +79,7 @@ THRESHOLD=3000
 
 if [ ! -f $EVALUATIONSDIR/linksmetric.all ]; then
   cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | grep -v "=" | sort -u > $EVALUATIONSDIR/linksmetric.all
+  cat $EVALUATIONSDIR/linksmetric.all | sed $FULLMACSED > $EVALUATIONSDIR/linksmetric.mat
 fi
 
 NODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
@@ -83,29 +87,33 @@ NODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
 echo "Create linkgraph (Threshold: $THRESHOLD)"
 
 if [ ! -f $EVALUATIONSDIR/graph.txt ]; then
-  echo -n "" > $EVALUATIONSDIR/graph.txt
 
-  for n in $NODES; do
-    for m in $NODES; do
-      METRIC=`cat $EVALUATIONSDIR/linksmetric.all | grep "$n $m" | awk '{print $3}' | sort | head -n 1`
+  (cd $DIR; matlab -nosplash -nodesktop -r "try,metric2graph('$EVALUATIONSDIR/linksmetric.mat','$EVALUATIONSDIR/graph.csv',$THRESHOLD),catch,exit(1),end,exit(0)" 1> /dev/null)
+  cat $EVALUATIONSDIR/graph.csv | sed "s#,# #g" > $EVALUATIONSDIR/graph.txt
+
+#  echo -n "" > $EVALUATIONSDIR/graph.txt
+
+#  for n in $NODES; do
+#    for m in $NODES; do
+#      METRIC=`cat $EVALUATIONSDIR/linksmetric.all | grep "$n $m" | awk '{print $3}' | sort | head -n 1`
 
       #echo "$n $m $METRIC" >> $EVALUATIONSDIR/foundmetric.txt
 
-      LINK=1
-      if [ "x$METRIC" = "x" ]; then
-        LINK=0
-      else
-        if [ $METRIC -lt $THRESHOLD ]; then
-          LINK=1
-        else
-          LINK=0
-        fi
-      fi
+#      LINK=1
+#      if [ "x$METRIC" = "x" ]; then
+#        LINK=0
+#      else
+#        if [ $METRIC -lt $THRESHOLD ]; then
+#          LINK=1
+#        else
+#          LINK=0
+#        fi
+#      fi
 
-      echo -n "$LINK " >> $EVALUATIONSDIR/graph.txt
-    done
-    echo "" >> $EVALUATIONSDIR/graph.txt
-  done
+#      echo -n "$LINK " >> $EVALUATIONSDIR/graph.txt
+#    done
+#    echo "" >> $EVALUATIONSDIR/graph.txt
+ # done
 fi
 
 ###############################################################################
@@ -162,6 +170,7 @@ fi
 
 echo "Networkstats!"
 
+cat $EVALUATIONSDIR/bcaststats.csv | sed "s#,# #g" > $EVALUATIONSDIR/bcaststats.mat
 BCASTSIZE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $3}' | sort -u`
 BCASTRATE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $4}' | sort -u`
 BCASTNODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
@@ -204,5 +213,3 @@ for r in $BCASTRATE; do
 
   done
 done
-
-
