@@ -91,6 +91,7 @@ if [ ! -f $EVALUATIONSDIR/graph.txt ]; then
   (cd $DIR; matlab -nosplash -nodesktop -r "try,metric2graph('$EVALUATIONSDIR/linksmetric.mat','$EVALUATIONSDIR/graph.csv',$THRESHOLD),catch,exit(1),end,exit(0)" 1> /dev/null)
   cat $EVALUATIONSDIR/graph.csv | sed "s#,# #g" > $EVALUATIONSDIR/graph.txt
 
+#TODO: use if no matlab is available
 #  echo -n "" > $EVALUATIONSDIR/graph.txt
 
 #  for n in $NODES; do
@@ -170,14 +171,21 @@ fi
 
 echo "Networkstats!"
 
-cat $EVALUATIONSDIR/bcaststats.csv | sed "s#,# #g" > $EVALUATIONSDIR/bcaststats.mat
+cat $EVALUATIONSDIR/bcaststats.csv | sed "s#,# #g" | sed $FULLMACSED > $EVALUATIONSDIR/bcaststats.mat
 BCASTSIZE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $3}' | sort -u`
 BCASTRATE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $4}' | sort -u`
 BCASTNODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
 
+(cd $DIR; matlab -nosplash -nodesktop -r "try,bcaststats2graph('$EVALUATIONSDIR/bcaststats.mat','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+
 for r in $BCASTRATE; do
   for s in $BCASTSIZE; do
+    GRAPHCSVFILE="$EVALUATIONSDIR/graph_psr_$r""_""$s.csv"
     GRAPHFILE="$EVALUATIONSDIR/graph_psr_$r""_""$s.txt"
+
+    if [ -f $GRAPHCSVFILE ]; then
+      cat $GRAPHCSVFILE | sed "s#,# #g" > $GRAPHFILE
+    fi
 
     if [ ! -f $GRAPHFILE ]; then
       echo -n "" > $GRAPHFILE
