@@ -88,7 +88,7 @@ echo "Create linkgraph (Threshold: $THRESHOLD)"
 
 if [ ! -f $EVALUATIONSDIR/graph.txt ]; then
 
-  (cd $DIR; matlab -nosplash -nodesktop -r "try,metric2graph('$EVALUATIONSDIR/linksmetric.mat','$EVALUATIONSDIR/graph.csv',$THRESHOLD),catch,exit(1),end,exit(0)" 1> /dev/null)
+  (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,metric2graph('$EVALUATIONSDIR/linksmetric.mat','$EVALUATIONSDIR/graph.csv',$THRESHOLD),catch,exit(1),end,exit(0)" 1> /dev/null)
   cat $EVALUATIONSDIR/graph.csv | sed "s#,# #g" > $EVALUATIONSDIR/graph.txt
 
 #TODO: use if no matlab is available
@@ -123,7 +123,7 @@ fi
 
 echo "Create partitions files"
 
-(cd $DIR; matlab -nosplash -nodesktop -r "try,partitions('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+(cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,partitions('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
 if [ $? -ne 0 ]; then
   echo "Ohh, matlab error."
@@ -132,7 +132,7 @@ fi
 
 echo "Get Bridges and Articulation points"
 
-(cd $DIR; matlab -nosplash -nodesktop -r "try,get_bridges_and_articulation_points('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/','none'),catch,exit(1),end,exit(0)" 1> /dev/null)
+(cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,get_bridges_and_articulation_points('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/','none'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
 
 echo "Create clusterfiles and nodedegree!"
@@ -147,7 +147,7 @@ fi
 for i in `(cd $EVALUATIONSDIR; ls cluster_*.csv)`; do
   CLUSTERID=`echo $i | sed "s#_# #g" | sed "s#\.# #g" | awk '{print $2}'`
   echo "Cluster: $CLUSTERID"
-  (cd $DIR; matlab -nosplash -nodesktop -r "try,nodedegree('$EVALUATIONSDIR/$i', '$EVALUATIONSDIR/graph.txt', '$EVALUATIONSDIR/', $CLUSTERID ),catch,exit(1),end,exit(0)" 1> /dev/null)
+  (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,nodedegree('$EVALUATIONSDIR/$i', '$EVALUATIONSDIR/graph.txt', '$EVALUATIONSDIR/', $CLUSTERID ),catch,exit(1),end,exit(0)" 1> /dev/null)
 done
 
 ###############################################################################
@@ -206,8 +206,8 @@ for r in $BCASTRATE; do
     PARAMS="$r""_""$s"
     TARGET="$EVALUATIONSDIR/cluster_""$PARAMS""_"
 
-    (cd $DIR; matlab -nosplash -nodesktop -r "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/','$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
-    (cd $DIR; matlab -nosplash -nodesktop -r "try,partitions_psr('$GRAPHFILE',[70 85],'$TARGET'),catch,exit(1),end,exit(0)" 1> /dev/null)
+    (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/','$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
+    (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,partitions_psr('$GRAPHFILE',[70 85],'$TARGET'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
     if [ "x$MODE" = "xsim" ]; then
       CLUSTERSIZEFILE="$EVALUATIONSDIR/cluster_""$PARAMS""_psr_85_clustersize.csv"
@@ -215,7 +215,7 @@ for r in $BCASTRATE; do
       CLUSTERFILE="$EVALUATIONSDIR/cluster_""$PARAMS""_psr_85_cluster_"$MAX_CLUSTER".csv"
       CLUSTERCSVFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".csv"
       CLUSTERPLMFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".plm"
-      (cd $DIR; matlab -nosplash -nodesktop -r "try,partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE'),catch,exit(1),end,exit(0)" 1> /dev/null)
+      (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE'),catch,exit(1),end,exit(0)" 1> /dev/null)
       cat $CLUSTERCSVFILE | sed "s#,# #g" | awk '{print "sk"$0}' > $CLUSTERPLMFILE
     fi
 
