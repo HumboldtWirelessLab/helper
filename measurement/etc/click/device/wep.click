@@ -24,13 +24,19 @@
 
 elementclass Wep {KEY $key, ACTIVE $active, DEBUG $debug |
 
-	wep_decap::WepDecap(KEY $key, KEYID 0);
-	wep_encap::WepEncap(KEY $key, KEYID 0, ACTIVE $active, DEBUG $debug);
+	wep_decap	::WepDecap(KEY $key, KEYID 0);
+	wep_encap	::WepEncap(KEY $key, KEYID 0, ACTIVE $active, DEBUG $debug);
+	
+	is_TLS 		:: Classifier(25/aa,-);
 
 	input[0]
+		-> is_TLS[1]
 	    -> wep_encap
 	    //-> Print("encrypted ............",100, TIMESTAMP true)
 	    -> [0]output;
+	    
+	    is_TLS
+	    	-> [0]output;
 
 	input[1]
 	    -> wep_clf::Classifier(1/40%40, -) // Test of wep frame
