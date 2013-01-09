@@ -263,7 +263,9 @@ case "$MODE" in
 		cat $DIR/../etc/ns/radio/$RADIO\.tcl >> $TCLFILE
 		
 		if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ] || [ "x$NODEPLACEMENT" = "xstring" ]; then
-			NODEPLACEMENTOPTS="$NODEPLACEMENTOPTS" $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
+			#let TOPORXRANGE=MAXRXRANGE+20
+			TOPORXRANGE=$MAXRXRANGE
+			NODEPLACEMENTOPTS="$NODEPLACEMENTOPTS" RXRANGE=$TOPORXRANGE $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
 			FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
 		fi
 		
@@ -330,9 +332,7 @@ case "$MODE" in
 		if [ "x$RESULTDIR" = "x" ]; then
 			RESULTDIR=.
 		fi
-		
-		cat $DIR/../etc/ns/script_01.tcl | sed -e "s#NAME#$NAME#g" -e "s#RESULTDIR#$RESULTDIR#g" >> $TCLFILE
-		
+
 		i=0
 		echo -n "" > $FINALRESULTDIR/nodes.mac
 		
@@ -346,11 +346,12 @@ case "$MODE" in
 			NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 			for nodedevice in $NODEDEVICELIST; do
 				
-				CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
-				# we tell the NS what click-script to load for a certain node
-				echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
-				
-				mac_raw=`expr $i + 1`
+				if [ "x$NAME2MAC" = "xyes" ]; then
+				  mac_raw=`echo $node | sed -e "s#[a-z]*[A-Z]*##g"`
+				else
+				  mac_raw=`expr $i + 1`
+				fi
+
 				m1=`expr $mac_raw / 256`
 				m2=`expr $mac_raw % 256`
 				m1h=$(echo "obase=16; $m1" | bc)
@@ -368,8 +369,11 @@ case "$MODE" in
 				fi
 				
 				NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#$node:eth#00-00-00-00-$m1h-$m2h#g"
-				
-				i=$mac_raw
+
+				echo "set node_name($i) \"$node\"" >> $TCLFILE
+				echo "set node_mac($i) \"00:00:00:00:$m1h:$m2h\"" >> $TCLFILE
+
+				let i=i+1
 				
 				last_node=$node
 			done
@@ -379,7 +383,23 @@ case "$MODE" in
 			NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#LASTNODE:eth#00-00-00-00-$m1h-$m2h#g"
 			NODENAME_SEDARG="$NODENAME_SEDARG -e s#LASTNODE#$last_node#g"
 		fi
-		
+
+		cat $DIR/../etc/ns/script_01.tcl | sed -e "s#NAME#$NAME#g" -e "s#RESULTDIR#$RESULTDIR#g" >> $TCLFILE
+
+		i=0
+		# Scann the node table to build a NetworkSimulator-Command for
+		# each line in the table, using mainly the information of "NODE" and
+		# "CLICKSCRIPT".
+		for node in $NODELIST; do
+			NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+			for nodedevice in $NODEDEVICELIST; do
+				CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
+				# we tell the NS what click-script to load for a certain node
+				echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
+				let i=i+1
+			done
+		done
+
 		echo "for {set i 0} {\$i < \$nodecount} {incr i} {" >> $TCLFILE
 		echo "     \$ns_ at 0.0 \"[\$node_(\$i) entry] runclick\"" >> $TCLFILE
 		echo " }" >> $TCLFILE
@@ -560,7 +580,9 @@ case "$MODE" in
 			echo "Evaluation..."
 			echo "#!/bin/sh" > $FINALRESULTDIR/eval_again.sh
 			echo "MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT" >> $FINALRESULTDIR/eval_again.sh
-			MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
+			if [ "x$DELAYEVALUATION" = "x" ]; then
+			  MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
+			fi
 		else
 			exit 1
 		fi

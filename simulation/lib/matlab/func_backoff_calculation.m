@@ -1,146 +1,87 @@
-function [counter_slots_global,packets_delivery_counter,packets_delivery_counter_global, counter_collision_global,retries_min_mean_neighbours,retries_max_mean_neighbours, retries_avg_mean_neighbours ] = func_backoff_calculation(vector_cw, number_of_stations,packet_delivery_limit)
+function [counter_slots_global,packets_delivery_counter_global, counter_collision_global,vector_packets_delivered_per_station,vector_collision_occurred_per_station,retries_min,retries_max,retries_avg,retries_avg_counter,counter_retries_min_frequencies,counter_retries_max_frequencies ] = func_backoff_calculation(vector_cw, number_of_stations,packet_delivery_limit)
 
-
-
-counter_backoff_random_row = 1;
-%counter_backoff_random_output_row = 1;
-counter_collision_global = 0;
-packets_delivered = zeros(1,number_of_stations);
-collision_occurred = zeros(1,number_of_stations);
-retries = zeros(1,number_of_stations);
-retries_max = zeros(1,number_of_stations);
-retries_min = zeros(1,number_of_stations);
-retries_min_first_time = zeros(1,number_of_stations);
-retries_avg = zeros(1,number_of_stations);
-retries_avg_counter = zeros(1,number_of_stations);
-counter_retries_min_frequencies = zeros(1,number_of_stations);
-counter_retries_max_frequencies = zeros(1,number_of_stations);
-retries_current = zeros(1,number_of_stations);
-counter_retries = 1;
-packets_delivery_counter = 0;
-counter_slots_global = 0;
-%backoff_random = int32((vector_cw(1,1)-1)* rand(1,number_of_stations));
-backoff_random = int32(vector_cw(1,1) * rand(1,number_of_stations));
-vector_backoff_random_current = zeros(1,size(backoff_random,2));
-for z=1:1:size(backoff_random,2)
-    vector_backoff_random_current(1,z) = backoff_random(counter_backoff_random_row,z);
-end
-
-while (packets_delivery_counter < packet_delivery_limit)
-
-minimum = -1;
-for i=1:1:size(vector_backoff_random_current,2)
-    if(vector_backoff_random_current(1,i) >= 0 && minimum == -1)
-        minimum = vector_backoff_random_current(1,i);
-    elseif (vector_backoff_random_current(1,i) >= 0 && vector_backoff_random_current(1,i) < minimum)
-        minimum = vector_backoff_random_current(1,i);
-    end
-end
-
-
-if(minimum >= 0)
-vector_backoff_random_current = vector_backoff_random_current -  minimum;
-counter_slots_global = counter_slots_global + minimum;
-end
-
-counter_collision = 0;
-for j=1:1:size(vector_backoff_random_current,2)
-        if (vector_backoff_random_current(1,j) == 0)
-            counter_collision = counter_collision + 1;
-        end
-end
-if(counter_collision > 1)
-    counter_collision_global = counter_collision_global + 1;
+    %Initialization
     
-end
-
-%for z=1:1:size(vector_backoff_random_current,2)
- %   backoff_random_output(counter_backoff_random_output_row,z) =  vector_backoff_random_current(1,z);
-%end
-%counter_backoff_random_output_row = counter_backoff_random_output_row +1;
-for j=1:1:size(vector_backoff_random_current,2)
-    if (vector_backoff_random_current(1,j) == 0)
-        if (counter_collision > 1)
-        collision_occurred(1,j) = collision_occurred(1,j) + 1;
-        %if(retries_counter_on == 1)
-            retries(counter_retries,j) = retries(counter_retries,j) + 1;
-            retries_current(1,j) = retries_current(1,j) + 1;
-            if (retries(counter_retries,j) >= size(vector_cw,2))
-                retries(counter_retries,j) = size(vector_cw,2)- 1;
-            end
-        %end
-        %vector_backoff_random_current(1,j) = floor( vector_cw(1,retries(counter_retries,j)+1)*rand(1,1));
-        
-        elseif (counter_collision == 1 )
-            packets_delivered(1,j) = packets_delivered(1,j) + 1;
-            packets_delivery_counter = packets_delivery_counter + 1;
-            if(retries(counter_retries,j) > 0)
-                retries(counter_retries,j) = 0;
-            end
-            if (retries_min_first_time(1,j) == 0)
-                
-                retries_min(1,j) = retries_current(1,j);
-                counter_retries_min_frequencies(1,j) = 1;
-                
-                retries_max(1,j) = retries_current(1,j);
-                counter_retries_max_frequencies(1,j) = 1;
-                
-                retries_avg(1,j) = retries_current(1,j);
-                retries_avg_counter(1,j) = retries_avg_counter(1,j) + 1;
-                
-                retries_min_first_time(1,j) = 1;
-            else
-                if (retries_current(1,j) < retries_min(1,j))
-                    retries_min(1,j) = retries_current(1,j);
-                    counter_retries_min_frequencies(1,j) = 1;
-                elseif (retries_current(1,j) == retries_min(1,j))
-                    counter_retries_min_frequencies(1,j) = counter_retries_min_frequencies(1,j) + 1;
-                end
-                if (retries_current(1,j) > retries_max(1,j))
-                    retries_max(1,j) = retries_current(1,j);
-                    counter_retries_max_frequencies(1,j) = 1;
-                elseif (retries_current(1,j) == retries_max(1,j))
-                    counter_retries_max_frequencies(1,j) = counter_retries_max_frequencies(1,j) + 1;
-                end
-                retries_avg(1,j) = retries_avg(1,j) + retries_current(1,j);
-                retries_avg_counter(1,j) = retries_avg_counter(1,j) + 1;
-            end
-        
-            %if (retries_current(counter_retries,j) > 0)
-             %   if (retries_current(counter_retries,j) >= retries_max(counter_retries,j))
-              %      retries_max(counter_retries,j) = retries_current(counter_retries,j);
-               %     counter_retries_max_frequencies = 1;
-               % end
-               % retries_avg(counter_retries,j) = retries_avg(counter_retries,j) + retries_current(counter_retries,j);
-            %end
-        end
-        %if
-        %vector_backoff_random_current(1,j) = floor( vector_cw(1,retries(counter_retries,j)+1)*rand(1,1));
-     %vector_backoff_random_current(1,j) =int32(( vector_cw(1,retries(counter_retries,j)+1)-1)*rand(1,1));
-     %vector_backoff_random_current(1,j) =int32(( vector_cw(1,retries(counter_retries,j)+1))*rand(1,1));
-     vector_backoff_random_current(1,j) =int32(vector_cw(1,1) * rand(1,1));
-    end
+    %init for collision calculation
+    counter_slots_global = 0;
+    packets_delivery_counter_global = 0;
+    counter_collision_global = 0;
    
-end
-counter_backoff_random_row = counter_backoff_random_row + 1;
-%counter_retries = counter_retries + 1; 
-for z=1:1:size(vector_backoff_random_current,2)
-    backoff_random(counter_backoff_random_row,z) = vector_backoff_random_current(1,z);
-    %retries(counter_retries,z) = retries(counter_retries-1,z);
-end
-%backoff_random(counter_backoff_random_row,:) =  vector_backoff_random_current(1,:);
+    vector_packets_delivered_per_station = zeros(1,number_of_stations);   
+    vector_collision_occurred_per_station = zeros(1,number_of_stations);
+    
+    % init for retries calculation
+    retries = zeros(1,number_of_stations);
+    retries_max = zeros(1,number_of_stations);
+    retries_min = zeros(1,number_of_stations);
+    retries_min_first_time = zeros(1,number_of_stations);
+    retries_avg = zeros(1,number_of_stations);
+    retries_avg_counter = zeros(1,number_of_stations);
+    counter_retries_min_frequencies = zeros(1,number_of_stations);
+    counter_retries_max_frequencies = zeros(1,number_of_stations);
+    retries_current = zeros(1,number_of_stations);
+    counter_retries = 1;
+    
+    %init random backoff calculation
+    option = 2;
+    option_standard = 0;
+    option_termination = 0;
+    vector_backoff_random_current = func_interval_random_numbers_integers_get(0,vector_cw(1,1),number_of_stations,option);
+    vector_station_has_packet_transmitted = zeros(1,number_of_stations);
+    %counter_backoff_random_row = 1;    
+    %backoff_random = zeros(1,size(vector_backoff_random_current,2));
+    %for z=1:1:size(backoff_random,2)
+    %    backoff_random(counter_backoff_random_row,z) = vector_backoff_random_current(1,z);
+    %end
+    criterion_termination = 1;
+    % Simualtion of collisions start here
+    while (criterion_termination)
 
-%retries(counter_retries,:) = retries(counter_retries-1,:);
-end
+        %Search for minimum Backoff and 
+        [minimum] = func_simulation_search_4_minimum(vector_backoff_random_current);
+        % Calculate Backoff and count Slots
+        if(minimum > 0)
+            vector_backoff_random_current = vector_backoff_random_current -  minimum;
+            counter_slots_global = counter_slots_global + minimum;
+        %elseif (minimum == 0)
+        %    counter_slots_global = counter_slots_global + 1;
+        end
+        % Search for collisions
+        counter_collision = func_simulation_search_4_collision(vector_backoff_random_current);
+        %If there are collisions count it global as one collision
+        if(counter_collision > 1)
+            counter_collision_global = counter_collision_global + 1;
+        elseif (counter_collision == 1)
+            packets_delivery_counter_global = packets_delivery_counter_global + 1;
+        end
 
-packets_delivery_counter_global = sum(packets_delivery_counter,2);
-retries_min_mean_neighbours = mean(retries_min);
-%counter_retries_min_frequencies;
-retries_max_mean_neighbours = mean(retries_max);
-%counter_retries_max_frequencies 
-retries_avg_mean = zeros(1,size(retries_avg,2));
-for r = 1:1:size(retries_avg,2)
-    retries_avg_mean(1,r) = retries_avg(1,r) / retries_avg_counter(1,r);
+%        [vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station,packets_delivery_counter_global,retries,counter_retries,retries_current,retries_min,retries_max,counter_retries_min_frequencies,counter_retries_max_frequencies,retries_avg,retries_avg_counter,retries_min_first_time] = func_simulation_collision_statics_calc(vector_backoff_random_current,option,counter_collision,vector_collision_occurred_per_station,vector_packets_delivered_per_station,packets_delivery_counter_global,retries,counter_retries,retries_current,retries_min,retries_max,counter_retries_min_frequencies,counter_retries_max_frequencies,retries_avg,retries_avg_counter,retries_min_first_time,vector_cw);
+        %[vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station] = func_simulation_stats_per_station_get(vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station,option);
+        if (option_standard == 1)
+            [vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station] = func_simulation_stats_per_station_standard_get(vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station,vector_cw,counter_collision,option);
+        else
+            [vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station,vector_station_has_packet_transmitted] = func_simulation_stats_per_station_get(vector_backoff_random_current,vector_collision_occurred_per_station,vector_packets_delivered_per_station,vector_cw,counter_collision,vector_station_has_packet_transmitted,option);
+            counter_transmitted = 0;
+            for i=1:1:size(vector_station_has_packet_transmitted,2) %search for transmitted stations
+                if (vector_station_has_packet_transmitted(1,i) == 1)
+                    counter_transmitted = counter_transmitted + 1;
+                end
+            end
+            if (counter_transmitted == size(vector_station_has_packet_transmitted,2))
+                vector_backoff_random_current = func_interval_random_numbers_integers_get(0,vector_cw(1,1),number_of_stations,option);
+                vector_station_has_packet_transmitted = zeros(1,number_of_stations); 
+            end
+        end
+        if (option_termination == 1)
+            [criterion_termination] = func_backoff_calculation_terminate_global(packets_delivery_counter_global,packet_delivery_limit);
+        else
+            [criterion_termination] = func_backoff_calculation_terminate_per_station(vector_packets_delivered_per_station,packet_delivery_limit);
+        end
+        %counter_collision = 0;
+        %counter_backoff_random_row = counter_backoff_random_row + 1;
+        %for z=1:1:size(vector_backoff_random_current,2)
+        %    backoff_random(counter_backoff_random_row,z) = vector_backoff_random_current(1,z);
+        %end
+    end
 end
-retries_avg_mean_neighbours = mean(retries_avg_mean);
 

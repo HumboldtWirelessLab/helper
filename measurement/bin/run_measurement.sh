@@ -209,7 +209,9 @@ if [ "x$TESTONLY" = "x" ]; then
       EVAL_LOG_OUT=1
     fi
     #echo "MODE=testbed CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.real RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh"
-    MODE=testbed CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.real RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
+    if [ "x$DELAYEVALUATION" = "x" ]; then
+      MODE=testbed CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DISCRIPTIONFILENAME.real RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
+    fi
   fi
 
 fi

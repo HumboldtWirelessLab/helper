@@ -78,7 +78,7 @@ case "$1" in
 	  #REPLACE=`cat $2 | grep -v "#" | awk '{print " \"s#node_" NR - 1 " #"$1" #g\""}'`
 	  #echo "$REPLACE"
 	  NPART_DIR="$DIR/../../src/Npart"
-	  java -classpath $NPART_DIR/classes/production/Npart:$NPART_DIR/lib/jargs.jar:$NPART_DIR/lib/mantissa-7.2.jar NPART.TopologyGenerator -n $NODECOUNT -r 80 -d 0.8 -o ts -p 5 -c 1 -t 150 -a distroL | sed $REPLACE | sed "s#;# #g"
+	  (cd $NPART_DIR; RXRANGE=$RXRANGE ./gen_topo.sh $NODECOUNT | sed $REPLACE | sed "s#;# #g")
 	  ;;
     "degree")
 	  NODES=`cat $2 | grep -v "#" | awk '{print $1"\n"}' | uniq`

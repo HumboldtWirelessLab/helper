@@ -24,5 +24,13 @@ if [ -e $RESULTDIR/status ]; then
     ( cd $RESULTDIR; tar cfj status.tar.bz2 status; rm -rf status )
 fi
 
+if [ -e $RESULTDIR/$NAME.tr ]; then
+    ( cd $RESULTDIR; bzip2 -9 $NAME.tr)
+fi
+
+if [ -e $RESULTDIR/$NAME.nam ]; then
+    ( cd $RESULTDIR; bzip2 -9 $NAME.nam)
+fi
+
 exit 0
 
