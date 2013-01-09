@@ -58,11 +58,12 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   -> [1]output;
 
   input[3] //passive
-  -> Print("Flooding. Passive overhear",TIMESTAMP true)
-  -> Discard;
+  //-> Print("Flooding. Passive overhear",TIMESTAMP true)
+  -> BRN2Decap()
+  -> [4]fl;
 
   input[4] //txfeedback success
-  -> Print("FloodFeedback")
+  //-> Print("FloodFeedback")
   -> BRN2Decap()
   -> [3]fl;
 
