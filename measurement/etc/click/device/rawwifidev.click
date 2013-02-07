@@ -36,7 +36,7 @@
 #define CST_PROCFILE /simulation
 #else
 
-#if WIFITYPE == 802
+#if WIFITYPE == 803
 
 #if DEVICENUMBER == 0
 #define CST_PROCFILE "/sys/devices/pci0000\:00/0000\:00\:11.0/stats/channel_utility"
