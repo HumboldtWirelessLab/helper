@@ -75,7 +75,7 @@ fi
 ###############################################################################
 echo "Create linkmetric matrix"
 
-THRESHOLD=3000
+THRESHOLD=400
 
 if [ ! -f $EVALUATIONSDIR/linksmetric.all ]; then
   cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | grep -v "=" | sort -u > $EVALUATIONSDIR/linksmetric.all
@@ -130,9 +130,9 @@ if [ $? -ne 0 ]; then
 fi
 
 
-echo "Get Bridges and Articulation points"
+#echo "Get Bridges and Articulation points"
 
-(cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,get_bridges_and_articulation_points('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/','none'),catch,exit(1),end,exit(0)" 1> /dev/null)
+#(cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,get_bridges_and_articulation_points('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/','none'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
 
 echo "Create clusterfiles and nodedegree!"

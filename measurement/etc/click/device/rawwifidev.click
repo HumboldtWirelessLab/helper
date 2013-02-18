@@ -141,6 +141,9 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef CERR
   -> hnd::HiddenNodeDetection(DEVICE $device, DEBUG 2)
 #endif
+#ifdef FOREIGNRXSTATS
+  -> ForeignRxStats(DEVICE $device,TIMEOUT 3, DEBUG 2)
+#endif
   -> [0]output;
 
 
