@@ -46,6 +46,10 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 #ifdef RAWDEV_DEBUG
   -> SetTimestamp()
   -> Print("NODENAME: From Device", 100, TIMESTAMP true)
+#else
+#ifdef SIMULATION
+  -> SetTimestamp()
+#endif
 #endif
 #ifdef RAWFILTER
   -> RAWFILTER
@@ -60,9 +64,6 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
   -> ToDump(FILENAME "RESULTDIR/NODENAME.NODEDEVICE.raw.dump", SNAPLEN RAWDUMPSNAPLEN)
 #endif
 #endif
-#endif
-#ifdef SIMULATION
-  -> SetTimestamp()
 #endif
   -> BRN2SetDeviceAnno(DEVICE $device)
   -> [0]output;
