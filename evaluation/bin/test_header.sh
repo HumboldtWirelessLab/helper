@@ -18,6 +18,12 @@ case "$SIGN" in
 	;;
 esac
 
+if [ ! -f $1 ]; then
+  echo "File $1 doesn't exist"
+  exit 1
+fi
+    
+
 if [ "x$COMPRESSION" = "xyes" ]; then
   COMPRESSION=""
 #  echo "Compression in TH"  >> $pwd/foo

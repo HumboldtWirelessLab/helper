@@ -48,6 +48,11 @@ fi
 DUMPFILE=$1
 COMPRESSED=0
 
+if [ ! -f $DUMPFILE ]; then
+  echo "File $DUMPFILE doesn't exist"
+  exit 1
+fi
+
 # check if bzip-packed
 if [ "$DUMPFILE" = "*.bz2" ]; then
 	ZIP=$1
