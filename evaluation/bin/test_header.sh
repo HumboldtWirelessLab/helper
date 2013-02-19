@@ -19,7 +19,7 @@ case "$SIGN" in
 esac
 
 if [ ! -f $1 ]; then
-  echo "File $1 doesn't exist"
+  echo "none"
   exit 1
 fi
     
@@ -42,6 +42,13 @@ if [ "x$DEBUG" = "x1" ]; then
 fi
 
 RESULT=`cat $DIR/../etc/click/oracle.click | sed -e "s#DUMP#$1#g" -e "s#//COMPRESSION#$COMPRESSION#g" | click-align 2> /dev/null | click 2>&1 | grep -v "expensive"`
+
+ERROR=`echo "$RESULT" | grep "Router could not be initialized!" | wc -l`
+
+if [ $ERROR -ne 0 ]; then
+  echo "none"
+  exit 1
+fi
 
 PACKETS=`echo "$RESULT" | grep -v ":"`
 HANDLER=`echo "$RESULT" | grep ":" | sed -e "s#raw_cnt.count:##g" -e "s#wifi_header_cnt_##g" -e "s#.count:##g"`

@@ -89,6 +89,11 @@ if [ "x$WIFI" = "xraw" ]; then
   exit 0
 fi
 
+if [ "x$WIFI" = "xnone" ]; then
+  echo "Couldn't detect header type" 1>&2
+  exit 1
+fi
+
 if [ "x$RX" = "x" ]; then
   RX="false"
 fi
