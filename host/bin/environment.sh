@@ -193,6 +193,18 @@ case "$1" in
 		    run_on_node $node "$DIR/../../nodes/bin/time.sh settime" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
 		done
 		;;
+	"debugfs")
+		for node in $NODELIST; do
+			ALREADY_MOUNTED=`run_on_node $node "mount | grep $NFSHOME | wc -l" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config | awk '{print $1}'`
+			echo "Check mount ($NFSHOME). Result: ->$ALREADY_MOUNTED<-"
+			if [ "x$ALREADY_MOUNTED" = "x0" ]; then
+			    run_on_node $node "mkdir -p $NFSHOME" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
+			    run_on_node $node "if [ -f /sbin/mount ]; then /sbin/mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME; else mount -t nfs -o $NFSOPTIONS $NFSSERVER:$NFSHOME $NFSHOME; fi" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config
+			else
+			    echo "$NFSHOME already mounted"
+			fi
+		done
+		;;
 	*)
 		$0 help
 		;;

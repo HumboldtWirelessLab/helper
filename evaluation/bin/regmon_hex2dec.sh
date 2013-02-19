@@ -34,14 +34,15 @@ fi
 CONVERTFILE=hex2dec.c
 CONVERTBIN=hex2dec
 
-TMPDIR=tmp
-
 
 #check for the regmon data hexdump
 if [ ! -f ./${DUMPFILE} ]; then
 	echo "ERROR: Specified Regmon data file doesn't exist."
 	exit -1;
 fi
+
+rm -f $CONVERTFILE ${CONVERTBIN} ${DUMPFILE}.h
+
 
 cat >> $CONVERTFILE << EOF 
 #include <stdio.h>
@@ -57,15 +58,20 @@ int main(void)
   int c;
 
   uint32_t *p = (int*) regmon_dump;
+  uint32_t max = sizeof(regmon_dump)-28;
+  max /= 28;
 
   c = 0;
 			
-  for( i = 0; i < 1000; i++ ) {
+  for( i = 0; i < max; i++ ) {
     for( j = 0; j < 7; j++ ) {
-      printf("%d ", p[c]);
+      printf("%u ", p[c]);
       c++;
     }
-    printf("\n");
+    uint64_t tv64 = p[c-5];
+    tv64 = tv64 << 32;
+    tv64 += (uint64_t)p[c-6];
+    printf("%llu\n",tv64);
   }
 }
 EOF
@@ -73,18 +79,11 @@ EOF
 # create a C-header containing the dump data as an array
 xxd -i ${DUMPFILE} ${DUMPFILE}.h
 
-
 # build the converter program
 gcc ${CONVERTFILE} -o ${CONVERTBIN}
 
-
 if [ -f ./${CONVERTBIN} ]; then # use it
 	./${CONVERTBIN} > ${DUMPFILE_DEC}
-fi
-
-
-if [ -f ./${DUMPFILE_DEC} ]; then
-	cp ${DUMPFILE_DEC} ../
 fi
 
 rm -f $CONVERTFILE ${CONVERTBIN} ${DUMPFILE}.h
@@ -92,6 +91,5 @@ rm -f $CONVERTFILE ${CONVERTBIN} ${DUMPFILE}.h
 if [ "$1" != "$DUMPFILE" ]; then
   rm -f $DUMPFILE
 fi
-
 
 # echo "${CONVERTBIN} done."

@@ -56,7 +56,7 @@ maxphylen[1]
   -> Discard;
 
   minphylen[0]
-  -> Print("PHY_TO_SHORTerror", TIMESTAMP true)
+  -> BRN2PrintWifi("PHY_TO_SHORTerror", TIMESTAMP true)
   -> Discard;
 
 error_clf[3]
