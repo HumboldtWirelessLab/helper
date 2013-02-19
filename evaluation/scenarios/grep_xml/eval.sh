@@ -22,7 +22,9 @@ esac
 
 if [ -f $RESULTDIR/measurement.log ]; then
     cat $RESULTDIR/measurement.log | grep -e "^[[:space:]]*<" > $EVALUATIONSDIR/measurement.xml
-    cat $RESULTDIR/measurement.log | grep -v "^[[:space:]]*<" > $EVALUATIONSDIR/measurement_debug.log
+    if [ "x$EVALUATION_LEVEL" != "x" ]; then
+      cat $RESULTDIR/measurement.log | grep -v "^[[:space:]]*<" > $EVALUATIONSDIR/measurement_debug.log
+    fi
 fi
 
 exit 0

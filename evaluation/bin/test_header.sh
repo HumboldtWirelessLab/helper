@@ -27,7 +27,13 @@ else
 #  echo "No Compression in TH" >> $pwd/foo
 #cat $DIR/../etc/click/oracle.click | sed -e "s#DUMP#$1#g" -e "s#//COMPRESSION#$COMPRESSION#g" > foo.nocomp
 fi
-    
+
+if [ "x$DEBUG" = "x1" ]; then
+  echo "DEBUG=1"
+  cat $DIR/../etc/click/oracle.click | sed -e "s#DUMP#$1#g" -e "s#//COMPRESSION#$COMPRESSION#g" | click-align
+  cat $DIR/../etc/click/oracle.click | sed -e "s#DUMP#$1#g" -e "s#//COMPRESSION#$COMPRESSION#g" | click-align 2> /dev/null | click 2>&1
+  exit 0
+fi
 
 RESULT=`cat $DIR/../etc/click/oracle.click | sed -e "s#DUMP#$1#g" -e "s#//COMPRESSION#$COMPRESSION#g" | click-align 2> /dev/null | click 2>&1 | grep -v "expensive"`
 

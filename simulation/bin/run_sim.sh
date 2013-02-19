@@ -140,7 +140,7 @@ case "$MODE" in
 		
 		DESCRIPTIONFILENAME=`basename $DESCRIPTIONFILE`
 		
-		if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ]; then
+		if [ "x$NODEPLACEMENT" != "xfile" ]; then
 			cat $DESCRIPTIONFILE | sed -e "s#[[:space:]]*NODEPLACEMENTFILE[[:space:]]*=.*##g" -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 			echo "" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 			echo "NODEPLACEMENTFILE=$FINALRESULTDIR/placementfile.plm" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
@@ -156,7 +156,7 @@ case "$MODE" in
 			FIELDSIZE=1000
 		fi
 		
-		if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ] || [ "x$NODEPLACEMENT" = "xstring" ]; then
+		if [ "x$NODEPLACEMENT" != "xfile" ]; then
 			FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
 		else
 			#use Placementfile
@@ -262,7 +262,7 @@ case "$MODE" in
 		
 		cat $DIR/../etc/ns/radio/$RADIO\.tcl >> $TCLFILE
 		
-		if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ] || [ "x$NODEPLACEMENT" = "xstring" ]; then
+		if [ "x$NODEPLACEMENT" != "xfile" ]; then
 			#let TOPORXRANGE=MAXRXRANGE+20
 			TOPORXRANGE=$MAXRXRANGE
 			NODEPLACEMENTOPTS="$NODEPLACEMENTOPTS" RXRANGE=$TOPORXRANGE $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
@@ -303,16 +303,14 @@ case "$MODE" in
 			FIELDSIZE=$POS_Y_MAX
 		fi
 		
-		if [ "x$NODEPLACEMENT" = "xrandom" ] || [ "x$NODEPLACEMENT" = "xgrid" ] || [ "x$NODEPLACEMENT" = "xnpart" ] || [ "x$NODEPLACEMENT" = "xfile" ]; then
-			if [ $POS_X_MAX -lt $FIELDSIZE ]; then
-				POS_X_MAX=$FIELDSIZE
-			fi
-			if [ $POS_Y_MAX -lt $FIELDSIZE ]; then
-				POS_Y_MAX=$FIELDSIZE
-			fi
-			POS_Z_MAX=0
-			#FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
+		if [ $POS_X_MAX -lt $FIELDSIZE ]; then
+			POS_X_MAX=$FIELDSIZE
 		fi
+		if [ $POS_Y_MAX -lt $FIELDSIZE ]; then
+			POS_Y_MAX=$FIELDSIZE
+		fi
+		POS_Z_MAX=0
+		#FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
 		
 		#		echo "FIN: $FINALPLMFILE"
 		echo "set xsize $POS_X_MAX" >> $TCLFILE
@@ -521,9 +519,11 @@ case "$MODE" in
 			GETTIMESTATS=""
 		fi
 		
+		echo "#!/bin/sh" > $FINALRESULTDIR/run_again.sh
+		
 		# Final stage: valgrind-check and experiment evaluation
 		if [ "x$USED_SIMULATOR" = "xns" ]; then
-			echo "Running NS2"
+			echo "echo \"Running NS2\"" >> $FINALRESULTDIR/run_again.sh
 			# check running NS with a memory debugger and profiler
 			which valgrind > /dev/null 2> /dev/null
 			if [ $? -ne 0 ]; then
@@ -540,11 +540,14 @@ case "$MODE" in
 				else
 				  SUPPRESSION="--suppressions=$DIR/../etc/ns/ns.supp"
 				fi
-				( cd $FINALRESULTDIR; echo "$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1" > run_again.sh)
-				( cd $FINALRESULTDIR; $GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
+
+				echo "$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1" >> $FINALRESULTDIR/run_again.sh
+				#( cd $FINALRESULTDIR; $GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
 			else
 				if [ "x$PROFILE" = "x1" ]; then
-					( cd $FINALRESULTDIR; $GETTIMESTATS ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+				
+				        echo "$GETTIMESTATS ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1" >> $FINALRESULTDIR/run_again.sh
+					#( cd $FINALRESULTDIR; $GETTIMESTATS ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
 				else
 					if [ "x$GDB" = "x1" ]; then
 						NS_FULL_PATH=`which ns`
@@ -553,21 +556,23 @@ case "$MODE" in
 						rm -f $FINALRESULTDIR/gdb.cmd
 						exit 0
 					else
-						( cd $FINALRESULTDIR; $GETTIMESTATS ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+						echo "$GETTIMESTATS ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1" >> $FINALRESULTDIR/run_again.sh
+						#( cd $FINALRESULTDIR; $GETTIMESTATS ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
 					fi
 				fi
 			fi
 		else if [ "x$USED_SIMULATOR" = "xjist" ]; then
-			echo "Running Jist"
+			echo "Running Jist" >> $FINALRESULTDIR/run_again.sh
 			( cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties )
 			# run simulation with jist
-			( cd $FINALRESULTDIR; $GETTIMESTATS $DIR/start-jist-sim.sh $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
+			echo "$GETTIMESTATS $DIR/start-jist-sim.sh $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1" >> $FINALRESULTDIR/run_again.sh
+			#( cd $FINALRESULTDIR; $GETTIMESTATS $DIR/start-jist-sim.sh $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties > $LOGDIR/$LOGFILE 2>&1 )
 		else #ns3
 			echo "Running NS3"
 			( cd $FINALRESULTDIR; $DIR/convert2ns3.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$NAME.cc )
 			# run simulation with NS3
 			if [ "x$NS3_HOME" != "x" ] && [ -e $NS3_HOME/ ]; then
-			   ( rm -rf $NS3_HOME/scratch/$NAME; mkdir $NS3_HOME/scratch/$NAME; cp $FINALRESULTDIR/$NAME.cc $NS3_HOME/scratch/$NAME; cd $NS3_HOME; ./waf ) > $LOGDIR/ns3_build.log 2>&1 
+			   ( rm -rf $NS3_HOME/scratch/$NAME; mkdir $NS3_HOME/scratch/$NAME; cp $FINALRESULTDIR/$NAME.cc $NS3_HOME/scratch/$NAME; cd $NS3_HOME; ./waf ) > $LOGDIR/ns3_build.log 2>&1
 			   ( cd $NS3_HOME; ./waf --run $NAME > $LOGDIR/$LOGFILE 2>&1 ) > $LOGDIR/$LOGFILE 2>&1
 			   ( cp $NS3_HOME/scratch/$NAME/* $FINALRESULTDIR ) >> $LOGDIR/ns3_build.log 2>&1
 			fi
@@ -575,13 +580,20 @@ case "$MODE" in
 		fi
 		fi
 		
+		#Prepare eval-script
+		
+		echo "#!/bin/sh" > $FINALRESULTDIR/eval_again.sh
+		echo "echo \"Evaluation...\"" >> $FINALRESULTDIR/eval_again.sh
+		echo "MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT" >> $FINALRESULTDIR/eval_again.sh
+		
+		if [ "x$PREPARE_ONLY" = "x" ]; then
+		  ( cd $FINALRESULTDIR; sh ./run_again.sh )
+		fi
+		
 		# if the simulation was correctly execruted start the automatized evaluation of the experiment
 		if [ $? -eq 0 ]; then
-			echo "Evaluation..."
-			echo "#!/bin/sh" > $FINALRESULTDIR/eval_again.sh
-			echo "MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT" >> $FINALRESULTDIR/eval_again.sh
-			if [ "x$DELAYEVALUATION" = "x" ]; then
-			  MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT
+			if [ "x$DELAYEVALUATION" = "x" ] && [ "x$PREPARE_ONLY" = "x" ]; then
+			  sh $FINALRESULTDIR/eval_again.sh
 			fi
 		else
 			exit 1
