@@ -17,9 +17,10 @@ case "$SIGN" in
      exit -1
      ;;
 esac
-							       
 
 #echo "Placement: $1" >&2
+
+echo $1 >> /dev/shm/plm.log
 
 case "$1" in
     "random")
@@ -110,11 +111,16 @@ case "$1" in
 	    X=`expr $NODEN \* $SIDESTEP`
 	    echo "$n $X $Y 0"
 	    NODEN=`expr $NODEN + 1`
-	  done	  
+	  done
 	  ;;
        *)
-          echo "Use $0 random|grid|npart nodefile fieldsize (distance)"
+          if [ -f $1 ]; then
+            NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq` | tee -a  /dev/shm/plm.log
+            NODEPLACEMENTOPTS=$NODEPLACEMENTOPTS sh $1 $2 $3 | tee -a /dev/shm/plm.log
+          else
+            echo "Use $0 random|grid|npart|string|degree nodefile fieldsize (distance)" >> /dev/shm/plm.log
+          fi
           ;;
-esac   
+esac
 
 exit 0;

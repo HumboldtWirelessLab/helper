@@ -26,6 +26,10 @@
 #define DEFAULT_DATARATE 2
 #endif
 
+#ifndef DEFAULT_DATARETRIES
+#define DEFAULT_DATARETRIES 11
+#endif
+
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
 	
 	availablerates::BrnAvailableRates(DEFAULT 2 4 11 22 12 18 24 36 48 72 96 108); //rates, that are used by that node
@@ -63,7 +67,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #else
   -> data_power::BrnSetTXPower(DEVICE $device, POWER 16)
 #endif
-  -> data_rate::SetTXRate(RATE DEFAULT_DATARATE, TRIES 11)
+  -> data_rate::SetTXRate(RATE DEFAULT_DATARATE, TRIES DEFAULT_DATARETRIES)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
 //  -> SetTimestamp()
 //  -> Print("NODENAME: In Queue", 100, TIMESTAMP true)
