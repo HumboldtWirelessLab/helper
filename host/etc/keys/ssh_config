@@ -39,3 +39,9 @@ Host sk*
    UserKnownHostsFile=/dev/null
    LogLevel QUIET
    User root
+
+Host *
+   StrictHostKeyChecking no
+   UserKnownHostsFile=/dev/null
+   LogLevel QUIET
+   User root
