@@ -26,7 +26,7 @@ esac
 if [ -f $RESULTDIR/nodes.mac ]; then
 
   NODES=`cat $RESULTDIR/nodes.mac | awk '{print $1}'`
-  
+
   for NODE in $NODES; do
     DEVICES=`cat $RESULTDIR/nodes.mac | grep "$NODE " | awk '{print $2}'`
     for DEVICE in $DEVICES; do
@@ -38,8 +38,8 @@ if [ -f $RESULTDIR/nodes.mac ]; then
           mv /tmp/$NODE.$DEVICE.raw.dump $RESULTDIR
         fi
       else
-        scp -F $DIR/../../../host/etc/keys/ssh_config -i $DIR/../../../host/etc/keys/id_dsa root@$NODE:/tmp/$NODE.$DEVICE.raw.dump $RESULTDIR > /dev/null 2>&1
-        ssh -F $DIR/../../../host/etc/keys/ssh_config -i $DIR/../../../host/etc/keys/id_dsa root@$NODE "/bin/rm -f /tmp/$NODE.$DEVICE.raw.dump"
+        echo -n "" | scp -F $DIR/../../../host/etc/keys/ssh_config -i $DIR/../../../host/etc/keys/id_dsa root@$NODE:/tmp/$NODE.$DEVICE.raw.dump $RESULTDIR > /dev/null 2>&1
+        echo -n "" | ssh -F $DIR/../../../host/etc/keys/ssh_config -i $DIR/../../../host/etc/keys/id_dsa root@$NODE "/bin/rm -f /tmp/$NODE.$DEVICE.raw.dump"
       fi
     fi
   done

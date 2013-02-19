@@ -565,7 +565,7 @@ for state in  $STATES; do
 			  screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
 			  CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
 			  sleep 0.1
-			  screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export FINALRESULTDIR=$FINALRESULTDIR; $APPLICATION start > $APPLOGFILE 2>&1\""
+			  screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export FINALRESULTDIR=$FINALRESULTDIR; export NODENAME=$node; $APPLICATION start > $APPLOGFILE 2>&1\""
 		  fi
 
 		  if [ $CURRENTMSCREENNUM -gt 25 ]; then
