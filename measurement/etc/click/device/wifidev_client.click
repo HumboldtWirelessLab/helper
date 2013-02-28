@@ -58,7 +58,7 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
 
   wififrame_clf[0]
     -> client
-    -> SetTXPower(0)
+    -> SetTXPower(63)
     -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
     -> wifioutq
     -> rawdevice;
