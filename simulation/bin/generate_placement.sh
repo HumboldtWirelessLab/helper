@@ -20,7 +20,10 @@ esac
 
 #echo "Placement: $1" >&2
 
-echo $1 >> /dev/shm/plm.log
+FAILURELOG=/dev/shm/plm.log
+FAILURELOG=/dev/null
+
+echo $1 >> $FAILURELOG
 
 case "$1" in
     "random")
@@ -115,10 +118,10 @@ case "$1" in
 	  ;;
        *)
           if [ -f $1 ]; then
-            NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq` | tee -a  /dev/shm/plm.log
-            NODEPLACEMENTOPTS=$NODEPLACEMENTOPTS sh $1 $2 $3 | tee -a /dev/shm/plm.log
+            NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq` | tee -a $FAILURELOG
+            NODEPLACEMENTOPTS=$NODEPLACEMENTOPTS sh $1 $2 $3 | tee -a $FAILURELOG
           else
-            echo "Use $0 random|grid|npart|string|degree nodefile fieldsize (distance)" >> /dev/shm/plm.log
+            echo "Use $0 random|grid|npart|string|degree nodefile fieldsize (distance)" >> $FAILURELOG
           fi
           ;;
 esac
