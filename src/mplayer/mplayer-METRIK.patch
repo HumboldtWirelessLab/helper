@@ -1,0 +1,283 @@
+# This is a patch for mplayer-1.0~rc3++final.dfsg1 to update it to mplayer-METRIK
+# 
+# To apply this patch:
+# STEP 1: Chdir to the source directory.
+# STEP 2: Run the 'applypatch' program with this patch file as input.
+#
+# If you do not have 'applypatch', it is part of the 'makepatch' package
+# that you can fetch from the Comprehensive Perl Archive Network:
+# http://www.perl.com/CPAN/authors/Johan_Vromans/makepatch-x.y.tar.gz
+# In the above URL, 'x' should be 2 or higher.
+#
+# To apply this patch without the use of 'applypatch':
+# STEP 1: Chdir to the source directory.
+# If you have a decent Bourne-type shell:
+# STEP 2: Run the shell with this file as input.
+# If you don't have such a shell, you may need to manually create
+# the files as shown below.
+# STEP 3: Run the 'patch' program with this file as input.
+#
+# These are the commands needed to create/delete files/directories:
+#
+touch 'libmpcodecs/vf_tracker.c'
+chmod 0644 'libmpcodecs/vf_tracker.c'
+#
+# This command terminates the shell and need not be executed manually.
+exit
+#
+#### End of Preamble ####
+
+#### Patch data follows ####
+diff -c 'mplayer-1.0~rc3++final.dfsg1/Makefile' 'mplayer-METRIK/Makefile'
+Index: ./Makefile
+*** ./Makefile	Sun Aug  1 16:19:37 2010
+--- ./Makefile	Thu Apr 12 18:50:44 2012
+***************
+*** 160,165 ****
+--- 160,166 ----
+                libmpcodecs/vf_tfields.c \
+                libmpcodecs/vf_tile.c \
+                libmpcodecs/vf_tinterlace.c \
++               libmpcodecs/vf_tracker.c \
+                libmpcodecs/vf_unsharp.c \
+                libmpcodecs/vf_vo.c \
+                libmpcodecs/vf_yadif.c \
+***************
+*** 330,335 ****
+--- 331,337 ----
+                                          libmpcodecs/vf_lavc.c \
+                                          libmpcodecs/vf_lavcdeint.c \
+                                          libmpcodecs/vf_screenshot.c \
++ 					libmpcodecs/vf_tracker.c \
+  
+  # These filters use private headers and do not work with shared libavcodec.
+  SRCS_COMMON-$(LIBAVCODEC_A)          += libaf/af_lavcac3enc.c \
+diff -c 'mplayer-1.0~rc3++final.dfsg1/README' 'mplayer-METRIK/README'
+Index: ./README
+*** ./README	Sun Aug  1 16:19:37 2010
+--- ./README	Wed Apr 11 17:14:02 2012
+***************
+*** 101,106 ****
+--- 101,110 ----
+  
+    ./configure --help
+  
++ For me (crk), use
++ 
++ ./configure --disable-dvdread --disable-dvdread-internal --disable-libdvdcss-internal
++ 
+  to see the available options and select what you need.
+  
+  The configure script prints a summary of enabled and disabled options. If you
+diff -c 'mplayer-1.0~rc3++final.dfsg1/libmpcodecs/vf.c' 'mplayer-METRIK/libmpcodecs/vf.c'
+Index: ./libmpcodecs/vf.c
+*** ./libmpcodecs/vf.c	Sun Aug  1 16:19:37 2010
+--- ./libmpcodecs/vf.c	Thu Apr 12 19:12:06 2012
+***************
+*** 99,104 ****
+--- 99,105 ----
+  extern const vf_info_t vf_info_blackframe;
+  extern const vf_info_t vf_info_geq;
+  extern const vf_info_t vf_info_ow;
++ extern const vf_info_t vf_info_tracker;
+  
+  // list of available filters:
+  static const vf_info_t* const filter_list[]={
+***************
+*** 191,196 ****
+--- 192,198 ----
+      &vf_info_yadif,
+      &vf_info_blackframe,
+      &vf_info_ow,
++     &vf_info_tracker,
+      NULL
+  };
+  
+diff -c /dev/null 'mplayer-METRIK/libmpcodecs/vf_tracker.c'
+Index: ./libmpcodecs/vf_tracker.c
+*** ./libmpcodecs/vf_tracker.c	Thu Jan  1 01:00:00 1970
+--- ./libmpcodecs/vf_tracker.c	Thu Apr 12 22:24:56 2012
+***************
+*** 0 ****
+--- 1,143 ----
++ #include <stdio.h>
++ #include <stdlib.h>
++ #include <string.h>
++ #include <time.h>
++ 
++ #include "config.h"
++ #include "mp_msg.h"
++ #include "help_mp.h"
++ 
++ #include "img_format.h"
++ 
++ // contains image structure
++ #include "mp_image.h"
++ // interface for plugins
++ #include "vf.h"
++ 
++ #include "m_option.h"
++ #include "m_struct.h"
++ 
++ 
++ static const struct vf_priv_s {
++     int tracker_w,tracker_h;
++     int tracker_x,tracker_y;
++     int frame;
++     FILE *fp;
++     char *tracker_fn;
++ } vf_priv_dflt = {
++   -1,-1,
++   -1,-1,
++   0,
++   NULL
++ };
++ 
++ extern int opt_screen_size_x;
++ extern int opt_screen_size_y;
++ 
++ 
++ 
++ //===========================================================================//
++ 
++ static int config(struct vf_instance_s* vf,
++         int width, int height, int d_width, int d_height,
++ 	unsigned int flags, unsigned int outfmt){
++     if(vf->priv->tracker_w<=0 || vf->priv->tracker_w>width) vf->priv->tracker_w=width;
++     if(vf->priv->tracker_h<=0 || vf->priv->tracker_h>height) vf->priv->tracker_h=height;
++     if(vf->priv->tracker_x<0) vf->priv->tracker_x=(width-vf->priv->tracker_w)/2;
++     if(vf->priv->tracker_y<0) vf->priv->tracker_y=(height-vf->priv->tracker_h)/2;
++ 	
++ 	    // rounding:
++     if(!IMGFMT_IS_RGB(outfmt) && !IMGFMT_IS_BGR(outfmt)){
++ 	switch(outfmt){
++ 	case IMGFMT_444P:
++ 	case IMGFMT_Y800:
++ 	case IMGFMT_Y8:
++ 	    break;
++ 	case IMGFMT_YVU9:
++ 	case IMGFMT_IF09:
++ 	    vf->priv->tracker_y&=~3;
++ 	case IMGFMT_411P:
++ 	    vf->priv->tracker_x&=~3;
++ 	    break;
++ 	case IMGFMT_YV12:
++ 	case IMGFMT_I420:
++ 	case IMGFMT_IYUV:
++ 	    vf->priv->tracker_y&=~1;
++ 	default:
++ 	    vf->priv->tracker_x&=~1;
++ 	}
++     }
++     
++     // create new file
++     vf->priv->fp = fopen(vf->priv->tracker_fn, "w");
++     fclose(vf->priv->fp);
++     
++    return vf_next_config(vf,vf->priv->tracker_w,vf->priv->tracker_h,d_width,d_height,flags,outfmt);
++ }
++ 
++ static int put_image(struct vf_instance_s* vf, mp_image_t *mpi, double pts){
++     mp_image_t *dmpi;
++     struct timeval tv;
++     
++     char buf[128];
++     
++     dmpi=vf_get_image(vf->next,mpi->imgfmt, MP_IMGTYPE_EXPORT, 0,vf->priv->tracker_w, vf->priv->tracker_h);
++ 
++     // todo:
++     // 1. Get frame index
++     vf->priv->frame++;
++     
++     // 2. Get timestemp
++ 	gettimeofday(&tv,NULL);
++ 	sprintf(buf, "stamp:%d.%d frame:%d\n", tv.tv_sec, tv.tv_usec, vf->priv->frame);
++ 
++     // 3. append info to file
++     vf->priv->fp = fopen(vf->priv->tracker_fn, "a");
++ 	fwrite(buf, strlen(buf), 1, vf->priv->fp);
++ 	fclose(vf->priv->fp);
++ 
++ 
++     return vf_next_put_image(vf,mpi, pts);
++ }
++ 
++ 
++ //===========================================================================//
++ 
++ static int open(vf_instance_t *vf, char* args){
++     vf->config=config;
++     vf->put_image=put_image;
++     vf->default_reqs=VFCAP_ACCEPT_STRIDE;
++     
++     if(!vf->priv) {
++     	vf->priv=malloc(sizeof(struct vf_priv_s));
++     }
++     
++     if(args) sscanf(args, "%s", 
++     vf->priv->tracker_fn);
++ 
++     return 1;
++ }
++ 
++ #define ST_OFF(f) M_ST_OFF(struct vf_priv_s,f)
++ static const m_option_t vf_opts_fields[] = {
++ 	{"file", ST_OFF(tracker_fn), CONF_TYPE_STRING, 0,0 ,0, NULL},
++   { NULL, NULL, 0, 0, 0, 0,  NULL }
++ };
++ 
++ static const m_struct_t vf_opts = {
++   "tracker",
++   sizeof(struct vf_priv_s),
++   &vf_priv_dflt,
++   vf_opts_fields 
++ };
++ 
++ const vf_info_t vf_info_tracker = {
++     "The tracker filter puts frame index and timestemp in a metafile",
++     "tracker",
++     "xcrkx",
++     "Developed for METRIK-Project at HU-Berlin",
++     open,
++     &vf_opts
++ };
++ 
++ //===========================================================================//
+#### End of Patch data ####
+
+#### ApplyPatch data follows ####
+# Data version        : 1.0
+# Date generated      : Thu Apr 12 22:40:16 2012
+# Generated by        : makepatch 2.03
+# Recurse directories : Yes
+# Excluded files      : (\A|/).*\~\Z
+#                       (\A|/).*\.a\Z
+#                       (\A|/).*\.bak\Z
+#                       (\A|/).*\.BAK\Z
+#                       (\A|/).*\.elc\Z
+#                       (\A|/).*\.exe\Z
+#                       (\A|/).*\.gz\Z
+#                       (\A|/).*\.ln\Z
+#                       (\A|/).*\.o\Z
+#                       (\A|/).*\.obj\Z
+#                       (\A|/).*\.olb\Z
+#                       (\A|/).*\.old\Z
+#                       (\A|/).*\.orig\Z
+#                       (\A|/).*\.rej\Z
+#                       (\A|/).*\.so\Z
+#                       (\A|/).*\.Z\Z
+#                       (\A|/)\.del\-.*\Z
+#                       (\A|/)\.make\.state\Z
+#                       (\A|/)\.nse_depinfo\Z
+#                       (\A|/)core\Z
+#                       (\A|/)tags\Z
+#                       (\A|/)TAGS\Z
+# p 'Makefile' 48284 1334249444 0100644
+# p 'README' 7845 1334157242 0100644
+# p 'libmpcodecs/vf.c' 25362 1334250726 0100644
+# c 'libmpcodecs/vf_tracker.c' 0 1334262296 0100644
+#### End of ApplyPatch data ####
+
+#### End of Patch kit [created: Thu Apr 12 22:40:16 2012] ####
+#### Patch checksum: 252 7446 4859 ####
+#### Checksum: 282 8555 33455 ####
