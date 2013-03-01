@@ -531,7 +531,7 @@ for state in  $STATES; do
 
           RUN_CLICK_APPLICATION=1
 
-          SCREENT="$node\_$nodedevice\_click"
+          SCREENT="c_$node\_$nodedevice"
           screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
           CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
           sleep 0.1
@@ -541,7 +541,7 @@ for state in  $STATES; do
 			    screen -S $MEASUREMENTSCREENNAME -p $SCREENT -X stuff "NODELIST=$node $DIR/../../host/bin/run_on_nodes.sh \"export CLICKPATH=$NODEBINDIR/../etc/click;CLICKPATH=$NODEBINDIR/../etc/click $NODEBINDIR/click-align-$NODEARCH $CLICKSCRIPT > /tmp/click/config; sleep $CLICKWAITTIME; echo "" > /tmp/click/config\""
 
 			    sleep 0.1
-			    SCREENT="$node\_$nodedevice\_kcm"	
+			    SCREENT="k_$node\_$nodedevice"
 			    screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
                             CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
 			    sleep 0.1
@@ -561,7 +561,7 @@ for state in  $STATES; do
 
 			  RUN_CLICK_APPLICATION=1
 
-			  SCREENT="$node\_$nodedevice\_app"	
+			  SCREENT="a_$node\_$nodedevice"
 			  screen -S $MEASUREMENTSCREENNAME -X screen -t $SCREENT
 			  CURRENTMSCREENNUM=`expr $CURRENTMSCREENNUM + 1`
 			  sleep 0.1
@@ -663,12 +663,12 @@ if [ $MEASUREMENT_ABORT -eq 0 ]; then
           CMEASUREMENTSCREENNAME=`cat $MSCREENFILENAME | grep "$node $nodedevice " | awk '{print $3}'`
 
           if [ ! "x$CLICKSCRIPT" = "x" ] && [ ! "x$CLICKSCRIPT" = "x-" ]; then
-            SCREENT="$node\_$nodedevice\_click"
+            SCREENT="c_$node\_$nodedevice"
             screen -S $CMEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
 
             CLICKMODDIR=`echo "$CONFIGLINE" | awk '{print $6}'`
             if [ ! "x$CLICKMODDIR" = "x" ] && [ ! "x$CLICKMODDIR" = "x-" ] && [ ! "x$CLICKMODE" = "xuserlevel" ]; then
-              SCREENT="$node\_$nodedevice\_kcm"
+              SCREENT="k_$node\_$nodedevice"
               screen -S $CMEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
             fi
           fi
@@ -676,7 +676,7 @@ if [ $MEASUREMENT_ABORT -eq 0 ]; then
           APPLICATION=`echo "$CONFIGLINE" | awk '{print $9}'`
 
           if [ ! "x$APPLICATION" = "x" ] && [ ! "x$APPLICATION" = "x-" ]; then
-            SCREENT="$node\_$nodedevice\_app"
+            SCREENT="a_$node\_$nodedevice"
             screen -S $CMEASUREMENTSCREENNAME -p $SCREENT -X stuff $'\n'
           fi
         done
