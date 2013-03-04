@@ -15,7 +15,7 @@ elementclass HAWK {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting, $lt, $lph, $
   -> hawkroutequerier[0]
   //-> Print("On the road to fwd")
   -> [1]hawkfwd[0]
-  //-> routing_peek
+  -> BRN2EtherEncap(USEANNO true)
   -> [0]output;
   
   input[1]
