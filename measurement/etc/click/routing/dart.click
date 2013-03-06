@@ -9,15 +9,18 @@ elementclass DART {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting |
   
   dartidcache::DartIDCache();  
   dartroutequerier::DartRouteQuerier( NODEIDENTITY $ID, DHTSTORAGE $dhtstorage, DARTIDCACHE dartidcache, DRT $dhtroutingtable, DEBUG 2);
-  dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,  DARTROUTING $dhtrouting, DRT $dhtroutingtable, DEBUG 2);
+  dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,  DARTROUTING $dhtrouting, DRT $dhtroutingtable, DEBUG 4);
+  routing_peek :: DartRoutingPeek(DEBUG 4);
   
   input[0]
   -> dartroutequerier[0]
   //-> Print("On the road to fwd")
-  -> [0]dartfwd[0]
+  -> [1]dartfwd[0]
+  -> BRN2EtherEncap(USEANNO true)
   -> [0]output;
   
   input[1]
+  -> routing_peek
   -> BRN2Decap()
   -> [0]dartfwd;
   
