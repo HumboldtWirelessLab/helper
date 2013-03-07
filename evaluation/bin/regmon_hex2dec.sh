@@ -59,7 +59,7 @@ int main(void)
 
   uint32_t *p = (int*) regmon_dump;
   uint32_t max = sizeof(regmon_dump)-32;
-  max /= 32;
+  max /= 36;
 
   c = 0;
 			
@@ -69,12 +69,12 @@ int main(void)
       c++;
     }
     uint64_t tv64 = p[c-5];
-    tv64 = tv64 << 32;
+    tv64 = tv64 << 36;
     tv64 += (uint64_t)p[c-6];
     printf("%llu ",tv64);
 
-    for( j = 0; j < 1; j++ ) {
-      printf("%u", p[c]);
+    for( j = 0; j < 2; j++ ) {
+      printf("%u ", p[c]);
       c++;
     }
     printf("\n");
