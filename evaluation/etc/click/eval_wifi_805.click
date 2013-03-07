@@ -80,6 +80,11 @@ error_clf[6]
   -> Discard;
 
 error_clf[7]
+  -> phantom :: Counter
+  -> BRN2PrintWifi("Phantom", TIMESTAMP true)
+  -> Discard;
+
+error_clf[8]
   -> unknown :: Counter
   -> BRN2PrintWifi("UNKNOWNerror", TIMESTAMP true)
   -> Discard;
