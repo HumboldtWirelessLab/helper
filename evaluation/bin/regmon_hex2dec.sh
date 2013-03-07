@@ -69,7 +69,7 @@ int main(void)
       c++;
     }
     uint64_t tv64 = p[c-5];
-    tv64 = tv64 << 32;
+    tv64 = tv64 << 36;
     tv64 += (uint64_t)p[c-6];
     printf("%llu ",tv64);
 
