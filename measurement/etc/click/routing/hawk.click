@@ -6,10 +6,10 @@
 // [1]output - BRN GEOR packets to internal nodes (BRN GEOR protocol)
 
 elementclass HAWK {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting, $lt, $lph, $dht, $debug |
-  rt::HawkRoutingtable(LPRH $lph, SUCCM $dht/dhtsuccessormaintenance, RTM $dht/dhtroutemaintenance, LINKTABLE $lt, DEBUG 2);
-  hawkroutequerier::HawkRouteQuerier( NODEIDENTITY $ID, DHTSTORAGE $dhtstorage, DHTROUTING $dhtrouting, RT rt, FRT $dhtroutingtable, DEBUG 2);
-  hawkfwd::HawkForwarder( NODEIDENTITY $ID, ROUTINGTABLE rt, FALCONROUTING $dhtrouting, DEBUG 2);
-  routing_peek :: HawkRoutingPeek(DEBUG 4);
+  rt::HawkRoutingtable(LPRH $lph, SUCCM $dht/dhtsuccessormaintenance, RTM $dht/dhtroutemaintenance, LINKTABLE $lt, DEBUG 4);
+  hawkroutequerier::HawkRouteQuerier( NODEIDENTITY $ID, DHTSTORAGE $dhtstorage, DHTROUTING $dhtrouting, RT rt, FRT $dhtroutingtable, DEBUG 4);
+  hawkfwd::HawkForwarder( NODEIDENTITY $ID, ROUTINGTABLE rt, FALCONROUTING $dhtrouting, DEBUG 4);
+  routing_peek :: HawkRoutingPeek(DEBUG 0);
   
   input[0]
   -> hawkroutequerier[0]
