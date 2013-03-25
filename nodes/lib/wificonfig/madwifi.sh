@@ -19,6 +19,7 @@ case "$SIGN" in
 esac
 
 get_phy_dev() {
+    #TODO: use sysctl (net.ath0.%parent = wifi0)
     NUMBER=`echo $1 | cut -b 4`
     echo "wifi$NUMBER"
 }
