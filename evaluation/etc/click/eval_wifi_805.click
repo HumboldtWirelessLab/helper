@@ -36,7 +36,8 @@ error_clf[0]
 
 error_clf[1]
   -> crc :: Counter
-  -> maxcrclen :: CheckLength(1500)
+  //TODO: check for max 802.11n PDU
+  -> maxcrclen :: CheckLength(8600)
   -> BRN2PrintWifi("CRCerror", TIMESTAMP true)
   -> Discard;
 
@@ -46,7 +47,7 @@ error_clf[1]
 
 error_clf[2]
   -> phy :: Counter
-  -> maxphylen :: CheckLength(1500)
+  -> maxphylen :: CheckLength(8600)
   -> minphylen :: CheckLength(13)[1]
   -> BRN2PrintWifi("PHYerror", TIMESTAMP true)
   -> Discard;
