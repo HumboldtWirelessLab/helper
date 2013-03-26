@@ -27,7 +27,7 @@ error_clf[0]
 
 error_clf[1]
   -> crc :: Counter
-  -> PrintCRCError(LABEL "", RATE 0, OFFSET 0, ANALYSE true, BITS 1)
+  -> PrintCRCError(LABEL "CRC", RATE 0, OFFSET 44, ANALYSE true, BITS 8, PAD 3000)
   -> Discard;
 
 ath2_decap[2]
