@@ -27,11 +27,11 @@
 
 #ifdef DHTROUTING
 
-elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat, DHT $dht | 
+elementclass ROUTING { ID $id, ETHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat, DHT $dht |
 
 #else
 
-elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat | 
+elementclass ROUTING { ID $id, ETHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat | 
 
 #endif
 
@@ -74,12 +74,19 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 #define BRN_PORT_ROUTING BRN_PORT_BCASTROUTING
 #define HAVEROUTING
 #else
+#ifdef ROUTINGDART
 
-dht::DHT_FALCON(ETHERADDRESS deviceaddress, LINKSTAT device_wifi/link_stat, STARTTIME 30000, UPDATEINT 1000, DEBUG 2);
-dhtstorage::DHT_STORAGE( DHTROUTING dht/dhtrouting, DEBUG 2 );
-routing::HAWK(id, dht/dhtroutingtable, dhtstorage/dhtstorage, dht/dhtrouting, lt, dht/dhtlprh, dht, 2);
+  routing::DART($id, $dht/dhtrouting/dhtroutingtable, $dht/dhtstorage/dhtstorage, $dht/dhtrouting/dhtrouting);
 
+#define BRN_PORT_ROUTING BRN_PORT_BCASTROUTING
+#define HAVEROUTING
+#else
+#ifdef ROUTINGHAWK
 
+  routing::HAWK($id, $dht/dhtrouting/dhtroutingtable, $dht/dhtstorage/dhtstorage, $dht/dhtrouting/dhtrouting, $lt, $dht/dhtrouting/dhtlprh, $dht/dhtrouting, 2);
+
+#endif
+#endif
 #endif
 #endif
 #endif
