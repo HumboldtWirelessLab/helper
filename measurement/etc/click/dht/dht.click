@@ -30,7 +30,7 @@ elementclass DHT { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $starttim
   dhtrouting::DHT_FALCON(ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $starttime, UPDATEINT $updateint, DEBUG $debug);
 #endif
 
-  dhtstorage::DHT_STORAGE(DHTROUTING dht/dhtrouting, DEBUG $debug);
+  dhtstorage::DHT_STORAGE(DHTROUTING dhtrouting/dhtrouting, DEBUG $debug);
 
   input[0]
   -> BRN2Decap()

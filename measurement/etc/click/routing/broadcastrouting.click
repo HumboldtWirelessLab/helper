@@ -22,23 +22,13 @@ elementclass BROADCASTROUTING {ID $id |
   -> BRN2Decap()
   -> [1]bcr;
 
-  
-  bcr[0] 
-  -> [0]output; 
+  bcr[0]
+  -> [0]output;
 
-  bcr[1] 
-  //-> Print("BCR[1]-src-out") 
+  bcr[1]
+  //-> Print("BCR[1]-src-out")
   -> BRN2EtherEncap(USEANNO true)
   -> [1]output;
-
-  input[2]
-  -> Discard;
-
-  input[3]
-  -> Discard;
-
-  input[4]
-  -> Discard;
 
 }
 

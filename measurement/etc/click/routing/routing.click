@@ -71,20 +71,22 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 
   routing::BROADCAST(ID $id, LT $lt);
 
-#define BRN_PORT_ROUTING BRN_PORT_BCASTROUTING
+#define BRN_PORT_ROUTING BRN_PORT_FLOODING
 #define HAVEROUTING
 #else
 #ifdef ROUTINGDART
 
   routing::DART($id, $dht/dhtrouting/dhtroutingtable, $dht/dhtstorage/dhtstorage, $dht/dhtrouting/dhtrouting);
 
-#define BRN_PORT_ROUTING BRN_PORT_BCASTROUTING
+#define BRN_PORT_ROUTING BRN_PORT_DART
 #define HAVEROUTING
 #else
 #ifdef ROUTINGHAWK
 
   routing::HAWK($id, $dht/dhtrouting/dhtroutingtable, $dht/dhtstorage/dhtstorage, $dht/dhtrouting/dhtrouting, $lt, $dht/dhtrouting/dhtlprh, $dht/dhtrouting, 2);
 
+#define BRN_PORT_ROUTING BRN_PORT_HAWK
+#define HAVEROUTING
 #endif
 #endif
 #endif

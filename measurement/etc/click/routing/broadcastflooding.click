@@ -53,7 +53,7 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   fl[0]
   -> [0]output;
 
-  fl[1] 
+  fl[1]
   -> BroadcastMultiplexer(NODEIDENTITY $id, USEANNO true)
   -> BRN2EtherEncap(USEANNO true) 
   //-> Print("BroadcastMultiplexer out")
