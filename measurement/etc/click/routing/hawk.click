@@ -19,18 +19,18 @@ elementclass HAWK {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting, $lt, $lph, $
   -> [1]hawkfwd[0]
   -> BRN2EtherEncap(USEANNO true)
   -> [0]output;
-  
+
   input[1]
   -> routing_peek
   -> BRN2Decap()
   -> [0]hawkfwd;
-  
+
   hawkfwd[1]
   -> [1]output;
-  
+
   hawkroutequerier[1]
   -> Discard;
-  
+
   input[2] -> Discard;
   input[3] -> Discard;
   input[4] -> Discard;
