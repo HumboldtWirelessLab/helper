@@ -9,6 +9,7 @@
 //input[1]: Received from brn node
 //input[2]: Errors (not used)
 //input[3]: Passiv (overhear)
+//input[4]: txfeedback: successful transmission of a BRN BroadcastRouting  packet
 //[0]output: Local copy ()
 //[1]output: To other brn nodes
 
@@ -88,6 +89,8 @@ elementclass BROADCAST {ID $id, LT $lt |
 
   overhear_bcr_clf[1]
   -> Discard;
+
+  input[4] -> Discard;
 
 }
 

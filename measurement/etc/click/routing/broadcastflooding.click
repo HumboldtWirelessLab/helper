@@ -5,7 +5,7 @@
 //input[1]: Received from other brn node
 //input[2]: txfeedback: failed transmission of a BRN BroadcastRouting  packet (broken link) from ds
 //input[3]: Passiv (overhear/monitor)
-//input[4]: txfeedback: successful transmission of a BRN BroadcastRouting  packet (broken link) from ds
+//input[4]: txfeedback: successful transmission of a BRN BroadcastRouting  packet
 
 //[0]output: Local copy (broadcast)
 //[1]output: To other brn nodes
