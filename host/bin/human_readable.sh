@@ -43,7 +43,7 @@ if [ "x$FILE" != "x" ]; then
   done < $FILE
 fi
 
-if [ "x$NODENUM" = "x1" ]; then
+if [ "x$MAC2NUM" = "x1" ]; then
   sed $NODEMAC2NUM_SEDARG
 else
   sed $NODEMAC_SEDARG

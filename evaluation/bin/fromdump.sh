@@ -54,7 +54,7 @@ if [ ! -f $DUMPFILE ]; then
 fi
 
 # check if bzip-packed
-if [ "$DUMPFILE" = "*.bz2" ]; then
+if [ `echo "$DUMPFILE" | grep ".bz2"` ]; then
 	ZIP=$1
 	COMPRESSED=1
 	NONCE=`date +%N`
