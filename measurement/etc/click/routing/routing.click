@@ -1,4 +1,13 @@
 /* Routing */
+// input[0] - ethernet (802.3) frames from external nodes (no BRN protocol)
+// input[1] - BRN packets from internal nodes
+// input[2] - failed transmission of a BRN packet (broken link) from ds
+// input[3] - Passiv (overhear/monitor)
+// input[4] - txfeedback: successful transmission of a BRN BroadcastRouting  packet
+// [0]output - ethernet (802.3) frames to external nodes/clients or me (no BRN protocol)
+// [1]output - BRN packets to internal nodes (BRN  protocol)
+// [2]output - to me
+// [3]output - broadcast
 
 #include "brn/brn.click"
 #include "dsr.click"
@@ -18,7 +27,7 @@
 
 #ifdef DHTROUTING
 
-elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat | 
+elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat, DHT $dht | 
 
 #else
 
@@ -64,6 +73,13 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 
 #define BRN_PORT_ROUTING BRN_PORT_BCASTROUTING
 #define HAVEROUTING
+#else
+
+dht::DHT_FALCON(ETHERADDRESS deviceaddress, LINKSTAT device_wifi/link_stat, STARTTIME 30000, UPDATEINT 1000, DEBUG 2);
+dhtstorage::DHT_STORAGE( DHTROUTING dht/dhtrouting, DEBUG 2 );
+routing::HAWK(id, dht/dhtroutingtable, dhtstorage/dhtstorage, dht/dhtrouting, lt, dht/dhtlprh, dht, 2);
+
+
 #endif
 #endif
 #endif
@@ -81,11 +97,14 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
   input[1]         //BRN
     -> [1]routing;
 
-  input[2]        //BRN-Feedback
+  input[2]        //BRN-Feedback (Failed)
     -> [2]routing;
 
   input[3]        //Overhear
     -> [3]routing;
+
+  input[4]        //BRN-Feedback (success)
+    -> [4]routing;
 
   routing[0]      //Ethernet
     -> toMeAfterRouting::BRN2ToThisNode(NODEIDENTITY id);
