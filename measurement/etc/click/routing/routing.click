@@ -58,7 +58,7 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 #else
 #ifdef ROUTINGGEOR
 
-  routing::GEOR($id, $lt, $linkstat);
+  routing::GEOR(ID $id, LT $lt, LINKSTAT $linkstat, DEBUG 2);
 
   Script(
     write routing/gps.cart_coord NODEPOSITIONX NODEPOSITIONY NODEPOSITIONZ,
@@ -127,7 +127,7 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 
   toMeAfterRouting[2]
     -> [1]output; //[1]device
-  
+
   toMeAfterRouting[0]
     -> [2]output; //to Me
 

@@ -13,14 +13,14 @@ elementclass GEOR {ID $ID, LT $LT, LINKSTAT $LS, DEBUG $debug  |
 
   gpsmap::GPSMap();
   gpslph::GPSLinkprobeHandler(LINKSTAT $LS, GPS gps, GPSMAP gpsmap);
-  
+
   grt::GeorTable(GPS gps, GPSMAP gpsmap, LINKTABLE $LT, DEBUG 2);
   gqu::GeorQuerier(NODEID $ID, GEORTABLE grt, DEBUG 2);
   gfwd::GeorForwarder(NODEID id, GEORTABLE grt, DEBUG 2);
 
   Idle
   -> [1]gqu;
-  
+
   gqu[1]
   -> Discard;
 
@@ -31,18 +31,18 @@ elementclass GEOR {ID $ID, LT $LT, LINKSTAT $LS, DEBUG $debug  |
   gfwd[0]
   -> BRN2EtherEncap(USEANNO true)
   -> [1]output;
-  
+
   gfwd[1]
   -> BRN2EtherEncap(USEANNO true)
 //  -> Print("GOT PACKET")
   -> [0]output;
-  
+
   gfwd[2]
   -> Discard;
 
-   input[0]
+  input[0]
   -> [0]gqu;
-  
+
   gqu[0]
   -> BRN2EtherEncap(USEANNO true)
   -> [1]output;
