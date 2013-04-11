@@ -22,7 +22,7 @@ elementclass DART {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting |
   //-> Print("On the road to fwd")
   -> [1]dartfwd[0]
   -> BRN2EtherEncap(USEANNO true)
-  -> [0]output;
+  -> [1]output;
 
   input[1]
   -> routing_peek
@@ -30,7 +30,7 @@ elementclass DART {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting |
   -> [0]dartfwd;
 
   dartfwd[1]
-  -> [1]output;
+  -> [0]output;
 
   dartroutequerier[1]
   -> Discard;
