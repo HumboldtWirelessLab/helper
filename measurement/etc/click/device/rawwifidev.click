@@ -142,7 +142,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> hnd::HiddenNodeDetection(DEVICE $device, DEBUG 2)
 #endif
 #ifdef FOREIGNRXSTATS
-  -> ForeignRxStats(DEVICE $device,TIMEOUT 3, DEBUG 2)
+  -> ForeignRxStats(DEVICE $device,TIMEOUT 5, DEBUG 4)
 #endif
   -> [0]output;
 
