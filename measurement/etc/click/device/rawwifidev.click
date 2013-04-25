@@ -88,12 +88,17 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> WifiSeq()                                                      // Set sequencenumber for simulation
 #endif
 #ifndef DISABLE_TOS2QUEUEMAPPER
+
+#ifndef TOS2QUEUEMAPPER_STRATEGY
+#define TOS2QUEUEMAPPER_STRATEGY 0
+#endif
+
 #ifdef SIMULATION
 #ifdef CST
 #ifdef USE_RTS_CTS
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, PLI pli, DEBUG 2)
 #else
-  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, DEBUG 2)
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, RATE 1, MSDUSIZE 1500, STRATEGY TOS2QUEUEMAPPER_STRATEGY, DEBUG 2)
 #endif //RTS_CTS
 #else //CST
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM )
