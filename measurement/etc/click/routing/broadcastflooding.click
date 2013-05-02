@@ -48,10 +48,14 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   unicfl :: UnicastFlooding(NODEIDENTITY $id, FLOODING fl, FLOODINGHELPER fl_helper, CANDSELECTIONSTRATEGY BCAST2UNIC_STRATEGY, DEBUG FLOODING_DEBUG);
 #endif
 
+  routing_peek::FloodingRoutingPeek(DEBUG 4);
+
   input[0]  //to be send
   -> [0]fl;
 
   input[1]  //from brn
+  -> Print("Plain: ",200)
+  -> routing_peek
   -> BRN2Decap()
   -> [1]fl;
 
