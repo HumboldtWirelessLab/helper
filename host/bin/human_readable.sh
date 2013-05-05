@@ -37,8 +37,14 @@ if [ "x$FILE" != "x" ]; then
   while read line; do
     NODENAME=`echo $line | awk '{print $1}'`
     NODEMAC=`echo $line | awk '{print $3}'`
+    NODENUM=`echo $line | awk '{print $4}'`
     NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#$NODEMAC#$NODENAME#g"
+    NODEMAC2NUM_SEDARG="$NODEMAC2NUM_SEDARG -e s#$NODEMAC#$NODENUM#g"
   done < $FILE
 fi
 
-sed $NODEMAC_SEDARG
+if [ "x$MAC2NUM" = "x1" ]; then
+  sed $NODEMAC2NUM_SEDARG
+else
+  sed $NODEMAC_SEDARG
+fi

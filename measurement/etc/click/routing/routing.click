@@ -1,4 +1,13 @@
 /* Routing */
+// input[0] - ethernet (802.3) frames from external nodes (no BRN protocol)
+// input[1] - BRN packets from internal nodes
+// input[2] - failed transmission of a BRN packet (broken link) from ds
+// input[3] - Passiv (overhear/monitor)
+// input[4] - txfeedback: successful transmission of a BRN BroadcastRouting  packet
+// [0]output - ethernet (802.3) frames to external nodes/clients or me (no BRN protocol)
+// [1]output - BRN packets to internal nodes (BRN  protocol)
+// [2]output - to me
+// [3]output - broadcast
 
 #include "brn/brn.click"
 #include "dsr.click"
@@ -18,11 +27,11 @@
 
 #ifdef DHTROUTING
 
-elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat | 
+elementclass ROUTING { ID $id, ETHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat, DHT $dht |
 
 #else
 
-elementclass ROUTING { ID $id, ETTHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat | 
+elementclass ROUTING { ID $id, ETHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTAT $linkstat | 
 
 #endif
 
@@ -49,7 +58,7 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 #else
 #ifdef ROUTINGGEOR
 
-  routing::GEOR($id, $lt, $linkstat);
+  routing::GEOR(ID $id, LT $lt, LINKSTAT $linkstat, DEBUG 2);
 
   Script(
     write routing/gps.cart_coord NODEPOSITIONX NODEPOSITIONY NODEPOSITIONZ,
@@ -62,8 +71,24 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 
   routing::BROADCAST(ID $id, LT $lt);
 
-#define BRN_PORT_ROUTING BRN_PORT_BCASTROUTING
+#define BRN_PORT_ROUTING BRN_PORT_FLOODING
 #define HAVEROUTING
+#else
+#ifdef ROUTINGDART
+
+  routing::DART($id, $dht/dhtrouting/dhtroutingtable, $dht/dhtstorage/dhtstorage, $dht/dhtrouting/dhtrouting);
+
+#define BRN_PORT_ROUTING BRN_PORT_DART
+#define HAVEROUTING
+#else
+#ifdef ROUTINGHAWK
+
+  routing::HAWK($id, $dht/dhtrouting/dhtroutingtable, $dht/dhtstorage/dhtstorage, $dht/dhtrouting/dhtrouting, $lt, $dht/dhtrouting/dhtlprh, $dht/dhtrouting, 2);
+
+#define BRN_PORT_ROUTING BRN_PORT_HAWK
+#define HAVEROUTING
+#endif
+#endif
 #endif
 #endif
 #endif
@@ -81,11 +106,14 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
   input[1]         //BRN
     -> [1]routing;
 
-  input[2]        //BRN-Feedback
+  input[2]        //BRN-Feedback (Failed)
     -> [2]routing;
 
   input[3]        //Overhear
     -> [3]routing;
+
+  input[4]        //BRN-Feedback (success)
+    -> [4]routing;
 
   routing[0]      //Ethernet
     -> toMeAfterRouting::BRN2ToThisNode(NODEIDENTITY id);
@@ -99,7 +127,7 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 
   toMeAfterRouting[2]
     -> [1]output; //[1]device
-  
+
   toMeAfterRouting[0]
     -> [2]output; //to Me
 

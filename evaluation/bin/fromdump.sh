@@ -54,7 +54,7 @@ if [ ! -f $DUMPFILE ]; then
 fi
 
 # check if bzip-packed
-if [ "$DUMPFILE" = "*.bz2" ]; then
+if [ `echo "$DUMPFILE" | grep ".bz2"` ]; then
 	ZIP=$1
 	COMPRESSED=1
 	NONCE=`date +%N`
@@ -114,10 +114,16 @@ else
   NOWRAP_PARAM=false
 fi
 
-if [ "x$2" = "xprint" ]; then
-  cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed -e "s#DUMP#$DUMPFILE#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" -e "s#//WRAP#$WRAP#g" -e "s#NOWRAP_PARAMS#$NOWRAP_PARAM#g" -e "s#//COMPRESSION#$COMPRESSION#g" | click-align
+if [ "x$PRINTCRC" = "x1" ]; then
+  CLICKFILE=$DIR/../etc/click/crceval_wifi_$WIFI.click
 else
-  cat $DIR/../etc/click/eval_wifi_$WIFI.click | sed -e "s#DUMP#$DUMPFILE#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" -e "s#//WRAP#$WRAP#g" -e "s#NOWRAP_PARAMS#$NOWRAP_PARAM#g" -e "s#//COMPRESSION#$COMPRESSION#g" | click-align 2> /dev/null | click 2>&1 | grep -v "expensive"
+  CLICKFILE=$DIR/../etc/click/eval_wifi_$WIFI.click
+fi
+
+if [ "x$2" = "xprint" ]; then
+  cat $CLICKFILE | sed -e "s#DUMP#$DUMPFILE#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" -e "s#//WRAP#$WRAP#g" -e "s#NOWRAP_PARAMS#$NOWRAP_PARAM#g" -e "s#//COMPRESSION#$COMPRESSION#g" | click-align
+else
+  cat $CLICKFILE | sed -e "s#DUMP#$DUMPFILE#g" -e "s#//SEQ#$SEQREP#g" -e "s#//ATH#$ATHREP#g" -e "s#//GPS#$GPSREP#g" -e "s#GPSDecap()#$GPSDECAP#g" -e "s#GPSPrint(NOWRAP true)#$GPSPRINT#g" -e "s#PARAMS_HT#$HT#g" -e "s#PARAMS_RX#$RX#g" -e "s#PARAMS_EVM#$EVM#g" -e "s#//WRAP#$WRAP#g" -e "s#NOWRAP_PARAMS#$NOWRAP_PARAM#g" -e "s#//COMPRESSION#$COMPRESSION#g" | click-align 2> /dev/null | click 2>&1 | grep -v "expensive"
 fi
 
 if [ $COMPRESSED -ne 0 ]; then

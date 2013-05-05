@@ -58,22 +58,32 @@ int main(void)
   int c;
 
   uint32_t *p = (int*) regmon_dump;
-  uint32_t max = sizeof(regmon_dump)-32;
-  max /= 36;
+
+  /*estimate size*/
+  //printf("sizeof: %lu\n", sizeof(regmon_dump));
+  uint32_t structsize = 28;
+
+  for (;((sizeof(regmon_dump) % structsize) != 0) && (structsize < 56); structsize += 4);
+  if ( structsize == 64 ) structsize = 32;
+
+  uint32_t cnt_structvalues = structsize / 4;
+
+  uint32_t max = sizeof(regmon_dump) - structsize;
+  max /= structsize;
 
   c = 0;
-			
+
   for( i = 0; i < max; i++ ) {
     for( j = 0; j < 7; j++ ) {
       printf("%u ", p[c]);
       c++;
     }
     uint64_t tv64 = p[c-5];
-    tv64 = tv64 << 36;
+    tv64 = tv64 << (uint64_t)36;
     tv64 += (uint64_t)p[c-6];
-    printf("%llu ",tv64);
+    printf("%" PRIu64 " ",tv64);
 
-    for( j = 0; j < 2; j++ ) {
+    for(; j < cnt_structvalues; j++ ) {
       printf("%u ", p[c]);
       c++;
     }

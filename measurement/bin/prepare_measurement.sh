@@ -117,6 +117,7 @@ case "$1" in
 			      if [ "x$LIMIT" = "x" ]; then
 			         CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#"`
 			      else
+			         #TODO: fix multiuse of file
 			         CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#" | head -n $LIMIT`
 			      fi
 			      #echo "NODES: $CNODE"

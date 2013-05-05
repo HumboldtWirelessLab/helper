@@ -9,6 +9,7 @@
 //input[1]: Received from brn node
 //input[2]: Errors (not used)
 //input[3]: Passiv (overhear)
+//input[4]: txfeedback: successful transmission of a BRN BroadcastRouting  packet
 //[0]output: Local copy ()
 //[1]output: To other brn nodes
 
@@ -22,14 +23,15 @@ elementclass BROADCAST {ID $id, LT $lt |
                               -       );
 
   bc_clf[0]
-  //-> Print("BC: broadcast")
+  -> Print("NODENAME: BC: broadcast", TIMESTAMP true)
   -> [0]bcf;
 
   bc_clf[1]
-  //-> Print("BC: unicast")
+  -> Print("NODENAME: BC: unicast", TIMESTAMP true)
   -> [0]bcr;
 
   input[1]
+  -> Print("BRNin", TIMESTAMP true)
   -> bcr_clf::Classifier( 0/BRN_PORT_FLOODING,     //Flooding
                           0/BRN_PORT_BCASTROUTING, //BroadcastRouting
                           -  ); //other
@@ -41,53 +43,43 @@ elementclass BROADCAST {ID $id, LT $lt |
   -> [1]bcr;
 
   bcr_clf[2]
-  -> Print("Unknown type in broadcast")
+  -> Print("NODENAME: Unknown type in broadcast",TIMESTAMP true)
   -> Discard;
 
-
-  input[2]
-  -> Discard;
-
+  input[2] -> [2]bcf;
 
   bcf[0]
-  //-> Print("Local Copy")
+  -> Print("NODENAME: Local Copy",TIMESTAMP true)
   -> bcrouting_clf::Classifier( 12/BRN_ETHERTYPE 14/BRN_PORT_BCASTROUTING,  //BrnBroadcastRouting
                                     - );
 
   bcrouting_clf[0]
   -> BRN2EtherDecap()
-  //-> Print("broadcastrouting")
+  -> Print("NODENAME: broadcastrouting",TIMESTAMP true)
   -> [1]bcr;
 
   bcrouting_clf[1]
-  //-> Print("SimpleFlood-Ether-OUT")
+  -> Print("NODENAME: SimpleFlood-Ether-OUT",TIMESTAMP true)
   -> [0]output;
 
   bcf[1]
-  //-> Print("Forward Copy")
+  -> Print("NODENAME: Forward Copy",TIMESTAMP true)
   -> [1]output;
 
   bcr[0]
+  -> Print("NODENAME: BCR: fin dest",TIMESTAMP true)
   -> [0]output;
 
   bcr[1]
-  //-> Print("Flood")
+  -> Print("NODENAME: Flood",TIMESTAMP true)
   -> [0]bcf;
 
-  Idle -> [2]bcr;
-  Idle -> [2]bcf;
-  Idle -> [3]bcf;
-  Idle -> [4]bcf;
-
   input[3]
-  -> overhear_bcr_clf::Classifier( 0/BRN_PORT_FLOODING,  //Flooding
-                                                   -  ); //other
-
-  overhear_bcr_clf
+  -> Classifier( 0/BRN_PORT_FLOODING )  //Flooding
   -> [3]bcf;
 
-  overhear_bcr_clf[1]
-  -> Discard;
+  input[4]
+  -> [4]bcf;
 
 }
 
