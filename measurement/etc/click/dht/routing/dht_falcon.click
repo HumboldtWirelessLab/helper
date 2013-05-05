@@ -3,16 +3,37 @@ elementclass DHT_FALCON { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $s
 
   dhtroutingtable :: FalconRoutingTable(ETHERADDRESS $etheraddress, /*USEMD5 false,*/ DEBUG $debug);
 
-  dhtroutemaintenance :: FalconRoutingTableMaintenance( FRT dhtroutingtable, STARTTIME $starttime, UPDATEINT $updateint, DEBUG 4);
-  dhtsuccessormaintenance :: FalconSuccessorMaintenance( FRT dhtroutingtable, STARTTIME $starttime, UPDATEINT $updateint, DEBUG 4, OPTIMIZATION 0);
-  dhtleaveorganizer :: FalconLeaveOrganizer(FRT dhtroutingtable, RETRIES 3, DEBUG $debug);
+  dhtroutemaintenance :: FalconRoutingTableMaintenance( FRT dhtroutingtable, STARTTIME $starttime, UPDATEINT $updateint, DEBUG 0);
 
-  dhtnws :: FalconNetworkSizeDetermination( FRT dhtroutingtable, DEBUG 0/*$debug*/);
+#ifdef SUCCFORWARD
+#define FALCON_SUCC_OPT 1
+#else
+
+#ifdef SUCCFORWARD_WITH_HINT
+#define FALCON_SUCC_OPT 3
+
+#else
+
+#ifdef SUCC_HINT
+#define FALCON_SUCC_OPT 2
+
+#else
+#define FALCON_SUCC_OPT 0
+#endif
+#endif
+#endif
+
+dhtsuccessormaintenance :: FalconSuccessorMaintenance( FRT dhtroutingtable, STARTTIME $starttime, UPDATEINT $updateint, DEBUG 0, OPTIMIZATION FALCON_SUCC_OPT);
+
+
+dhtleaveorganizer :: FalconLeaveOrganizer(FRT dhtroutingtable, RETRIES 3, DEBUG $debug);
+
+  dhtnws :: FalconNetworkSizeDetermination( FRT dhtroutingtable, DEBUG 0 /*$debug*/);
 
 #ifdef USEHAWK
-  dhtlprh :: FalconLinkProbeHandler(FRT dhtroutingtable, LINKSTAT $lt, REGISTERHANDLER true, ONLYFINGERTAB true, NODESPERLP 255, DELAY $starttime, DEBUG 0);
+  dhtlprh :: FalconLinkProbeHandler(FRT dhtroutingtable, LINKSTAT $lt, REGISTERHANDLER true, ONLYFINGERTAB true, NODESPERLP 255 , DELAY $starttime, DEBUG $debug);
 #else
-  dhtlprh :: FalconLinkProbeHandler(FRT dhtroutingtable, LINKSTAT $lt, REGISTERHANDLER true, ONLYFINGERTAB false, NODESPERLP 255, DELAY $starttime, DEBUG $debug);
+  dhtlprh :: FalconLinkProbeHandler(FRT dhtroutingtable, LINKSTAT $lt, REGISTERHANDLER true, ONLYFINGERTAB false, NODESPERLP 255 , DELAY $starttime, DEBUG $debug);
 #endif
 
   dhtrouting :: DHTRoutingFalcon(FRT dhtroutingtable, LEAVEORGANIZER dhtleaveorganizer, RESPONSIBLE 1, ENABLERANGEQUERIES false, DEBUG $debug);
@@ -64,11 +85,38 @@ elementclass DHT_FALCON { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $s
   dhtroutingtable :: FalconRoutingTable(ETHERADDRESS $etheraddress);
 
   dhtroutemaintenance :: FalconRoutingTableMaintenance( FRT dhtroutingtable, STARTTIME $starttime, UPDATEINT $updateint, DEBUG 4);
-  dhtsuccessormaintenance :: FalconSuccessorMaintenance( FRT dhtroutingtable, STARTTIME $starttime, UPDATEINT $updateint, DEBUG 4, OPTIMIZATION 0);
+
+
+#ifdef SUCCFORWARD
+#define FALCON_SUCC_OPT 1
+#else
+
+#ifdef SUCCFORWARD_WITH_HINT
+#define FALCON_SUCC_OPT 3
+
+#else
+
+#ifdef SUCC_HINT
+#define FALCON_SUCC_OPT 2
+
+#else
+#define FALCON_SUCC_OPT 0
+#endif
+#endif
+#endif
+
+dhtsuccessormaintenance :: FalconSuccessorMaintenance( FRT dhtroutingtable, STARTTIME $starttime, UPDATEINT $updateint, DEBUG 4, OPTIMIZATION FALCON_SUCC_OPT);
+
   dhtleaveorganizer :: FalconLeaveOrganizer(FRT dhtroutingtable, RETRIES 3, DEBUG $debug);
 
   dhtnws :: FalconNetworkSizeDetermination( FRT dhtroutingtable, DEBUG 4/*$debug*/);
-  dhtlprh :: FalconLinkProbeHandler(FRT dhtroutingtable, LINKSTAT $lt, REGISTERHANDLER true, NODESPERLP 255, DELAY $starttime, DEBUG $debug);
+
+#ifdef USEHAWK
+  dhtlprh :: FalconLinkProbeHandler(FRT dhtroutingtable, LINKSTAT $lt, REGISTERHANDLER true, ONLYFINGERTAB true, NODESPERLP 5, DELAY $starttime, DEBUG 4/*$debug*/);
+#else
+  dhtlprh :: FalconLinkProbeHandler(FRT dhtroutingtable, LINKSTAT $lt, REGISTERHANDLER true, ONLYFINGERTAB false, NODESPERLP 5, DELAY $starttime, DEBUG 4/*$debug*/);
+#endif
+
 
   dhtrouting :: DHTRoutingFalcon(FRT dhtroutingtable, LEAVEORGANIZER dhtleaveorganizer, RESPONSIBLE 1, ENABLERANGEQUERIES false, DEBUG $debug);
 
