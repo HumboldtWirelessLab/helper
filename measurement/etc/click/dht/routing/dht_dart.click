@@ -4,8 +4,11 @@ elementclass DHT_DART { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $sta
   dhtroutemaintenance :: DartRoutingTableMaintenance( DRT dhtroutingtable, ACTIVESTART false,
                                                       STARTTIME  $starttime,  UPDATEINT $updateint, DEBUG $debug);
   dhtlprh :: DartLinkProbeHandler(DRT dhtroutingtable, LINKSTAT $lt, DEBUG 4);
-  
-  dhtrouting :: DHTRoutingDart(DRT dhtroutingtable, DEBUG $debug)
+ #ifdef EXPAND_NEIGHBOURHOOD 
+  dhtrouting :: DHTRoutingDart(DRT dhtroutingtable,EXPANDNEIGHBOURHOOD true, DEBUG $debug)
+ #else
+   dhtrouting :: DHTRoutingDart(DRT dhtroutingtable,EXPANDNEIGHBOURHOOD false, DEBUG 4)
+#endif
   
   input[0]
   //-> Print("R-in",100)

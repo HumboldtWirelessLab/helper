@@ -55,7 +55,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
                             RT      availablerates,
 //                          METRIC     "etx_metric ett_metric",
                             METRIC     "etx_metric",
-                            DEBUG            2 );
+                            DEBUG            0 );
 
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);

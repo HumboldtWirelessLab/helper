@@ -5,11 +5,15 @@
 // [1]output - BRN GEOR packets to internal nodes (BRN GEOR protocol)
 
 elementclass DART {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting |
-  DartIDStore( NODEIDENTITY  $ID, DHTSTORAGE $dhtstorage, DRT $dhtroutingtable, DEBUG 2);
+  DartIDStore( NODEIDENTITY  $ID, DHTSTORAGE $dhtstorage, DRT $dhtroutingtable, DEBUG 4);
   
   dartidcache::DartIDCache();  
-  dartroutequerier::DartRouteQuerier( NODEIDENTITY $ID, DHTSTORAGE $dhtstorage, DARTIDCACHE dartidcache, DRT $dhtroutingtable, DEBUG 2);
-  dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,  DARTROUTING $dhtrouting, DRT $dhtroutingtable, DEBUG 4);
+  dartroutequerier::DartRouteQuerier( NODEIDENTITY $ID, DHTSTORAGE $dhtstorage, DARTIDCACHE dartidcache, DRT $dhtroutingtable, DEBUG 4);
+#ifdef OPT_ROUTING
+  dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,OPT 1,  DARTROUTING $dhtrouting, DRT $dhtroutingtable, DEBUG 4);
+#else
+dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,OPT 0,  DARTROUTING $dhtrouting, DRT $dhtroutingtable, DEBUG 4);
+#endif
   routing_peek :: DartRoutingPeek(DEBUG 4);
   
   input[0]
