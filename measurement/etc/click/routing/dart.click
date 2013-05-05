@@ -10,13 +10,9 @@
 // [1]output - BRN GEOR packets to internal nodes (BRN GEOR protocol)
 
 elementclass DART {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting |
-<<<<<<< HEAD
-  DartIDStore( NODEIDENTITY  $ID, DHTSTORAGE $dhtstorage, DRT $dhtroutingtable, DEBUG 4);
   
-=======
   DartIDStore( NODEIDENTITY  $ID, DHTSTORAGE $dhtstorage, DRT $dhtroutingtable, DEBUG 2);
 
->>>>>>> 5b4099d6257cfe4770272b36b5405d6b723d6f69
   dartidcache::DartIDCache();  
   dartroutequerier::DartRouteQuerier( NODEIDENTITY $ID, DHTSTORAGE $dhtstorage, DARTIDCACHE dartidcache, DRT $dhtroutingtable, DEBUG 4);
 #ifdef OPT_ROUTING
@@ -31,7 +27,7 @@ dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,OPT 0,  DARTRO
   //-> Print("On the road to fwd")
   -> [1]dartfwd[0]
   -> BRN2EtherEncap(USEANNO true)
-  -> [1]output;
+  -> [0]output;
 
   input[1]
   -> routing_peek
@@ -39,7 +35,7 @@ dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,OPT 0,  DARTRO
   -> [0]dartfwd;
 
   dartfwd[1]
-  -> [0]output;
+  -> [1]output;
 
   dartroutequerier[1]
   -> Discard;
@@ -47,11 +43,11 @@ dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,OPT 0,  DARTRO
   input[2]
   -> Discard;
 
-  input[3]
-  -> Discard;
+//  input[3]
+//  -> Discard;
 
-  input[4]
-  -> Discard;
+//  input[4]
+//  -> Discard;
 }
 
 #endif
