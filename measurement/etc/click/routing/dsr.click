@@ -1,6 +1,8 @@
 // input[0] - ethernet (802.3) frames from external nodes (no BRN protocol)
 // input[1] - BRN DSR packets from internal nodes
 // input[2] - failed transmission of a BRN DSR packet (broken link) from ds
+// input[3] - passive (overhear)
+// input[4] - txfeedback: successful transmission of a BRN BroadcastRouting  packet
 // [0]output - ethernet (802.3) frames to external nodes/clients or me (no BRN protocol)
 // [1]output - BRN DSR packets to internal nodes (BRN DSR protocol)
 
@@ -20,7 +22,6 @@
 #ifndef DSR_PARAM_FORCE_PASSIVE_ACK_RETRIES
 #define DSR_PARAM_FORCE_PASSIVE_ACK_RETRIES false
 #endif
-
 
 
 elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
@@ -161,5 +162,6 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
   -> [0]err_forwarder;
 
   input[3] -> Discard;
+  input[4] -> Discard;
 }
 
