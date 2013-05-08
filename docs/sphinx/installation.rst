@@ -1,5 +1,5 @@
-Click
-*****
+Click-Basics
+************
 
 Installation
 ============
@@ -117,20 +117,18 @@ Parameter den zu verwendenden Simulator (*ns* oder *jist*) und den Pfad zur
 Experimente im Testbed
 ======================
 
-clickctrl.sh
-------------
+run_measurement.sh
+------------------
+Ähnlich wie bei der Simulation verwenden wir das selbst geschriebene Skript *run_measurement.sh*. Dieses führt grob folgende Arbeitsschritte durch:
 
-Mit dem *clickctrl.sh* Script (zu Finden im Ordner */helper/host/bin/* kann man
-einzelne :ref:`Handler <handler>` von einzelnen Knoten im Netzwerk abfragen oder schreiben. Ein
-Anwendungsfall ist beispielsweise das Abfragen von Statistiken zur Laufzeit
-eines Experiments. Das Skript wird folgendermaßen aufgerufen::
+#. für jeden Knoten (siehe *.mes-Datei) wird eine Screen-Session hergestellt
+#. über diese Screen-Session werden per ssh Befehle abgesetzt
+#. außerdem werden per NFS Informationen über die Knoten eingeholt (z. B. Architektur-Info)
+#. Treiber laden
+#. Treiber konfigurieren
+#. Click starten
+#. Zusätzliche Pre- und Post-Skripts ausführen
 
-    clickctrl.sh read address port element handler
-    clickctrl.sh write address port element handler "arguments of element"
-
-
-Das Skript verwendet intern das `ControlSocket <http://read.cs.ucla.edu/click/elements/controlsocket>`_
-Element.
 
 Weitere Dokumentation
 =====================
