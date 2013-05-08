@@ -60,6 +60,7 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   -> [1]fl;
 
   input[2]  //txfeedback failure
+  -> BRN2Decap()
   -> [2]fl;
 
   fl[0]
