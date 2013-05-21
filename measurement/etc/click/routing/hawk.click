@@ -50,7 +50,7 @@ hawkfwd::HawkForwarder( NODEIDENTITY $ID, ROUTINGTABLE rt,FRT $dhtroutingtable, 
   -> Discard;
 
   input[2] -> Discard;
-//  input[3] -> Discard;
-//  input[4] -> Discard;
+  input[3] -> Discard;
+  input[4] -> Discard;
 }
 
