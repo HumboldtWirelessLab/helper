@@ -43,11 +43,11 @@ dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,OPT 0,  DARTRO
   input[2]
   -> Discard;
 
-//  input[3]
-//  -> Discard;
+  input[3]
+  -> Discard;
 
-//  input[4]
-//  -> Discard;
+  input[4]
+  -> Discard;
 }
 
 #endif
