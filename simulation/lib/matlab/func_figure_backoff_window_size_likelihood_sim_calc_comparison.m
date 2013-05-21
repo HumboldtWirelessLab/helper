@@ -16,7 +16,9 @@ hold all
                 x_1=start_value_index_1:5:x_axis_points_value_max;          
                 start_value_index_2 =  find(matrix_plot_2(vector_birthday_problem_neighbours(1,p),:) ~=0,1);
                 x_2=start_value_index_2:5:x_axis_points_value_max;
-            
+                if (isempty(start_value_index_1))
+                    x_1 =  x_2;
+                end
                 hplots(1,p) = plot(x_1,matrix_plot_1(vector_birthday_problem_neighbours(1,p),start_value_index_1:5:x_axis_points_value_max));
                 hplots(1,p+size(vector_birthday_problem_neighbours,2)) = plot(x_2,matrix_plot_2(vector_birthday_problem_neighbours(1,p),start_value_index_2:5:x_axis_points_value_max),'-x');
             

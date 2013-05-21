@@ -11,7 +11,7 @@ function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80
     byte = 8; % one byte has 8 bits
     plcp_framing_bits = mac_frame * byte;
 
-if (mac_frame >=mac_frame_length_min && mac_frame <= mac_frame_length_max)
+if ((mac_frame >=mac_frame_length_min && mac_frame <= mac_frame_length_max) || mac_frame > 0) % TODO: Fragmentation to be in the specification
     mcs_check = 0;
     number_of_spatial_streams = 0;
     if(mcs >= 0 && mcs <= 7)
@@ -106,11 +106,11 @@ fec_coding_rate_1_2 = 1/2;
 ofdm_data_bits_per_symbol_6 = ofdm_radio_channel_capacity_total * fec_coding_rate_1_2; %[bits], speed 6 [Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
 
 % ---------------------------------- OFDM-Rates (depend of the Data-Bits per Symbol)  ---------------------------------------------------------------------------------
-kb = 1000;%[byte]
-mb = kb * 1000;%[byte]
+kbps = 1000;%[bit/second] Umrechnungsfaktor := 1 Mb/s (Mbps) = 1000 kb/s
+Mbps = kbps * 1000;%[bit/second] Umrechnungsfaktor := 1 Mb/s (Mbps) = 1000 kb/s = 1000000 Bit/seconds
 ofdm_phy_symbol_rate = 1 / (time_symbol); % [symbols per second], see Gast, 2005, chapter 13, OFDM PMD
-rate_6 =(ofdm_phy_symbol_rate * ofdm_data_bits_per_symbol_6) / mb; %[Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
-ofdm_plcp_header_signal_duration_6_mbps = ofdm_plcp_header_signal / (rate_6 * mb);%[sec]
+rate_6 =(ofdm_phy_symbol_rate * ofdm_data_bits_per_symbol_6) / Mbps; %[Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
+ofdm_plcp_header_signal_duration_6_mbps = ofdm_plcp_header_signal / (rate_6 * Mbps);%[sec]
 
 % ---------------------------------- 802.11n legacy-preamble  ---------------------------------------------------------------------------------
 legacy_preamble_duration = ofdm_plcp_preamble_duration + ofdm_plcp_header_signal_duration_6_mbps; %[sec], see Perahia and Stacey, 2008, page 71, Figure 4.10 Mixed format preamble
@@ -140,7 +140,7 @@ data_bits_per_symbol = ofdm_number_of_coded_bits * fec_coding_rate; %[bits]
 
 % ---------------------------------- OFDM-Rates (depend of the Data-Bits per Symbol)  ---------------------------------------------------------------------------------
 phy_symbol_rate = 1 / (time_symbol); % [symbols per second], see Gast, 2005, chapter 13, OFDM PMD
-rate =(phy_symbol_rate * data_bits_per_symbol) / mb; %[Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
+rate =(phy_symbol_rate * data_bits_per_symbol) / Mbps; %[Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
 
 rate = rate * number_of_spatial_streams; %MIMO
 
@@ -166,7 +166,7 @@ ht_sig = ht_sig_1 + ht_sig_2;%[bit], see Perahia and Stacey, 2008, page 78, Figu
 
 %ht_sig_with_coding_rate = (ht_sig / fec_coding_rate_1_2); %[bits], see Perahia and Stacey, 2008, page 80
 
-ht_sig_duration = ht_sig / (rate_6 * mb);%[sec], see Perahia and Stacey, 2008, page 80; ht_sig:= High Throughput Signal Field
+ht_sig_duration = ht_sig / (rate_6 * Mbps);%[sec], see Perahia and Stacey, 2008, page 80; ht_sig:= High Throughput Signal Field
 
 
 ht_stf_duration = 4e-6; %[sec], 4 microseconds, see Perahia and Stacey, 2008, page 82; ht_stf:= High Throughput Short Training Field
@@ -216,7 +216,7 @@ plcp_data = ofdm_plcp_data + pad_bits; % [Bits], see Gast, 2005, chapter 13, OFD
 
 
 
-plcp_data_duration = plcp_data / (rate * mb); 
+plcp_data_duration = plcp_data / (rate * Mbps); 
 plcp_framing_bits = plcp_data;
 plcp_framing_duration = preamble_duration + plcp_data_duration;%[sec],see Perahia and Stacey, 2008, page 71; Figure 4.10 Mixed format preamble
 %frame_duration_20_mhz = preamble_duration + plcp_data_duration;%[sec],see Perahia and Stacey, 2008, page 71; Figure 4.10 Mixed format preamble
