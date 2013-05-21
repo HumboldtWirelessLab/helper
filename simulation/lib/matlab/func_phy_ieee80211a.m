@@ -6,7 +6,7 @@ function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80
     byte = 8; % one byte has 8 bits
     plcp_framing_bits = mac_frame * byte;
     plcp_framing_duration = 0;
-    if (mac_frame >=mac_frame_length_min && mac_frame <= mac_frame_length_max && rate > 0 && rate <= 72)
+    if (((mac_frame >=mac_frame_length_min && mac_frame <= mac_frame_length_max) || mac_frame > 0) && rate > 0 && rate <= 72)% TODO: Fragmentation to be in the specification
         % ---------------------------------- OFDM-TIMES  ---------------------------------------------------------------------------------
         time_symbol =4e-6;%[sec], 4 microseconds, see Gast, 2005, chapter 13, OFDM as applied bay 802.11a; OFDM Parameter choice for 802.11a
         time_integration = 3.2e-6; %[sec], 3.2 microseconds, see Gast, 2005, chapter 13, OFDM as applied by 802.11a; OFDM Parameter choice for 802.11a
@@ -72,15 +72,15 @@ function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80
         ofdm_plcp_data = ofdm_plcp_data + pad_bits; % [Bits], see Gast, 2005, chapter 13, OFDM PLCP, Figure 13-14. OFDM PLCP framing format
 
         % ---------------------------------- OFDM-Rates (depend of the Data-Bits per Symbol)  ---------------------------------------------------------------------------------
-        kb = 1000;%[byte]
-        mb = kb * 1000;%[byte]
+        kbps = 1000;%[bit/second] Umrechnungsfaktor := 1 Mb/s (Mbps) = 1000 kb/s
+        Mbps = kbps * 1000;%[bit/second] Umrechnungsfaktor := 1 Mb/s (Mbps) = 1000 kb/s = 1000000 Bit/seconds
         phy_symbol_rate = 1 / (time_symbol); % [symbols per second], see Gast, 2005, chapter 13, OFDM PMD
-        rate =(phy_symbol_rate * data_bits_per_symbol) / mb; %[Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
+        rate =(phy_symbol_rate * data_bits_per_symbol) / Mbps; %[Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
         %---------------------- OFDM-Header-Duration  -----------------------------------
         rate_header = 6;
-        plcp_header_duration = ofdm_plcp_header_signal / (rate_header * mb); %[sec]
+        plcp_header_duration = ofdm_plcp_header_signal / (rate_header * Mbps); %[sec]
         %---------------------- OFDM-Data-Duration (only data_bits_per_symbol) -----------------------------------
-        plcp_data_duration = ofdm_plcp_data / (rate * mb); %[sec]
+        plcp_data_duration = ofdm_plcp_data / (rate * Mbps); %[sec]
 
         plcp_framing_duration = plcp_preamble_duration + plcp_header_duration + plcp_data_duration; %[sec]
         plcp_framing_bits = ofdm_plcp_header_signal + ofdm_plcp_data; % [bits] plcp_preamble_bits are not included
