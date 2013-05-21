@@ -10,15 +10,15 @@
 // [1]output - BRN GEOR packets to internal nodes (BRN GEOR protocol)
 
 elementclass DART {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting |
-  
+
   DartIDStore( NODEIDENTITY  $ID, DHTSTORAGE $dhtstorage, DRT $dhtroutingtable, DEBUG 2);
 
-  dartidcache::DartIDCache();  
+  dartidcache::DartIDCache();
   dartroutequerier::DartRouteQuerier( NODEIDENTITY $ID, DHTSTORAGE $dhtstorage, DARTIDCACHE dartidcache, DRT $dhtroutingtable, DEBUG 4);
 #ifdef OPT_ROUTING
   dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,OPT 1,  DARTROUTING $dhtrouting, DRT $dhtroutingtable, DEBUG 4);
 #else
-dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,OPT 0,  DARTROUTING $dhtrouting, DRT $dhtroutingtable, DEBUG 4);
+  dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,OPT 0,  DARTROUTING $dhtrouting, DRT $dhtroutingtable, DEBUG 4);
 #endif
   routing_peek :: DartRoutingPeek(DEBUG 4);
 
@@ -27,7 +27,7 @@ dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,OPT 0,  DARTRO
   //-> Print("On the road to fwd")
   -> [1]dartfwd[0]
   -> BRN2EtherEncap(USEANNO true)
-  -> [0]output;
+  -> [1]output;
 
   input[1]
   -> routing_peek
@@ -35,7 +35,7 @@ dartfwd::DartForwarder( NODEIDENTITY $ID, DARTIDCACHE dartidcache,OPT 0,  DARTRO
   -> [0]dartfwd;
 
   dartfwd[1]
-  -> [1]output;
+  -> [0]output;
 
   dartroutequerier[1]
   -> Discard;

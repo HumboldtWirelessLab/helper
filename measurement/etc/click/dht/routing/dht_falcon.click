@@ -26,7 +26,7 @@ elementclass DHT_FALCON { ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $s
 dhtsuccessormaintenance :: FalconSuccessorMaintenance( FRT dhtroutingtable, STARTTIME $starttime, UPDATEINT $updateint, DEBUG 0, OPTIMIZATION FALCON_SUCC_OPT);
 
 
-dhtleaveorganizer :: FalconLeaveOrganizer(FRT dhtroutingtable, RETRIES 3, DEBUG $debug);
+  dhtleaveorganizer :: FalconLeaveOrganizer(FRT dhtroutingtable, RETRIES 3, DEBUG $debug);
 
   dhtnws :: FalconNetworkSizeDetermination( FRT dhtroutingtable, DEBUG 0 /*$debug*/);
 
@@ -49,7 +49,7 @@ dhtleaveorganizer :: FalconLeaveOrganizer(FRT dhtroutingtable, RETRIES 3, DEBUG 
     //-> Print("R-S-out",100)
     -> [0]output;
 
-    dhtsuccessormaintenance[1] -> [1]output;
+  dhtsuccessormaintenance[1] -> [1]output;
 
   frc[1]// -> Print("R-FT-in",100)
     -> dhtroutemaintenance
@@ -69,7 +69,7 @@ dhtleaveorganizer :: FalconLeaveOrganizer(FRT dhtroutingtable, RETRIES 3, DEBUG 
     -> dhtnws
     // -> Print("R-NWS-out",100)
     -> [0]output;
-    
+
   dhtroutingpeek -> [0]output;
 
   frc[4]
@@ -77,9 +77,9 @@ dhtleaveorganizer :: FalconLeaveOrganizer(FRT dhtroutingtable, RETRIES 3, DEBUG 
     -> dhtpassivemon
     // -> Print("FalconPassive out",100)
     -> [0]output;
-     
+
   ||
-  
+
  ETHERADDRESS $etheraddress, LINKSTAT $lt, STARTTIME $starttime, UPDATEINT $updateint, DEBUG $debug |
 
   dhtroutingtable :: FalconRoutingTable(ETHERADDRESS $etheraddress);
