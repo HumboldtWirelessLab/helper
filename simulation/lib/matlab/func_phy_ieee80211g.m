@@ -4,8 +4,8 @@ function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80
     mac_frame_length_min = 1; %[bytes], see 802.11g Standard, page 17, Table 123A TXVECTOR parameters
     mac_frame_length_max = 4095; %[bytes], see Gast, 2005, see Gast, 2005, chapter 14, ERP Physical Medium Dependent (PMD) Layer, Table 14-3. ERP PHY parameters
     byte = 8; %[bit]   
-    kb = 1000;%[byte]   
-    mb = kb * 1000;%[byte]
+    kbps = 1000;%[bit/second] Umrechnungsfaktor := 1 Mb/s (Mbps) = 1000 kb/s
+    Mbps = kbps * 1000;%[bit/second] Umrechnungsfaktor := 1 Mb/s (Mbps) = 1000 kb/s = 1000000 Bit/seconds
     %matrix_dsss_ofdm = 0;
     %matrix_erp_pbcc = 0;
     output_xml =  sprintf('<plcp-80211g /> \n');
@@ -13,7 +13,7 @@ function [plcp_framing_bits,plcp_framing_duration, output_xml] = func_phy_ieee80
     % Initialization of the function return values
     plcp_framing_bits = mac_frame * byte;
     plcp_framing_duration = 0; 
- if (mac_frame >= mac_frame_length_min && mac_frame <= mac_frame_length_max)
+ if ((mac_frame >= mac_frame_length_min && mac_frame <= mac_frame_length_max) || mac_frame > 0) % TODO: Fragmentation to be in the specification
 
 
 
@@ -48,17 +48,17 @@ if (rate == 1 || rate == 2 || rate == 5.5 || rate == 11 || rate == 22 || rate ==
         second = 1000000; %[microseconds]; 1 seconds = 1000000 microseconds
         transmitted_symbols_per_seconds=bits_per_symbol_dbpsk * second; %[symbols/sec], see Gast, 2005, chapter 12, The "Original" Direct Sequence PHY, Transmission at 1.0 Mbps
     
-        rate_preamble = transmitted_symbols_per_seconds * bits_per_symbol  / mb;
+        rate_preamble = transmitted_symbols_per_seconds * bits_per_symbol  / Mbps;
         
         if (greenfield == 1 && rate >= 2)  
             bits_per_symbol_dqpsk= 2; %DQPSK; see Gast, 2005, chapter 12, Differential Quadrature Phase Shift Keying
             bits_per_symbol = bits_per_symbol_dqpsk;
-            rate_header = transmitted_symbols_per_seconds * bits_per_symbol  / mb;
+            rate_header = transmitted_symbols_per_seconds * bits_per_symbol  / Mbps;
         else 
             rate_header = rate_preamble;
         end
-        plcp_preamble_duration = ((plcp_preamble * byte) / (rate_preamble * mb)); %[seconds], see Gast, 2005, chapter 12, High Rate Direct Sequence PHY (HR/DSSS), figure 12-17. HR/DSSS PLCP framing
-        plcp_header_duration = ((plcp_header * byte) / (rate_header * mb)); %[seconds], see Gast, 2005, chapter 12, High Rate Direct Sequence PHY (HR/DSSS), figure 12-17. HR/DSSS PLCP framing
+        plcp_preamble_duration = ((plcp_preamble * byte) / (rate_preamble * Mbps)); %[seconds], see Gast, 2005, chapter 12, High Rate Direct Sequence PHY (HR/DSSS), figure 12-17. HR/DSSS PLCP framing
+        plcp_header_duration = ((plcp_header * byte) / (rate_header * Mbps)); %[seconds], see Gast, 2005, chapter 12, High Rate Direct Sequence PHY (HR/DSSS), figure 12-17. HR/DSSS PLCP framing
         plcp_preamble_header_duration = plcp_preamble_duration + plcp_header_duration; %[seconds]
         clock_switching = 0;
         if(rate == 2)
@@ -80,8 +80,8 @@ if (rate == 1 || rate == 2 || rate == 5.5 || rate == 11 || rate == 22 || rate ==
         end
          
             
-        rate_data = transmitted_symbols_per_seconds * bits_per_symbol  / mb;
-        plcp_data_duration = ((mac_frame * byte) / (rate_data * mb));%[sec]
+        rate_data = transmitted_symbols_per_seconds * bits_per_symbol  / Mbps;
+        plcp_data_duration = ((mac_frame * byte) / (rate_data * Mbps));%[sec]
         plcp_framing_duration = plcp_preamble_header_duration + clock_switching + plcp_data_duration;%[sec]
         plcp_framing_bits = (mac_frame * byte) + (plcp_preamble * byte) + (plcp_header * byte);%[bits]
 %DSSS-OFDM (like 802.11b: Short- and Long-Preamble),  see 802.11g Standard, page 22, Figure 153A Long preamble PPDU format for DSSS-OFDM and page 23 Figure 153B Short preamble PPDU format for DSSS-OFDM
@@ -109,7 +109,7 @@ if (rate == 1 || rate == 2 || rate == 5.5 || rate == 11 || rate == 22 || rate ==
             number_bits_per_channel = 6; %[bits], see Gast, 2005, chapter 13, OFDM as applied bay 802.11a; Figure 13-9. Constellations used by 802.11a
         end
 
-        radio_channel_capacity_total = number_of_subcarriers_data * number_bits_per_channel; %[bits]; coded_bits_per_symbol, see Gast 2005, chapter 13, Table 13-3. Encoding details for different OFDM data rates
+        radio_channel_capacity_total = number_of_subcarriers_data * number_bits_per_channel; %[coded_bits/symbol]; coded_bits_per_symbol, see Gast 2005, chapter 13, Table 13-3. Encoding details for different OFDM data rates
 
         % ---------------------------------- OFDM-Forward Error Correction (FEC) ---------------------------------------------------------------------------------
         %fec_constraint_length = 7; %[bits], see Gast, 2005, chrate > 0 && rate <= 72)apter 13, OFDM as applied bay 802.11a; Forward error correction with convolutional coding
@@ -141,9 +141,9 @@ if (rate == 1 || rate == 2 || rate == 5.5 || rate == 11 || rate == 22 || rate ==
         plcp_preamble_duration = pclp_preamble_short_duration + plcp_preamble_long_duration; %[sec]; see Gast, 2005,chapter 13, OFDM PLCP; Figure 13-15. Preamble and frame start and see Gast, 2005, chapter 13, Characteristics of the OFDM PHY, Table 13-5. OFDM PHY parameter
         % ---------------------------------- OFDM Data-Bits per Symbol (depend of the modulation)  ---------------------------------------------------------------------------------
         if (fec_coding_rate > 0)
-            data_bits_per_symbol = radio_channel_capacity_total * fec_coding_rate; %[bits], speed 6 [Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
+            data_bits_per_symbol = radio_channel_capacity_total * fec_coding_rate; %[bits/symbol], speed 6 [Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
         else
-            data_bits_per_symbol = radio_channel_capacity_total;
+            data_bits_per_symbol = radio_channel_capacity_total; %[bits/symbol]
         end
         % ---------------------------------- OFDM Pad-Bits for PLCP-Data  ---------------------------------------------------------------------------------
         pad_bits = data_bits_per_symbol - mod(ofdm_plcp_data,data_bits_per_symbol); %[Bits], see Gast, 2005, chapter 13,Transmission and Reception
@@ -151,23 +151,23 @@ if (rate == 1 || rate == 2 || rate == 5.5 || rate == 11 || rate == 22 || rate ==
         ofdm_plcp_data = ofdm_plcp_data + pad_bits; % [Bits], see Gast, 2005, chapter 13, OFDM PLCP, Figure 13-14. OFDM PLCP framing format
 
         % ---------------------------------- OFDM-Rates (depend of the Data-Bits per Symbol)  ---------------------------------------------------------------------------------
-        kb = 1000;%[byte]
-        mb = kb * 1000;%[byte]
+        %kb = 1000;%[byte]
+        %mb = kb * 1000;%[byte]
         phy_symbol_rate = 1 / (time_symbol); % [symbols per second], see Gast, 2005, chapter 13, OFDM PMD
-        rate =(phy_symbol_rate * data_bits_per_symbol) / mb; %[Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
+        rate =(phy_symbol_rate * data_bits_per_symbol) / Mbps; %[Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
         %---------------------- OFDM-Header-Duration  -----------------------------------
         rate_header = 6;
-        plcp_header_duration = ofdm_plcp_header_signal / (rate_header * mb); %[sec]
+        plcp_header_duration = ofdm_plcp_header_signal / (rate_header * Mbps); %[sec]
         %---------------------- OFDM-Data-Duration (only data_bits_per_symbol) -----------------------------------
-        plcp_data_duration = ofdm_plcp_data / (rate * mb); %[sec]
+        plcp_data_duration = ofdm_plcp_data / (rate * Mbps); %[sec]
 
         plcp_framing_duration = plcp_preamble_duration + plcp_header_duration + plcp_data_duration + signal_extension; %[sec]
         plcp_framing_bits = ofdm_plcp_header_signal + ofdm_plcp_data; % [bits] plcp_preamble_bits are not included
  elseif (rate >= 6  && rate <= 72 && dsss_ofdm_use == 1)
 
      byte = 8; %[bit]   
-    kb = 1000;%[byte]   
-    mb = kb * 1000;%[byte]
+    %kb = 1000;%[byte]   
+    %mb = kb * 1000;%[byte]
 
     plcp_preamble_sync_long = 16; %[Byte]
     plcp_preamble_sync_short = 7; %[Byte], see Gast, 2005, chapter 12, High Rate Direct Sequence PHY (HR/DSSS), figure 12-17. HR/DSSS PLCP framing
@@ -194,17 +194,17 @@ if (rate == 1 || rate == 2 || rate == 5.5 || rate == 11 || rate == 22 || rate ==
         second = 1000000; %[microseconds]; 1 seconds = 1000000 microseconds
         transmitted_symbols_per_seconds=bits_per_symbol_dbpsk * second; %[symbols/sec], see Gast, 2005, chapter 12, The "Original" Direct Sequence PHY, Transmission at 1.0 Mbps
     
-        rate_preamble = transmitted_symbols_per_seconds * bits_per_symbol  / mb;
+        rate_preamble = transmitted_symbols_per_seconds * bits_per_symbol  / Mbps;
         
         if (greenfield == 1 && rate >= 2)  
             bits_per_symbol_dqpsk= 2; %DQPSK; see Gast, 2005, chapter 12, Differential Quadrature Phase Shift Keying
             bits_per_symbol = bits_per_symbol_dqpsk;
-            rate_header = transmitted_symbols_per_seconds * bits_per_symbol  / mb;
+            rate_header = transmitted_symbols_per_seconds * bits_per_symbol  / Mbps;
         else 
             rate_header = rate_preamble;
         end
-        plcp_preamble_duration = ((plcp_preamble * byte) / (rate_preamble * mb)); %[seconds], see Gast, 2005, chapter 12, High Rate Direct Sequence PHY (HR/DSSS), figure 12-17. HR/DSSS PLCP framing
-        plcp_header_duration = ((plcp_header * byte) / (rate_header * mb)); %[seconds], see Gast, 2005, chapter 12, High Rate Direct Sequence PHY (HR/DSSS), figure 12-17. HR/DSSS PLCP framing
+        plcp_preamble_duration = ((plcp_preamble * byte) / (rate_preamble * Mbps)); %[seconds], see Gast, 2005, chapter 12, High Rate Direct Sequence PHY (HR/DSSS), figure 12-17. HR/DSSS PLCP framing
+        plcp_header_duration = ((plcp_header * byte) / (rate_header * Mbps)); %[seconds], see Gast, 2005, chapter 12, High Rate Direct Sequence PHY (HR/DSSS), figure 12-17. HR/DSSS PLCP framing
         plcp_preamble_duration = plcp_preamble_duration + plcp_header_duration; %[seconds]
       % ---------------------------------- OFDM-TIMES  ---------------------------------------------------------------------------------
         time_symbol =4e-6;%[sec], 4 microseconds, see Gast, 2005, chapter 13, OFDM as applied bay 802.11a; OFDM Parameter choice for 802.11a
@@ -271,15 +271,15 @@ if (rate == 1 || rate == 2 || rate == 5.5 || rate == 11 || rate == 22 || rate ==
         ofdm_plcp_data = ofdm_plcp_data + pad_bits; % [Bits], see Gast, 2005, chapter 13, OFDM PLCP, Figure 13-14. OFDM PLCP framing format
 
         % ---------------------------------- OFDM-Rates (depend of the Data-Bits per Symbol)  ---------------------------------------------------------------------------------
-        kb = 1000;%[byte]
-        mb = kb * 1000;%[byte]
+        %kb = 1000;%[byte]
+        %mb = kb * 1000;%[byte]
         phy_symbol_rate = 1 / (time_symbol); % [symbols per second], see Gast, 2005, chapter 13, OFDM PMD
-        rate =(phy_symbol_rate * data_bits_per_symbol) / mb; %[Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
+        rate =(phy_symbol_rate * data_bits_per_symbol) / Mbps; %[Mbps], see Gast, 2005, chapter 13, OFDM PMD, Table 13-3. Encoding details for different OFDM data rates
         %---------------------- OFDM-Header-Duration  -----------------------------------
         rate_header = 6;
-        plcp_header_duration = (ofdm_plcp_header_signal / (rate_header * mb)); %[sec]
+        plcp_header_duration = (ofdm_plcp_header_signal / (rate_header * Mbps)); %[sec]
         %---------------------- OFDM-Data-Duration (only data_bits_per_symbol) -----------------------------------
-        plcp_data_duration = ofdm_plcp_data / (rate * mb); %[sec]
+        plcp_data_duration = ofdm_plcp_data / (rate * Mbps); %[sec]
 
         plcp_framing_duration = plcp_preamble_duration + plcp_header_duration + plcp_data_duration + signal_extension; %[sec]
         plcp_framing_bits = ofdm_plcp_header_signal + ofdm_plcp_data; % [bits] plcp_preamble_bits are not included
