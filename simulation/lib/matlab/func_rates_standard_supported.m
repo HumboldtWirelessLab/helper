@@ -11,8 +11,8 @@ function [ vector_rates ] = func_rates_standard_supported( letter_of_standard )
             vector_rates = sort([vector_rates_80211a_mandatory,vector_rates_80211a_optional]);
         case{'g'}
             vector_rates_80211g_erp_pbcc = [22,33];
-            vector_rates_80211g_erp_ofdm = vector_rates_80211a;
-            vector_rates = sort([vector_rates_80211,vector_rates_80211b_hr_dsss,vector_rates_80211g_erp_pbcc, vector_rates_80211g_erp_ofdm]);
+            vector_rates_80211g_erp_ofdm = vector_rates_80211a_mandatory;
+            vector_rates = sort([vector_rates_80211,vector_rates_80211b_hr_dsss,vector_rates_80211g_erp_pbcc, vector_rates_80211g_erp_ofdm,vector_rates_80211a_optional]);
         case{'n'}
             [matrix_data_rates_80211n ] = func_80211n_data_rates_supported_get();
             vector_rates = unique(matrix_data_rates_80211n)';
