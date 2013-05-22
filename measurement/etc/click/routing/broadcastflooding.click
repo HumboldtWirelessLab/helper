@@ -35,7 +35,7 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 #endif
 #endif
 
-  fl_passive_ack::FloodingPassiveAck(NODEIDENTITY $id, FLOODINGHELPER fl_helper, DEFAULTRETRIES 2, DEFAULTTIMEOUT 20, DEBUG 4);
+  fl_passive_ack::FloodingPassiveAck(NODEIDENTITY $id, FLOODINGHELPER fl_helper, DEFAULTRETRIES 2, DEFAULTTIMEOUT 20, DEBUG FLOODING_DEBUG);
 
   fl::Flooding(NODEIDENTITY $id, FLOODINGPOLICY flp, FLOODINGPASSIVEACK fl_passive_ack, DEBUG FLOODING_DEBUG);
 
@@ -47,17 +47,24 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 #ifndef BCAST2UNIC_PRESELECTION_STRATEGY
 #define BCAST2UNIC_PRESELECTION_STRATEGY 0
 #endif
-
-  unicfl :: UnicastFlooding(NODEIDENTITY $id, FLOODING fl, FLOODINGHELPER fl_helper, PRESELECTIONSTRATEGY BCAST2UNIC_PRESELECTION_STRATEGY, CANDSELECTIONSTRATEGY BCAST2UNIC_STRATEGY, DEBUG FLOODING_DEBUG);
+#ifndef BCAST2UNIC_REJECTONEMPTYCS
+#define BCAST2UNIC_REJECTONEMPTYCS true
+#endif
+#ifndef BCAST2UNIC_UCASTPEERMETRIC
+#define BCAST2UNIC_UCASTPEERMETRIC 0
 #endif
 
-  routing_peek::FloodingRoutingPeek(DEBUG 4);
+
+  unicfl :: UnicastFlooding(NODEIDENTITY $id, FLOODING fl, FLOODINGHELPER fl_helper, PRESELECTIONSTRATEGY BCAST2UNIC_PRESELECTION_STRATEGY, REJECTONEMPTYCS BCAST2UNIC_REJECTONEMPTYCS, CANDSELECTIONSTRATEGY BCAST2UNIC_STRATEGY, UCASTPEERMETRIC BCAST2UNIC_UCASTPEERMETRIC, DEBUG FLOODING_DEBUG);
+#endif
+
+  routing_peek::FloodingRoutingPeek(DEBUG FLOODING_DEBUG);
 
   input[0]  //to be send
   -> [0]fl;
 
   input[1]  //from brn
-  -> Print("Plain: ",200)
+  //-> Print("Plain: ",200)
   -> routing_peek
   -> BRN2Decap()
   -> [1]fl;
@@ -87,6 +94,13 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   //-> Print("FloodFeedback")
   -> BRN2Decap()
   -> [3]fl;
+
+#ifdef BCAST2UNIC
+  unicfl[1]                                                // reject transmission
+  -> BRN2EtherDecap()
+  -> BRN2Decap()
+  -> [5]fl;
+#endif
 
 }
 
