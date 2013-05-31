@@ -10,11 +10,11 @@
     </xsl:template>
 
     <xsl:template match="txflow">
-	<xsl:value-of select="../@node" /><xsl:text>,</xsl:text>
+<!--	<xsl:value-of select="../@node" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="@src" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="@dst" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="@avg_hops" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="@packet_count" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@avg_hops" /><xsl:text>,</xsl:text> -->
+	<xsl:value-of select="@packet_count" /><xsl:text> </xsl:text>
 	<xsl:value-of select="@packet_size" /><xsl:value-of select="$newline" />
     </xsl:template>
 </xsl:stylesheet>

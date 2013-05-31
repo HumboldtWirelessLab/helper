@@ -16,7 +16,8 @@
 	<xsl:value-of select="@avg_hops" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="@packet_count" /><xsl:text>,</xsl:text>
 	<xsl:variable name="smac" select="@src" />
-	<xsl:value-of select="../../flowstats[@node=$smac]/txflow/@packet_count" /><xsl:value-of select="$newline" />
+	<xsl:value-of select="../../flowstats[@node=$smac]/txflow/@packet_count" />
+	<xsl:value-of select="@packet_size" /><xsl:text>,</xsl:text><xsl:value-of select="$newline" />
     </xsl:template>
 
 </xsl:stylesheet>
