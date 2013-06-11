@@ -11,13 +11,13 @@
 
     <xsl:template match="/">
 	<xsl:value-of select="count(//flooding)" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="sum(//flooding/forward/@count)" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="(sum(//flooding/forward/@count) div (count(//flooding)))" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="sum(//flooding/source/@count)" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="sum(//flooding/received/@count)" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="sum(//flooding/sent/@count)" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="sum(//flooding/forward/@count)" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="sum(//flooding/passive/@count)" /><xsl:value-of select="$newline" />
-	
+	<xsl:value-of select="sum(//flooding/localstats/@received_new)" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="(sum(//flooding/localstats/@received_new) div (count(//flooding)))" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="sum(//flooding/localstats/@source)" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="sum(//flooding/localstats/@received)" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="sum(//flooding/localstats/@sent)" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="sum(//flooding/localstats/@forward)" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="sum(//flooding/localstats/@passive)" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="sum(//flooding/localstats/@forward_new)" /><xsl:value-of select="$newline" />
     </xsl:template>
 </xsl:stylesheet>
