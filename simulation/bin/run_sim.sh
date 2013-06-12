@@ -382,6 +382,16 @@ case "$MODE" in
 			NODENAME_SEDARG="$NODENAME_SEDARG -e s#LASTNODE#$last_node#g"
 		fi
 
+                if [ "x$DISABLE_TR" = "x1" ]; then
+                  echo "set enable_tr 0" >> $TCLFILE
+                else
+                  echo "set enable_tr 1" >> $TCLFILE
+                fi
+                if [ "x$DISABLE_NAM" = "x1" ]; then
+                  echo "set enable_nam 0" >> $TCLFILE
+                else
+                  echo "set enable_nam 1" >> $TCLFILE
+                fi
 		cat $DIR/../etc/ns/script_01.tcl | sed -e "s#NAME#$NAME#g" -e "s#RESULTDIR#$RESULTDIR#g" >> $TCLFILE
 
 		i=0
