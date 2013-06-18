@@ -81,12 +81,15 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   -> [0]output;
 
   fl[1]
-  -> BroadcastMultiplexer(NODEIDENTITY $id, USEANNO true)
-  -> BRN2EtherEncap(USEANNO true) 
-  //-> Print("BroadcastMultiplexer out")
+  -> BRN2EtherEncap(USEANNO true)
+#ifdef SIMULATION
+  -> rdq::RandomDelayQueue(MINDELAY 10, MAXDELAY 20, DIFFDELAY 5, TIMESTAMPANNOS false)
+#endif
 #ifdef BCAST2UNIC
   -> unicfl                                                // transmit to other brn nodes
 #endif
+  -> BroadcastMultiplexer(NODEIDENTITY $id, USEANNO false)
+  //-> Print("BroadcastMultiplexer out")
   -> [1]output;
 
   input[3] //passive
