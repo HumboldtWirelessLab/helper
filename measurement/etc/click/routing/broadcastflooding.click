@@ -50,7 +50,7 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 #define FLOODING_LASTNODES_PP 3
 #endif
 
-  fl::Flooding(NODEIDENTITY $id, FLOODINGPOLICY flp, FLOODINGPASSIVEACK fl_passive_ack, LASTNODESPERPKT FLOODING_LASTNODES_PP, DEBUG FLOODING_DEBUG);
+  fl::Flooding(NODEIDENTITY $id, FLOODINGPOLICY flp, FLOODINGPASSIVEACK fl_passive_ack, DEBUG FLOODING_DEBUG);
 
 #ifdef BCAST2UNIC
 
@@ -71,6 +71,8 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   unicfl :: UnicastFlooding(NODEIDENTITY $id, FLOODING fl, FLOODINGHELPER fl_helper, PRESELECTIONSTRATEGY BCAST2UNIC_PRESELECTION_STRATEGY, REJECTONEMPTYCS BCAST2UNIC_REJECTONEMPTYCS, CANDSELECTIONSTRATEGY BCAST2UNIC_STRATEGY, UCASTPEERMETRIC BCAST2UNIC_UCASTPEERMETRIC, DEBUG FLOODING_DEBUG);
 #endif
 
+  fl_piggyback::FloodingPiggyback(FLOODING fl, LASTNODESPERPKT FLOODING_LASTNODES_PP, DEBUG 4);
+
   routing_peek::FloodingRoutingPeek(DEBUG FLOODING_DEBUG);
 
   input[0]  //to be send
@@ -90,13 +92,16 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   -> [0]output;
 
   fl[1]
-  -> BRN2EtherEncap(USEANNO true)
+  -> Print("NODENAME: FL to Queue",50)
 #ifdef SIMULATION
   -> rdq::RandomDelayQueue(MINDELAY 10, MAXDELAY 20, DIFFDELAY 5, TIMESTAMPANNOS false)
 #endif
 #ifdef BCAST2UNIC
   -> unicfl                                                // transmit to other brn nodes
 #endif
+  -> Print("NODENAME: unifl to piggyback",50)
+  -> fl_piggyback
+  -> BRN2EtherEncap(USEANNO true)
   -> BroadcastMultiplexer(NODEIDENTITY $id, USEANNO false)
   //-> Print("BroadcastMultiplexer out")
   -> [1]output;
@@ -113,7 +118,6 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 
 #ifdef BCAST2UNIC
   unicfl[1]                                                // reject transmission
-  -> BRN2EtherDecap()
   -> BRN2Decap()
   -> [5]fl;
 #endif
