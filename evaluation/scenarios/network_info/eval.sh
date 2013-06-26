@@ -169,6 +169,10 @@ if [ ! -f $EVALUATIONSDIR/bcaststats.csv ]; then
   xsltproc $DIR/bcaststats.xslt $DATAFILE > $EVALUATIONSDIR/bcaststats.csv
 fi
 
+###############################################################################
+# networkstats
+###############################################################################
+
 echo "Networkstats!"
 
 cat $EVALUATIONSDIR/bcaststats.csv | sed "s#,# #g" | sed $FULLMACSED > $EVALUATIONSDIR/bcaststats.mat
@@ -215,8 +219,11 @@ for r in $BCASTRATE; do
       CLUSTERFILE="$EVALUATIONSDIR/cluster_""$PARAMS""_psr_85_cluster_"$MAX_CLUSTER".csv"
       CLUSTERCSVFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".csv"
       CLUSTERPLMFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".plm"
-      (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE'),catch,exit(1),end,exit(0)" 1> /dev/null)
-      cat $CLUSTERCSVFILE | sed "s#,# #g" | awk '{print "sk"$0}' > $CLUSTERPLMFILE
+      if [ -e CLUSTERCSVFILE ]; then
+        echo "partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE')"
+        (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE'),catch,exit(1),end,exit(0)" 1> /dev/null)
+        cat $CLUSTERCSVFILE | sed "s#,# #g" | awk '{print "sk"$0}' > $CLUSTERPLMFILE
+      fi
     fi
 
   done

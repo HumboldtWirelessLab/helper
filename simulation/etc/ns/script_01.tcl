@@ -37,12 +37,22 @@ $ns_ use-scheduler Heap
 #
 # Create and activate trace files.
 #
-set tracefd     [open "RESULTDIR/NAME.tr" w]
-set namtrace    [open "RESULTDIR/NAME.nam" w]
+if { $enable_tr == 1 } {
+  set tracefd     [open "RESULTDIR/NAME.tr" w]
+} else {
+  set tracefd     [open "/dev/null" w]
+}
+
 $ns_ trace-all $tracefd
+
+if { $enable_nam == 1 } {
+  set namtrace    [open "RESULTDIR/NAME.nam" w]
+} else {
+  set namtrace    [open "/dev/null" w]
+}
+
 $ns_ namtrace-all-wireless $namtrace $xsize $ysize
 $ns_ use-newtrace
-
 
 #
 # Create the "god" object. This is another artifact of using

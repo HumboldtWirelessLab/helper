@@ -51,14 +51,18 @@ elementclass IAPP {
   STALE $stale,
   ASSOCLIST $assoc_list,
   ASSOC_RESP $assoc_resp,
+  NODEIDENTITY $id,
+  LINKTABLE $lt,
+  // SIG_ASSOC $sig_assoc
   |
-  //SIG_ASSOC $sig_assoc |
 
   iapp_encap  :: BrnIappEncap();
 
   iapp_filter :: BrnIappRoamingFilter(ASSOCLIST $assoc_list);
-  
+
   sta_tracker :: BrnIappStationTracker(
+                  NODEIDENTITY $id,
+                  LINKTABLE $lt,
                   STALE $stale,
                   ASSOCLIST $assoc_list,
                   NOTIFYHDL notify_hdl,
@@ -67,10 +71,14 @@ elementclass IAPP {
                   //SIG_ASSOC $sig_assoc);
 
   hello_hdl   :: BrnIappHelloHandler(
+                  NODEIDENTITY $id,
+                  LINKTABLE $lt,
                   ASSOCLIST $assoc_list,
-                  ENCAP iapp_encap);
+                  ENCAP iapp_encap,
+                  STALE $stale);
 
   notify_hdl  :: BrnIappNotifyHandler(
+                  NODEIDENTITY $id,
                   RESEND_NOTIFY 100, 
                   NUM_RESEND 7, 
                   ASSOCLIST $assoc_list, 
@@ -79,42 +87,43 @@ elementclass IAPP {
                   );
 
   route_hdl   :: BrnIappRouteUpdateHandler(
+                  NODEIDENTITY $id,
+                  LINKTABLE $lt,
                   ASSOCLIST $assoc_list,
                   ENCAP iapp_encap,
                   HELLOHDL hello_hdl);
-  
+
   data_hdl    :: BrnIappDataHandler(
+                  NODEIDENTITY $id,
                   ASSOCLIST $assoc_list, 
                   ENCAP iapp_encap, 
                   ROUTEHDL route_hdl);
 
   snoopy      :: BrnIappStationSnooper(
+                  NODEIDENTITY $id,
                   ASSOCLIST $assoc_list, 
                   STATRACK sta_tracker, 
                   HELLOHDL hello_hdl);
 
-  all :: CompoundHandler("debug", "BrnIappEncap BrnIappRoamingFilter
-    BrnIappStationTracker BrnIappHelloHandler BrnIappRouteUpdateHandler
-    BrnIappDataHandler BrnIappStationSnooper", "2");
+  all :: BrnCompoundHandler(CLASSES "BrnIappEncap BrnIappRoamingFilter BrnIappStationTracker BrnIappHelloHandler BrnIappRouteUpdateHandler BrnIappDataHandler BrnIappStationSnooper", CLASSESHANDLER "debug", CLASSESVALUE "2");
 
-  optimize :: CompoundHandler("optimize", "BrnIappStationSnooper 
-    BrnIappHelloHandler BrnIappDataHandler BrnIappStationTracker", "true");
+  optimize :: BrnCompoundHandler(CLASSES "BrnIappStationSnooper BrnIappHelloHandler BrnIappDataHandler BrnIappStationTracker", CLASSESHANDLER "optimize", CLASSESVALUE "true");
 
   //----------------------------------------------------------------------------
   // Look into all packets from the queue and filter out those to roamed STAs.
   // If such a packet is found, it is duplicated and given to the iapp and
   // to the dsr error forwarder in order to generate a route errror, which
   // is send to the originator of the packet.
-  
+
   elementclass ip_printer {  
     input[0]
     -> ethertype_clf :: Classifier(12/8086, 12/0800);
-    
+
     ethertype_clf[0] // brn
     -> CheckIPHeader(OFFSET 58)
     //-> IPPrint("from_iapp_data_to_dsr0")
     -> [0]output;
-  
+
     ethertype_clf[1] // ether
     -> CheckIPHeader(OFFSET 14)
     //-> IPPrint("from_iapp_data_to_dsr0")
@@ -122,6 +131,7 @@ elementclass IAPP {
   }
 
   data2_hdl   :: BrnIappDataHandler(
+                  NODEIDENTITY $id,
                   ASSOCLIST $assoc_list, 
                   ENCAP iapp_encap, 
                   ROUTEHDL route_hdl);
@@ -200,7 +210,7 @@ elementclass IAPP {
   //----------------------------------------------------------------------------
   // Either IAPP packets encapsulated in BRN/Ethernet to be routet to other 
   // mesh nodes or packets for roamed STAs, which are sent to the new mesh node.
-  
+
   notify_hdl[0]
   //-> Print("from_iapp_notify_to_dsr0")
   -> SetPacketAnno(TOS 1)
@@ -235,20 +245,20 @@ elementclass IAPP_Peek {
   input 
     -> dsr_src_clf :: Classifier(0/BRN_PORT_DSR 6/04, -)
     -> BRN2Decap()
-    -> StripDSRHeader()
+    //-> StripDSRHeader()
          -> iapp_peek :: Classifier(12/8086 14/BRN_PORT_IAPP, -)
          -> iapp_peek_tee :: Tee() // Duplicate because it is killed in iapp
          -> BRN2EtherDecap() // strips an ethernet header
          -> BRN2Decap()
          -> [1]output;
-    
+
   dsr_src_clf[1]
        -> [0]output;
- 
+
   iapp_peek[1]
     -> PushPacketHeader()
     -> [0]output;
-       
+
   iapp_peek_tee[1]
     -> PushPacketHeader()
     -> [0]output;
