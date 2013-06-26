@@ -67,7 +67,6 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 #define BCAST2UNIC_UCASTPEERMETRIC 0
 #endif
 
-
   unicfl :: UnicastFlooding(NODEIDENTITY $id, FLOODING fl, FLOODINGHELPER fl_helper, PRESELECTIONSTRATEGY BCAST2UNIC_PRESELECTION_STRATEGY, REJECTONEMPTYCS BCAST2UNIC_REJECTONEMPTYCS, CANDSELECTIONSTRATEGY BCAST2UNIC_STRATEGY, UCASTPEERMETRIC BCAST2UNIC_UCASTPEERMETRIC, DEBUG FLOODING_DEBUG);
 #endif
 
@@ -92,17 +91,15 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   -> [0]output;
 
   fl[1]
-  -> Print("NODENAME: FL to Queue",50)
 #ifdef SIMULATION
   -> rdq::RandomDelayQueue(MINDELAY 10, MAXDELAY 20, DIFFDELAY 5, TIMESTAMPANNOS false)
 #endif
 #ifdef BCAST2UNIC
   -> unicfl                                                // transmit to other brn nodes
 #endif
-  -> Print("NODENAME: unifl to piggyback",50)
   -> fl_piggyback
+  -> BroadcastMultiplexer(NODEIDENTITY $id, USEANNO true)
   -> BRN2EtherEncap(USEANNO true)
-  -> BroadcastMultiplexer(NODEIDENTITY $id, USEANNO false)
   //-> Print("BroadcastMultiplexer out")
   -> [1]output;
 
