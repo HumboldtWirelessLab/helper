@@ -73,7 +73,15 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 
 #endif
 #ifndef FLOODING_LASTNODES_PP
-#define FLOODING_LASTNODES_PP 10
+#define FLOODING_LASTNODES_PP 3
+#endif
+
+#ifndef BCAST_RNDDELAYQUEUE_MINDELAY
+#define BCAST_RNDDELAYQUEUE_MINDELAY 1
+#endif
+
+#ifndef BCAST_RNDDELAYQUEUE_MAXDELAY
+#define BCAST_RNDDELAYQUEUE_MAXDELAY 20
 #endif
 
   fl_piggyback::FloodingPiggyback(FLOODING fl, LASTNODESPERPKT FLOODING_LASTNODES_PP, DEBUG 4);
@@ -96,9 +104,13 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   fl[0]
   -> [0]output;
 
+
   fl[1]
 #ifdef SIMULATION
-  -> rdq::RandomDelayQueue(MINDELAY 10, MAXDELAY 20, DIFFDELAY 5, TIMESTAMPANNOS false)
+  -> rdq::RandomDelayQueue(MINDELAY BCAST_RNDDELAYQUEUE_MINDELAY, MAXDELAY BCAST_RNDDELAYQUEUE_MAXDELAY, DIFFDELAY 10, TIMESTAMPANNOS false)
+#endif
+#ifdef PRIO_QUEUE
+  -> FrontDropQueue(100)
 #endif
 #ifdef BCAST2UNIC
   -> unicfl                                                // transmit to other brn nodes
