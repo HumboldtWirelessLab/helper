@@ -89,6 +89,7 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   routing_peek::FloodingRoutingPeek(DEBUG FLOODING_DEBUG);
 
   input[0]  //to be send
+  -> e2eretry::FloodingEnd2EndRetry(DEFAULTRETRIES 3, DEFAULTTIMEOUT 500, TIMETOLERANCE 20, DEBUG 4)
   -> [0]fl;
 
   input[1]  //from brn
