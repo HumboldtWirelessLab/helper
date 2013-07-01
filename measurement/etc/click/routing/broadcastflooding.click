@@ -84,12 +84,24 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 #define BCAST_RNDDELAYQUEUE_MAXDELAY 20
 #endif
 
+#ifndef BCAST_E2E_RETRIES
+#define BCAST_E2E_RETRIES 0
+#endif
+#ifndef BCAST_E2E_TIMEOUT
+#define BCAST_E2E_TIMEOUT 500
+#endif
+#ifndef BCAST_E2E_TIMETOLERANCE
+#define BCAST_E2E_TIMETOLERANCE 20
+#endif
+
+
+
   fl_piggyback::FloodingPiggyback(FLOODING fl, LASTNODESPERPKT FLOODING_LASTNODES_PP, DEBUG 4);
 
   routing_peek::FloodingRoutingPeek(DEBUG FLOODING_DEBUG);
 
   input[0]  //to be send
-  -> e2eretry::FloodingEnd2EndRetry(DEFAULTRETRIES 3, DEFAULTTIMEOUT 500, TIMETOLERANCE 20, DEBUG 4)
+  -> e2eretry::FloodingEnd2EndRetry(DEFAULTRETRIES BCAST_E2E_RETRIES, DEFAULTTIMEOUT BCAST_E2E_TIMEOUT, TIMETOLERANCE BCAST_E2E_TIMETOLERANCE, DEBUG 4)
   -> [0]fl;
 
   input[1]  //from brn
