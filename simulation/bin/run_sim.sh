@@ -552,12 +552,10 @@ case "$MODE" in
 				fi
 
 				echo "$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1" >> $FINALRESULTDIR/run_again.sh
-				#( cd $FINALRESULTDIR; $GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
 			else
 				if [ "x$PROFILE" = "x1" ]; then
-				
-				        echo "$GETTIMESTATS ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1" >> $FINALRESULTDIR/run_again.sh
-					#( cd $FINALRESULTDIR; $GETTIMESTATS ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+					NS_FULL_PATH=`which ns`
+					echo "$GETTIMESTATS valgrind --tool=callgrind --callgrind-out-file=$FINALRESULTDIR/callgrind.out $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1" >> $FINALRESULTDIR/run_again.sh
 				else
 					if [ "x$GDB" = "x1" ]; then
 						NS_FULL_PATH=`which ns`
@@ -567,7 +565,6 @@ case "$MODE" in
 						exit 0
 					else
 						echo "$GETTIMESTATS ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1" >> $FINALRESULTDIR/run_again.sh
-						#( cd $FINALRESULTDIR; $GETTIMESTATS ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
 					fi
 				fi
 			fi
