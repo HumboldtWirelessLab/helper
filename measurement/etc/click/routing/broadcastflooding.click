@@ -94,9 +94,7 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 #define BCAST_E2E_TIMETOLERANCE 20
 #endif
 
-
-
-  fl_piggyback::FloodingPiggyback(FLOODING fl, LASTNODESPERPKT FLOODING_LASTNODES_PP, DEBUG 4);
+  fl_piggyback::FloodingPiggyback(NODEIDENTITY $id, FLOODING fl,  FLOODINGHELPER fl_helper, LASTNODESPERPKT FLOODING_LASTNODES_PP, DEBUG 4);
 
   routing_peek::FloodingRoutingPeek(DEBUG FLOODING_DEBUG);
 
