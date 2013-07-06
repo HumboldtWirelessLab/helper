@@ -555,7 +555,7 @@ case "$MODE" in
 			else
 				if [ "x$PROFILE" = "x1" ]; then
 					NS_FULL_PATH=`which ns`
-					echo "$GETTIMESTATS valgrind --tool=callgrind --callgrind-out-file=$FINALRESULTDIR/callgrind.out $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1" >> $FINALRESULTDIR/run_again.sh
+					echo "$GETTIMESTATS valgrind --tool=callgrind --collect-jumps=yes --callgrind-out-file=$FINALRESULTDIR/callgrind.out $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1" >> $FINALRESULTDIR/run_again.sh
 				else
 					if [ "x$GDB" = "x1" ]; then
 						NS_FULL_PATH=`which ns`
