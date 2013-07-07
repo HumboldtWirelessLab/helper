@@ -101,15 +101,24 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 #endif
 
   input[0]         //Ethernet
+#ifdef ROUTING_PERFORMANCE_CNT
+    -> routing_in_cnt_mecl::Counter()
+#endif
     -> [0]routing;
 
   input[1]         //BRN
+#ifdef ROUTING_PERFORMANCE_CNT
+    -> routing_in_cnt_brn::Counter()
+#endif
     -> [1]routing;
 
   input[2]        //BRN-Feedback (Failed)
     -> [2]routing;
 
   input[3]        //Overhear
+#ifdef ROUTING_PERFORMANCE_CNT
+    -> routing_in_cnt_passive::Counter()
+#endif
     -> [3]routing;
 
   input[4]        //BRN-Feedback (success)
@@ -122,16 +131,33 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 #ifdef ROUTINGDSR
     -> SetEtherAddr(SRC $ea)
 #endif
-    -> routing_cnt::Counter()
+#ifdef ROUTING_PERFORMANCE_CNT
+    -> routing_out_cnt_brn::Counter()
+#endif
     -> [0]output; //[0]device
 
   toMeAfterRouting[2]
+#ifdef ROUTING_PERFORMANCE_CNT
+    -> routing_out_cnt_cl::Counter()
+#endif
     -> [1]output; //[1]device
 
   toMeAfterRouting[0]
+#ifdef ROUTING_PERFORMANCE_CNT
+    -> routing_out_cnt_me::Counter()
+#endif
     -> [2]output; //to Me
 
   toMeAfterRouting[1]
+#ifdef ROUTING_PERFORMANCE_CNT
+    -> routing_out_cnt_bcast::Counter()
+#endif
     -> [3]output; //broadcast
 
+//#ifdef ROUTING_PERFORMANCE_CNT
+//  routing_pkt_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.count routing_in_cnt_brn.count routing_in_cnt_passive.count routing_out_cnt_brn.count routing_out_cnt_cl.count routing_out_cnt_me.count routing_out_cnt_bcast.count", DEBUG 4);
+//#endif
+
 }
+
+
