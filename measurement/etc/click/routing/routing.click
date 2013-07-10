@@ -154,9 +154,10 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 #endif
     -> [3]output; //broadcast
 
-//#ifdef ROUTING_PERFORMANCE_CNT
-//  routing_pkt_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.count routing_in_cnt_brn.count routing_in_cnt_passive.count routing_out_cnt_brn.count routing_out_cnt_cl.count routing_out_cnt_me.count routing_out_cnt_bcast.count", DEBUG 4);
-//#endif
+#ifdef ROUTING_PERFORMANCE_CNT
+  routing_pkt_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.count routing_in_cnt_brn.count routing_in_cnt_passive.count routing_out_cnt_brn.count routing_out_cnt_cl.count routing_out_cnt_me.count routing_out_cnt_bcast.count", DEBUG 2);
+  routing_byte_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.byte_count routing_in_cnt_brn.byte_count routing_in_cnt_passive.byte_count routing_out_cnt_brn.byte_count routing_out_cnt_cl.byte_count routing_out_cnt_me.byte_count routing_out_cnt_bcast.byte_count", DEBUG 2);
+#endif
 
 }
 
