@@ -94,12 +94,12 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 #define BCAST_E2E_TIMETOLERANCE 20
 #endif
 
-  fl_piggyback::FloodingPiggyback(NODEIDENTITY $id, FLOODING fl,  FLOODINGHELPER fl_helper, LASTNODESPERPKT FLOODING_LASTNODES_PP, DEBUG 4);
+  fl_piggyback::FloodingPiggyback(NODEIDENTITY $id, FLOODING fl,  FLOODINGHELPER fl_helper, LASTNODESPERPKT FLOODING_LASTNODES_PP, DEBUG FLOODING_DEBUG);
 
   routing_peek::FloodingRoutingPeek(DEBUG FLOODING_DEBUG);
 
   input[0]  //to be send
-  -> e2eretry::FloodingEnd2EndRetry(DEFAULTRETRIES BCAST_E2E_RETRIES, DEFAULTTIMEOUT BCAST_E2E_TIMEOUT, TIMETOLERANCE BCAST_E2E_TIMETOLERANCE, DEBUG 4)
+  -> e2eretry::FloodingEnd2EndRetry(DEFAULTRETRIES BCAST_E2E_RETRIES, DEFAULTTIMEOUT BCAST_E2E_TIMEOUT, TIMETOLERANCE BCAST_E2E_TIMETOLERANCE, DEBUG FLOODING_DEBUG)
   -> [0]fl;
 
   input[1]  //from brn
@@ -127,6 +127,7 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   -> unicfl                                                // transmit to other brn nodes
 #endif
   -> fl_piggyback
+  -> setsrc::BRN2SetSrcForNeighbor(LINKTABLE $lt, USEANNO true)
   -> BroadcastMultiplexer(NODEIDENTITY $id, USEANNO true)
   -> BRN2EtherEncap(USEANNO true)
   //-> Print("BroadcastMultiplexer out")
@@ -134,6 +135,7 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 
   input[3] //passive
   //-> Print("Flooding. Passive overhear",TIMESTAMP true)
+  -> [1]routing_peek[1]
   -> BRN2Decap()
   -> [4]fl;
 
@@ -148,6 +150,11 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   -> [5]fl;
 #endif
 
+
+  setsrc[1]
+  -> BRN2EtherEncap(USEANNO true)
+  -> Print("No Src for Dst",100)
+  -> Discard;
 }
 
 #endif

@@ -251,7 +251,7 @@ BRNAddressInfo(ipdev eth0:ip);
 #define FROMRAWDEVICE(x) FromDump(FILENAME DUMPFILESRC, TIMING true)
 #define TORAWDEVICE(x) Discard()
 #else 
-#define FROMRAWDEVICE(x) FromSimDevice(x, SNAPLEN 8190)
+#define FROMRAWDEVICE(x) FromSimDevice(x, SNAPLEN 8190, HEADROOM 192)
 #ifdef POLLING
 #define TORAWDEVICE(x) ToSimDevice(x, ENCAP UNKNOWN )
 #else
