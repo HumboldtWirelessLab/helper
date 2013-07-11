@@ -147,7 +147,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> Tos2QueueMapperTXFeedback(TOS2QM tosq)
 #endif
 #ifdef FOREIGNRXSTATS
-  -> ForeignRxStats(DEVICE $device,TIMEOUT 5, DEBUG 4)
+  -> ForeignRxStats(DEVICE $device,TIMEOUT 5, DEBUG 2)
 #endif
   -> [0]output;
 
