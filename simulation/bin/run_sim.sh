@@ -180,7 +180,10 @@ case "$MODE" in
 			fi
 		fi
 		
+		#echo "gen clickfile" >> $FINALRESULTDIR/time.log
+		#date +"%s:%N" >> $FINALRESULTDIR/time.log
 		DUMPFILEDIR=$DUMPFILEDIR USED_SIMULATOR=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR POSTFIX=$POSTFIX NODEPLACEMENTFILE=$FINALPLMFILE $DIR/prepare-sim.sh prepare $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
+		#date +"%s:%N" >> $FINALRESULTDIR/time.log
 		
 		mv $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX $FINALRESULTDIR/$DESCRIPTIONFILENAME.tmp
 		
@@ -262,12 +265,15 @@ case "$MODE" in
 		
 		cat $DIR/../etc/ns/radio/$RADIO\.tcl >> $TCLFILE
 		
+		#echo "gen placement" >> $FINALRESULTDIR/time.log
+		#date +"%s:%N" >> $FINALRESULTDIR/time.log
 		if [ "x$NODEPLACEMENT" != "xfile" ]; then
 			#let TOPORXRANGE=MAXRXRANGE+20
 			TOPORXRANGE=$MAXRXRANGE
 			NODEPLACEMENTOPTS="$NODEPLACEMENTOPTS" RXRANGE=$TOPORXRANGE $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
 			FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
 		fi
+		#date +"%s:%N" >> $FINALRESULTDIR/time.log
 		
 		POS_X_MAX=0
 		POS_Y_MAX=0
@@ -275,9 +281,10 @@ case "$MODE" in
 		
 		#echo "FIN: $FINALPLMFILE"
 		for node in $NODELIST; do
-			POS_X=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
-			POS_Y=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
-			POS_Z=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
+			POS_LINE=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]"`
+			POS_X=`echo $POS_LINE | awk '{print $2}'`
+			POS_Y=`echo $POS_LINE | awk '{print $3}'`
+			POS_Z=`echo $PRO_LINE | awk '{print $4}'`
 			if [ $POS_X -gt $POS_X_MAX ]; then
 				POS_X_MAX=$POS_X;
 			fi
@@ -322,7 +329,7 @@ case "$MODE" in
 		    echo "\$defaultRNG seed $SEED" >> $TCLFILE
 		    echo "set arrivalRNG [new RNG]" >> $TCLFILE
 		    echo "set sizeRNG [new RNG]" >> $TCLFILE
-		    
+
 #		    echo "set seed $SEED" >> $TCLFILE
 #		    echo "set seed $SEED" > /dev/null
 		fi
@@ -337,6 +344,8 @@ case "$MODE" in
 		NODEMAC_SEDARG=""
 		NODENAME_SEDARG=""
 		
+		#echo "gen nodes.mac" >> $FINALRESULTDIR/time.log
+		#date +"%s:%N" >> $FINALRESULTDIR/time.log
 		# Scann the node table to build a NetworkSimulator-Command for
 		# each line in the table, using mainly the information of "NODE" and
 		# "CLICKSCRIPT".
@@ -381,6 +390,7 @@ case "$MODE" in
 			NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#LASTNODE:eth#00-00-00-00-$m1h-$m2h#g"
 			NODENAME_SEDARG="$NODENAME_SEDARG -e s#LASTNODE#$last_node#g"
 		fi
+		#date +"%s:%N" >> $FINALRESULTDIR/time.log
 
                 if [ "x$DISABLE_TR" = "x1" ]; then
                   echo "set enable_tr 0" >> $TCLFILE
@@ -394,19 +404,22 @@ case "$MODE" in
                 fi
 		cat $DIR/../etc/ns/script_01.tcl | sed -e "s#NAME#$NAME#g" -e "s#RESULTDIR#$RESULTDIR#g" >> $TCLFILE
 
+		#echo "load click" >> $FINALRESULTDIR/time.log
+		#date +"%s:%N" >> $FINALRESULTDIR/time.log
 		i=0
 		# Scann the node table to build a NetworkSimulator-Command for
 		# each line in the table, using mainly the information of "NODE" and
 		# "CLICKSCRIPT".
-		for node in $NODELIST; do
-			NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-			for nodedevice in $NODEDEVICELIST; do
-				CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
-				# we tell the NS what click-script to load for a certain node
-				echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
-				let i=i+1
-			done
-		done
+                while read line; do
+			search=`echo "$line" | awk '{print "^"$1"[[:space:]]"$2"[[:space:]]"}'`
+			echo "$search" >> $FINALRESULTDIR/master.log
+
+			CLICK=`cat $NODETABLE | grep -v "#" | egrep "$search" | awk '{print $7}'`
+			# we tell the NS what click-script to load for a certain node
+			echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
+			let i=i+1
+		done < $FINALRESULTDIR/nodes.mac
+		#date +"%s:%N" >> $FINALRESULTDIR/time.log
 
 		echo "for {set i 0} {\$i < \$nodecount} {incr i} {" >> $TCLFILE
 		echo "     \$ns_ at 0.0 \"[\$node_(\$i) entry] runclick\"" >> $TCLFILE
@@ -414,10 +427,13 @@ case "$MODE" in
 		
 		i=0
 		
+		#echo "plm" >> $FINALRESULTDIR/time.log
+		#date +"%s:%N" >> $FINALRESULTDIR/time.log
 		for node in $NODELIST; do
-			POS_X=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
-			POS_Y=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
-			POS_Z=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
+			POS_LINE=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]"`
+			POS_X=`echo $POS_LINE | awk '{print $2}'`
+			POS_Y=`echo $POS_LINE | awk '{print $3}'`
+			POS_Z=`echo $PRO_LINE | awk '{print $4}'`
 			
 			NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 			
@@ -431,6 +447,7 @@ case "$MODE" in
 				i=`expr $i + 1`
 			done
 		done
+		#date +"%s:%N" >> $FINALRESULTDIR/time.log
 		
 		cat $DIR/../etc/ns/script_02.tcl >> $TCLFILE
 		
