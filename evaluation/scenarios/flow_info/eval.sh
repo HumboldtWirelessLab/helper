@@ -34,14 +34,6 @@ else
   fi
 fi
 
-FULLSED=""
-while read line; do
-  SRCN=`echo $line | awk '{print $1}'` 
-  SRCM=`echo $line | awk '{print $3}'`
-
-  FULLSED="$FULLSED -e s#$SRCM#$SRCN#g"
-done < $RESULTDIR/nodes.mac
-
 EVALUATIONSDIR="$EVALUATIONSDIR""/flow_info"
 if [ ! -e $EVALUATIONSDIR ]; then
   mkdir -p $EVALUATIONSDIR
@@ -56,8 +48,7 @@ RXCOUNT=`cat $EVALUATIONSDIR/flowstats_rx.csv | wc -l`
 TXBCASTCOUNT=`cat $EVALUATIONSDIR/flowstats_tx.csv | grep "FF-FF-FF-FF-FF-FF" | wc -l`
 TXUNICASTCOUNT=`cat $EVALUATIONSDIR/flowstats_tx.csv | grep -v "FF-FF-FF-FF-FF-FF" | wc -l`
 
+cat $EVALUATIONSDIR/flowstats_rx.csv | MAC2NUM=1 human_readable.sh $RESULTDIR/nodes.mac | sed "s#,# #g" > $EVALUATIONSDIR/flowstats_rx.mat
+cat $EVALUATIONSDIR/flowstats_tx.csv | MAC2NUM=1 human_readable.sh $RESULTDIR/nodes.mac | sed "s#,# #g" > $EVALUATIONSDIR/flowstats_tx.mat
 
-
-cat $EVALUATIONSDIR/flowstats_rx.csv | sed $FULLSED | sed "s#,# #g" > $EVALUATIONSDIR/flowstats_rx.mat
-cat $EVALUATIONSDIR/flowstats_tx.csv | sed $FULLSED | sed "s#,# #g" > $EVALUATIONSDIR/flowstats_tx.mat
-
+(cd $DIR; matwrapper.sh "flowstats('$EVALUATIONSDIR/flowstats_rx.mat','$EVALUATIONSDIR/flowtime.mat')")
