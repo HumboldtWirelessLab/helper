@@ -284,7 +284,7 @@ case "$MODE" in
 			POS_LINE=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]"`
 			POS_X=`echo $POS_LINE | awk '{print $2}'`
 			POS_Y=`echo $POS_LINE | awk '{print $3}'`
-			POS_Z=`echo $PRO_LINE | awk '{print $4}'`
+			POS_Z=`echo $POS_LINE | awk '{print $4}'`
 			if [ $POS_X -gt $POS_X_MAX ]; then
 				POS_X_MAX=$POS_X;
 			fi
@@ -433,7 +433,7 @@ case "$MODE" in
 			POS_LINE=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]"`
 			POS_X=`echo $POS_LINE | awk '{print $2}'`
 			POS_Y=`echo $POS_LINE | awk '{print $3}'`
-			POS_Z=`echo $PRO_LINE | awk '{print $4}'`
+			POS_Z=`echo $POS_LINE | awk '{print $4}'`
 			
 			NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
 			
