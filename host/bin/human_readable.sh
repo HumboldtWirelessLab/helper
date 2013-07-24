@@ -43,6 +43,9 @@ if [ "x$FILE" != "x" ]; then
   done < $FILE
 fi
 
+NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#FF-FF-FF-FF-FF-FF#Broadcast#g"
+NODEMAC2NUM_SEDARG="$NODEMAC2NUM_SEDARG -e s#FF-FF-FF-FF-FF-FF#65535#g"
+
 if [ "x$MAC2NUM" = "x1" ]; then
   sed $NODEMAC2NUM_SEDARG
 else
