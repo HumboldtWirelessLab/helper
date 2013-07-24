@@ -66,7 +66,7 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
 #endif
  -> BRN2EtherEncap() 
  -> [1]output;                                             // rreq packets (broadcast)
-  
+
   querier[1] 
 #ifdef DEBUG_DSR
   -> SetTimestamp()
@@ -83,7 +83,6 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
   -> Print("NODENAME: Forward", 100, TIMESTAMP true)
 #endif
   -> dsr_stats
-  -> routing_peek
   -> BRN2EtherEncap(USEANNO true)
   -> [1]output;
 
@@ -149,6 +148,7 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
   -> [1]output;
 
   dsrclf[3]
+  -> routing_peek
 #ifdef DEBUG_DSR
   -> Print("NODENAME: SRCFWD")
 #endif
