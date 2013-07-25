@@ -124,6 +124,13 @@ for {set i 0} {$i < $nodecount } {incr i} {
     $node_($i) topography $wtopo
     $node_($i) nodetrace $tracefd
 
+    $node_($i) set X_ $pos_x($i)
+    $node_($i) set Y_ $pos_y($i)
+    $node_($i) set Z_ $pos_z($i)
+    $node_($i) label $nodelabel($i)
+
+    [$node_($i) entry] loadclick $clickfile($i)
+
     #
     # The node name is used by Click to distinguish information
     # coming from different nodes. For example, a "Print" element
@@ -140,6 +147,7 @@ for {set i 0} {$i < $nodecount } {incr i} {
     # but there's no reason why each node couldn't use a different
     # script.
     #
+    $ns_ at 0.0 "[$node_($i) entry] runclick"
 }
 
 # 

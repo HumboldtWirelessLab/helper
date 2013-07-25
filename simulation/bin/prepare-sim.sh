@@ -58,6 +58,8 @@ case "$1" in
 		    WORKDIR=$RESULTDIR
 		fi
 
+		ALLNODES="| "`cat $CONFIGDIR/$NODETABLE`
+
 		echo -n "" > $RESULTDIR/$NODETABLE.$POSTFIX
 		while read line; do
 		    ISCOMMENT=`echo $line | grep "#" | wc -l`
@@ -94,14 +96,15 @@ case "$1" in
 			  while [ $NO_NODES -lt $LIMIT ]; do
 			    NEW_NODE="sk$AC_NODEID"
 
-			    AC_NODEID=`expr $AC_NODEID + 1`
+			    let AC_NODEID=AC_NODEID+1
 
-			    NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$NEW_NODE[[:space:]]*" | wc -l`
-			    NODEINFILE2=`cat $CONFIGDIR/$NODETABLE | grep -e "^$NEW_NODE[[:space:]]*" | wc -l`
+			    NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$NEW_NODE[[:space:]]" | wc -l`
+			    #NODEINFILE2=`cat $CONFIGDIR/$NODETABLE | grep -e "^$NEW_NODE[[:space:]]*" | wc -l`
+			    NODEINFILE2=`echo $ALLNODES | grep -e "[[:space:]]$NEW_NODE[[:space:]]" | wc -l`
 
 			    if [ $NODEINFILE -eq 0 ] && [ $NODEINFILE2 -eq 0 ]; then
 			      CNODES="$CNODES $NEW_NODE"
-			      NO_NODES=`expr $NO_NODES + 1`
+			      let NO_NODES=NO_NODES+1
 			    fi
 
 			  done
@@ -230,7 +233,7 @@ case "$1" in
             		    #echo "Found node $CNODE with device $CDEV. Step over"  
 			    continue
 			else
-			  NODES_OF_GROUP=`expr $NODES_OF_GROUP + 1`
+			  let NODES_OF_GROUP=NODES_OF_GROUP+1
 			fi
 
             if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
@@ -258,7 +261,7 @@ case "$1" in
 
                 CPPOPTS="$CPPOPTS -DNODENAME=$CNODE -DWIFITYPE=$NODEWIFITYPE"
 
-                ( cd $CONFIGDIR; cat $CLICK | add_include $HAS_BRNINCLUDE | cpp -I$DIR/../../measurement/etc/click $CPPOPTS -DCWMINPARAM="\"$CWMIN\"" -DCWMAXPARAM="\"$CWMAX\"" -DAIFSPARAM="\"$AIFS\"" | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" | grep -v "^#" > $CLICKFINALNAME )
+                ( cd $CONFIGDIR; cat $CLICK | add_include $HAS_BRNINCLUDE | cpp -I$DIR/../../measurement/etc/click $CPPOPTS -DCWMINPARAM="\"$CWMIN\"" -DCWMAXPARAM="\"$CWMAX\"" -DAIFSPARAM="\"$AIFS\"" | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" | grep -v "^#" > $CLICKFINALNAME ) &
 
             else
               CLICKFINALNAME="-"
