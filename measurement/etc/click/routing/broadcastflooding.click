@@ -9,6 +9,7 @@
 
 //[0]output: Local copy (broadcast)
 //[1]output: To other brn nodes
+//[2]output - Feedback packets for upper layer
 
 #ifndef FLOODING_DEBUG
 #define FLOODING_DEBUG 2
@@ -149,11 +150,15 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   -> [5]fl;
 #endif
 
-
   setsrc[1]
   -> BRN2EtherEncap(USEANNO true)
   -> Print("No Src for Dst",100)
   -> Discard;
+
+#ifdef ROUTING_TXFEEDBACK
+  Idle -> [2]output;
+#endif
+
 }
 
 #endif

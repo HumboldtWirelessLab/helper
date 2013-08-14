@@ -8,6 +8,7 @@
 // [1]output - BRN packets to internal nodes (BRN  protocol)
 // [2]output - to me
 // [3]output - broadcast
+// [4]output - txfeedback for upper layer
 
 #include "brn/brn.click"
 #include "dsr.click"
@@ -113,6 +114,7 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
     -> [1]routing;
 
   input[2]        //BRN-Feedback (Failed)
+    -> Print("NODENAME: Failed")
     -> [2]routing;
 
   input[3]        //Overhear
@@ -122,6 +124,7 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
     -> [3]routing;
 
   input[4]        //BRN-Feedback (success)
+    -> Print("NODENAME: Succ")
     -> [4]routing;
 
   routing[0]      //Ethernet
@@ -153,6 +156,10 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
     -> routing_out_cnt_bcast::Counter()
 #endif
     -> [3]output; //broadcast
+
+#ifdef ROUTING_TXFEEDBACK
+   routing[2] -> [4]output;
+#endif
 
 #ifdef ROUTING_PERFORMANCE_CNT
   routing_pkt_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.count routing_in_cnt_brn.count routing_in_cnt_passive.count routing_out_cnt_brn.count routing_out_cnt_cl.count routing_out_cnt_me.count routing_out_cnt_bcast.count", DEBUG 2);

@@ -6,6 +6,7 @@
 // input[4] - txfeedback: successful transmission of a BRN BroadcastRouting  packet
 // [0]output - ethernet (802.3) frames to external nodes/clients or me (no BRN protocol)
 // [1]output - BRN GEOR packets to internal nodes (BRN GEOR protocol)
+// [2]output - Feedback packets for upper layer
 
 elementclass HAWK {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting, $lt, $lph, $dht, $debug |
 
@@ -58,5 +59,9 @@ hawkfwd::HawkForwarder( NODEIDENTITY $ID, ROUTINGTABLE rt,FRT $dhtroutingtable, 
   input[2] -> Discard;
   input[3] -> Discard;
   input[4] -> Discard;
+
+#ifdef ROUTING_TXFEEDBACK
+  Idle -> [2]output;
+#endif
 }
 

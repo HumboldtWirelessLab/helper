@@ -137,7 +137,6 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 #ifdef PLE
   -> ple
-  //-> co_cst
 #endif
 #endif
 #ifdef CERR

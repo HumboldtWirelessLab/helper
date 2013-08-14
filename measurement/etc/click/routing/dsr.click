@@ -5,6 +5,7 @@
 // input[4] - txfeedback: successful transmission of a BRN BroadcastRouting  packet
 // [0]output - ethernet (802.3) frames to external nodes/clients or me (no BRN protocol)
 // [1]output - BRN DSR packets to internal nodes (BRN DSR protocol)
+// [2]output - Feedback packets for upper layer
 
 
 #ifndef DSR_PARAM_LAST_HOP_OPT
@@ -54,6 +55,8 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
 
   err_forwarder :: BRN2ErrorForwarder(NODEIDENTITY $ID, LINKTABLE $LT, DSRENCAP dsr_encap, DSRDECAP dsr_decap, ROUTEQUERIER querier, DEBUG 2);
   routing_peek :: DSRPeek(DEBUG 2);
+
+  feedback_handler :: DSRHandleFeedback(NODEIDENTITY $ID, DEBUG 2);
 
   input[0]
 #ifdef DEBUG_DSR
@@ -158,10 +161,21 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
   // undeliverable packets
   // ------------------
   input[2]
-  //-> Discard;
+  //-> Print("TXF failed",50)
+  -> [1]feedback_handler[0]
   -> [0]err_forwarder;
 
-  input[3] -> Discard;
-  input[4] -> Discard;
+  input[3] -> Discard; //passive
+
+  input[4]
+  //-> Print("TXF succ",50)
+  -> [0]feedback_handler;
+
+#ifdef ROUTING_TXFEEDBACK
+  feedback_handler[1] -> [2]output;
+#else
+  feedback_handler[1] -> Discard;
+#endif
+
 }
 

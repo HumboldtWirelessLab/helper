@@ -19,7 +19,7 @@ javac -cp lib/jargs.jar:lib/mantissa-7.2.jar src/Visualize/*.java > /dev/null 2>
 
 if [ "x$RXRANGE" = "x" ]; then
   RXRANGE=100
-fi  
+fi
 
 #java -classpath $NPART_DIR/classes/:$NPART_DIR/lib/jargs.jar:$NPART_DIR/lib/mantissa-7.2.jar NPART.TopologyGenerator -h
 
