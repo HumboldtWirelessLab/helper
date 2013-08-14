@@ -64,7 +64,7 @@ int main(void)
   uint32_t structsize = 28;
 
   for (;((sizeof(regmon_dump) % structsize) != 0) && (structsize < 56); structsize += 4);
-  if ( structsize == 64 ) structsize = 32;
+  if ( structsize == 56 ) structsize = 28;
 
   uint32_t cnt_structvalues = structsize / 4;
 
@@ -74,13 +74,13 @@ int main(void)
   c = 0;
 
   for( i = 0; i < max; i++ ) {
-    for( j = 0; j < 7; j++ ) {
+    for( j = 0; j < 7; j++ ) {   // jiffies nsec sec cycles busy_cycles rx_cycles tx_cycles
       printf("%u ", p[c]);
       c++;
     }
-    uint64_t tv64 = p[c-5];
-    tv64 = tv64 << (uint64_t)36;
-    tv64 += (uint64_t)p[c-6];
+    uint64_t tv64 = p[c-5];      // get sec
+    tv64 = tv64 << (uint64_t)32; // shift (sec to nsec)
+    tv64 += (uint64_t)p[c-6];    // add nsec
     printf("%" PRIu64 " ",tv64);
 
     for(; j < cnt_structvalues; j++ ) {
