@@ -16,7 +16,17 @@
 	<xsl:value-of select="@avg_hops" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="@packet_count" /><xsl:text>,</xsl:text>
 	<xsl:variable name="smac" select="@src" />
-	<xsl:value-of select="../../flowstats[@node=$smac]/txflow/@packet_count" /><xsl:value-of select="$newline" />
+	<xsl:variable name="dmac" select="@dst" />
+	<xsl:variable name="psize" select="@packet_size" />
+	<xsl:variable name="fid" select="@flowid" />
+	<xsl:value-of select="../../flowstats/txflow[@src=$smac and @dst=$dmac and @packet_size=$psize and @flowid=$fid]/@packet_count" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@packet_size" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@min_hops" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@max_hops" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@time" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@min_time" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@max_time" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@flowid" /><xsl:value-of select="$newline" />
     </xsl:template>
 
 </xsl:stylesheet>

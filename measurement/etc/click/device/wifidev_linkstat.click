@@ -26,8 +26,8 @@
 #define DEFAULT_DATARATE 2
 #endif
 
-#ifndef DEFAULT_DATARETRIES
-#define DEFAULT_DATARETRIES 11
+#ifndef DEFAULT_DATATRIES
+#define DEFAULT_DATATRIES 11
 #endif
 
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
@@ -59,7 +59,6 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
-  //rawWifiDevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
 #if WIFITYPE == 805
@@ -67,7 +66,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #else
   -> data_power::BrnSetTXPower(DEVICE $device, POWER 16)
 #endif
-  -> data_rate::SetTXRate(RATE DEFAULT_DATARATE, TRIES DEFAULT_DATARETRIES)
+  -> data_rate::SetTXRates(RATE0 DEFAULT_DATARATE, TRIES0 DEFAULT_DATATRIES, TRIES1 0, TRIES2 0, TRIES3 0)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
 //  -> SetTimestamp()
 //  -> Print("NODENAME: In Queue", 100, TIMESTAMP true)
@@ -195,6 +194,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #ifdef PRIO_QUEUE
 
   input[2]
+  -> x_data_rate::SetTXRates(RATE0 DEFAULT_DATARATE, TRIES0 DEFAULT_DATATRIES, TRIES1 0, TRIES2 0, TRIES3 0)
   -> x_brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> [1]x_prio_q;
 
@@ -203,6 +203,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   ig_feedback_clf[0]
   -> qc::BRN2PacketQueueControl(QUEUESIZEHANDLER qc_q.length, QUEUERESETHANDLER qc_q.reset, MINP 200, MAXP 500, SUPPRESSORHANDLER qc_suppressor.active0, DISABLE_QUEUE_RESET false, TXFEEDBACK_REUSE true, DEBUG 2)
+  -> Print("packet")
   -> EtherEncap(0x8888, $etheraddress, ff:ff:ff:ff:ff:ff)
   -> WifiEncap(0x00, 0:0:0:0:0:0)
   -> qc_rate :: SetTXRate(2)

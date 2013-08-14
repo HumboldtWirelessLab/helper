@@ -8,7 +8,13 @@
 // [1]output - BRN GEOR packets to internal nodes (BRN GEOR protocol)
 
 elementclass HAWK {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting, $lt, $lph, $dht, $debug |
-  rt::HawkRoutingtable(LPRH $lph, SUCCM $dht/dhtsuccessormaintenance, RTM $dht/dhtroutemaintenance, LINKTABLE $lt, DEBUG 4);
+
+#ifdef USEMETRIC
+#define UMETRIC true
+#else
+#define UMETRIC false 
+#endif
+  rt::HawkRoutingtable(LPRH $lph, SUCCM $dht/dhtsuccessormaintenance, RTM $dht/dhtroutemaintenance, LINKTABLE $lt,USE_METRIC UMETRIC, DEBUG 4);
   hawkroutequerier::HawkRouteQuerier( NODEIDENTITY $ID, DHTSTORAGE $dhtstorage, DHTROUTING $dhtrouting, RT rt, FRT $dhtroutingtable, DEBUG 0);
 
 
@@ -50,7 +56,7 @@ hawkfwd::HawkForwarder( NODEIDENTITY $ID, ROUTINGTABLE rt,FRT $dhtroutingtable, 
   -> Discard;
 
   input[2] -> Discard;
-//  input[3] -> Discard;
-//  input[4] -> Discard;
+  input[3] -> Discard;
+  input[4] -> Discard;
 }
 

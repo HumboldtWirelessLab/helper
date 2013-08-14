@@ -37,12 +37,22 @@ $ns_ use-scheduler Heap
 #
 # Create and activate trace files.
 #
-set tracefd     [open "RESULTDIR/NAME.tr" w]
-set namtrace    [open "RESULTDIR/NAME.nam" w]
+if { $enable_tr == 1 } {
+  set tracefd     [open "RESULTDIR/NAME.tr" w]
+} else {
+  set tracefd     [open "/dev/null" w]
+}
+
 $ns_ trace-all $tracefd
+
+if { $enable_nam == 1 } {
+  set namtrace    [open "RESULTDIR/NAME.nam" w]
+} else {
+  set namtrace    [open "/dev/null" w]
+}
+
 $ns_ namtrace-all-wireless $namtrace $xsize $ysize
 $ns_ use-newtrace
-
 
 #
 # Create the "god" object. This is another artifact of using
@@ -114,6 +124,13 @@ for {set i 0} {$i < $nodecount } {incr i} {
     $node_($i) topography $wtopo
     $node_($i) nodetrace $tracefd
 
+    $node_($i) set X_ $pos_x($i)
+    $node_($i) set Y_ $pos_y($i)
+    $node_($i) set Z_ $pos_z($i)
+    $node_($i) label $nodelabel($i)
+
+    [$node_($i) entry] loadclick $clickfile($i)
+
     #
     # The node name is used by Click to distinguish information
     # coming from different nodes. For example, a "Print" element
@@ -130,6 +147,7 @@ for {set i 0} {$i < $nodecount } {incr i} {
     # but there's no reason why each node couldn't use a different
     # script.
     #
+    $ns_ at 0.0 "[$node_($i) entry] runclick"
 }
 
 # 

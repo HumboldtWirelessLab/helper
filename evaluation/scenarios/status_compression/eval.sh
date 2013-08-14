@@ -32,5 +32,13 @@ if [ -e $RESULTDIR/$NAME.nam ]; then
     ( cd $RESULTDIR; bzip2 -9 $NAME.nam)
 fi
 
+if [ -e $RESULTDIR/measurement.log ]; then
+  if [ ! -e $RESULTDIR/measurement.log.bz2 ]; then
+    ( cd $RESULTDIR; bzip2 -9 measurement.log)
+  else
+    ( cd $RESULTDIR; rm -f measurement.log )
+  fi
+fi
+
 exit 0
 

@@ -129,6 +129,8 @@ MODE=sim
 
 case "$MODE" in
 	"sim")
+		declare -a dectohex=('00' '01' '02' '03' '04' '05' '06' '07' '08' '09' '0A' '0B' '0C' '0D' '0E' '0F' '10' '11' '12' '13' '14' '15' '16' '17' '18' '19' '1A' '1B' '1C' '1D' '1E' '1F' '20' '21' '22' '23' '24' '25' '26' '27' '28' '29' '2A' '2B' '2C' '2D' '2E' '2F' '30' '31' '32' '33' '34' '35' '36' '37' '38' '39' '3A' '3B' '3C' '3D' '3E' '3F' '40' '41' '42' '43' '44' '45' '46' '47' '48' '49' '4A' '4B' '4C' '4D' '4E' '4F' '50' '51' '52' '53' '54' '55' '56' '57' '58' '59' '5A' '5B' '5C' '5D' '5E' '5F' '60' '61' '62' '63' '64' '65' '66' '67' '68' '69' '6A' '6B' '6C' '6D' '6E' '6F' '70' '71' '72' '73' '74' '75' '76' '77' '78' '79' '7A' '7B' '7C' '7D' '7E' '7F' '80' '81' '82' '83' '84' '85' '86' '87' '88' '89' '8A' '8B' '8C' '8D' '8E' '8F' '90' '91' '92' '93' '94' '95' '96' '97' '98' '99' '9A' '9B' '9C' '9D' '9E' '9F' 'A0' 'A1' 'A2' 'A3' 'A4' 'A5' 'A6' 'A7' 'A8' 'A9' 'AA' 'AB' 'AC' 'AD' 'AE' 'AF' 'B0' 'B1' 'B2' 'B3' 'B4' 'B5' 'B6' 'B7' 'B8' 'B9' 'BA' 'BB' 'BC' 'BD' 'BE' 'BF' 'C0' 'C1' 'C2' 'C3' 'C4' 'C5' 'C6' 'C7' 'C8' 'C9' 'CA' 'CB' 'CC' 'CD' 'CE' 'CF' 'D0' 'D1' 'D2' 'D3' 'D4' 'D5' 'D6' 'D7' 'D8' 'D9' 'DA' 'DB' 'DC' 'DD' 'DE' 'DF' 'E0' 'E1' 'E2' 'E3' 'E4' 'E5' 'E6' 'E7' 'E8' 'E9' 'EA' 'EB' 'EC' 'ED' 'EE' 'EF' 'F0' 'F1' 'F2' 'F3' 'F4' 'F5' 'F6' 'F7' 'F8' 'F9' 'FA' 'FB' 'FC' 'FD' 'FE' 'FF');
+	
 		if [ "x$USED_SIMULATOR" = "xjist" ]; then
 			POSTFIX=jist
 		else if [ "x$USED_SIMULATOR" = "xns3" ]; then
@@ -180,7 +182,13 @@ case "$MODE" in
 			fi
 		fi
 		
+		echo "gen clickfile" >> $FINALRESULTDIR/time.log
+		date +"%s:%N" >> $FINALRESULTDIR/time.log
 		DUMPFILEDIR=$DUMPFILEDIR USED_SIMULATOR=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR POSTFIX=$POSTFIX NODEPLACEMENTFILE=$FINALPLMFILE $DIR/prepare-sim.sh prepare $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
+		date +"%s:%N" >> $FINALRESULTDIR/time.log
+
+		echo "run_sim" >> $FINALRESULTDIR/time.log
+		date +"%s:%N" >> $FINALRESULTDIR/time.log
 		
 		mv $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX $FINALRESULTDIR/$DESCRIPTIONFILENAME.tmp
 		
@@ -262,6 +270,8 @@ case "$MODE" in
 		
 		cat $DIR/../etc/ns/radio/$RADIO\.tcl >> $TCLFILE
 		
+		echo "gen placement" >> $FINALRESULTDIR/time.log
+		date +"%s:%N" >> $FINALRESULTDIR/time.log
 		if [ "x$NODEPLACEMENT" != "xfile" ]; then
 			#let TOPORXRANGE=MAXRXRANGE+20
 			TOPORXRANGE=$MAXRXRANGE
@@ -269,29 +279,34 @@ case "$MODE" in
 			FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
 		fi
 		
-		POS_X_MAX=0
-		POS_Y_MAX=0
-		POS_Z_MAX=0
+		#POS_X_MAX=0
+		#POS_Y_MAX=0
+		#POS_Z_MAX=0
 		
 		#echo "FIN: $FINALPLMFILE"
-		for node in $NODELIST; do
-			POS_X=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
-			POS_Y=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
-			POS_Z=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
-			if [ $POS_X -gt $POS_X_MAX ]; then
-				POS_X_MAX=$POS_X;
-			fi
-			if [ $POS_Y -gt $POS_Y_MAX ]; then
-				POS_Y_MAX=$POS_Y;
-			fi
-			if [ $POS_Z -gt $POS_Z_MAX ]; then
-				POS_Z_MAX=$POS_Z;
-			fi
-		done
+		#for node in $NODELIST; do
+		#	POS_LINE=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]"`
+		#	POS_X=`echo $POS_LINE | awk '{print $2}'`
+		#	POS_Y=`echo $POS_LINE | awk '{print $3}'`
+		#	POS_Z=`echo $POS_LINE | awk '{print $4}'`
+		#	if [ $POS_X -gt $POS_X_MAX ]; then
+		#		POS_X_MAX=$POS_X;
+		#	fi
+		#	if [ $POS_Y -gt $POS_Y_MAX ]; then
+		#		POS_Y_MAX=$POS_Y;
+		#	fi
+		#	if [ $POS_Z -gt $POS_Z_MAX ]; then
+		#		POS_Z_MAX=$POS_Z;
+		#	fi
+		#done
 		
-		POS_X_MAX=`expr $POS_X_MAX + 50`
-		POS_Y_MAX=`expr $POS_Y_MAX + 50`
-		POS_Z_MAX=`expr $POS_Z_MAX + 50`
+		POS_X_MAX=`cat $FINALPLMFILE | awk '{print $2}' | sort | tail -n 1`
+		POS_Y_MAX=`cat $FINALPLMFILE | awk '{print $3}' | sort | tail -n 1`
+		POS_Z_MAX=`cat $FINALPLMFILE | awk '{print $4}' | sort | tail -n 1`
+		
+		let POS_X_MAX=POS_X_MAX+50
+		let POS_Y_MAX=POS_Y_MAX+50
+		let POS_Z_MAX=POS_Z_MAX+50
 		
 		if [ "x$FIELDSIZE" = "x" ]; then
 			FIELDSIZE=$POS_X_MAX
@@ -322,7 +337,7 @@ case "$MODE" in
 		    echo "\$defaultRNG seed $SEED" >> $TCLFILE
 		    echo "set arrivalRNG [new RNG]" >> $TCLFILE
 		    echo "set sizeRNG [new RNG]" >> $TCLFILE
-		    
+
 #		    echo "set seed $SEED" >> $TCLFILE
 #		    echo "set seed $SEED" > /dev/null
 		fi
@@ -333,97 +348,89 @@ case "$MODE" in
 
 		i=0
 		echo -n "" > $FINALRESULTDIR/nodes.mac
-		
+
 		NODEMAC_SEDARG=""
 		NODENAME_SEDARG=""
 		
+		echo "" >> $TCLFILE
+		
+		echo "gen nodes.mac" >> $FINALRESULTDIR/time.log
+		date +"%s:%N" >> $FINALRESULTDIR/time.log
 		# Scann the node table to build a NetworkSimulator-Command for
 		# each line in the table, using mainly the information of "NODE" and
 		# "CLICKSCRIPT".
 		for node in $NODELIST; do
-			NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-			for nodedevice in $NODEDEVICELIST; do
-				
+			POS_LINE=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]"`
+			read TRASH POS_X POS_Y POS_Z <<< $POS_LINE
+			#POS_X=`echo $POS_LINE | awk '{print $2}'`
+			#POS_Y=`echo $POS_LINE | awk '{print $3}'`
+			#POS_Z=`echo $POS_LINE | awk '{print $4}'`
+
+			NODEDEVICELIST_CLICK=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2","$7}'`
+
+			for nodedevice_click in $NODEDEVICELIST_CLICK; do
+
+				IFS=, read nodedevice_click_nospace <<< $nodedevice_click
+				read nodedevice CLICK <<< $nodedevice_click_nospace
+
 				if [ "x$NAME2MAC" = "xyes" ]; then
 				  mac_raw=`echo $node | sed -e "s#[a-z]*[A-Z]*##g"`
 				else
-				  mac_raw=`expr $i + 1`
+				  let mac_raw=i+1
 				fi
 
-				m1=`expr $mac_raw / 256`
-				m2=`expr $mac_raw % 256`
-				m1h=$(echo "obase=16; $m1" | bc)
-				m2h=$(echo "obase=16; $m2" | bc)
-				if [ $m1 -lt 16 ]; then
-					m1h="0$m1h"
-				fi
-				if [ $m2 -lt 16 ]; then
-					m2h="0$m2h"
-				fi
-				echo "$node $nodedevice 00-00-00-00-$m1h-$m2h $mac_raw" >> $FINALRESULTDIR/nodes.mac
+				let m1=mac_raw/256
+				let m2=mac_raw%256
+
+				nodemac="00-00-00-00-${dectohex[m1]}-${dectohex[m2]}"
+				echo "$node $nodedevice $nodemac $mac_raw" >> $FINALRESULTDIR/nodes.mac
 				if [ "x$NODEMAC_SEDARG" = "x" ]; then
-					NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#FIRSTNODE:eth#00-00-00-00-$m1h-$m2h#g"
-					NODENAME_SEDARG="$NODENAME_SEDARG -e s#FIRSTNODE#$node#g"
+					NODEMAC_SEDARG="-e s#FIRSTNODE:eth#$nodemac#g"
+					NODENAME_SEDARG="-e s#FIRSTNODE#$node#g"
 				fi
 				
-				NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#$node:eth#00-00-00-00-$m1h-$m2h#g"
+				NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#$node:eth#$nodemac#g"
 
 				echo "set node_name($i) \"$node\"" >> $TCLFILE
-				echo "set node_mac($i) \"00:00:00:00:$m1h:$m2h\"" >> $TCLFILE
+				echo "set node_mac($i) \"00:00:00:00:${dectohex[m1]}:${dectohex[m2]}\"" >> $TCLFILE
+
+				echo "set pos_x($i) $POS_X" >> $TCLFILE
+				echo "set pos_y($i) $POS_Y" >> $TCLFILE
+				echo "set pos_z($i) $POS_Z" >> $TCLFILE
+				echo "set nodelabel($i) \"$node.$nodedevice\"" >> $TCLFILE
+				
+				
+				#CLICK=`cat $NODETABLE | egrep "^$node[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
+				echo "set clickfile($i) \"$CLICK\"" >> $TCLFILE
+
+				let POS_X=POS_X+1
 
 				let i=i+1
-				
-				last_node=$node
 			done
 		done
 		
 		if [ "x$NODEMAC_SEDARG" != "x" ]; then
-			NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#LASTNODE:eth#00-00-00-00-$m1h-$m2h#g"
-			NODENAME_SEDARG="$NODENAME_SEDARG -e s#LASTNODE#$last_node#g"
+			NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#LASTNODE:eth#$nodemac#g"
+			NODENAME_SEDARG="$NODENAME_SEDARG -e s#LASTNODE#$node#g"
 		fi
+
+                if [ "x$DISABLE_TR" = "x1" ]; then
+                  echo "set enable_tr 0" >> $TCLFILE
+                else
+                  echo "set enable_tr 1" >> $TCLFILE
+                fi
+                if [ "x$DISABLE_NAM" = "x1" ]; then
+                  echo "set enable_nam 0" >> $TCLFILE
+                else
+                  echo "set enable_nam 1" >> $TCLFILE
+                fi
 
 		cat $DIR/../etc/ns/script_01.tcl | sed -e "s#NAME#$NAME#g" -e "s#RESULTDIR#$RESULTDIR#g" >> $TCLFILE
 
-		i=0
-		# Scann the node table to build a NetworkSimulator-Command for
-		# each line in the table, using mainly the information of "NODE" and
-		# "CLICKSCRIPT".
-		for node in $NODELIST; do
-			NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-			for nodedevice in $NODEDEVICELIST; do
-				CLICK=`cat $NODETABLE | grep -v "#" | egrep "^$node[[:space:]]" | egrep "[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
-				# we tell the NS what click-script to load for a certain node
-				echo "[\$node_($i) entry] loadclick \"$CLICK\"" >> $TCLFILE
-				let i=i+1
-			done
-		done
-
-		echo "for {set i 0} {\$i < \$nodecount} {incr i} {" >> $TCLFILE
-		echo "     \$ns_ at 0.0 \"[\$node_(\$i) entry] runclick\"" >> $TCLFILE
-		echo " }" >> $TCLFILE
-		
-		i=0
-		
-		for node in $NODELIST; do
-			POS_X=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $2}'`
-			POS_Y=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $3}'`
-			POS_Z=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]" | awk '{print $4}'`
-			
-			NODEDEVICELIST=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2}'`
-			
-			for nodedevice in $NODEDEVICELIST; do
-				echo "\$node_($i) set X_ $POS_X" >> $TCLFILE
-				echo "\$node_($i) set Y_ $POS_Y" >> $TCLFILE
-				echo "\$node_($i) set Z_ $POS_Z" >> $TCLFILE
-				echo "\$node_($i) label $node.$nodedevice" >> $TCLFILE
-				
-				POS_X=`expr $POS_X + 1`
-				i=`expr $i + 1`
-			done
-		done
-		
 		cat $DIR/../etc/ns/script_02.tcl >> $TCLFILE
 		
+		echo "handle" >> $FINALRESULTDIR/time.log
+		date +"%s:%N" >> $FINALRESULTDIR/time.log
 		#echo "Handle Control file"
 		# Evaluate the control file (*.ctl)
 		if [ "x$CONTROLFILE" != "x" ]; then
@@ -434,8 +441,12 @@ case "$MODE" in
 				ISCOMMENT=`echo $line | grep "#" | wc -l`
 				if [ $ISCOMMENT -eq 0 ]; then
 					# collect information of control file
+					#read TIME NODENAME NODEDEVICE MODE ELEMENT HANDLER <<< $line
+					#NODENAME=`echo $NODENAME | sed $NODENAME_SEDARG`
+					
+					#OLD VERSION
 					TIME=`echo $line | awk '{print $1}'`
-					NODENAME=`echo $line | awk '{print $2}' | sed $NODENAME_SEDARG | sed "s#,# #g"`
+					NODENAME=`echo $line | awk '{print $2}' | sed $NODENAME_SEDARG`
 					NODEDEVICE=`echo $line | awk '{print $3}'`
 					MODE=`echo $line | awk '{print $4}'`
 					ELEMENT=`echo $line | awk '{print $5}'`
@@ -454,7 +465,7 @@ case "$MODE" in
 					for n in $HANDLERNODES; do
 						
 						NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$n[[:space:]]" | awk '{print $4}'`
-						NODENUM=`expr $NODENUM - 1`
+						let NODENUM=NODENUM-1
 						if [ "x$TIME" != "x" ]; then
 							
 							# the write handler
@@ -476,9 +487,7 @@ case "$MODE" in
 								elif [ "x$MODE" = "xmove" ]; then
 								MOVE_MODE=$ELEMENT
 								MOVE_SPEED=$HANDLER
-								MOVE_X=`echo $line | awk '{print $7}'`
-								MOVE_Y=`echo $line | awk '{print $8}'`
-								MOVE_Z=`echo $line | awk '{print $9}'`
+								read TRASH1 TRASH2 TRASH3 TRASH4 TRASH5 TRASH6 MOVE_X MOVE_Y MOVE_Z <<< $line
 								if [ "x$USED_SIMULATOR" = "xns" ]; then
 									echo "\$ns_ at $TIME \"\$node_($NODENUM) setdest $MOVE_X $MOVE_Y $MOVE_SPEED\"" >> $TCLFILE
 								else
@@ -518,6 +527,9 @@ case "$MODE" in
 		else
 			GETTIMESTATS=""
 		fi
+
+		echo "prepare run_again" >> $FINALRESULTDIR/time.log
+		date +"%s:%N" >> $FINALRESULTDIR/time.log
 		
 		echo "#!/bin/sh" > $FINALRESULTDIR/run_again.sh
 		
@@ -542,12 +554,10 @@ case "$MODE" in
 				fi
 
 				echo "$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1" >> $FINALRESULTDIR/run_again.sh
-				#( cd $FINALRESULTDIR; $GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1 )
 			else
 				if [ "x$PROFILE" = "x1" ]; then
-				
-				        echo "$GETTIMESTATS ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1" >> $FINALRESULTDIR/run_again.sh
-					#( cd $FINALRESULTDIR; $GETTIMESTATS ns-profile $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
+					NS_FULL_PATH=`which ns`
+					echo "$GETTIMESTATS valgrind --tool=callgrind --collect-jumps=yes --callgrind-out-file=$FINALRESULTDIR/callgrind.out $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1" >> $FINALRESULTDIR/run_again.sh
 				else
 					if [ "x$GDB" = "x1" ]; then
 						NS_FULL_PATH=`which ns`
@@ -557,7 +567,6 @@ case "$MODE" in
 						exit 0
 					else
 						echo "$GETTIMESTATS ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1" >> $FINALRESULTDIR/run_again.sh
-						#( cd $FINALRESULTDIR; $GETTIMESTATS ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1 )
 					fi
 				fi
 			fi
@@ -598,6 +607,7 @@ case "$MODE" in
 		else
 			exit 1
 		fi
+		date +"%s:%N" >> $FINALRESULTDIR/time.log
 	;;
 esac
 
