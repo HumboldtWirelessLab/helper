@@ -1,15 +1,12 @@
-function [matrix_likelihood_collisions] = func_sim_mean_per_station_calculation(matrix, matrix_packets_successful_delivered,read_3D_on)
-    matrix_likelihood_collisions = zeros(size(matrix,1),size(matrix,2),size(matrix,3));
-    for p=1:1:size(matrix,3)
-        for t=1:1:size(matrix,2)
-            for z=1:1:size(matrix,1)
-                if (read_3D_on == 1)
-                    matrix_likelihood_collisions(z,t,p) = matrix(z,t,p) / (matrix(z,t,p) + matrix_packets_successful_delivered(z,t,p));
-                else
-                    matrix_likelihood_collisions(z,t,p) = matrix(z,t,p) / (matrix(z,t,p) + matrix_packets_successful_delivered(p,t));
+function [matrix_likelihood_collisions] = func_sim_mean_per_station_calculation(matrix_2D, matrix_packets_successful_delivered)
+    matrix_likelihood_collisions = zeros(size(matrix_2D,1),size(matrix_2D,2));
+        for t=1:1:size(matrix_2D,1)
+            for z=1:1:size(matrix_2D,2)
+                if (matrix_2D(z,t,p) + matrix_packets_successful_delivered(p,t) > 0)
+                    matrix_likelihood_collisions(t,z) = matrix_2D(t,z) / (matrix_2D(t,z) + matrix_packets_successful_delivered(t,z));
                 end
             end
         end
-    end
+   
 end
 

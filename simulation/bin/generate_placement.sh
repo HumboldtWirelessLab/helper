@@ -29,7 +29,7 @@ case "$1" in
     "random")
           NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
           NODECOUNT=`echo $NODES | wc -w`
-    
+
 	  if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
 	    NODEDIST=$3
 	    SIDELEN=`echo "sqrt(${NODECOUNT})*${NODEDIST}" | bc`
@@ -49,14 +49,14 @@ case "$1" in
           NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
           NODECOUNT=`echo $NODES | wc -w`
           SIDELEN=`echo "sqrt($NODECOUNT)" | bc`
-	  SLSQR=`expr $SIDELEN \* $SIDELEN`
+	  let SLSQR=SIDELEN*SIDELEN
 	  #echo "NODECOUNT: $NODECOUNT  SLSQR: $SLSQR"
 	  if [ $SLSQR -lt $NODECOUNT ]; then
-	    SIDELEN=`expr $SIDELEN + 1`
+	    let SIDELEN=SIDELEN+1
 	  fi
-	  
+
 	  #echo "SL: $SIDELEN"
-	  
+
 	  NODEN=0
 	  if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
 	    SIDESTEP=$3
@@ -67,12 +67,15 @@ case "$1" in
 	      SIDESTEP=`expr $3 / \( $SIDELEN - 1 \)`
 	    fi
 	  fi
+
 	  #echo "ST: $SIDESTEP"
 	  for n in $NODES; do
-	    X=`expr \( $NODEN % $SIDELEN \) \* $SIDESTEP`
-	    Y=`expr \( $NODEN / $SIDELEN \) \* $SIDESTEP`
+	    let X=NODEN%SIDELEN*SIDESTEP
+	    let Y=NODEN/SIDELEN*SIDESTEP
+	    #X=`expr \( $NODEN % $SIDELEN \) \* $SIDESTEP`
+	    #Y=`expr \( $NODEN / $SIDELEN \) \* $SIDESTEP`
+	    let NODEN=NODEN+1
 	    echo "$n $X $Y 0"
-	    NODEN=`expr $NODEN + 1`
 	  done
           ;;
     "npart")

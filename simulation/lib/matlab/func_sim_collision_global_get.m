@@ -1,34 +1,27 @@
-function [matrix_col_occured_mean_neighbour_backoff_global,matrix_likelihood_collisions_percent_global,matrix_col_occured_simulation_all_neighbour_backoff_global,matrix_likelihood_simulation_all_collisions_percent_global] = func_sim_collision_global_get(folder_name,number_of_simulation,packets_successful_delivered)
-%---------------------------------Filenames--------------------------------
-    filename = 'sim_matrix_counter_collision_sim_neighbour_backoff_global';
-    filename_csv = sprintf('%s/%s',folder_name,filename);
-   
-    %------------------ Read results of the simulation ------------------------
-    [matrix_col_occured_neighbour_backoff_global_read] = func_matrix_3D_csvread(filename_csv,number_of_simulation);
-    matrix_col_occured_simulation_all_neighbour_backoff_global = zeros(size(matrix_col_occured_neighbour_backoff_global_read,1),size(matrix_col_occured_neighbour_backoff_global_read,3),size(matrix_col_occured_neighbour_backoff_global_read,2));
-    	
-    for i=1:1:size(matrix_col_occured_neighbour_backoff_global_per_station_read,3)
-        for p=1:1:size(matrix_col_occured_neighbour_backoff_global_per_station_read,2)
-            for j=1:1:number_of_simulation
-                matrix_col_occured_simulation_all_neighbour_backoff_global(j,i,p) = matrix_col_occured_neighbour_backoff_global_read(j,p,i);
-               
+function [matrix_col_occured_mean_neighbour_backoff_global,matrix_likelihood_collisions_percent_global] = func_sim_collision_global_get(matrix_3D_col_occured_simulation_neighbour_backoff_global,matrix_3D_likelihood_simulation_collisions_percent_global)
+    
+    matrix_col_occured_mean_neighbour_backoff_global_mean = mean(matrix_3D_col_occured_simulation_neighbour_backoff_global,1);
+    matrix_likelihood_collisions_percent_global_mean = mean(matrix_3D_likelihood_simulation_collisions_percent_global,1); 
+    
+    matrix_col_occured_mean_neighbour_backoff_global = zeros(size(matrix_col_occured_mean_neighbour_backoff_global_mean,2),size(matrix_col_occured_mean_neighbour_backoff_global_mean,3));
+    matrix_likelihood_collisions_percent_global = zeros(size(matrix_likelihood_collisions_percent_global_mean,2),size(matrix_likelihood_collisions_percent_global_mean,3));
+    %% Eliminate Dimension 1
+    for i=1:1:size(matrix_likelihood_collisions_percent_global_mean,2)
+         for j=1:1:size(matrix_likelihood_collisions_percent_global_mean,3)
+             matrix_col_occured_mean_neighbour_backoff_global(i,j) =  matrix_col_occured_mean_neighbour_backoff_global_mean(1,i,j);
+             matrix_likelihood_collisions_percent_global(i,j) =  matrix_likelihood_collisions_percent_global_mean(1,i,j);
+         end
+    end   
+    %%        TODO: has to bee modified in Simulation (change from 0 to 100%)     
+    matrix_sim_likelihood_collisions_percent_global2 = matrix_likelihood_collisions_percent_global; 
+    for d1 = 1:1:size(matrix_sim_likelihood_collisions_percent_global2,1)
+        for d2 = 1:1:size(matrix_sim_likelihood_collisions_percent_global2,1)
+            if (matrix_sim_likelihood_collisions_percent_global2(d1,d2) == 0)
+                matrix_sim_likelihood_collisions_percent_global2(d1,d2) = 1;
             end
         end
     end
-     matrix_col_occured_mean_neighbour_backoff_global_mean = mean(matrix_col_occured_simulation_all_neighbour_backoff_global,1);
-     
-    [matrix_likelihood_collisions] = func_sim_mean_per_station_calculation(matrix_col_occured_simulation_all_neighbour_backoff_global,packets_successful_delivered);
-    [matrix_likelihood_simulation_all_collisions_percent_global] = func_matrix_3D_convert_2_percent(matrix_likelihood_collisions);
-    matrix_likelihood_collisions_percent_global_mean = mean(matrix_likelihood_simulation_all_collisions_percent_global,1);
-    
-    matrix_col_occured_mean_neighbour_backoff_global = zeros(size(matrix_col_occured_simulation_all_neighbour_backoff_global,3),size(matrix_col_occured_simulation_all_neighbour_backoff_global,2));
-    matrix_likelihood_collisions_percent_global = zeros(size(matrix_col_occured_simulation_all_neighbour_backoff_global,3),size(matrix_col_occured_simulation_all_neighbour_backoff_global,2));
-    for i=1:1:size(matrix_col_occured_simulation_all_neighbour_backoff_global,2)
-         for j=1:1:size(matrix_col_occured_simulation_all_neighbour_backoff_global,3)
-             matrix_col_occured_mean_neighbour_backoff_global(j,i) =  matrix_col_occured_mean_neighbour_backoff_global_mean(1,i,j);
-             matrix_likelihood_collisions_percent_global(j,i) =  matrix_likelihood_collisions_percent_global_mean(1,i,j);
-         end
-     end
+    matrix_likelihood_collisions_percent_global = matrix_sim_likelihood_collisions_percent_global2;
 end
 
 

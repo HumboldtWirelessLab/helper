@@ -20,8 +20,7 @@ function  func_write_csv_stats(folder_name, matrix_results_packets_delivery_coun
     filename_xml_17 = sprintf('%s/sim_matrix_col_occured_sim_neighbour_backoff_global_per_station.bin',folder_name);
     filename_xml_18 = sprintf('%s/sim_matrix_results_collision_avg_per_station.bin',folder_name);
     
-    csvwrite(filename_xml_1,matrix_results_packets_delivery_counter_global) 
-    csvwrite(filename_xml_2 ,matrix_results_counter_slots_global) 
+
     csvwrite(filename_xml_3,matrix_results_collision_avg)
     csvwrite(filename_xml_4,matrix_results_collision_min)
     csvwrite(filename_xml_5,matrix_results_collision_min_counter)
@@ -44,7 +43,8 @@ function  func_write_csv_stats(folder_name, matrix_results_packets_delivery_coun
     func_csvwrite_matrix_3D(filename_xml_16,matrix_collision_sim_neighbour_backoff_global_per_station)  
     func_csvwrite_matrix_3D(filename_xml_17,matrix_col_occured_sim_neighbour_backoff_global_per_station)
     func_csvwrite_matrix_3D(filename_xml_18,matrix_results_collision_avg_per_station)   
-   
+    func_csvwrite_matrix_3D(filename_xml_1,matrix_results_packets_delivery_counter_global) 
+    func_csvwrite_matrix_3D(filename_xml_2 ,matrix_results_counter_slots_global) 
     %func_write_matrix_3D(filename_xml_14,matrix_results_collision_simulation_neighbour_backoff_global)
     %func_write_matrix_3D(filename_xml_15,matrix_counter_collision_sim_neighbour_backoff_global)
     %func_write_matrix_3D(filename_xml_16,matrix_collision_sim_neighbour_backoff_global_per_station)  

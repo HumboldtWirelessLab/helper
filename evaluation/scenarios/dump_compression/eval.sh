@@ -23,7 +23,7 @@ esac
 #echo $RESULTDIR
 #(cd $RESULTDIR;ls *.dump)
 
-for d in `(cd $RESULTDIR;ls *.dump)`; do
+for d in `(cd $RESULTDIR;ls *.dump 2> /dev/null)`; do
     ( cd $RESULTDIR; bzip2 -z -9 $d )
 done
 
