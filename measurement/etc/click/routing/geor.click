@@ -6,6 +6,7 @@
 
 // [0]output - ethernet (802.3) frames to external nodes/clients or me (no BRN protocol)
 // [1]output - BRN GEOR packets to internal nodes (BRN GEOR protocol)
+// [2]output - Feedback packets for upper layer
 
 elementclass GEOR {ID $ID, LT $LT, LINKSTAT $LS, DEBUG $debug  |
 
@@ -34,7 +35,7 @@ elementclass GEOR {ID $ID, LT $LT, LINKSTAT $LS, DEBUG $debug  |
 
   gfwd[1]
   -> BRN2EtherEncap(USEANNO true)
-//  -> Print("GOT PACKET")
+  //-> Print("GOT PACKET")
   -> [0]output;
 
   gfwd[2]
@@ -47,12 +48,12 @@ elementclass GEOR {ID $ID, LT $LT, LINKSTAT $LS, DEBUG $debug  |
   -> BRN2EtherEncap(USEANNO true)
   -> [1]output;
 
-  input[2]
-  -> Discard;
+  input[2] -> Discard;
+  input[3] -> Discard;
+  input[4] -> Discard;
 
-  input[3]
-  -> Discard;
+#ifdef ROUTING_TXFEEDBACK
+  Idle -> [2]output;
+#endif
 
-  input[4]
-  -> Discard;
 }

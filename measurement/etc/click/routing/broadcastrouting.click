@@ -9,6 +9,7 @@
 
 // [0]output - ethernet (802.3) frames to external nodes/clients or me (no BRN protocol)
 // [1]output - BRN BroadcastRouting packets to internal nodes (BRN BroadcastRouting protocol)
+// [2]output - Feedback packets for upper layer
 
 elementclass BROADCASTROUTING {ID $id |
 
@@ -29,6 +30,10 @@ elementclass BROADCASTROUTING {ID $id |
   //-> Print("BCR[1]-src-out")
   -> BRN2EtherEncap(USEANNO true)
   -> [1]output;
+
+#ifdef ROUTING_TXFEEDBACK
+  Idle -> [2]output;
+#endif
 
 }
 

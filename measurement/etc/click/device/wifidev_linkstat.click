@@ -89,7 +89,19 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> error_clf :: FilterPhyErr()
 #endif
 #ifndef DISABLE_WIFIDUBFILTER
+#ifndef DISBALE_BCASTWIFIDUPS
+  -> bcast_clf::Classifier(30/80860c0c,
+                           - );
+
+  bcast_clf[1]
+#endif
   -> WifiDupeFilter()
+#ifndef DISBALE_BCASTWIFIDUPS
+  -> bcast_dup::Null();
+
+  bcast_clf[0]
+  -> bcast_dup
+#endif
 #endif
   -> wififrame_clf :: Classifier( 1/40%40,  // wep frames
                                   0/00%0f,  // management frames
@@ -176,7 +188,6 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   //-> Print("ChannelStats")
   -> BRN2EtherDecap()
   -> BRN2Decap()
-//  -> cocst::CooperativeChannelStats(CHANNELSTATS wifidevice/cst, NEIGHBOURS true, INTERVAL 1000, DEBUG 4)
   -> cocst::CooperativeChannelStats(CHANNELSTATS wifidevice/cst, NEIGHBOURS true, INTERVAL 1000, DEBUG 2)
   -> cocst_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
   -> cocst_rate::SetTXRate(RATE 2, TRIES 1)

@@ -5,6 +5,7 @@
 // input[4] - txfeedback: successful transmission of a BRN BroadcastRouting  packet
 // [0]output - ethernet (802.3) frames to external nodes/clients or me (no BRN protocol)
 // [1]output - BRN BATMAN packets to internal nodes (BRN BATMAN protocol)
+// [2]output - Feedback packets for upper layer
 
 elementclass BATMAN {$ID, $LT |
 
@@ -15,12 +16,12 @@ elementclass BATMAN {$ID, $LT |
 
   bf::BatmanForwarder( NODEID $ID, BATMANTABLE brt);
   br::BatmanRouting(NODEID $ID, BATMANTABLE brt);
-  
+
   bfd::BatmanFailureDetection( NODEID $ID, BATMANTABLE brt, ACTIVE true);
-  
+
   input[1]
   -> BRN2Decap()
--> Print("NODENAME: BATMAN", TIMESTAMP true)
+  -> Print("NODENAME: BATMAN", TIMESTAMP true)
   -> bc::Classifier( 0/10,  //originator
                      0/20   //routingfwd
                   );
@@ -43,11 +44,11 @@ elementclass BATMAN {$ID, $LT |
   bf[0]
   -> [0]output;
 
-  bf[1] 
+  bf[1]
 //-> Print("Fwd to next hop", TIMESTAMP true) 
   -> brnee;
-  
-  bf[2] 
+
+  bf[2]
   -> Print("RouteError",150)
   -> Discard;
 
@@ -62,20 +63,24 @@ elementclass BATMAN {$ID, $LT |
 //-> Print("Its me")
   -> [0]output;
 
-  br[1] 
+  br[1]
 //-> Print("NODEDEVICE: On Route", TIMESTAMP true)
   -> brnee;
-  
+
   br[2]
 //-> Print("Unknown Dest")
   -> Discard;
 
   input[2]
   -> [1]bfd[2]
-//  -> Print("Retry")
+//-> Print("Retry")
   -> brnee;
-  
+
   input[3] -> Discard;
   input[4] -> Discard;
-  
+
+#ifdef ROUTING_TXFEEDBACK
+  Idle -> [2]output;
+#endif
+
 }

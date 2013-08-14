@@ -12,6 +12,7 @@
 //input[4]: txfeedback: successful transmission of a BRN BroadcastRouting  packet
 //[0]output: Local copy ()
 //[1]output: To other brn nodes
+//[2]output - Feedback packets for upper layer
 
 elementclass BROADCAST {ID $id, LT $lt |
 
@@ -80,6 +81,12 @@ elementclass BROADCAST {ID $id, LT $lt |
 
   input[4]
   -> [4]bcf;
+
+#ifdef ROUTING_TXFEEDBACK
+  bcr[2] -> Discard;
+  bcf[2] -> Discard;
+  Idle -> [2]output;
+#endif
 
 }
 
