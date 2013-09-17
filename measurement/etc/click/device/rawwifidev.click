@@ -82,8 +82,10 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef SIMULATION
   bo_off::BoOff(DEBUG 4);
-  bo_learning::BoLearning(STRICT 1, DEBUG 4);
+  bo_maxtp::BoMaxThroughput(CHANNELSTATS cst, DEBUG 4);
   bo_cla::BoChannelLoadAware(CHANNELSTATS cst, TARGETLOAD 90, DEBUG 4);
+  bo_targetpl::BoTargetPacketloss(CHANNELSTATS cst, TARGETPL 10, DEBUG 4);
+  bo_learning::BoLearning(STRICT 1, DEBUG 4);
   bo_tdiff::BoTargetDiffRxTxBusy(CHANNELSTATS cst, TARGETDIFF 5, DEBUG 4);
 #endif
 
@@ -117,7 +119,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
               CWMAX CWMAXPARAM,
               AIFS AIFSPARAM,
               STRATEGY TOS2QUEUEMAPPER_STRATEGY,
-              BO_SCHEMES "bo_learning bo_cla bo_tdiff",
+              BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning  bo_tdiff",
               DEBUG 4)
 #endif //RTS_CTS
 #else //CST
