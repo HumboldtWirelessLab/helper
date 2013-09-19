@@ -205,37 +205,34 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #ifdef PRIO_QUEUE
 
   input[2]
-  -> x_data_rate::SetTXRates(RATE0 DEFAULT_DATARATE, TRIES0 DEFAULT_DATATRIES, TRIES1 0, TRIES2 0, TRIES3 0)
-  -> x_brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  //-> x_data_rate::SetTXRates(RATE0 DEFAULT_DATARATE, TRIES0 DEFAULT_DATATRIES, TRIES1 0, TRIES2 0, TRIES3 0)
+  //-> x_brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> [1]x_prio_q;
 
-  qc_q::NotifierQueue(500);
-  qc_suppressor::Suppressor();
+  Idle()
+  -> ig_flow::BRN2SimpleFlow(EXTRADATA "Interferenzgraph", ELEMENTID 255, DEBUG 2);
 
   ig_feedback_clf[0]
-  -> qc::BRN2PacketQueueControl(QUEUESIZEHANDLER qc_q.length, QUEUERESETHANDLER qc_q.reset, MINP 200, MAXP 500, SUPPRESSORHANDLER qc_suppressor.active0, DISABLE_QUEUE_RESET false, TXFEEDBACK_REUSE true, DEBUG 2)
+  -> BRN2EtherDecap()
+  -> Classifier( 0/BRN_PORT_FLOW )
+  -> BRN2Decap()
+  -> [1]ig_flow
   -> Print("packet")
   -> EtherEncap(0x8888, $etheraddress, ff:ff:ff:ff:ff:ff)
   -> WifiEncap(0x00, 0:0:0:0:0:0)
-  -> qc_rate :: SetTXRate(2)
+  -> ig_rate :: SetTXRate(2)
 #if WIFITYPE == 805
-  -> qc_power :: BrnSetTXPower(DEVICE $device, POWER 61)
+  -> ig_power :: BrnSetTXPower(DEVICE $device, POWER 61)
 #else
-  -> qc_power :: BrnSetTXPower(DEVICE $device, POWER 16)
+  -> ig_power :: BrnSetTXPower(DEVICE $device, POWER 16)
 #endif
   -> SetTimestamp()
-  -> qc_q
-  -> qc_suppressor
-//  -> SetTimestamp()
-//  -> Print(TIMESTAMP true)
+  -> ig_notifierqueue::NotifierQueue(500)
+  -> ig_suppressor::Suppressor()
+  //-> SetTimestamp()
+  //-> Print(TIMESTAMP true)
   -> [0]x_prio_q;
 
-/*
-  qc_q[1]
-  -> SetTimestamp()
-  -> Print(TIMESTAMP true)
-  -> Discard;
-*/
 #endif
 
   error_clf[1]
