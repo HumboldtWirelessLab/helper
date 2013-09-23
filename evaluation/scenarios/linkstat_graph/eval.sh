@@ -25,7 +25,6 @@ if [ ! -e $EVALUATIONSDIR ]; then
 fi
 
 if [ -e $DIR/../../bin/functions.sh ]; then
-  echo "found"
   . $DIR/../../bin/functions.sh
 fi
 
