@@ -146,5 +146,5 @@ if [ ! -f $EVALUATIONSDIR/linksmetric.png ] || [ ! -f $EVALUATIONSDIR/linksmetri
   fi
 fi
 
-#rm -f $EVALUATIONSDIR/links.dot.tmp $EVALUATIONSDIR/links.dot $EVALUATIONSDIR/linksmetric.dot.tmp $EVALUATIONSDIR/linksmetric.dot $EVALUATIONSDIR/links.all $EVALUATIONSDIR/linksmetric.all
+rm -f $EVALUATIONSDIR/links.dot.tmp $EVALUATIONSDIR/links.dot $EVALUATIONSDIR/linksmetric.dot.tmp $EVALUATIONSDIR/linksmetric.dot $EVALUATIONSDIR/links.all $EVALUATIONSDIR/linksmetric.all
 #$EVALUATIONSDIR/conn.mat

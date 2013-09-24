@@ -57,6 +57,8 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
                             METRIC     "etx_metric",
                             DEBUG            0 );
 
+  dts::DistTimeSync(LINKSTAT link_stat, TIMEDRIFT -1, OFFSET -1, DEBUG 2);
+
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
 
@@ -142,6 +144,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   wififrame_clf[2]
 //  -> BRN2PrintWifi("RX")
+    -> dts
     -> WifiDecap()
 //  -> Print("Data")
     -> brn_ether_clf :: Classifier( 12/BRN_ETHERTYPE, - )
