@@ -239,6 +239,9 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #endif
 
   error_clf[1]
+#ifdef SIMULATION
+  -> PrintCRCError(LABEL "CRC", RATE 2)
+#endif
 //  -> Print("RXPHYERR")
   -> Discard;
 
