@@ -108,10 +108,10 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef COLLINFO
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS CST, COLLISIONINFO cinfo, STRATEGY TOS2QUEUEMAPPER_STRATEGY, DEBUG 2)
 #else
-  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_tdiff", DEBUG 4)
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_tdiff", DEBUG 2)
 #endif //RTS_CTS
 #else //CST
-  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_learning", DEBUG 4)
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_learning", DEBUG 2)
 #endif //CST
 #endif //SIMULATION
 #endif
@@ -154,7 +154,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> hnd::HiddenNodeDetection(DEVICE $device, DEBUG 2)
 #endif
 #ifdef SIMULATION
-  -> Tos2QueueMapperTXFeedback(TOS2QM tosq, DEBUG 4)
+  -> Tos2QueueMapperTXFeedback(TOS2QM tosq, DEBUG 2)
 #endif
 #ifdef FOREIGNRXSTATS
   -> ForeignRxStats(DEVICE $device,TIMEOUT 5, DEBUG 2)
