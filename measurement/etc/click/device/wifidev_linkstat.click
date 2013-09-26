@@ -209,7 +209,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   input[2]
   //-> x_data_rate::SetTXRates(RATE0 DEFAULT_DATARATE, TRIES0 DEFAULT_DATATRIES, TRIES1 0, TRIES2 0, TRIES3 0)
-  //-> x_brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+  -> x_brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> [1]x_prio_q;
 
   Idle()
