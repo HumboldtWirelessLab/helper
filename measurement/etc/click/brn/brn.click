@@ -5,7 +5,7 @@
 #define DEBUGLEVEL 2
 #endif
 
-#define BRN_DEFAULT_TTL                 128   
+#define BRN_DEFAULT_TTL                 128
 #define BRN_DEFAULT_TOS                   0
 
 #define BRN_ETHERTYPE                  8086
@@ -18,7 +18,6 @@
 #define BRN_PORT_GATEWAY                 03
 #define BRN_PORT_EVENTHANDLER            04
 #define BRN_PORT_ALARMINGPROTOCOL        05
-#define BRN_PORT_COMP_ALARMINGPROTOCOL   06
 /*Routing*/
 #define BRN_PORT_DSR                     0a
 #define BRN_PORT_BCASTROUTING            0b
@@ -35,7 +34,6 @@
 /*Topology*/
 #define BRN_PORT_TOPOLOGY_DETECTION      23
 #define BRN_PORT_NHOPNEIGHBOURING        24
-#define BRN_PORT_COMP_NHOPNEIGHBOURING   25
 /*P2P*/
 #define BRN_PORT_DHTROUTING              28
 #define BRN_PORT_DHTSTORAGE              29
