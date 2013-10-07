@@ -86,11 +86,12 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef SIMULATION
 #ifdef CST
-  bo_maxtp::BoMaxThroughput(CHANNELSTATS cst, DEBUG 4);
-  bo_cla::BoChannelLoadAware(CHANNELSTATS cst, TARGETLOAD 90, DEBUG 4);
-  bo_targetpl::BoTargetPacketloss(CHANNELSTATS cst, TARGETPL 10, DEBUG 4);
+  bo_maxtp::BoMaxThroughput(CHANNELSTATS CST, DEBUG 4);
+  bo_cla::BoChannelLoadAware(CHANNELSTATS CST, TARGETLOAD 90, DEBUG 4);
+  bo_targetpl::BoTargetPacketloss(CHANNELSTATS CST, TARGETPL 10, DEBUG 4);
+  bo_tdiff::BoTargetDiffRxTxBusy(CHANNELSTATS CST, TARGETDIFF 5, DEBUG 4);
+#endif
   bo_learning::BoLearning(STRICT 1, DEBUG 4);
-  bo_tdiff::BoTargetDiffRxTxBusy(CHANNELSTATS cst, TARGETDIFF 5, DEBUG 4);
 #endif
 #endif
 
@@ -109,15 +110,9 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 
 #ifdef COLLINFO
-  -> tosq::Tos2QueueMapper(
-              CWMIN CWMINPARAM,
-              CWMAX CWMAXPARAM,
-              AIFS AIFSPARAM,
-              CHANNELSTATS cst,
-              COLLISIONINFO cinfo,
-              STRATEGY TOS2QUEUEMAPPER_STRATEGY,
-              DEBUG 2)
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS CST, COLLISIONINFO cinfo, STRATEGY TOS2QUEUEMAPPER_STRATEGY, DEBUG 2)
 #else
+<<<<<<< HEAD
   -> tosq::Tos2QueueMapper(
               CWMIN CWMINPARAM,
               CWMAX CWMAXPARAM,
@@ -125,17 +120,16 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
               STRATEGY TOS2QUEUEMAPPER_STRATEGY,
               BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_tdiff",
               DEBUG 4)
+=======
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_tdiff", DEBUG 4)
+>>>>>>> e53e8351759a84a3f2a6b2cc79a65074c81e3b29
 #endif //RTS_CTS
 #else //CST
-  -> tosq::Tos2QueueMapper(
-              CWMIN CWMINPARAM,
-              CWMAX CWMAXPARAM,
-              AIFS AIFSPARAM,
-              STRATEGY TOS2QUEUEMAPPER_STRATEGY,
-              DEBUG 4)
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_learning", DEBUG 4)
 #endif //CST
 #endif //SIMULATION
 #endif
+
 #ifdef USE_RTS_CTS
   ->setrtscts::Brn2_SetRTSCTS(PLI pli)
 #endif

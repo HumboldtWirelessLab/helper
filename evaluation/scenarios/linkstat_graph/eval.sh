@@ -1,13 +1,31 @@
 #!/bin/bash
 
-#echo "Eval not valid"
+dir=$(dirname "$0")
+pwd=$(pwd)
 
-#exit 0
+SIGN=`echo $dir | cut -b 1`
+
+case "$SIGN" in
+  "/")
+        DIR=$dir
+        ;;
+  ".")
+        DIR=$pwd/$dir
+        ;;
+   *)
+        echo "Error while getting directory"
+        exit -1
+        ;;
+esac
 
 . $CONFIGFILE
 
 if [ ! -e $EVALUATIONSDIR ]; then
   mkdir -p $EVALUATIONSDIR
+fi
+
+if [ -e $DIR/../../bin/functions.sh ]; then
+  . $DIR/../../bin/functions.sh
 fi
 
 if [ -f $RESULTDIR/measurement.xml ]; then
@@ -57,9 +75,9 @@ if [ -e $NODEPLACEMENTFILE ]; then
   for n in $NODES; do
     NODENAME=`cat $RESULTDIR/nodes.mac | grep $n | awk '{print $1}'`
     X=`cat $NODEPLACEMENTFILE | grep "$NODENAME " | awk '{print $2}'`
-    X=`calc $X / 50 | sed "s#^[[:space:]]*~##g"`
+    X=`calculate "$X/50" | sed "s#^[[:space:]]*~##g"`
     Y=`cat $NODEPLACEMENTFILE | grep "$NODENAME " | awk '{print $3}'`
-    Y=`calc $Y / 50 | sed "s#^[[:space:]]*~##g"`
+    Y=`calculate "$Y/50" | sed "s#^[[:space:]]*~##g"`
     echo "\"$n\" [pos=\"$X,$Y!\"];" >> $EVALUATIONSDIR/links.dot.tmp
     echo "\"$n\" [pos=\"$X,$Y!\"];" >> $EVALUATIONSDIR/linksmetric.dot.tmp
   done
