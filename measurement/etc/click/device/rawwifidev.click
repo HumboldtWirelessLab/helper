@@ -80,6 +80,10 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 
 
+
+  // RAWDEV from include rawdev.click
+  rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);
+
 #ifdef SIMULATION
 #ifdef CST
   bo_maxtp::BoMaxThroughput(CHANNELSTATS CST, DEBUG 4);
@@ -89,9 +93,6 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
   bo_learning::BoLearning(STRICT 1, DEBUG 4);
 #endif
-
-  // RAWDEV from include rawdev.click
-  rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
 #if defined(SIMULATION) || (WIFITYPE == 803)
@@ -105,6 +106,8 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef SIMULATION
 #ifdef CST
+
+
 #ifdef COLLINFO
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS CST, COLLISIONINFO cinfo, STRATEGY TOS2QUEUEMAPPER_STRATEGY, DEBUG 2)
 #else

@@ -27,7 +27,7 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
 #ifdef SIMULATION
   -> simpacketreuse::PullTee()
   -> toraw::TORAWDEVICE($devname);
-  
+
   simpacketreuse[1]
   -> [1]output;
 #else

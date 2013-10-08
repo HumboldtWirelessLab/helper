@@ -21,13 +21,22 @@ elementclass ADHOC_OR_INFRASTRUCTURE_CLIENT {
     assoc_req :: BRN2AssocRequester(ETH $eth, WIRELESS_INFO $auth_info, RT auth_rates, DEBUG 0);
 
     bs :: BRN2BeaconScanner(RT auth_rates, DEBUG 2);
- 
-    isc :: BRN2InfrastructureClient(WIRELESS_INFO $auth_info, RT auth_rates, 
-                                    BEACONSCANNER bs, PROBE_REQUESTER probe_req, AUTH_REQUESTER auth_req, 
-                                    ASSOC_REQUESTER assoc_req, WIFIENCAP $clientwifiencap, ACTIVESCAN $active, DEBUG 2 );
 
-	  //all :: CompoundHandler("debug", "BRNAssocRequester InfrastructureClient", "2");
-	  
+
+#ifdef SIMULATION
+  channel_list::AvailableChannels($channel);
+#endif
+
+    isc :: BRN2InfrastructureClient(WIRELESS_INFO $auth_info, RT auth_rates,
+                                    BEACONSCANNER bs, PROBE_REQUESTER probe_req, AUTH_REQUESTER auth_req, 
+                                    ASSOC_REQUESTER assoc_req, WIFIENCAP $clientwifiencap, ACTIVESCAN $active,
+#ifdef SIMULATION
+                                    CHANNELLIST channel_list,
+#endif
+                                    DEBUG 2 );
+
+     //all :: CompoundHandler("debug", "BRNAssocRequester InfrastructureClient", "2");
+
 
     input[0]
     -> mgt_cl :: Classifier(0/00%f0, //Association Request
