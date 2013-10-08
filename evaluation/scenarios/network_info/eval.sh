@@ -25,6 +25,10 @@ esac
 
 . $CONFIGFILE
 
+if [ -e $DIR/../../bin/functions.sh ]; then
+  . $DIR/../../bin/functions.sh
+fi
+
 ###############################################################################
 # Get datafile
 ###############################################################################
@@ -69,7 +73,6 @@ if [ ! -e $EVALUATIONSDIR ]; then
   mkdir -p $EVALUATIONSDIR
 fi
 
-
 ###############################################################################
 # create linkmetric.all
 ###############################################################################
@@ -88,7 +91,8 @@ echo "Create linkgraph (Threshold: $THRESHOLD)"
 
 if [ ! -f $EVALUATIONSDIR/graph.txt ]; then
 
-  (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,metric2graph('$EVALUATIONSDIR/linksmetric.mat','$EVALUATIONSDIR/graph.csv',$THRESHOLD),catch,exit(1),end,exit(0)" 1> /dev/null)
+  #(cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,metric2graph('$EVALUATIONSDIR/linksmetric.mat','$EVALUATIONSDIR/graph.csv',$THRESHOLD),catch,exit(1),end,exit(0)" 1> /dev/null)
+  (cd $DIR; matwrapper "try,metric2graph('$EVALUATIONSDIR/linksmetric.mat','$EVALUATIONSDIR/graph.csv',$THRESHOLD),catch,exit(1),end,exit(0)" 1> /dev/null)
   cat $EVALUATIONSDIR/graph.csv | sed "s#,# #g" > $EVALUATIONSDIR/graph.txt
 
 #TODO: use if no matlab is available
