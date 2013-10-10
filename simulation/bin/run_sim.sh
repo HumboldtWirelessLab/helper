@@ -452,6 +452,7 @@ case "$MODE" in
 					ELEMENT=`echo $line | awk '{print $5}'`
 					HANDLER=`echo $line | awk '{print $6}'`
 					
+
 					# if "ALL" is used, take all nodes of nodelist, else just the respective node
 					if [ "x$NODENAME" = "xALL" ]; then
 						HANDLERNODES=$NODELIST
@@ -463,7 +464,9 @@ case "$MODE" in
 					# used by the simulator to dynamically control the process
 					# or get some information out of the network activities... yey!
 					for n in $HANDLERNODES; do
-						
+
+						CLICKFILE=`cat $NODETABLE | grep "$n eth0 " | awk '{print $7}'`
+
 						NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$n[[:space:]]" | awk '{print $4}'`
 						let NODENUM=NODENUM-1
 						if [ "x$TIME" != "x" ]; then
@@ -472,19 +475,21 @@ case "$MODE" in
 							if [ "x$MODE" = "xwrite" ]; then
 								VALUE=`get_params $line | sed $NODEMAC_SEDARG`
 								if [ "x$USED_SIMULATOR" = "xns" ]; then
-									echo "\$ns_ at $TIME \"set result \\[\\[\$node_($NODENUM) entry\\] writehandler $ELEMENT $HANDLER \\\"$VALUE\\\" \\]\"" >> $TCLFILE
+									echo "Script(wait $TIME, write  $ELEMENT.$HANDLER $VALUE);" >> $CLICKFILE
+									#echo "\$ns_ at $TIME \"set result \\[\\[\$node_($NODENUM) entry\\] writehandler $ELEMENT $HANDLER \\\"$VALUE\\\" \\]\"" >> $TCLFILE
 								else
 									echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,$VALUE;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 								fi
-								# the read handler
-								elif [ "x$MODE" = "xread" ]; then
+							# the read handler
+							elif [ "x$MODE" = "xread" ]; then
 								if [ "x$USED_SIMULATOR" = "xns" ]; then
-									echo "\$ns_ at $TIME \"puts \\\"\\[\\[\$node_($NODENUM) entry\\] readhandler $ELEMENT $HANDLER \\]\\\"\"" >> $TCLFILE
+									echo "Script(wait $TIME, read $ELEMENT.$HANDLER);" >> $CLICKFILE
+									#echo "\$ns_ at $TIME \"puts \\\"\\[\\[\$node_($NODENUM) entry\\] readhandler $ELEMENT $HANDLER \\]\\\"\"" >> $TCLFILE
 								else
 									echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 								fi
-								# for special purpose (no idea, what this is for =)
-								elif [ "x$MODE" = "xmove" ]; then
+							# for special purpose: move nodes in simulator
+							elif [ "x$MODE" = "xmove" ]; then
 								MOVE_MODE=$ELEMENT
 								MOVE_SPEED=$HANDLER
 								read TRASH1 TRASH2 TRASH3 TRASH4 TRASH5 TRASH6 MOVE_X MOVE_Y MOVE_Z <<< $line
