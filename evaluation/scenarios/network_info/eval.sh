@@ -91,7 +91,6 @@ echo "Create linkgraph (Threshold: $THRESHOLD)"
 
 if [ ! -f $EVALUATIONSDIR/graph.txt ]; then
 
-  #(cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,metric2graph('$EVALUATIONSDIR/linksmetric.mat','$EVALUATIONSDIR/graph.csv',$THRESHOLD),catch,exit(1),end,exit(0)" 1> /dev/null)
   (cd $DIR; matwrapper "try,metric2graph('$EVALUATIONSDIR/linksmetric.mat','$EVALUATIONSDIR/graph.csv',$THRESHOLD),catch,exit(1),end,exit(0)" 1> /dev/null)
   cat $EVALUATIONSDIR/graph.csv | sed "s#,# #g" > $EVALUATIONSDIR/graph.txt
 
@@ -127,7 +126,7 @@ fi
 
 echo "Create partitions files"
 
-(cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,partitions('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+(cd $DIR; matwrapper "try,partitions('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
 if [ $? -ne 0 ]; then
   echo "Ohh, matlab error."
@@ -136,7 +135,7 @@ fi
 
 #echo "Get Bridges and Articulation points"
 
-#(cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,get_bridges_and_articulation_points('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/','none'),catch,exit(1),end,exit(0)" 1> /dev/null)
+#(cd $DIR; matwrapper "try,get_bridges_and_articulation_points('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/','none'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
 
 echo "Create clusterfiles and nodedegree!"
@@ -151,7 +150,7 @@ fi
 for i in `(cd $EVALUATIONSDIR; ls cluster_*.csv)`; do
   CLUSTERID=`echo $i | sed "s#_# #g" | sed "s#\.# #g" | awk '{print $2}'`
   echo "Cluster: $CLUSTERID"
-  (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,nodedegree('$EVALUATIONSDIR/$i', '$EVALUATIONSDIR/graph.txt', '$EVALUATIONSDIR/', $CLUSTERID ),catch,exit(1),end,exit(0)" 1> /dev/null)
+  (cd $DIR; matwrapper "try,nodedegree('$EVALUATIONSDIR/$i', '$EVALUATIONSDIR/graph.txt', '$EVALUATIONSDIR/', $CLUSTERID ),catch,exit(1),end,exit(0)" 1> /dev/null)
 done
 
 ###############################################################################
@@ -184,7 +183,7 @@ BCASTSIZE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $3}' | sort -u`
 BCASTRATE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $4}' | sort -u`
 BCASTNODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
 
-(cd $DIR; matlab -nosplash -nodesktop -r "try,bcaststats2graph('$EVALUATIONSDIR/bcaststats.mat','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+(cd $DIR; matwrapper "try,bcaststats2graph('$EVALUATIONSDIR/bcaststats.mat','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
 for r in $BCASTRATE; do
   for s in $BCASTSIZE; do
@@ -214,8 +213,8 @@ for r in $BCASTRATE; do
     PARAMS="$r""_""$s"
     TARGET="$EVALUATIONSDIR/cluster_""$PARAMS""_"
 
-    (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/','$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
-    (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,partitions_psr('$GRAPHFILE',[70 85],'$TARGET'),catch,exit(1),end,exit(0)" 1> /dev/null)
+    (cd $DIR; matwrapper "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/','$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
+    (cd $DIR; matwrapper "try,partitions_psr('$GRAPHFILE',[70 85],'$TARGET'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
     if [ "x$MODE" = "xsim" ]; then
       CLUSTERSIZEFILE="$EVALUATIONSDIR/cluster_""$PARAMS""_psr_85_clustersize.csv"
@@ -225,7 +224,7 @@ for r in $BCASTRATE; do
       CLUSTERPLMFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".plm"
       if [ -e CLUSTERCSVFILE ]; then
         echo "partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE')"
-        (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE'),catch,exit(1),end,exit(0)" 1> /dev/null)
+        (cd $DIR; matwrapper "try,partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE'),catch,exit(1),end,exit(0)" 1> /dev/null)
         cat $CLUSTERCSVFILE | sed "s#,# #g" | awk '{print "sk"$0}' > $CLUSTERPLMFILE
       fi
     fi
