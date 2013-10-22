@@ -1,3 +1,4 @@
+
 #!/bin/sh
 
 dir=$(dirname "$0")
@@ -17,6 +18,44 @@ case "$SIGN" in
 	exit -1
 	;;
 esac
+
+
+function handle_eval {
+
+  local i=""
+
+  for i in $@; do
+
+    EVAL_DONE=`cat $EVALUATION_DONE_FILE | grep "$i" | wc -l`
+
+    if [ $EVAL_DONE -eq 0 ]; then
+
+      if [ -e $DIR/../scenarios/$i ]; then
+        if [ -e $DIR/../scenarios/$i/.depends ]; then
+          handle_eval `cat $DIR/../scenarios/$i/.depends`
+        fi
+
+        if [ -f $DIR/../scenarios/$i/eval.sh ]; then
+          ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $DIR/../scenarios/$i/eval.sh )
+        fi
+      else
+        EVALDIR=`dirname $CONFIGDIR/$i`
+        if [ -e $EVALDIR/.depends ]; then
+          handle_eval `cat $EVALDIR/.depends`
+        fi
+
+        if [ -f $CONFIGDIR/$i ]; then
+          ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $CONFIGDIR/$i )
+        fi
+      fi
+
+      echo "$i" >> $EVALUATION_DONE_FILE
+    #else
+    #  echo "$i already done"
+    fi
+  done
+
+}
 
 if [ "x$1" != "x" ]; then
   if [ -f $1 ]; then
@@ -53,18 +92,14 @@ if [ "x$REWRITEEVALUATION" != "x" ]; then
   EVALUATION=$REWRITEEVALUATION
 fi
 
+EVALUATION_DONE_FILE=$EVALUATIONDIR/.evaluation_done
+
+echo -n "" > $EVALUATION_DONE_FILE
+
 EVALUATION="$PREEVALUATION $EVALUATION $ADDEVALUATION"
 
 if [ "x$EVALUATION" != "x" ]; then
-  for i in $EVALUATION; do
-    if [ -e $DIR/../scenarios/$i ]; then
-      ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $DIR/../scenarios/$i/eval.sh )
-    else
-      if [ -f $CONFIGDIR/$i ]; then
-        ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $CONFIGDIR/$i )
-      fi
-    fi
-  done
+  handle_eval "$EVALUATION"
 else
   echo "No evaluation"
 fi
