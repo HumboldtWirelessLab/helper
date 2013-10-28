@@ -58,7 +58,7 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 #endif
 
 #ifndef BCAST_ENABLE_ABORT_TX
-#define BCAST_ENABLE_ABORT_TX false
+#define BCAST_ENABLE_ABORT_TX 0
 #endif
 
 
