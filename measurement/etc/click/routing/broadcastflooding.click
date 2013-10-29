@@ -38,7 +38,8 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   flp::MPRFlooding(NODEIDENTITY $id, LINKTABLE $lt, MAXNBMETRIC MPR_LF_NBMETRIC, DEBUG FLOODING_DEBUG);
 #else
 #ifdef MST_FL
-  flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH "/home/yetinam/Dokumente/brn-tools/click-brn-scripts/500-experiments/002-flooding-evaluation/005-mst_flooding_test/circles", DEBUG FLOODING_DEBUG);
+  //flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH "/home/yetinam/Dokumente/brn-tools/click-brn-scripts/500-experiments/002-flooding-evaluation/005-mst_flooding_test/circles", DEBUG FLOODING_DEBUG);
+  flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH "CONFIGDIR/circles", DEBUG FLOODING_DEBUG);
 #else
   flp::SimpleFlooding();
 #endif
