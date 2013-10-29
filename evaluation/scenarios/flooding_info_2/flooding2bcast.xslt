@@ -20,7 +20,14 @@
 	<xsl:text>,</xsl:text>
 	<xsl:value-of select="../@value" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="../@fwd" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="../@sent" /><xsl:value-of select="$newline" />
+	<xsl:value-of select="../@sent" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@forwarded" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@responsible" /><xsl:text>,</xsl:text><!-- 15 -->
+	<xsl:value-of select="@foreign_responsible" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@rx_acked" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@rcv_cnt" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="../@fwd_done" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="../@fwd_succ" /><xsl:value-of select="$newline" />
     </xsl:template>
 
 </xsl:stylesheet>
