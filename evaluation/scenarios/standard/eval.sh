@@ -20,6 +20,10 @@ case "$SIGN" in
         ;;
 esac
 
+if [ -e $DIR/../../bin/functions.sh ]; then
+  . $DIR/../../bin/functions.sh
+fi
+
 echo -n "" > all_bssid.dat
 echo -n "" > nodes.dat
 echo -n "" > all_seq_no.dat
@@ -72,24 +76,24 @@ for dump in `ls *.dump.all.dat 2> /dev/null`; do
 
     echo "processing $dump"
     echo "$node $CHANNEL" >> nodes.dat
-    
+
     BASEFILE=`echo $dump | sed "s#.all.dat##g"`
-    
+
 #offset 6 -> 67
     cat $dump | grep "OKPacket:" | awk '{ print $69 "\t" $70 "\t" $72 "\t" $75}' | sed -s 's/://g' | sed -s 's/Mb//g' | sed -s 's/mgmt/0/g' | sed -s 's/cntl/1/g' | sed -s 's/data/2/g' > $BASEFILE.ok.dat
     cat $dump | grep "CRCerror:" | awk '{ print $69 "\t" $70 "\t" $72 }' | sed -s 's/://g' | sed -s 's/Mb//g' > $BASEFILE.crc.dat
     cat $dump | grep "PHYerror:" | awk '{ print $69 "\t" $70 }' | sed -s 's/://g' | sed -s 's/Mb//g' >  $BASEFILE.phy.dat
     cat $dump | grep "OKPacket:" | grep "mgmt beacon\|mgmt probe_resp" | awk '{ print $75 }' | uniq  >  $BASEFILE.bssid.dat
     cat $BASEFILE.bssid.dat | wc -l >> all_bssid.dat
-    
+
     if [ "x$SINGLEOUTMAC" != "x" ]; then
             cat $dump | grep "OKPacket:" | grep -i $SINGLEOUTMAC | awk '{ print $73 }' | sed -s 's/+//g' | awk -F "/" '{ print $1 }' >  $BASEFILE.rssi_ref.dat
     fi
-      
+
     cat $dump | grep "Sequence:" | awk '{ print $6"\tSRCMAC" $10$11 "\t" $13 }' | sed "s#SRCMACffff##g" | sed "s#:##g" >>  $BASEFILE.seq_no.dat.tmp
     cat $BASEFILE.seq_no.dat.tmp | awk '{print $2" "$3}'>> all_seq_no.dat.tmp
     cat $BASEFILE.seq_no.dat.tmp | awk '{print $1"\t"$2"\t"strtonum("0x"$3)}' >> $BASEFILE.seq_no.dat
-    
+
     rm $BASEFILE.seq_no.dat.tmp
 
     #cat $dump | grep "Sequence:" | awk '{ print $6"\tSRCMAC" $10$11 "\t" $13 }' |  sed "s#SRCMACffff##g" | sed "s#:##g" | head -n15 | awk -v nodeid="$nodeid" '{ print nodeid "\t" $2 "\t" $5}' | awk --non-decimal-data '{print $1 "\t" $2 "\t" $3 "\t" ("0x"$4)+0 }' | sed -s 's/://g' >> sync.dat
@@ -107,21 +111,6 @@ touch processing_done
 
 NODEDEVLIST="$NODEDEVLIST }"
 
-which matlab > /dev/null
-
-if [ $? -ne 0 ]; then
-  echo "No matlab. Try octave."
-  which octave > /dev/null
-  if [ $? -ne 0 ]; then
-    echo "No octave. Abort evaluation."
-    exit 0
-  else
-    MATLAB="octave --eval"
-  fi
-else
-  MATLAB="matlab -nodesktop -nosplash -nojvm -nodisplay -r"
-fi
-
 DEBUGDEV=./matlab.log
 
 #echo $NODEDEVLIST
@@ -130,14 +119,14 @@ echo "Copy Data"
 cp $DIR/*.m .
 
 echo "Channel load all"
-${MATLAB} "try,measure_channel_load_all($NODEDEVLIST),catch,exit(1),end,exit(0)" >> $DEBUGDEV 2>&1
+matwrapper "try,measure_channel_load_all($NODEDEVLIST),catch,exit(1),end,exit(0)" >> $DEBUGDEV 2>&1
 
 if [ $? -ne 0 ]; then
   echo "Ohh, matlab error."
 fi
 
 echo "Channel load buckets"
-${MATLAB} "try,measure_channel_load_buckets_all($NODEDEVLIST),catch,exit(1),end,exit(0)" >> $DEBUGDEV 2>&1
+matwrapper "try,measure_channel_load_buckets_all($NODEDEVLIST),catch,exit(1),end,exit(0)" >> $DEBUGDEV 2>&1
 
 if [ $? -ne 0 ]; then
   echo "Ohh, matlab error."
@@ -145,7 +134,7 @@ fi
 
 if [ "x$SINGLEOUTMAC" != "x" ]; then
   echo "RSSI Ref"
-  ${MATLAB} "try,measure_rssi_ref($NODEDEVLIST),catch,exit(1),end,exit(0)" >> $DEBUGDEV 2>&1
+  matwrapper "try,measure_rssi_ref($NODEDEVLIST),catch,exit(1),end,exit(0)" >> $DEBUGDEV 2>&1
 
   if [ $? -ne 0 ]; then
     echo "Ohh, matlab error."
