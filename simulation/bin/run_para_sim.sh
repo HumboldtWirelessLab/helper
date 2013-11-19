@@ -18,11 +18,22 @@ case "$SIGN" in
       ;;
 esac
 
+$DIR/../lib/parasim/para_sim_ctrl.sh status
+
+USE_DISTPARASIM=$?
+
 MAX_THREADS=4
 
-if [ -e /proc/cpuinfo ]; then
-  MAX_THREADS=`cat /proc/cpuinfo | grep processor | wc -l`
+if [ $USE_DISTPARASIM -eq 1 ]; then
+  $DIR/../lib/parasim/para_sim_ctrl.sh cpus
+  MAX_THREADS=$?
+else
+  if [ -e /proc/cpuinfo ]; then
+    MAX_THREADS=`cat /proc/cpuinfo | grep processor | wc -l`
+  fi
 fi
+
+echo "Use dist_para_sim: $USE_DISTPARASIM max. threads: $MAX_THREADS"
 
 NUM=0
 
@@ -38,7 +49,13 @@ for i in `find -name run_again.sh`; do
 
   SIMDIR=`dirname $i`
 
-  (cd  $SIMDIR/;sh ./run_again.sh > run_again.log 2>&1; sh ./eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; echo $NUM >> $WORKINGDIR/sim_finish ) &
+  echo $SIMDIR
+  if [ $USE_DISTPARASIM -eq 1 ]; then
+    JOBCOMMAND="cd $WORKINGDIR/$SIMDIR/;sh ./run_again.sh > run_again.log 2>&1; sh ./eval_again.sh > eval_again.log 2>&1; echo $NUM >> $WORKINGDIR/sim_finish" $DIR/../lib/parasim/para_sim_ctrl.sh commit
+  else
+    (cd $SIMDIR/;sh ./run_again.sh > run_again.log 2>&1; sh ./eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; echo $NUM >> $WORKINGDIR/sim_finish ) &
+  fi
+
   echo "$NUM" >> $WORKINGDIR/sim_run
 
   let NUM=NUM+1
@@ -49,7 +66,7 @@ for i in `find -name run_again.sh`; do
   let SIM_DIFF=SIM_RUN-SIM_FIN
 
   while [ $SIM_DIFF -gt $MAX_THREADS ]; do
-    sleep 5
+    sleep 1
     echo -n -e "Finished $SIM_FIN of $COUNT_SIMS sims         \033[1G"
     SIM_FIN=`cat $WORKINGDIR/sim_finish | wc -l`
     let SIM_DIFF=SIM_RUN-SIM_FIN
@@ -58,7 +75,7 @@ for i in `find -name run_again.sh`; do
 done
 
 while [ $SIM_DIFF -ne 0 ]; do
-    sleep 5
+    sleep 1
     echo -n -e "Finished $SIM_FIN of $COUNT_SIMS sims         \033[1G"
     SIM_FIN=`cat $WORKINGDIR/sim_finish | wc -l`
     let SIM_DIFF=SIM_RUN-SIM_FIN
