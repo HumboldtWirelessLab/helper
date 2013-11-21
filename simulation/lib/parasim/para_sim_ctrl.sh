@@ -29,11 +29,16 @@ case "$1" in
               mkdir $WORKERDIR
             fi
 
-            for WORKERNAME in `cat $DIR/hosts | awk '{print $1}' | sort -u`; do
-              for WORKERCPU in `cat $DIR/hosts | grep "$WORKERNAME " | awk '{print $2}' | sort -u`; do
+            for WORKERNAME in `cat $DIR/$HOSTS | awk '{print $1}' | sort -u`; do
+              NO_CPUS=`cat $DIR/$HOSTS | grep "$WORKERNAME " | awk '{print $2}' | sort -u | tail -n 1`
+              for WORKERCPU in `seq $NO_CPUS`; do
                 echo "$WORKERNAME $WORKERCPU"
                 #echo "ssh $WORKERUSERNAME@$WORKERNAME \"(cd $DIR; $DIR/start_worker.sh $WORKERNAME $WORKERCPU)\""
-                ssh $WORKERUSERNAME@$WORKERNAME "(cd $DIR; $DIR/start_worker.sh $WORKERNAME $WORKERCPU)"
+                if [ "x$DOMAIN" = "x" ]; then
+                  ssh $WORKERUSERNAME@$WORKERNAME "(cd $DIR; $DIR/start_worker.sh $WORKERNAME $WORKERCPU)"
+                else
+                  ssh $WORKERUSERNAME@$WORKERNAME$DOMAIN "(cd $DIR; $DIR/start_worker.sh $WORKERNAME $WORKERCPU)"
+                fi
                 #echo "DONE $?"
               done
             done
