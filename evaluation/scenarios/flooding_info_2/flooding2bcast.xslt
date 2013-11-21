@@ -30,7 +30,8 @@
 	<xsl:value-of select="@rcv_cnt" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="../@fwd_done" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="../@fwd_succ" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="@finished_responsible" /><xsl:value-of select="$newline" />
+	<xsl:value-of select="@finished_responsible" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="../@time" /><xsl:value-of select="$newline" />
     </xsl:template>
 
 </xsl:stylesheet>
