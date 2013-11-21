@@ -14,6 +14,8 @@
 	<xsl:value-of select="../../../@node" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="../../@node" /><xsl:text>,</xsl:text>
 	<xsl:variable name="smac" select="../../@node" />
+	<!-- <xsl:value-of select="../../../../flowstats[@node=$smac]/txflow/@packet_size" /><xsl:text>,0,0,0,0,0,</xsl:text>
+	     <xsl:value-of select="../../../../flowstats[@node=$smac]/txflow/@packet_count" /><xsl:text>,</xsl:text> -->
 	<xsl:value-of select="$packetsize"/>
 	<xsl:text>,0,0,0,0,0,</xsl:text>
 	<xsl:value-of select="$packetcount"/>
@@ -27,7 +29,8 @@
 	<xsl:value-of select="@rx_acked" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="@rcv_cnt" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="../@fwd_done" /><xsl:text>,</xsl:text>
-	<xsl:value-of select="../@fwd_succ" /><xsl:value-of select="$newline" />
+	<xsl:value-of select="../@fwd_succ" /><xsl:text>,</xsl:text>
+	<xsl:value-of select="@finished_responsible" /><xsl:value-of select="$newline" />
     </xsl:template>
 
 </xsl:stylesheet>
