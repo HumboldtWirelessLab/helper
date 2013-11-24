@@ -51,3 +51,10 @@ if [ ! -e $EVALUATIONSDIR ]; then
 fi
 
 xsltproc $DIR/flooding.xslt $DATAFILE > $EVALUATIONSDIR/floodingstats.csv
+
+FLOWSTATS=`xsltproc $DIR/flow_stats.xslt $DATAFILE`
+PSIZE=`echo $FLOWSTATS | awk '{print $2}'`
+PCOUNT=`echo $FLOWSTATS | awk '{print $1}'`
+xsltproc --stringparam packetsize "$PSIZE" --stringparam packetcount "$PCOUNT" $DIR/flooding2bcast.xslt $DATAFILE | grep -v ",," > $EVALUATIONSDIR/floodingforwardstats.csv
+
+cat $EVALUATIONSDIR/floodingforwardstats.csv | sed "s#,# #g" | sed $FULLIDSED > $EVALUATIONSDIR/floodingforwardstats.mat

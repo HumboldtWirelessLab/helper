@@ -50,20 +50,8 @@ if [ ! -e $EVALUATIONSDIR ]; then
   mkdir -p $EVALUATIONSDIR
 fi
 
-#NEW VERSION
-FLOWSTATS=`xsltproc $DIR/flow_stats.xslt $DATAFILE`
-PSIZE=`echo $FLOWSTATS | awk '{print $2}'`
-PCOUNT=`echo $FLOWSTATS | awk '{print $1}'`
-#echo "$PSIZE $PCOUNT"
-xsltproc --stringparam packetsize "$PSIZE" --stringparam packetcount "$PCOUNT" $DIR/flooding2bcast.xslt $DATAFILE | grep -v ",," > $EVALUATIONSDIR/floodingforwardstats.csv
-
-#OLD
-#xsltproc $DIR/flooding2bcast.xslt $DATAFILE | grep -v ",," > $EVALUATIONSDIR/floodingforwardstats.csv
-
-cat $EVALUATIONSDIR/floodingforwardstats.csv | sed "s#,# #g" | sed $FULLIDSED > $EVALUATIONSDIR/floodingforwardstats.mat
-
 (cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "try,flooding2pdr('$EVALUATIONSDIR/floodingforwardstats.mat','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
-#(cd $DIR; matlab -nosplash -nodesktop -nojvm -nodisplay -r "flooding2pdr('$EVALUATIONSDIR/floodingforwardstats.mat','$EVALUATIONSDIR/'),exit(0)")
+
 cat $EVALUATIONSDIR/flooding_lasthop_fwd_pdr.csv | sed "s#,# #g" > $EVALUATIONSDIR/flooding_lasthop_fwd_pdr.mat
 cat $EVALUATIONSDIR/flooding_lasthop_fwd_pkt_cnt.csv | sed "s#,# #g" > $EVALUATIONSDIR/flooding_lasthop_fwd_pkt_cnt.mat
 cat $EVALUATIONSDIR/flooding_lasthop_tx_pdr.csv | sed "s#,# #g" > $EVALUATIONSDIR/flooding_lasthop_tx_pdr.mat
