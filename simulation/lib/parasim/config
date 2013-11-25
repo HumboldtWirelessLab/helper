@@ -1,0 +1,5 @@
+WORKERUSERNAME=robert
+WORKERDIR=worker_data
+WORKERNICE=19
+HOSTS=hosts
+DOMAIN=.informatik.hu-berlin.de

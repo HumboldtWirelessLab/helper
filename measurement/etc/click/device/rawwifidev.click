@@ -89,7 +89,6 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   bo_maxtp::BoMaxThroughput(CHANNELSTATS CST, DEBUG 4);
   bo_cla::BoChannelLoadAware(CHANNELSTATS CST, TARGETLOAD 90, DEBUG 4);
   bo_targetpl::BoTargetPacketloss(CHANNELSTATS CST, TARGETPL 10, DEBUG 4);
-  bo_tdiff::BoTargetDiffRxTxBusy(CHANNELSTATS CST, TARGETDIFF 5, DEBUG 4);
 #endif
   bo_learning::BoLearning(STRICT 1, DEBUG 4);
 #endif
@@ -111,7 +110,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef COLLINFO
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS CST, COLLISIONINFO cinfo, STRATEGY TOS2QUEUEMAPPER_STRATEGY, DEBUG 2)
 #else
-  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_tdiff", DEBUG 2)
+  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning", DEBUG 2)
 #endif //RTS_CTS
 #else //CST
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_learning", DEBUG 2)
