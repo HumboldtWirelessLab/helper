@@ -59,14 +59,14 @@ PCOUNT=`echo $FLOWSTATS | awk '{print $1}'`
 
 
 #Small stats. info about all broadcasts
-xsltproc --stringparam packetsize "$PSIZE" --stringparam packetcount "$PCOUNT" $DIR/flooding_small_stats.xslt $DATAFILE | grep -v ",," > $EVALUATIONSDIR/floodingsmallstats.csv
+xsltproc --stringparam packetsize "$PSIZE" --stringparam packetcount "$PCOUNT" $DIR/flooding_small_stats.xslt $DATAFILE > $EVALUATIONSDIR/floodingsmallstats.csv
 
-cat $EVALUATIONSDIR/floodingsmallstats.csv | sed "s#,# #g" | sed $FULLIDSED > $EVALUATIONSDIR/floodingsmallstats.mat
+cat $EVALUATIONSDIR/floodingsmallstats.csv | sed -e "s#,# #g" $FULLIDSED > $EVALUATIONSDIR/floodingsmallstats.mat
 
 
 #Full Info. info about all packets which are send and received. Can be used to get pdr during flooding
-xsltproc --stringparam packetsize "$PSIZE" --stringparam packetcount "$PCOUNT" $DIR/flooding_stats.xslt $DATAFILE | grep -v ",," > $EVALUATIONSDIR/floodingforwardstats.csv
+xsltproc --stringparam packetsize "$PSIZE" --stringparam packetcount "$PCOUNT" $DIR/flooding_stats.xslt $DATAFILE > $EVALUATIONSDIR/floodingforwardstats.csv
 
-cat $EVALUATIONSDIR/floodingforwardstats.csv | sed "s#,# #g" | sed $FULLIDSED > $EVALUATIONSDIR/floodingforwardstats.mat
+cat $EVALUATIONSDIR/floodingforwardstats.csv | sed -e "s#,# #g" $FULLIDSED > $EVALUATIONSDIR/floodingforwardstats.mat
 
 
