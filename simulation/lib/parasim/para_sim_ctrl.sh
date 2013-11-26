@@ -33,10 +33,11 @@ case "$1" in
               NO_CPUS=`cat $DIR/$HOSTS | grep "$WORKERNAME " | awk '{print $2}' | sort -u | tail -n 1`
               for WORKERCPU in `seq $NO_CPUS`; do
                 echo "$WORKERNAME $WORKERCPU"
-                #echo "ssh $WORKERUSERNAME@$WORKERNAME \"(cd $DIR; $DIR/start_worker.sh $WORKERNAME $WORKERCPU)\""
                 if [ "x$DOMAIN" = "x" ]; then
+                  echo "ssh $WORKERUSERNAME@$WORKERNAME \"(cd $DIR; $DIR/start_worker.sh $WORKERNAME $WORKERCPU)\""
                   ssh $WORKERUSERNAME@$WORKERNAME "(cd $DIR; $DIR/start_worker.sh $WORKERNAME $WORKERCPU)"
                 else
+                  echo "ssh $WORKERUSERNAME@$WORKERNAME$DOMAIN \"(cd $DIR; $DIR/start_worker.sh $WORKERNAME $WORKERCPU)\""
                   ssh $WORKERUSERNAME@$WORKERNAME$DOMAIN "(cd $DIR; $DIR/start_worker.sh $WORKERNAME $WORKERCPU)"
                 fi
                 #echo "DONE $?"
@@ -47,6 +48,29 @@ case "$1" in
     "stop")
             echo "Stop"
             touch $DIR/end
+            ;;
+    "forcestop")
+            touch "Stop"
+
+            if [ ! -d $WORKERDIR ]; then
+              mkdir $WORKERDIR
+            fi
+
+            for WORKERNAME in `cat $DIR/$HOSTS | awk '{print $1}' | sort -u`; do
+              NO_CPUS=`cat $DIR/$HOSTS | grep "$WORKERNAME " | awk '{print $2}' | sort -u | tail -n 1`
+              for WORKERCPU in `seq $NO_CPUS`; do
+                echo "$WORKERNAME $WORKERCPU"
+                WORKERPID=`cat $DIR/$WORKERDIR/$WORKERNAME.$WORKERCPU.pid`
+                if [ "x$DOMAIN" = "x" ]; then
+                  ssh $WORKERUSERNAME@$WORKERNAME "kill $WORKERPID; killall sleep"
+                else
+                  ssh $WORKERUSERNAME@$WORKERNAME$DOMAIN "kill $WORKERPID; killall sleep"
+                fi
+                #echo "DONE $?"
+                rm $DIR/$WORKERDIR/$WORKERNAME.$WORKERCPU.pid
+              done
+            done
+
             ;;
     "status")
             #echo "Status"
@@ -82,6 +106,7 @@ case "$1" in
               JOBFILE=`echo $i | sed "s#pid#job#g"`
               if [ ! -f $DIR/$WORKERDIR/$JOBFILE ]; then
                 echo "#!/bin/bash" > $DIR/$WORKERDIR/$JOBFILE
+                echo ". ~/.bashrc" >> $DIR/$WORKERDIR/$JOBFILE
                 echo "cd $PWD" >> $DIR/$WORKERDIR/$JOBFILE
                 echo $JOBCOMMAND >> $DIR/$WORKERDIR/$JOBFILE
                 echo "cd $DIR" >> $DIR/$WORKERDIR/$JOBFILE
@@ -89,6 +114,16 @@ case "$1" in
               fi
             done
             ;;
+    "psstatus")
+            for WORKERNAME in `cat $DIR/$HOSTS | awk '{print $1}' | sort -u`; do
+              echo "$WORKERNAME"
+              if [ "x$DOMAIN" = "x" ]; then
+                ssh $WORKERUSERNAME@$WORKERNAME "ps -le | grep 14275"
+              else
+                ssh $WORKERUSERNAME@$WORKERNAME$DOMAIN "ps -le | grep 14275"
+              fi
+            done
+           ;;
     "*")
             echo "Unknown command"
             ;;
