@@ -18,11 +18,22 @@ case "$SIGN" in
       ;;
 esac
 
+$DIR/../lib/parasim/para_sim_ctrl.sh status
+
+USE_DISTPARASIM=$?
+
 MAX_THREADS=4
 
-if [ -e /proc/cpuinfo ]; then
-  MAX_THREADS=`cat /proc/cpuinfo | grep processor | wc -l`
+if [ $USE_DISTPARASIM -eq 1 ]; then
+  $DIR/../lib/parasim/para_sim_ctrl.sh cpus
+  MAX_THREADS=$?
+else
+  if [ -e /proc/cpuinfo ]; then
+    MAX_THREADS=`cat /proc/cpuinfo | grep processor | wc -l`
+  fi
 fi
+
+echo "Use dist_para_sim: $USE_DISTPARASIM max. threads: $MAX_THREADS"
 
 NUM=0
 
@@ -34,23 +45,44 @@ echo -n "" > $WORKINGDIR/sim_run
 COUNT_SIMS=`find -name run_again.sh | wc -l`
 FINISHEDSIMS=0
 
+rm -rf $WORKINGDIR/sim_finish_dir
+mkdir $WORKINGDIR/sim_finish_dir
+
+SIM_RUN=0
+SIM_FIN=0
+
 for i in `find -name run_again.sh`; do
 
   SIMDIR=`dirname $i`
 
-  (cd  $SIMDIR/;sh ./run_again.sh > run_again.log 2>&1; sh ./eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; echo $NUM >> $WORKINGDIR/sim_finish ) &
+  echo $SIMDIR
+  if [ $USE_DISTPARASIM -eq 1 ]; then
+    JOBCOMMAND="cd $WORKINGDIR/$SIMDIR/;sh ./run_again.sh > run_again.log 2>&1; sh ./eval_again.sh > eval_again.log 2>&1; touch $WORKINGDIR/sim_finish_dir/$NUM" $DIR/../lib/parasim/para_sim_ctrl.sh commit
+  else
+    (cd $SIMDIR/;sh ./run_again.sh > run_again.log 2>&1; sh ./eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; touch $WORKINGDIR/sim_finish_dir/$NUM ) &
+  fi
+
+  let SIM_RUN=SIM_RUN+1
   echo "$NUM" >> $WORKINGDIR/sim_run
 
   let NUM=NUM+1
 
-  SIM_RUN=`cat $WORKINGDIR/sim_run | wc -l`
+  for fs in `(cd $WORKINGDIR/sim_finish_dir; ls)`; do
+    echo $fs >> $WORKINGDIR/sim_finish
+    rm $WORKINGDIR/sim_finish_dir/$fs
+  done
+
   SIM_FIN=`cat $WORKINGDIR/sim_finish | wc -l`
 
   let SIM_DIFF=SIM_RUN-SIM_FIN
 
   while [ $SIM_DIFF -gt $MAX_THREADS ]; do
-    sleep 5
+    sleep 1
     echo -n -e "Finished $SIM_FIN of $COUNT_SIMS sims         \033[1G"
+    for fs in `(cd $WORKINGDIR/sim_finish_dir; ls)`; do
+      echo $fs >> $WORKINGDIR/sim_finish
+      rm $WORKINGDIR/sim_finish_dir/$fs
+    done
     SIM_FIN=`cat $WORKINGDIR/sim_finish | wc -l`
     let SIM_DIFF=SIM_RUN-SIM_FIN
   done
@@ -58,10 +90,15 @@ for i in `find -name run_again.sh`; do
 done
 
 while [ $SIM_DIFF -ne 0 ]; do
-    sleep 5
+    sleep 1
     echo -n -e "Finished $SIM_FIN of $COUNT_SIMS sims         \033[1G"
+    for fs in `(cd $WORKINGDIR/sim_finish_dir; ls)`; do
+      echo $fs >> $WORKINGDIR/sim_finish
+      rm $WORKINGDIR/sim_finish_dir/$fs
+    done
     SIM_FIN=`cat $WORKINGDIR/sim_finish | wc -l`
     let SIM_DIFF=SIM_RUN-SIM_FIN
 done
 
 rm -f $WORKINGDIR/sim_finish $WORKINGDIR/sim_run
+rm -rf sim_finish_dir
