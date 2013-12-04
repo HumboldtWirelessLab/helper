@@ -466,6 +466,10 @@ case "$MODE" in
 
 						CLICKFILE=`cat $NODETABLE | grep "$n eth0 " | awk '{print $7}'`
 
+            if [ "x$CLICKFILE" = "x" ]; then
+              continue;
+            fi
+
 						NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$n[[:space:]]" | awk '{print $4}'`
 						let NODENUM=NODENUM-1
 						if [ "x$TIME" != "x" ]; then
