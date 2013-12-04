@@ -33,7 +33,7 @@ function get_params() {
 
 if [ "x$1" = "xhelp" ]; then
 	echo "Use: [DUMPFILEDIR=Path-to-dumps] $0 [ns|jist [des-file  [target-dir]]]"
-	
+
 	exit 0
 fi
 
@@ -42,7 +42,7 @@ if [ $# -gt 0 ]; then
 		echo "Use $0 [ns|ns3|jist] des-file"
 		exit 0
 	fi
-	
+
 	USED_SIMULATOR=$1
 else
 	USED_SIMULATOR=ns
@@ -77,7 +77,7 @@ if [ $# -gt 1 ]; then
 	fi
 else
 	DESCRIPTIONFILE=`ls *.des | awk '{print $1}'`
-	
+
 	if [ "x$DESCRIPTIONFILE" = "x" ]; then
 		echo "No description-file"
 		exit 0
@@ -92,11 +92,11 @@ FINALRESULTDIR=`echo $RESULTDIR | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#CONFIGDIR#
 # check for result directory
 if [ "x$3" = "x" ]; then
 	echo "RESULTDIR is target. No Subdir."
-	
+
 	# check numbered directories to propose automatically
 	i=1
 	while [ -e "./$i" ]; do i=$((i+1)); done
-	
+
 	echo "Proposing $FINALRESULTDIR/$i"
 	FINALRESULTDIR=$FINALRESULTDIR/$i
 else
@@ -104,7 +104,7 @@ else
 		i=$3
 	        if [ "x$FORCE_DIR" = "x" ]; then
 		  echo "Measurement already exits"
-		
+
 		  while [ -e "./$i" ]; do i=$((i+1)); done
 
 		  if [ $LOGLEVEL -gt 0 ]; then echo "Use $FINALRESULTDIR/$i"; fi
@@ -130,7 +130,7 @@ MODE=sim
 case "$MODE" in
 	"sim")
 		declare -a dectohex=('00' '01' '02' '03' '04' '05' '06' '07' '08' '09' '0A' '0B' '0C' '0D' '0E' '0F' '10' '11' '12' '13' '14' '15' '16' '17' '18' '19' '1A' '1B' '1C' '1D' '1E' '1F' '20' '21' '22' '23' '24' '25' '26' '27' '28' '29' '2A' '2B' '2C' '2D' '2E' '2F' '30' '31' '32' '33' '34' '35' '36' '37' '38' '39' '3A' '3B' '3C' '3D' '3E' '3F' '40' '41' '42' '43' '44' '45' '46' '47' '48' '49' '4A' '4B' '4C' '4D' '4E' '4F' '50' '51' '52' '53' '54' '55' '56' '57' '58' '59' '5A' '5B' '5C' '5D' '5E' '5F' '60' '61' '62' '63' '64' '65' '66' '67' '68' '69' '6A' '6B' '6C' '6D' '6E' '6F' '70' '71' '72' '73' '74' '75' '76' '77' '78' '79' '7A' '7B' '7C' '7D' '7E' '7F' '80' '81' '82' '83' '84' '85' '86' '87' '88' '89' '8A' '8B' '8C' '8D' '8E' '8F' '90' '91' '92' '93' '94' '95' '96' '97' '98' '99' '9A' '9B' '9C' '9D' '9E' '9F' 'A0' 'A1' 'A2' 'A3' 'A4' 'A5' 'A6' 'A7' 'A8' 'A9' 'AA' 'AB' 'AC' 'AD' 'AE' 'AF' 'B0' 'B1' 'B2' 'B3' 'B4' 'B5' 'B6' 'B7' 'B8' 'B9' 'BA' 'BB' 'BC' 'BD' 'BE' 'BF' 'C0' 'C1' 'C2' 'C3' 'C4' 'C5' 'C6' 'C7' 'C8' 'C9' 'CA' 'CB' 'CC' 'CD' 'CE' 'CF' 'D0' 'D1' 'D2' 'D3' 'D4' 'D5' 'D6' 'D7' 'D8' 'D9' 'DA' 'DB' 'DC' 'DD' 'DE' 'DF' 'E0' 'E1' 'E2' 'E3' 'E4' 'E5' 'E6' 'E7' 'E8' 'E9' 'EA' 'EB' 'EC' 'ED' 'EE' 'EF' 'F0' 'F1' 'F2' 'F3' 'F4' 'F5' 'F6' 'F7' 'F8' 'F9' 'FA' 'FB' 'FC' 'FD' 'FE' 'FF');
-	
+
 		if [ "x$USED_SIMULATOR" = "xjist" ]; then
 			POSTFIX=jist
 		else if [ "x$USED_SIMULATOR" = "xns3" ]; then
@@ -139,9 +139,9 @@ case "$MODE" in
 			POSTFIX=ns2
 		fi
 		fi
-		
+
 		DESCRIPTIONFILENAME=`basename $DESCRIPTIONFILE`
-		
+
 		if [ "x$NODEPLACEMENT" != "xfile" ]; then
 			cat $DESCRIPTIONFILE | sed -e "s#[[:space:]]*NODEPLACEMENTFILE[[:space:]]*=.*##g" -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 			echo "" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
@@ -149,7 +149,7 @@ case "$MODE" in
 		else
 			cat $DESCRIPTIONFILE | sed -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 		fi
-		
+
 		if [ "x$NODEPLACEMENT" = "x" ]; then
 			echo "use default plm"
 			NODEPLACEMENT="random"
@@ -157,7 +157,7 @@ case "$MODE" in
 		if [ "x$FIELDSIZE" = "x" ]; then
 			FIELDSIZE=1000
 		fi
-		
+
 		if [ "x$NODEPLACEMENT" != "xfile" ]; then
 			FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
 		else
@@ -181,7 +181,7 @@ case "$MODE" in
 				fi
 			fi
 		fi
-		
+
 		echo "gen clickfile" >> $FINALRESULTDIR/time.log
 		date +"%s:%N" >> $FINALRESULTDIR/time.log
 		DUMPFILEDIR=$DUMPFILEDIR USED_SIMULATOR=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR POSTFIX=$POSTFIX NODEPLACEMENTFILE=$FINALPLMFILE $DIR/prepare-sim.sh prepare $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
@@ -189,18 +189,18 @@ case "$MODE" in
 
 		echo "run_sim" >> $FINALRESULTDIR/time.log
 		date +"%s:%N" >> $FINALRESULTDIR/time.log
-		
+
 		mv $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX $FINALRESULTDIR/$DESCRIPTIONFILENAME.tmp
-		
+
 		cat $FINALRESULTDIR/$DESCRIPTIONFILENAME.tmp | grep -v "NODEPLACEMENTFILE" | sed -e "s#$NODETABLE#$FINALRESULTDIR/$NODETABLE.$POSTFIX#g" > $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 		echo "NODEPLACEMENTFILE=$FINALPLMFILE" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
-		
+
 		rm $FINALRESULTDIR/$DESCRIPTIONFILENAME.tmp
-		
+
 		SIMDES=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
-		
+
 		. $SIMDES
-		
+
 		if  [ "x$POSTFIX" = "xjist" ]; then
 			. $DIR/../etc/jist/distances/default
 		else
@@ -225,9 +225,9 @@ case "$MODE" in
 		if [ "x$POSTFIX" = "xns2" ]; then
 			TCLFILE="$FINALRESULTDIR/$NAME.tcl"
 			WIFICONFIGFILE=`cat $NODETABLE | grep -v "#" | head -n 1 | awk '{print $5}'`
-			
+
 			. $DIR/../../nodes/etc/wifi/default
-			
+
 			if [ -f $WIFICONFIGFILE ]; then
 				. $WIFICONFIGFILE
 			else
@@ -239,7 +239,7 @@ case "$MODE" in
 					fi
 				fi
 			fi
-			
+
 			if [ "x$CWMIN" = "x" ]; then
 				CWMIN=$DEFAULT_CWMIN
 			fi
@@ -249,27 +249,27 @@ case "$MODE" in
 			if [ "x$AIFS" = "x" ]; then
 				AIFS=$DEFAULT_AIFS
 			fi
-			
+
 		else
 			TCLFILE="/dev/null"
 		fi
-		
+
 		NODELIST=`cat $NODETABLE | grep -v "#" | awk '{print $1}' | uniq`
 		NODECOUNT=`cat $NODETABLE | grep -v "#" | wc -l`
-		
+
 		echo "#Autogenerated" > $TCLFILE
-		
+
 		INDEX=1
-		
+
 		for hwq in `seq 0 3`; do
 			echo $CWMIN | awk -v I=$hwq '{print "Mac/802_11 set CWMin"I"_ "$(I+1)}' | sed "s#0_#_#g" >> $TCLFILE
 			echo $CWMAX | awk -v I=$hwq '{print "Mac/802_11 set CWMax"I"_ "$(I+1)}' | sed "s#0_#_#g" >> $TCLFILE
 		done
-		
+
 		echo "Mac/802_11 set NoHWQueues_ 4" >> $TCLFILE
-		
+
 		cat $DIR/../etc/ns/radio/$RADIO\.tcl >> $TCLFILE
-		
+
 		echo "gen placement" >> $FINALRESULTDIR/time.log
 		date +"%s:%N" >> $FINALRESULTDIR/time.log
 		if [ "x$NODEPLACEMENT" != "xfile" ]; then
@@ -278,11 +278,11 @@ case "$MODE" in
 			NODEPLACEMENTOPTS="$NODEPLACEMENTOPTS" RXRANGE=$TOPORXRANGE $DIR/generate_placement.sh $NODEPLACEMENT $NODETABLE $FIELDSIZE > $FINALRESULTDIR/placementfile.plm
 			FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
 		fi
-		
+
 		#POS_X_MAX=0
 		#POS_Y_MAX=0
 		#POS_Z_MAX=0
-		
+
 		#echo "FIN: $FINALPLMFILE"
 		#for node in $NODELIST; do
 		#	POS_LINE=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]"`
@@ -299,15 +299,15 @@ case "$MODE" in
 		#		POS_Z_MAX=$POS_Z;
 		#	fi
 		#done
-		
+
 		POS_X_MAX=`cat $FINALPLMFILE | awk '{print $2}' | sort | tail -n 1`
 		POS_Y_MAX=`cat $FINALPLMFILE | awk '{print $3}' | sort | tail -n 1`
 		POS_Z_MAX=`cat $FINALPLMFILE | awk '{print $4}' | sort | tail -n 1`
-		
+
 		let POS_X_MAX=POS_X_MAX+50
 		let POS_Y_MAX=POS_Y_MAX+50
 		let POS_Z_MAX=POS_Z_MAX+50
-		
+
 		if [ "x$FIELDSIZE" = "x" ]; then
 			FIELDSIZE=$POS_X_MAX
 		fi
@@ -317,7 +317,7 @@ case "$MODE" in
 		if [ $FIELDSIZE -lt $POS_Y_MAX ]; then
 			FIELDSIZE=$POS_Y_MAX
 		fi
-		
+
 		if [ $POS_X_MAX -lt $FIELDSIZE ]; then
 			POS_X_MAX=$FIELDSIZE
 		fi
@@ -326,13 +326,13 @@ case "$MODE" in
 		fi
 		POS_Z_MAX=0
 		#FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
-		
+
 		#		echo "FIN: $FINALPLMFILE"
 		echo "set xsize $POS_X_MAX" >> $TCLFILE
 		echo "set ysize $POS_Y_MAX" >> $TCLFILE
 		echo "set nodecount $NODECOUNT"	>> $TCLFILE
 		echo "set stoptime $TIME" >> $TCLFILE
-		
+
 		if [ "x$SEED" != "x" ]; then
 		    echo "\$defaultRNG seed $SEED" >> $TCLFILE
 		    echo "set arrivalRNG [new RNG]" >> $TCLFILE
@@ -351,9 +351,9 @@ case "$MODE" in
 
 		NODEMAC_SEDARG=""
 		NODENAME_SEDARG=""
-		
+
 		echo "" >> $TCLFILE
-		
+
 		echo "gen nodes.mac" >> $FINALRESULTDIR/time.log
 		date +"%s:%N" >> $FINALRESULTDIR/time.log
 		# Scann the node table to build a NetworkSimulator-Command for
@@ -388,7 +388,7 @@ case "$MODE" in
 					NODEMAC_SEDARG="-e s#FIRSTNODE:eth#$nodemac#g"
 					NODENAME_SEDARG="-e s#FIRSTNODE#$node#g"
 				fi
-				
+
 				NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#$node:eth#$nodemac#g"
 
 				echo "set node_name($i) \"$node\"" >> $TCLFILE
@@ -398,8 +398,8 @@ case "$MODE" in
 				echo "set pos_y($i) $POS_Y" >> $TCLFILE
 				echo "set pos_z($i) $POS_Z" >> $TCLFILE
 				echo "set nodelabel($i) \"$node.$nodedevice\"" >> $TCLFILE
-				
-				
+
+
 				#CLICK=`cat $NODETABLE | egrep "^$node[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
 				echo "set clickfile($i) \"$CLICK\"" >> $TCLFILE
 
@@ -408,7 +408,7 @@ case "$MODE" in
 				let i=i+1
 			done
 		done
-		
+
 		if [ "x$NODEMAC_SEDARG" != "x" ]; then
 			NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#LASTNODE:eth#$nodemac#g"
 			NODENAME_SEDARG="$NODENAME_SEDARG -e s#LASTNODE#$node#g"
@@ -428,7 +428,7 @@ case "$MODE" in
 		cat $DIR/../etc/ns/script_01.tcl | sed -e "s#NAME#$NAME#g" -e "s#RESULTDIR#$RESULTDIR#g" >> $TCLFILE
 
 		cat $DIR/../etc/ns/script_02.tcl >> $TCLFILE
-		
+
 		echo "handle" >> $FINALRESULTDIR/time.log
 		date +"%s:%N" >> $FINALRESULTDIR/time.log
 		#echo "Handle Control file"
@@ -443,7 +443,7 @@ case "$MODE" in
 					# collect information of control file
 					#read TIME NODENAME NODEDEVICE MODE ELEMENT HANDLER <<< $line
 					#NODENAME=`echo $NODENAME | sed $NODENAME_SEDARG`
-					
+
 					#OLD VERSION
 					TIME=`echo $line | awk '{print $1}'`
 					NODENAME=`echo $line | awk '{print $2}' | sed $NODENAME_SEDARG`
@@ -451,7 +451,6 @@ case "$MODE" in
 					MODE=`echo $line | awk '{print $4}'`
 					ELEMENT=`echo $line | awk '{print $5}'`
 					HANDLER=`echo $line | awk '{print $6}'`
-					
 
 					# if "ALL" is used, take all nodes of nodelist, else just the respective node
 					if [ "x$NODENAME" = "xALL" ]; then
@@ -459,7 +458,7 @@ case "$MODE" in
 					else
 						HANDLERNODES=$NODENAME
 					fi
-					
+
 					# Main stage: now we set up the click-handler which are going to be
 					# used by the simulator to dynamically control the process
 					# or get some information out of the network activities... yey!
@@ -467,10 +466,14 @@ case "$MODE" in
 
 						CLICKFILE=`cat $NODETABLE | grep "$n eth0 " | awk '{print $7}'`
 
+            if [ "x$CLICKFILE" = "x" ]; then
+              continue;
+            fi
+
 						NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$n[[:space:]]" | awk '{print $4}'`
 						let NODENUM=NODENUM-1
 						if [ "x$TIME" != "x" ]; then
-							
+
 							# the write handler
 							if [ "x$MODE" = "xwrite" ]; then
 								VALUE=`get_params $line | sed $NODEMAC_SEDARG`
@@ -507,11 +510,11 @@ case "$MODE" in
 				echo "" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 			fi
 		fi
-		
+
 		cat $DIR/../etc/ns/script_03.tcl >> $TCLFILE
-		
+
 		#echo "Finish setup"
-		
+
 		# Prepare result directories
 		if [ ! -e $LOGDIR ]; then
 			echo "Create $LOGDIR"
@@ -521,7 +524,7 @@ case "$MODE" in
 			echo "Create $RESULTDIR"
 			mkdir -p $RESULTDIR
 		fi
-		
+
 		if [ -f /usr/bin/time ]; then
 		        QUIETSUPPORT=`/usr/bin/time --help | grep "quiet" | wc -l`
 			if [ $QUIETSUPPORT -gt 0 ]; then
@@ -535,9 +538,9 @@ case "$MODE" in
 
 		echo "prepare run_again" >> $FINALRESULTDIR/time.log
 		date +"%s:%N" >> $FINALRESULTDIR/time.log
-		
+
 		echo "#!/bin/sh" > $FINALRESULTDIR/run_again.sh
-		
+
 		# Final stage: valgrind-check and experiment evaluation
 		if [ "x$USED_SIMULATOR" = "xns" ]; then
 			echo "echo \"Running NS2\"" >> $FINALRESULTDIR/run_again.sh
@@ -593,17 +596,17 @@ case "$MODE" in
 			exit 0
 		fi
 		fi
-		
+
 		#Prepare eval-script
-		
+
 		echo "#!/bin/sh" > $FINALRESULTDIR/eval_again.sh
-		echo "echo \"Evaluation...\"" >> $FINALRESULTDIR/eval_again.sh
+		#echo "echo \"Evaluation...\"" >> $FINALRESULTDIR/eval_again.sh
 		echo "MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT" >> $FINALRESULTDIR/eval_again.sh
-		
+
 		if [ "x$PREPARE_ONLY" = "x" ]; then
 		  ( cd $FINALRESULTDIR; sh ./run_again.sh )
 		fi
-		
+
 		# if the simulation was correctly execruted start the automatized evaluation of the experiment
 		if [ $? -eq 0 ]; then
 			if [ "x$DELAYEVALUATION" = "x" ] && [ "x$PREPARE_ONLY" = "x" ]; then
