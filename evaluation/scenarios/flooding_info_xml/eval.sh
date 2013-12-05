@@ -51,12 +51,13 @@ if [ ! -e $EVALUATIONSDIR ]; then
 fi
 
 #summary. Small info
-xsltproc $DIR/flooding_summary.xslt $DATAFILE > $EVALUATIONSDIR/floodingstats.csv
+xsltproc $DIR/flooding_small_summary.xslt $DATAFILE > $EVALUATIONSDIR/floodingstats.csv
+
+
 
 FLOWSTATS=`xsltproc $DIR/flow_stats.xslt $DATAFILE`
 PSIZE=`echo $FLOWSTATS | awk '{print $2}'`
 PCOUNT=`echo $FLOWSTATS | awk '{print $1}'`
-
 
 #Small stats. info about all broadcasts
 xsltproc --stringparam packetsize "$PSIZE" --stringparam packetcount "$PCOUNT" $DIR/flooding_small_stats.xslt $DATAFILE > $EVALUATIONSDIR/floodingsmallstats.csv
@@ -69,4 +70,6 @@ xsltproc --stringparam packetsize "$PSIZE" --stringparam packetcount "$PCOUNT" $
 
 cat $EVALUATIONSDIR/floodingforwardstats.csv | sed -e "s#,# #g" $FULLIDSED > $EVALUATIONSDIR/floodingforwardstats.mat
 
+xsltproc $DIR/flooding2pdr.xslt $DATAFILE > $EVALUATIONSDIR/flooding_pdr.csv
+cat $EVALUATIONSDIR/flooding_pdr.csv | sed "s#,# #g" | sed $FULLIDSED > $EVALUATIONSDIR/flooding_pdr.mat
 
