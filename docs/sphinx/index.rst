@@ -11,6 +11,7 @@ Inhalt:
 .. toctree::
    :maxdepth: 2
 
+   brn-tools
    installation
    click_elemente
    click_scripte
