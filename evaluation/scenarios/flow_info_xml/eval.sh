@@ -50,5 +50,3 @@ TXUNICASTCOUNT=`cat $EVALUATIONSDIR/flowstats_tx.csv | grep -v "FF-FF-FF-FF-FF-F
 
 cat $EVALUATIONSDIR/flowstats_rx.csv | MAC2NUM=1 human_readable.sh $RESULTDIR/nodes.mac | sed "s#,# #g" > $EVALUATIONSDIR/flowstats_rx.mat
 cat $EVALUATIONSDIR/flowstats_tx.csv | MAC2NUM=1 human_readable.sh $RESULTDIR/nodes.mac | sed "s#,# #g" > $EVALUATIONSDIR/flowstats_tx.mat
-
-(cd $DIR; matwrapper.sh "flowstats('$EVALUATIONSDIR/flowstats_rx.mat','$EVALUATIONSDIR/flowtime.mat')")
