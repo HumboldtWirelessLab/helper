@@ -1,6 +1,9 @@
 #ifndef __BROADCASTFLOODING_CLICK__
 #define __BROADCASTFLOODING_CLICK__
 
+#define STR_EXPAND(tok) #tok
+#define STR(tok) STR_EXPAND(tok)
+
 //input[0]: From Src (who wants to send a broadcats), i.e. the originator of the flooding
 //input[1]: Received from other brn node
 //input[2]: txfeedback: failed transmission of a BRN BroadcastRouting  packet (broken link) from ds
@@ -39,10 +42,13 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 #else
 #ifdef MST_FL
   //flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH "/home/yetinam/Dokumente/brn-tools/click-brn-scripts/500-experiments/002-flooding-evaluation/005-mst_flooding_test/circles", DEBUG FLOODING_DEBUG);
+  #ifndef CIRCLE_DATA
+	#define CIRCLE_DATA circles
+  #endif
   #ifdef MST_BD
-	flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH "CONFIGDIR/circles", BIDIRECTIONAL true, DEBUG FLOODING_DEBUG);
+	flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL true, DEBUG FLOODING_DEBUG);
   #else
-	flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH "CONFIGDIR/circles", BIDIRECTIONAL false, DEBUG FLOODING_DEBUG);
+	flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL false, DEBUG FLOODING_DEBUG);
   #endif
 #else
   flp::SimpleFlooding();
