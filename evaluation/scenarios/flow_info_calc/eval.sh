@@ -34,4 +34,11 @@ else
   fi
 fi
 
-exit 0
+EVALUATIONSDIR="$EVALUATIONSDIR""/flow_info"
+
+#NONODES=`cat $RESULTDIR/nodes.mac | wc -l`
+#RXCOUNT=`cat $EVALUATIONSDIR/flowstats_rx.csv | wc -l`
+#TXBCASTCOUNT=`cat $EVALUATIONSDIR/flowstats_tx.csv | grep "FF-FF-FF-FF-FF-FF" | wc -l`
+#TXUNICASTCOUNT=`cat $EVALUATIONSDIR/flowstats_tx.csv | grep -v "FF-FF-FF-FF-FF-FF" | wc -l`
+
+(cd $DIR; matwrapper.sh "flowstats('$EVALUATIONSDIR/flowstats_rx.mat','$EVALUATIONSDIR/flowtime.mat')")

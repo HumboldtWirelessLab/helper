@@ -9,8 +9,15 @@
       <!--<xsl:value-of select="."/>-->
     </xsl:template>
 
-    <xsl:template match="/">
-	<xsl:value-of select="count(//flooding)" /><xsl:text>,</xsl:text>
+    <xsl:template match="/flooding_table/src">
+	<xsl:variable name="nonodes" select="count(../../flooding)" />
+	<xsl:variable name="mac" select="../@node" />
+	<xsl:variable name="srcmac" select="@node" />
+	<xsl:variable name="cntfloods" select="@node" />
+	
+	
+	
+	<xsl:value-of select="$nonodes" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="sum(//flooding/localstats/@received_new)" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="(((sum(//flooding/localstats/@received_new) + sum(//flooding/localstats/@source_new)) div ((count(//flooding) * (sum(//flooding/localstats/@source_new))))))" /><xsl:text>,</xsl:text>
 	<xsl:value-of select="sum(//flooding/localstats/@source)" /><xsl:text>,</xsl:text>
