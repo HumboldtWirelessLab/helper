@@ -12,7 +12,7 @@ elementclass GEOR {ID $ID, LT $LT, LINKSTAT $LS, DEBUG $debug  |
 
   gps::GPS();
 
-  gpsmap::GPSMap();
+  gpsmap::GPSMap(TIMEOUT 10000);
   gpslph::GPSLinkprobeHandler(LINKSTAT $LS, GPS gps, GPSMAP gpsmap);
 
   grt::GeorTable(GPS gps, GPSMAP gpsmap, LINKTABLE $LT, DEBUG 2);
