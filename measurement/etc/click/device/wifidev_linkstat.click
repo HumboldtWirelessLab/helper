@@ -240,7 +240,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   error_clf[1]
 #ifdef SIMULATION
-  -> PrintCRCError(LABEL "CRC", RATE 2)
+  -> PrintCRCError(LABEL "CRC")
 #endif
 //  -> Print("RXPHYERR")
   -> Discard;
