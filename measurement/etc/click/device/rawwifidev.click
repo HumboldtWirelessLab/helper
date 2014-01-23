@@ -64,17 +64,25 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 
 #ifdef SIMULATION
+#ifdef PLE
+#define COLLINFO
+#define CERR
+#endif
+
 #ifdef COLLINFO
   cinfo::CollisionInfo();
 #endif
-#ifdef USE_RTS_CTS
-  pli::PacketLossInformation();
+
+#ifdef CERR
+  hnd::HiddenNodeDetection(DEVICE $device, DEBUG 2);
+#endif
+
 #ifdef PLE
-#ifdef PLE_COCST
+  pli::PacketLossInformation();
+#ifdef COOPCST
   ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, COOPCHANNELSTATS cocst, DEVICE $device, HNWORST false, DEBUG 4);
 #else
   ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, DEVICE $device, HNWORST false, DEBUG 2);
-#endif
 #endif
 #endif
 #endif
@@ -100,6 +108,13 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 #endif
 
+#ifdef USE_RTS_CTS
+#ifdef PLE
+  rtscts_ple::RtsCtsPLI(PLI pli);
+#endif
+#endif
+
+
   input[0]
 #if defined(SIMULATION) || (WIFITYPE == 803)
   -> WifiSeq()                                                      // Set sequencenumber for simulation
@@ -112,28 +127,34 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef SIMULATION
 #ifdef CST
-
-
-#ifdef COLLINFO
-  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS CST, COLLISIONINFO cinfo, STRATEGY TOS2QUEUEMAPPER_STRATEGY, DEBUG 2)
-#else
   -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_nbs bo_const", DEBUG 2)
-#endif //RTS_CTS
-#else //CST
-  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, STRATEGY TOS2QUEUEMAPPER_STRATEGY, DEBUG 2)
-#endif //CST
+#endif
 #endif //SIMULATION
 #endif
 
 #ifdef USE_RTS_CTS
-  ->setrtscts::Brn2_SetRTSCTS(PLI pli)
+#ifdef PLE
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 4, RTSCTS_SCHEMES rtscts_ple)
+#else
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 1)
 #endif
+#endif
+
 #ifdef SETCHANNEL
   -> sc::BRN2SetChannel(DEVICE $device, CHANNEL 0)
 #endif
   -> __WIFIENCAP__
 
 #ifndef NOATHOPERATION
+
+
+
+
+
+
+
+
+
 #if WIFITYPE == 805                                                 /***  for ath2 add priority scheduler to prefer operation packet ***/
   -> [1]op_prio_s::PrioSched();                                     /**/
                                                                     /**/
@@ -160,10 +181,12 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 #endif
 #ifdef CERR
-  -> hnd::HiddenNodeDetection(DEVICE $device, DEBUG 2)
+  -> hnd
 #endif
 #ifdef SIMULATION
+#ifdef CST
   -> Tos2QueueMapperTXFeedback(TOS2QM tosq, DEBUG 2)
+#endif
 #endif
 #ifdef FOREIGNRXSTATS
   -> ForeignRxStats(DEVICE $device,TIMEOUT 5, DEBUG 2)
