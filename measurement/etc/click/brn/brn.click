@@ -11,6 +11,7 @@
 #define BRN_ETHERTYPE                  8086
 #define BRN_ETHERTYPE_HEX            0x8086
 
+#define BRN_MAC_BROADCAST FF:FF:FF:FF:FF:FF
 
 /*Basics and Services*/
 #define BRN_PORT_LINK_PROBE              01
