@@ -112,6 +112,10 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef PLE
   rtscts_ple::RtsCtsPLI(PLI pli);
 #endif
+  rtscts_packetsize::RtsCtsPacketSize(PACKETSIZE 750);
+  rtscts_random::RtsCtsPLI(PLI pli);
+  rtscts_hiddennode::RtsCtsHiddenNode(HIDDENNODE hnd, COOPCHANNELSTATS cocst);
+
 #endif
 
 
