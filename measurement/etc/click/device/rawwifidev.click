@@ -102,9 +102,9 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
   bo_nbs::BoNeighbours(CHANNELSTATS CST, DEBUG 4);
 
-  bo_learning::BoLearning(MIN_CWMIN 31, MAX_CWMIN 1023, STRICT 1, CAP 1, DEBUG 4);
+  bo_learning::BoLearning(MIN_CWMIN 32, MAX_CWMIN 1024, STRICT 1, CAP 1, DEBUG 4);
 
-  bo_const::BoConstant(CHANNELSTATS CST, BO 31, DEBUG 4);
+  bo_const::BoConstant(CHANNELSTATS CST, BO 32, DEBUG 4);
 #endif
 #endif
 
