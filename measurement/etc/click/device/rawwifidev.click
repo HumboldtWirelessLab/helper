@@ -112,10 +112,14 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef PLE
   rtscts_ple::RtsCtsPLI(PLI pli);
 #endif
-  rtscts_packetsize::RtsCtsPacketSize(PACKETSIZE 750);
-  rtscts_random::RtsCtsPLI(PLI pli);
+  rtscts_packetsize::RtsCtsPacketSize(PACKETSIZE 1532);
+  rtscts_random::RtsCtsRandom(PROBABILITY 50);
+#ifdef CERR
+#ifdef COOPCST
   rtscts_hiddennode::RtsCtsHiddenNode(HIDDENNODE hnd, COOPCHANNELSTATS cocst);
-
+#define RTSCTS_HN
+#endif
+#endif
 #endif
 
 
@@ -138,9 +142,21 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef USE_RTS_CTS
 #ifdef PLE
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 4, RTSCTS_SCHEMES rtscts_ple)
+
+#ifdef RTSCTS_HN
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 2, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random rtscts_hiddennode")
 #else
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 1)
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 2, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random")
+#endif
+
+#else
+
+#ifdef CERR
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 2, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random rtscts_hiddennode")
+#else
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 2, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random")
+#endif
+
 #endif
 #endif
 
@@ -150,14 +166,6 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   -> __WIFIENCAP__
 
 #ifndef NOATHOPERATION
-
-
-
-
-
-
-
-
 
 #if WIFITYPE == 805                                                 /***  for ath2 add priority scheduler to prefer operation packet ***/
   -> [1]op_prio_s::PrioSched();                                     /**/
