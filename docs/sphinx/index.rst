@@ -16,6 +16,7 @@ Inhalt:
    click_elemente
    click_scripte
    ns_click_interaction
+   faq
 
 .. Indices and tables
 .. ==================
