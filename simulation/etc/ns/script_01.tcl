@@ -129,8 +129,6 @@ for {set i 0} {$i < $nodecount } {incr i} {
     $node_($i) set Z_ $pos_z($i)
     $node_($i) label $nodelabel($i)
 
-    [$node_($i) entry] loadclick $clickfile($i)
-
     #
     # The node name is used by Click to distinguish information
     # coming from different nodes. For example, a "Print" element
@@ -140,6 +138,8 @@ for {set i 0} {$i < $nodecount } {incr i} {
     # NODENAME is set by run_sim.sh
     #
     [$node_($i) set classifier_] setnodename $node_name($i)
+
+    [$node_($i) entry] loadclick $clickfile($i)
 
     #
     # Load the appropriate Click router script for the node.
