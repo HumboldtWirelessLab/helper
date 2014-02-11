@@ -216,6 +216,7 @@ case "$1" in
                   fi
                 fi
 
+                NODE_IN_CNODES=1
 
 		      for CNODE in $CNODES; do
 
@@ -237,8 +238,11 @@ case "$1" in
 			fi
 
             if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
-                CLICKFINALNAME="$RESULTDIR/$CLICKBASENAME.$CNODE.$CDEV"
-
+                if [ "x$USE_SINGLE_CLICKFILE" = "x1" ] ; then
+                  CLICKFINALNAME="$RESULTDIR/$CLICKBASENAME.$CDEV"
+                else
+                  CLICKFINALNAME="$RESULTDIR/$CLICKBASENAME.$CNODE.$CDEV"
+               fi
 
 		NODEWIFITYPE=$WIFITYPE
 
@@ -259,10 +263,17 @@ case "$1" in
 		  fi
 		fi
 
-                CPPOPTS="$CPPOPTS -DNODENAME=$CNODE -DWIFITYPE=$NODEWIFITYPE"
 
-                ( cd $CONFIGDIR; cat $CLICK | add_include $HAS_BRNINCLUDE | cpp -I$DIR/../../measurement/etc/click $CPPOPTS -DCWMINPARAM="\"$CWMIN\"" -DCWMAXPARAM="\"$CWMAX\"" -DAIFSPARAM="\"$AIFS\"" | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" | grep -v "^#" > $CLICKFINALNAME ) &
-
+                if [ "x$USE_SINGLE_CLICKFILE" = "x1" ] ; then
+                  CPPOPTS="$CPPOPTS -DNODENAME=auto -DWIFITYPE=$NODEWIFITYPE"
+                  if [ $NODE_IN_CNODES -eq 1 ]; then
+                    ( cd $CONFIGDIR; cat $CLICK | add_include $HAS_BRNINCLUDE | cpp -I$DIR/../../measurement/etc/click $CPPOPTS -DCWMINPARAM="\"$CWMIN\"" -DCWMAXPARAM="\"$CWMAX\"" -DAIFSPARAM="\"$AIFS\"" | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" | grep -v "^#" > $CLICKFINALNAME ) &
+                  fi
+                  let NODE_IN_CNODES=NODE_IN_CNODES+1
+                else
+                  CPPOPTS="$CPPOPTS -DNODENAME=$CNODE -DWIFITYPE=$NODEWIFITYPE"
+                  ( cd $CONFIGDIR; cat $CLICK | add_include $HAS_BRNINCLUDE | cpp -I$DIR/../../measurement/etc/click $CPPOPTS -DCWMINPARAM="\"$CWMIN\"" -DCWMAXPARAM="\"$CWMAX\"" -DAIFSPARAM="\"$AIFS\"" | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" | grep -v "^#" > $CLICKFINALNAME ) &
+                fi
             else
               CLICKFINALNAME="-"
             fi

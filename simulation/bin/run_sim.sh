@@ -130,6 +130,8 @@ MODE=sim
 case "$MODE" in
 	"sim")
 		declare -a dectohex=('00' '01' '02' '03' '04' '05' '06' '07' '08' '09' '0A' '0B' '0C' '0D' '0E' '0F' '10' '11' '12' '13' '14' '15' '16' '17' '18' '19' '1A' '1B' '1C' '1D' '1E' '1F' '20' '21' '22' '23' '24' '25' '26' '27' '28' '29' '2A' '2B' '2C' '2D' '2E' '2F' '30' '31' '32' '33' '34' '35' '36' '37' '38' '39' '3A' '3B' '3C' '3D' '3E' '3F' '40' '41' '42' '43' '44' '45' '46' '47' '48' '49' '4A' '4B' '4C' '4D' '4E' '4F' '50' '51' '52' '53' '54' '55' '56' '57' '58' '59' '5A' '5B' '5C' '5D' '5E' '5F' '60' '61' '62' '63' '64' '65' '66' '67' '68' '69' '6A' '6B' '6C' '6D' '6E' '6F' '70' '71' '72' '73' '74' '75' '76' '77' '78' '79' '7A' '7B' '7C' '7D' '7E' '7F' '80' '81' '82' '83' '84' '85' '86' '87' '88' '89' '8A' '8B' '8C' '8D' '8E' '8F' '90' '91' '92' '93' '94' '95' '96' '97' '98' '99' '9A' '9B' '9C' '9D' '9E' '9F' 'A0' 'A1' 'A2' 'A3' 'A4' 'A5' 'A6' 'A7' 'A8' 'A9' 'AA' 'AB' 'AC' 'AD' 'AE' 'AF' 'B0' 'B1' 'B2' 'B3' 'B4' 'B5' 'B6' 'B7' 'B8' 'B9' 'BA' 'BB' 'BC' 'BD' 'BE' 'BF' 'C0' 'C1' 'C2' 'C3' 'C4' 'C5' 'C6' 'C7' 'C8' 'C9' 'CA' 'CB' 'CC' 'CD' 'CE' 'CF' 'D0' 'D1' 'D2' 'D3' 'D4' 'D5' 'D6' 'D7' 'D8' 'D9' 'DA' 'DB' 'DC' 'DD' 'DE' 'DF' 'E0' 'E1' 'E2' 'E3' 'E4' 'E5' 'E6' 'E7' 'E8' 'E9' 'EA' 'EB' 'EC' 'ED' 'EE' 'EF' 'F0' 'F1' 'F2' 'F3' 'F4' 'F5' 'F6' 'F7' 'F8' 'F9' 'FA' 'FB' 'FC' 'FD' 'FE' 'FF');
+		declare -A node_to_num_map
+		declare -A node_to_clickfile_map
 
 		if [ "x$USED_SIMULATOR" = "xjist" ]; then
 			POSTFIX=jist
@@ -279,27 +281,6 @@ case "$MODE" in
 			FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
 		fi
 
-		#POS_X_MAX=0
-		#POS_Y_MAX=0
-		#POS_Z_MAX=0
-
-		#echo "FIN: $FINALPLMFILE"
-		#for node in $NODELIST; do
-		#	POS_LINE=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]"`
-		#	POS_X=`echo $POS_LINE | awk '{print $2}'`
-		#	POS_Y=`echo $POS_LINE | awk '{print $3}'`
-		#	POS_Z=`echo $POS_LINE | awk '{print $4}'`
-		#	if [ $POS_X -gt $POS_X_MAX ]; then
-		#		POS_X_MAX=$POS_X;
-		#	fi
-		#	if [ $POS_Y -gt $POS_Y_MAX ]; then
-		#		POS_Y_MAX=$POS_Y;
-		#	fi
-		#	if [ $POS_Z -gt $POS_Z_MAX ]; then
-		#		POS_Z_MAX=$POS_Z;
-		#	fi
-		#done
-
 		POS_X_MAX=`cat $FINALPLMFILE | awk '{print $2}' | sort | tail -n 1`
 		POS_Y_MAX=`cat $FINALPLMFILE | awk '{print $3}' | sort | tail -n 1`
 		POS_Z_MAX=`cat $FINALPLMFILE | awk '{print $4}' | sort | tail -n 1`
@@ -327,7 +308,7 @@ case "$MODE" in
 		POS_Z_MAX=0
 		#FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
 
-		#		echo "FIN: $FINALPLMFILE"
+		#echo "FIN: $FINALPLMFILE"
 		echo "set xsize $POS_X_MAX" >> $TCLFILE
 		echo "set ysize $POS_Y_MAX" >> $TCLFILE
 		echo "set nodecount $NODECOUNT"	>> $TCLFILE
@@ -362,9 +343,6 @@ case "$MODE" in
 		for node in $NODELIST; do
 			POS_LINE=`cat $FINALPLMFILE | grep -v "#" | egrep "^$node[[:space:]]"`
 			read TRASH POS_X POS_Y POS_Z <<< $POS_LINE
-			#POS_X=`echo $POS_LINE | awk '{print $2}'`
-			#POS_Y=`echo $POS_LINE | awk '{print $3}'`
-			#POS_Z=`echo $POS_LINE | awk '{print $4}'`
 
 			NODEDEVICELIST_CLICK=`cat $NODETABLE | egrep "^$node[[:space:]]" | awk '{print $2","$7}'`
 
@@ -384,6 +362,9 @@ case "$MODE" in
 
 				nodemac="00-00-00-00-${dectohex[m1]}-${dectohex[m2]}"
 				echo "$node $nodedevice $nodemac $mac_raw" >> $FINALRESULTDIR/nodes.mac
+				node_to_num_map[$node]=$mac_raw
+				node_to_clickfile_map[$node]=$CLICK
+
 				if [ "x$NODEMAC_SEDARG" = "x" ]; then
 					NODEMAC_SEDARG="-e s#FIRSTNODE:eth#$nodemac#g"
 					NODENAME_SEDARG="-e s#FIRSTNODE#$node#g"
@@ -399,12 +380,9 @@ case "$MODE" in
 				echo "set pos_z($i) $POS_Z" >> $TCLFILE
 				echo "set nodelabel($i) \"$node.$nodedevice\"" >> $TCLFILE
 
-
-				#CLICK=`cat $NODETABLE | egrep "^$node[[:space:]]$nodedevice[[:space:]]" | awk '{print $7}'`
 				echo "set clickfile($i) \"$CLICK\"" >> $TCLFILE
 
 				let POS_X=POS_X+1
-
 				let i=i+1
 			done
 		done
@@ -445,12 +423,15 @@ case "$MODE" in
 					#NODENAME=`echo $NODENAME | sed $NODENAME_SEDARG`
 
 					#OLD VERSION
-					TIME=`echo $line | awk '{print $1}'`
-					NODENAME=`echo $line | awk '{print $2}' | sed $NODENAME_SEDARG`
-					NODEDEVICE=`echo $line | awk '{print $3}'`
-					MODE=`echo $line | awk '{print $4}'`
-					ELEMENT=`echo $line | awk '{print $5}'`
-					HANDLER=`echo $line | awk '{print $6}'`
+					#TIME=`echo $line | awk '{print $1}'`
+					#NODENAME=`echo $line | awk '{print $2}' | sed $NODENAME_SEDARG`
+					#NODEDEVICE=`echo $line | awk '{print $3}'`
+					#MODE=`echo $line | awk '{print $4}'`
+					#ELEMENT=`echo $line | awk '{print $5}'`
+					#HANDLER=`echo $line | awk '{print $6}'`
+
+					read TIME NODENAME NODEDEVICE MODE ELEMENT HANDLER <<< $line
+					NODENAME=`echo $NODENAME | sed $NODENAME_SEDARG`
 
 					# if "ALL" is used, take all nodes of nodelist, else just the respective node
 					if [ "x$NODENAME" = "xALL" ]; then
@@ -464,13 +445,16 @@ case "$MODE" in
 					# or get some information out of the network activities... yey!
 					for n in $HANDLERNODES; do
 
-						CLICKFILE=`cat $NODETABLE | grep "$n eth0 " | awk '{print $7}'`
+						CLICKFILE=${node_to_clickfile_map[$node]}
+						#CLICKFILE=`cat $NODETABLE | grep "$n eth0 " | awk '{print $7}'`
 
-            if [ "x$CLICKFILE" = "x" ]; then
-              continue;
-            fi
+						if [ "x$CLICKFILE" = "x" ]; then
+							continue;
+						fi
 
-						NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$n[[:space:]]" | awk '{print $4}'`
+						NODENUM=${node_to_num_map[$n]}
+						#NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$n[[:space:]]" | awk '{print $4}'`
+						
 						let NODENUM=NODENUM-1
 						if [ "x$TIME" != "x" ]; then
 
