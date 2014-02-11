@@ -445,7 +445,7 @@ case "$MODE" in
 					# or get some information out of the network activities... yey!
 					for n in $HANDLERNODES; do
 
-						CLICKFILE=${node_to_clickfile_map[$node]}
+						CLICKFILE=${node_to_clickfile_map[$n]}
 						#CLICKFILE=`cat $NODETABLE | grep "$n eth0 " | awk '{print $7}'`
 
 						if [ "x$CLICKFILE" = "x" ]; then
