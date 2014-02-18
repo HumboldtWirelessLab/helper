@@ -423,15 +423,16 @@ case "$MODE" in
 					#NODENAME=`echo $NODENAME | sed $NODENAME_SEDARG`
 
 					#OLD VERSION
-					#TIME=`echo $line | awk '{print $1}'`
-					#NODENAME=`echo $line | awk '{print $2}' | sed $NODENAME_SEDARG`
-					#NODEDEVICE=`echo $line | awk '{print $3}'`
-					#MODE=`echo $line | awk '{print $4}'`
-					#ELEMENT=`echo $line | awk '{print $5}'`
-					#HANDLER=`echo $line | awk '{print $6}'`
+					TIME=`echo $line | awk '{print $1}'`
+					NODENAME=`echo $line | awk '{print $2}' | sed $NODENAME_SEDARG`
+					NODEDEVICE=`echo $line | awk '{print $3}'`
+					MODE=`echo $line | awk '{print $4}'`
+					ELEMENT=`echo $line | awk '{print $5}'`
+					HANDLER=`echo $line | awk '{print $6}'`
 
-					read TIME NODENAME NODEDEVICE MODE ELEMENT HANDLER <<< $line
-					NODENAME=`echo $NODENAME | sed $NODENAME_SEDARG`
+					#Produces wrong clickfiles from controlfiles
+					#read TIME NODENAME NODEDEVICE MODE ELEMENT HANDLER <<< $line
+					#NODENAME=`echo $NODENAME | sed $NODENAME_SEDARG`
 
 					# if "ALL" is used, take all nodes of nodelist, else just the respective node
 					if [ "x$NODENAME" = "xALL" ]; then
