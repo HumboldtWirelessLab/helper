@@ -15,15 +15,16 @@ function flowstats(f,of)
   AVG_TIME=10;
   MIN_TIME=11;
   MAX_TIME=12;
-  
-  
+
   
   
   %TODO: check: mean over mean? 
   search_params = [ SRC_NODE DST_NODE TX_PKT_COUNT PKT_SIZE];
-  params=unique(data(:,search_params),'rows')
+  params=unique(data(:,search_params),'rows');
   
-  res = [];
+  res = zeros(size(params,1),10+size(search_params,2));
+  cnt=1;
+  %res=[];
   
   for i = 1:size(params,1)
     p = params(i,:);
@@ -37,10 +38,13 @@ function flowstats(f,of)
     avg_rx_pkt = mean(d(:,RX_PKT_COUNT));
     tx_pkt = mean(d(:,TX_PKT_COUNT));
     reach = 100 * (avg_rx_pkt / tx_pkt);
-    res = [ res ; p avg_time min_time max_time avg_hops min_hops max_hops avg_rx_pkt avg_rx_pkt  tx_pkt reach ];
+    %res = [ res ; p avg_time min_time max_time avg_hops min_hops max_hops avg_rx_pkt avg_rx_pkt  tx_pkt reach ];
+    res(cnt,:)=[p avg_time min_time max_time avg_hops min_hops max_hops avg_rx_pkt avg_rx_pkt  tx_pkt reach];
+    cnt=cnt+1;
   end
   
-  res
+  %res
+  disp(res)
   csvwrite(of,res);
 	
 end
