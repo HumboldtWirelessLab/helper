@@ -25,7 +25,7 @@
 elementclass BROADCASTFLOODING {ID $id, LT $lt |
 
   fl_helper::FloodingHelper(LINKTABLE $lt, MAXNBMETRIC FLOODING_MAXNBMETRIC, CACHETIMEOUT 5000000, DEBUG FLOODING_DEBUG);
-
+/*
 #ifdef PRO_FL
 #ifndef PROBABILITYFLOODING_FWDPROBALILITY
 #define PROBABILITYFLOODING_FWDPROBALILITY 90
@@ -62,6 +62,64 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   flp::SimpleFlooding();
 #endif
 #endif
+#endif
+*/
+
+
+#ifdef PRO_FL
+	//Probability Flooding
+	#define DEAD_FL
+	#ifndef PROBABILITYFLOODING_FWDPROBALILITY
+		#define PROBABILITYFLOODING_FWDPROBALILITY 90
+	#endif
+	flp::ProbabilityFlooding(NODEIDENTITY $id, FLOODINGHELPER fl_helper, MAXNBMETRIC FLOODING_MAXNBMETRIC, MINNEIGHBOURS 3, FWDPROBALILITY PROBABILITYFLOODING_FWDPROBALILITY, DEBUG FLOODING_DEBUG);
+#endif
+
+#ifdef MPR_FL
+	//MPR Flooding
+	#define DEAD_FL
+	#ifndef MPR_LF_NBMETRIC
+		#define MPR_LF_NBMETRIC 500
+	#endif
+	flp::MPRFlooding(NODEIDENTITY $id, FLOODINGHELPER fl_helper, MAXNBMETRIC MPR_LF_NBMETRIC, MPRUPDATEINTERVAL 10000, DEBUG FLOODING_DEBUG);
+#endif
+
+#ifdef MST_FL
+  //MST Flooding (Circle Flooding)
+  #define DEAD_FL
+  #ifndef CIRCLE_DATA
+	#define CIRCLE_DATA circles
+  #endif
+  #ifdef MST_BD //Bidirectional
+	#ifdef MST_PRE //Pre - Only retransmit if transmission comes from a parent node
+		flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL true, ONLY_PRE true, DEBUG FLOODING_DEBUG);
+	#else
+		flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL true, ONLY_PRE false, DEBUG FLOODING_DEBUG);
+	#endif
+  #else
+	#ifdef MST_PRE
+		flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL false, ONLY_PRE true, DEBUG FLOODING_DEBUG);
+	#else
+		flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL false, ONLY_PRE false, DEBUG FLOODING_DEBUG);
+	#endif
+  #endif
+#endif
+
+#ifdef OVL_FL
+	//Overlay Flooding
+	#define DEAD_FL
+	ovl::OverlayStructure(NODEIDENTITY $id, DEBUG FLOODING_DEBUG);
+	flp::OverlayPolicy(NODEIDENTITY $id, OVERLAY_STRUCTURE ovl, DEBUG FLOODING_DEBUG);
+#endif
+
+#ifdef CIR_OVL
+	//Circle Overlay
+	cir_ovl::CircleOverlay(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), OVERLAY_STRUCTURE ovl, DEBUG FLOODING_DEBUG);
+#endif
+
+#ifndef DEAD_FL
+	//Simple Flooding if no flooding policy is choosen
+	flp::SimpleFlooding();
 #endif
 
 #ifndef FLOODING_PASSIVE_ACK_RETRIES
