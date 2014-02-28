@@ -10,11 +10,13 @@ function flooding_reachability( filename, basedir )
   for i = 1:size(nodes,1)
      reach=zeros(max(allnodes),2);
      node=nodes(i);
-     packets=max(data(data(:,3)==node,10)); %src
+     rx1=data((data(:,3)==node),:);
+     packets=max(rx1(:,10)); %src
 
      for a = 1:size(allnodes,1)     %last
-        rxpackets=unique(data((data(:,3)==node) & (data(:,2)==allnodes(a)),11));
-
+        %rxpackets=unique(data((data(:,3)==node) & (data(:,2)==allnodes(a)),11));
+        rxpackets=unique(rx1((rx1(:,2)==allnodes(a)),11));
+        
         reach(allnodes(a),1) = allnodes(a);
         if isempty(rxpackets)
           reach(allnodes(a),2)=0;
