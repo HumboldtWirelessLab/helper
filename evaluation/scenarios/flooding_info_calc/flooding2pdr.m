@@ -16,18 +16,25 @@ function flooding2pdr( filename, basedir )
      pdr_hop_fwd_pkt_cnt_mat=zeros(max(allnodes),max(allnodes));
 
      node=nodes(i);
-
+     
+     data3=data(data(:,3)==node,:);
+     data3s=data3(data3(:,13)==1,:);
+     data3r=data3(data3(:,12)==1,:);
+     
      packets=max(data(data(:,3)==node,10)); %src
-
+     %pkt_fwd=unique(data((data(:,3)==node) & (data(:,12)==1),11));
+    
      for a = 1:size(allnodes,1)     %last
-          pkt_fwd=unique(data((data(:,3)==node) & (data(:,12)==1),11));
-
+         
+         lastpackets_sent=unique(data3s(data3s(:,2)==allnodes(a),11));
+         lastpackets_fwd=unique(data3r(data3r(:,2)==allnodes(a),11));
+         rx1=data3(data3(:,1)==allnodes(a),:);
          for b = 1:size(allnodes,1) %dst
+            rxpackets=rx1(rx1(:,2)==allnodes(b),11); %lasthop
+            %rxpackets=data((data(:,3)==node) & (data(:,1)==allnodes(a)) & (data(:,2)==allnodes(b)),11); %lasthop
 
-            rxpackets=data((data(:,3)==node) & (data(:,1)==allnodes(a)) & (data(:,2)==allnodes(b)),11); %lasthop
-
-            lastpackets_sent=unique(data((data(:,3)==node) & (data(:,2)==allnodes(a)) & (data(:,13)==1),11));
-            lastpackets_fwd=unique(data((data(:,3)==node) & (data(:,2)==allnodes(a)) & (data(:,12)==1),11));
+            %lastpackets_sent=unique(data((data(:,3)==node) & (data(:,2)==allnodes(a)) & (data(:,13)==1),11));
+            %lastpackets_fwd=unique(data((data(:,3)==node) & (data(:,2)==allnodes(a)) & (data(:,12)==1),11));
 
             if isempty(rxpackets)
                 pdr=0;
@@ -74,7 +81,7 @@ function flooding2pdr( filename, basedir )
      end
 
      
-     pkt_fwd=unique(data((data(:,3)==node) & (data(:,12)==1),11));
+     %pkt_fwd=unique(data((data(:,3)==node) & (data(:,12)==1),11));
 
 
      pdr_mat=100*pdr_mat;

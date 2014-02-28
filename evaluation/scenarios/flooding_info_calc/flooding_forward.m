@@ -3,7 +3,8 @@ function flooding_forward( filename, basedir )
 %   Detailed explanation goes here
 
   data=load(filename,'-ASCII');
-
+  datas=data(data(:,12)==1,:);
+  
   nodes=unique(data(:,3)); 
   allnodes=unique(data(:,2));
 
@@ -11,10 +12,16 @@ function flooding_forward( filename, basedir )
      fwd_prob=zeros(max(allnodes),1);
      node=nodes(i);
 
+     rx1=data((data(:,3)==node),:);
+     rx1s=datas((datas(:,3)==node),:);
+     
      for a = 1:size(allnodes,1)     %last
-        rxpackets=unique(data((data(:,3)==node) & (data(:,2)==allnodes(a)),11));
-        fwdpackets=unique(data((data(:,3)==node) & (data(:,2)==allnodes(a)) & (data(:,12)==1),11));
-
+        %rxpackets=unique(data((data(:,3)==node) & (data(:,2)==allnodes(a)),11));
+        %fwdpackets=unique(data((data(:,3)==node) & (data(:,2)==allnodes(a)) & (data(:,12)==1),11));
+        
+        rxpackets=unique(rx1(rx1(:,2)==allnodes(a),11));
+        fwdpackets=unique(rx1s(rx1s(:,2)==allnodes(a),11));
+        
         if isempty(rxpackets)
           fwd_prob(allnodes(a))=0;
         else
