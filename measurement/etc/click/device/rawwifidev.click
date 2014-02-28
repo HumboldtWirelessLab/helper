@@ -74,7 +74,11 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 
 #ifdef CERR
-  hnd::HiddenNodeDetection(DEVICE $device, DEBUG 2);
+#ifdef COOPCST_STRING
+  hnd::HiddenNodeDetection(DEVICE $device, TIMEOUT 1000, COOPCHANNELSTATSPATH COOPCST_STRING, DEBUG 2);
+#else
+  hnd::HiddenNodeDetection(DEVICE $device, TIMEOUT 1000, DEBUG 2);
+#endif
 #endif
 
 #ifdef PLE
@@ -112,13 +116,11 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef PLE
   rtscts_ple::RtsCtsPLI(PLI pli);
 #endif
-  rtscts_packetsize::RtsCtsPacketSize(PACKETSIZE 1532);
+  rtscts_packetsize::RtsCtsPacketSize(PACKETSIZE 1032);
   rtscts_random::RtsCtsRandom(PROBABILITY 50);
 #ifdef CERR
-#ifdef COOPCST
-  rtscts_hiddennode::RtsCtsHiddenNode(HIDDENNODE hnd, COOPCHANNELSTATS cocst);
+  rtscts_hiddennode::RtsCtsHiddenNode(HIDDENNODE hnd);
 #define RTSCTS_HN
-#endif
 #endif
 #endif
 
@@ -144,21 +146,23 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef PLE
 
 #ifdef RTSCTS_HN
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 2, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random rtscts_hiddennode")
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 1, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random rtscts_hiddennode")
 #else
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 2, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random")
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 1, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random")
 #endif
 
 #else
 
 #ifdef CERR
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 2, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random rtscts_hiddennode")
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 1, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random rtscts_hiddennode")
 #else
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 2, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random")
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 1, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random")
 #endif
 
 #endif
 #endif
+
+  //-> Print("Wifi", TIMESTAMP true)
 
 #ifdef SETCHANNEL
   -> sc::BRN2SetChannel(DEVICE $device, CHANNEL 0)
@@ -193,6 +197,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 #endif
 #ifdef CERR
+  //-> BRN2PrintWifi()
   -> hnd
 #endif
 #ifdef SIMULATION
