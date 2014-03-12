@@ -270,7 +270,18 @@ case "$MODE" in
 
 		echo "Mac/802_11 set NoHWQueues_ 4" >> $TCLFILE
 
-		cat $DIR/../etc/ns/radio/$RADIO\.tcl >> $TCLFILE
+		if [ -e $DIR/../etc/ns/radio/deprecated/$RADIO\.tcl ]; then
+		    cat $DIR/../etc/ns/radio/deprecated/$RADIO\.tcl >> $TCLFILE
+		else
+		    if [ -e $DIR/../etc/ns/radio/$RADIO\.tcl ]; then
+			cat $DIR/../etc/ns/radio/802_11bg.tcl >> $TCLFILE
+			cat $DIR/../etc/ns/radio/$RADIO\.tcl >> $TCLFILE
+		    else
+			echo "Radiomodel not found"
+			exit 1
+		   fi
+		
+		fi
 
 		echo "gen placement" >> $FINALRESULTDIR/time.log
 		date +"%s:%N" >> $FINALRESULTDIR/time.log

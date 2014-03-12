@@ -15,6 +15,7 @@
 #define DEFAULT_LINKPROBE_PERIOD            2000
 #define DEFAULT_LINKPROBE_TAU              30000
 #define DEFAULT_LINKPROBE_PROBES         "2 500"
+//4 500 11 500 22 500"
 #else
 #define DEFAULT_LINKPROBE_PERIOD            1000
 #define DEFAULT_LINKPROBE_TAU             100000
@@ -70,20 +71,27 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #endif
   -> data_rate::SetTXRates(RATE0 DEFAULT_DATARATE, TRIES0 DEFAULT_DATATRIES, TRIES1 0, TRIES2 0, TRIES3 0)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+
 //  -> SetTimestamp()
 //  -> Print("NODENAME: In Queue", 100, TIMESTAMP true)
+
   -> data_queue::NotifierQueue(100)
 //  -> SetTimestamp()
 //  -> Print("NODENAME: Out Queue", 100, TIMESTAMP true)
+
   -> data_suppressor::Suppressor()
   -> [1]lp_data_scheduler::PrioSched()
 #ifdef PRIO_QUEUE
   -> [2]x_prio_q::PrioSched()
 #endif
+
 //  -> SetTimestamp()
 //  -> Print("NODENAME: To Wifidev", 100, TIMESTAMP true)
+
   -> wifidevice                                            //rawWifiDevice
-//-> PrintWifi("Fromdev", TIMESTAMP true)
+
+  //-> PrintWifi("Fromdev", TIMESTAMP true)
+
   -> filter_tx :: FilterTX()
 #if WIFITYPE == 805
   -> error_clf :: WifiErrorClassifier()

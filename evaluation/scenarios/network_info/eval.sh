@@ -94,30 +94,6 @@ if [ ! -f $EVALUATIONSDIR/graph.txt ]; then
   (cd $DIR; matwrapper "try,metric2graph('$EVALUATIONSDIR/linksmetric.mat','$EVALUATIONSDIR/graph.csv',$THRESHOLD),catch,exit(1),end,exit(0)" 1> /dev/null)
   cat $EVALUATIONSDIR/graph.csv | sed "s#,# #g" > $EVALUATIONSDIR/graph.txt
 
-#TODO: use if no matlab is available
-#  echo -n "" > $EVALUATIONSDIR/graph.txt
-
-#  for n in $NODES; do
-#    for m in $NODES; do
-#      METRIC=`cat $EVALUATIONSDIR/linksmetric.all | grep "$n $m" | awk '{print $3}' | sort | head -n 1`
-
-      #echo "$n $m $METRIC" >> $EVALUATIONSDIR/foundmetric.txt
-
-#      LINK=1
-#      if [ "x$METRIC" = "x" ]; then
-#        LINK=0
-#      else
-#        if [ $METRIC -lt $THRESHOLD ]; then
-#          LINK=1
-#        else
-#          LINK=0
-#        fi
-#      fi
-
-#      echo -n "$LINK " >> $EVALUATIONSDIR/graph.txt
-#    done
-#    echo "" >> $EVALUATIONSDIR/graph.txt
- # done
 fi
 
 ###############################################################################
@@ -135,7 +111,7 @@ fi
 
 #echo "Get Bridges and Articulation points"
 
-#(cd $DIR; matwrapper "try,get_bridges_and_articulation_points('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/','none'),catch,exit(1),end,exit(0)" 1> /dev/null)
+(cd $DIR; matwrapper "try,get_bridges_and_articulation_points('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/','none'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
 
 echo "Create clusterfiles and nodedegree!"

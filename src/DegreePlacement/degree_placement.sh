@@ -33,6 +33,7 @@ for i in `seq $1`; do
 done
 
 NODECOUNT=`echo $NODES | wc -w`
-java -classpath $DIR/bin/production/DegreePlacement:$DIR/lib/jargs.jar DegreePlacementGenerator -n $NODECOUNT -r $2 -d $3 -x $4 -y $4
+#java -classpath $DIR/bin/production/DegreePlacement:$DIR/lib/jargs.jar DegreePlacementGenerator -n $NODECOUNT -r $2 -d $3 -x $4 -y $4
+java -classpath $DIR/src:$DIR/lib/jargs.jar DegreePlacementGenerator -n $NODECOUNT -r $2 -d $3 -x $4 -y $4
 
 exit 0;
