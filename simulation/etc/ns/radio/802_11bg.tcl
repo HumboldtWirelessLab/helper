@@ -24,7 +24,7 @@ Phy/WirelessPhy set Noise_    -100.0;
 Phy/WirelessPhy set CSThresh_  -96.0;
 Phy/WirelessPhy set RXThresh_  -95.0;
 
-Phy/WirelessPhy set Pt_   0.25118;             # transmission power (24dbm)
+Phy/WirelessPhy set Pt_   24;                  # transmission power (24dbm = 0.25118 watt)
 Phy/WirelessPhy set freq_ 2.472e9;             # for broadcast packets channel-13.2.472GHz
 Phy/WirelessPhy set L_    1.0;
 
