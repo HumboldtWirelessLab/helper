@@ -18,7 +18,7 @@ Phy/WirelessPhy set CPThresh_ 10.0
 Phy/WirelessPhy set CSThresh_ 3.1623e-10;    #-95db
 Phy/WirelessPhy set RXThresh_ 3.28984e-09;   #-84.8db communication radius
 Phy/WirelessPhy set Rb_ 2*1e6
-Phy/WirelessPhy set Pt_ 0.281838;            # transmission power
+Phy/WirelessPhy set Pt_ 7.214e-3;            # transmission power
 Phy/WirelessPhy set freq_ 2.472e9;           # for broadcast packets channel-13.2.472GHz
 Phy/WirelessPhy set L_ 1.0
 
@@ -40,6 +40,8 @@ Phy/WirelessPhy set RXThresh4 6.3096e-10; #-92db
 Phy/WirelessPhy set RXThresh5 6.3096e-10; #-92db
 Phy/WirelessPhy set RXThresh6 6.3096e-10; #-92db
 Phy/WirelessPhy set RXThresh7 6.3096e-10; #-92db
+
+#noise                                    
 
 # Mac Layer
 Mac/802_11 set dataRate_ 6Mb
