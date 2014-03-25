@@ -25,102 +25,45 @@
 elementclass BROADCASTFLOODING {ID $id, LT $lt |
 
   fl_helper::FloodingHelper(LINKTABLE $lt, MAXNBMETRIC FLOODING_MAXNBMETRIC, CACHETIMEOUT 5000000, DEBUG FLOODING_DEBUG);
-/*
-#ifdef PRO_FL
+
+/************************************************************************************************************************/
+/********************* F L O O D I N G   P O L I C I E S ****************************************************************/
+/************************************************************************************************************************/
+
+
 #ifndef PROBABILITYFLOODING_FWDPROBALILITY
 #define PROBABILITYFLOODING_FWDPROBALILITY 90
 #endif
-  flp::ProbabilityFlooding(NODEIDENTITY $id, FLOODINGHELPER fl_helper, MAXNBMETRIC FLOODING_MAXNBMETRIC, MINNEIGHBOURS 3, FWDPROBALILITY PROBABILITYFLOODING_FWDPROBALILITY, DEBUG FLOODING_DEBUG);
-#else
-#ifdef MPR_FL
+
+  flp_prob::ProbabilityFlooding(NODEIDENTITY $id, FLOODINGHELPER fl_helper, MAXNBMETRIC FLOODING_MAXNBMETRIC, MINNEIGHBOURS 3, FWDPROBALILITY PROBABILITYFLOODING_FWDPROBALILITY, CNTNB2ABORT 0, DEBUG FLOODING_DEBUG);
 
 #ifndef MPR_LF_NBMETRIC
 #define MPR_LF_NBMETRIC 500
 #endif
 
-  flp::MPRFlooding(NODEIDENTITY $id, FLOODINGHELPER fl_helper, MAXNBMETRIC MPR_LF_NBMETRIC, MPRUPDATEINTERVAL 10000, DEBUG FLOODING_DEBUG);
-#else
-#ifdef MST_FL
-  //flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH "/home/yetinam/Dokumente/brn-tools/click-brn-scripts/500-experiments/002-flooding-evaluation/005-mst_flooding_test/circles", DEBUG FLOODING_DEBUG);
-  #ifndef CIRCLE_DATA
-	#define CIRCLE_DATA circles
-  #endif
-  #ifdef MST_BD
-	#ifdef MST_PRE
-		flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL true, ONLY_PRE true, DEBUG FLOODING_DEBUG);
-	#else
-		flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL true, ONLY_PRE false, DEBUG FLOODING_DEBUG);
-	#endif
-  #else
-	#ifdef MST_PRE
-		flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL false, ONLY_PRE true, DEBUG FLOODING_DEBUG);
-	#else
-		flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL false, ONLY_PRE false, DEBUG FLOODING_DEBUG);
-	#endif
-  #endif
-#else
-  flp::SimpleFlooding();
-#endif
-#endif
-#endif
-*/
+  flp_mpr::MPRFlooding(NODEIDENTITY $id, FLOODINGHELPER fl_helper, MAXNBMETRIC MPR_LF_NBMETRIC, MPRUPDATEINTERVAL 10000, DEBUG FLOODING_DEBUG);
 
 
-#ifdef PRO_FL
-	//Probability Flooding
-	#define DEAD_FL
-	#ifndef PROBABILITYFLOODING_FWDPROBALILITY
-		#define PROBABILITYFLOODING_FWDPROBALILITY 90
-	#endif
-	flp::ProbabilityFlooding(NODEIDENTITY $id, FLOODINGHELPER fl_helper, MAXNBMETRIC FLOODING_MAXNBMETRIC, MINNEIGHBOURS 3, FWDPROBALILITY PROBABILITYFLOODING_FWDPROBALILITY, DEBUG FLOODING_DEBUG);
+#ifndef CIRCLE_DATA
+#define CIRCLE_DATA circles
 #endif
 
-#ifdef MPR_FL
-	//MPR Flooding
-	#define DEAD_FL
-	#ifndef MPR_LF_NBMETRIC
-		#define MPR_LF_NBMETRIC 500
-	#endif
-	flp::MPRFlooding(NODEIDENTITY $id, FLOODINGHELPER fl_helper, MAXNBMETRIC MPR_LF_NBMETRIC, MPRUPDATEINTERVAL 10000, DEBUG FLOODING_DEBUG);
+#ifndef MST_BD
+#define MST_BD false
 #endif
 
-#ifdef MST_FL
-  //MST Flooding (Circle Flooding)
-  #define DEAD_FL
-  #ifndef CIRCLE_DATA
-	#define CIRCLE_DATA circles
-  #endif
-  #ifdef MST_BD //Bidirectional
-	#ifdef MST_PRE //Pre - Only retransmit if transmission comes from a parent node
-		flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL true, ONLY_PRE true, DEBUG FLOODING_DEBUG);
-	#else
-		flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL true, ONLY_PRE false, DEBUG FLOODING_DEBUG);
-	#endif
-  #else
-	#ifdef MST_PRE
-		flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL false, ONLY_PRE true, DEBUG FLOODING_DEBUG);
-	#else
-		flp::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL false, ONLY_PRE false, DEBUG FLOODING_DEBUG);
-	#endif
-  #endif
+#ifndef MST_PRE
+#define MST_PRE false
 #endif
 
-#ifdef OVL_FL
-	//Overlay Flooding
-	#define DEAD_FL
-	ovl::OverlayStructure(NODEIDENTITY $id, DEBUG FLOODING_DEBUG);
-	flp::OverlayPolicy(NODEIDENTITY $id, OVERLAY_STRUCTURE ovl, DEBUG FLOODING_DEBUG);
-#endif
+  flp_mst::MSTFlooding(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), BIDIRECTIONAL MST_BD, ONLY_PRE MST_PRE, DEBUG FLOODING_DEBUG);
 
-#ifdef CIR_OVL
-	//Circle Overlay
-	cir_ovl::CircleOverlay(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), OVERLAY_STRUCTURE ovl, DEBUG FLOODING_DEBUG);
-#endif
+  ovl::OverlayStructure(NODEIDENTITY $id, DEBUG FLOODING_DEBUG);
+  cir_ovl::CircleOverlay(NODEIDENTITY $id, CIRCLEPATH STR(CONFIGDIR/CIRCLE_DATA), OVERLAY_STRUCTURE ovl, DEBUG FLOODING_DEBUG);
+  flp_overlay::OverlayFlooding(NODEIDENTITY $id, OVERLAY_STRUCTURE ovl, DEBUG FLOODING_DEBUG);
 
-#ifndef DEAD_FL
-	//Simple Flooding if no flooding policy is choosen
-	flp::SimpleFlooding();
-#endif
+  flp_simple::SimpleFlooding();
+
 
 #ifndef FLOODING_PASSIVE_ACK_RETRIES
 #define FLOODING_PASSIVE_ACK_RETRIES 2
@@ -146,12 +89,14 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 #define BCAST_FPA_DEFAULTTIMEOUT 1000
 #endif
 
+#ifndef FLOODING_STRATEGY
+#define FLOODING_STRATEGY 1
+#endif
+
 
   fl_passive_ack::FloodingPassiveAck(NODEIDENTITY $id, FLOODINGHELPER fl_helper, DEFAULTRETRIES FLOODING_PASSIVE_ACK_RETRIES, DEFAULTINTERVAL BCAST_RNDDELAYQUEUE_MAXDELAY, DEFAULTTIMEOUT BCAST_FPA_DEFAULTTIMEOUT, ABORTONFINISHED BCAST_FPA_ABORTONFINISH, DEBUG FLOODING_DEBUG);
 
-  fl::Flooding(NODEIDENTITY $id, FLOODINGPOLICY flp, FLOODINGPASSIVEACK fl_passive_ack, ABORTTX BCAST_ENABLE_ABORT_TX, DEBUG FLOODING_DEBUG);
-
-#ifdef BCAST2UNIC
+  fl::Flooding(NODEIDENTITY $id, FLOODINGPOLICIES "flp_prob flp_mpr flp_mst flp_overlay flp_simple", FLOODINGSTRATEGY FLOODING_STRATEGY, FLOODINGPASSIVEACK fl_passive_ack, ABORTTX BCAST_ENABLE_ABORT_TX, DEBUG FLOODING_DEBUG);
 
 #ifndef BCAST2UNIC_STRATEGY
 #define BCAST2UNIC_STRATEGY 0
@@ -177,7 +122,6 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 
   unicfl :: UnicastFlooding(NODEIDENTITY $id, FLOODING fl, FLOODINGHELPER fl_helper, PRESELECTIONSTRATEGY BCAST2UNIC_PRESELECTION_STRATEGY, REJECTONEMPTYCS BCAST2UNIC_REJECTONEMPTYCS, CANDSELECTIONSTRATEGY BCAST2UNIC_STRATEGY, UCASTPEERMETRIC BCAST2UNIC_UCASTPEERMETRIC, FORCERESPONSIBILITY BCAST2UNIC_FORCERESPONSIBILITY, USEASSIGNINFO BCAST2UNIC_USEASSIGNINFO, FIXCS BCAST2UNIC_FIXCS, DEBUG FLOODING_DEBUG);
 
-#endif
 #ifndef FLOODING_LASTNODES_PP
 #define FLOODING_LASTNODES_PP 3
 #endif
@@ -220,9 +164,7 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 #ifdef PRIO_QUEUE
   -> FrontDropQueue(100)
 #endif
-#ifdef BCAST2UNIC
   -> unicfl                                                // transmit to other brn nodes
-#endif
   -> fl_piggyback
   -> setsrc::BRN2SetSrcForNeighbor(LINKTABLE $lt, USEANNO true)
   -> BroadcastMultiplexer(NODEIDENTITY $id, USEANNO true)
@@ -241,11 +183,9 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   -> BRN2Decap()
   -> [3]fl;
 
-#ifdef BCAST2UNIC
   unicfl[1]                                                // reject transmission
   -> BRN2Decap()
   -> [5]fl;
-#endif
 
   setsrc[1]
   -> BRN2EtherEncap(USEANNO true)
