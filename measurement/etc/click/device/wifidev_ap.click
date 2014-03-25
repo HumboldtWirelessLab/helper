@@ -88,9 +88,9 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   -> WifiEncap(0x00, 0:0:0:0:0:0)
   -> ig_rate :: SetTXRate(2)
 #if WIFITYPE == 805
-  -> ig_power :: BrnSetTXPower(DEVICE $device, POWER 61)
+  -> ig_power :: SetTXPower(POWER 61)
 #else
-  -> ig_power :: BrnSetTXPower(DEVICE $device, POWER 16)
+  -> ig_power :: SetTXPower(POWER 24)
 #endif
   -> SetTimestamp()
   -> ig_notifierqueue::NotifierQueue(500)
@@ -103,7 +103,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   input[2]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
-  -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
+  -> SetTXRate(RATE 2, TRIES 7)
   -> [0]prios;
 
   wifioutq
@@ -140,7 +140,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   input[0]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> SetTXPower(0)
-  -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
+  -> SetTXRate(RATE 2, TRIES 7)
   -> wifioutq;
 
   wifidevice[0]
@@ -163,7 +163,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   wififrame_clf[0]
     -> fb::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
     -> ap
-    -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
+    -> SetTXRate(RATE 2, TRIES 7)
     -> wifioutq;
 
   fb[1]
@@ -190,7 +190,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> wep
 #endif
     -> SetTXPower(0)
-    -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
+    -> SetTXRate(RATE 2, TRIES 7)
     -> wifioutq;
 
   toStation[1]

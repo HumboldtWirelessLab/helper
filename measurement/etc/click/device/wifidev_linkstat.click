@@ -65,11 +65,11 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   input[0]
 #if WIFITYPE == 805
-  -> data_power::BrnSetTXPower(DEVICE $device, POWER 61)
+  -> data_power::SetTXPower(POWER 48)
 #else
-  -> data_power::BrnSetTXPower(DEVICE $device, POWER 16)
+  -> data_power::SetTXPower(POWER 24)
 #endif
-  -> data_rate::SetTXRates(RATE0 DEFAULT_DATARATE, TRIES0 DEFAULT_DATATRIES, TRIES1 0, TRIES2 0, TRIES3 0)
+  -> data_rate::SetTXRate(RATE DEFAULT_DATARATE, TRIES DEFAULT_DATATRIES)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
 
 //  -> SetTimestamp()
@@ -164,9 +164,9 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
     -> lp_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
 #ifndef DISABLE_LP_POWER
 #if WIFITYPE == 805
-    -> lp_power::BrnSetTXPower(DEVICE $device, POWER 61)
+    -> lp_power::SetTXPower(POWER 48)
 #else
-    -> lp_power::BrnSetTXPower(DEVICE $device, POWER 16)
+    -> lp_power::SetTXPower(POWER 24)
 #endif
 #endif
     -> lp_wifiencap::WifiEncap(0x00, 0:0:0:0:0:0)
@@ -216,7 +216,7 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #ifdef PRIO_QUEUE
 
   input[2]
-  //-> x_data_rate::SetTXRates(RATE0 DEFAULT_DATARATE, TRIES0 DEFAULT_DATATRIES, TRIES1 0, TRIES2 0, TRIES3 0)
+  //-> x_data_rate::SetTXRate(RATE DEFAULT_DATARATE, TRIES DEFAULT_DATATRIES)
   -> x_brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> [1]x_prio_q;
 
@@ -233,9 +233,9 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> WifiEncap(0x00, 0:0:0:0:0:0)
   -> ig_rate :: SetTXRate(2)
 #if WIFITYPE == 805
-  -> ig_power :: BrnSetTXPower(DEVICE $device, POWER 61)
+  -> ig_power :: SetTXPower(POWER 24)
 #else
-  -> ig_power :: BrnSetTXPower(DEVICE $device, POWER 16)
+  -> ig_power :: SetTXPower(POWER 48)
 #endif
   -> SetTimestamp()
   -> ig_notifierqueue::NotifierQueue(500)
