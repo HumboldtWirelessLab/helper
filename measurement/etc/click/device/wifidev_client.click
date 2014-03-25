@@ -59,8 +59,12 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
 
   wififrame_clf[0]
     -> client
+#if WIFITYPE == 805
     -> SetTXPower(63)
-    -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
+#else
+    -> SetTXPower(48)
+#endif
+    -> SetTXRate(RATE 2, TRIES 7)
     -> wifioutq
     -> rawdevice;
 
@@ -72,7 +76,7 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
 
   toMe[1]         //broadcast 
   -> [0]output; 
-  
+
   toMe[2] -> Discard;
 
   wififrame_clf[2]
@@ -87,7 +91,7 @@ elementclass WIFIDEV_CLIENT { DEVICENAME $devname,
 
     //-> Print("Send 1")
     -> SetTXPower(0)
-    -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
+    -> SetTXRate(RATE 2, TRIES 7)
     -> wifioutq;
   
 } 
