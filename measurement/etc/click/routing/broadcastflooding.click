@@ -169,7 +169,11 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
   -> setsrc::BRN2SetSrcForNeighbor(LINKTABLE $lt, USEANNO true)
   -> BroadcastMultiplexer(NODEIDENTITY $id, USEANNO true)
   -> BRN2EtherEncap(USEANNO true)
-  //-> Print("BroadcastMultiplexer out")
+
+  //TODO:
+  //Rateselection
+  //RTS/CTS
+
   -> [1]output;
 
   input[3] //passive
