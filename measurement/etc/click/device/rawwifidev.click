@@ -100,15 +100,15 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef CST
   bo_maxtp::BoMaxThroughput(CHANNELSTATS CST, DEBUG 2);
 
-  bo_cla::BoChannelLoadAware(CHANNELSTATS CST, TARGETLOAD 90, TARGETDIFF 0, CAP 1, CST_SYNC 1, DEBUG 4);
+  bo_cla::BoChannelLoadAware(CHANNELSTATS CST, TARGETLOAD 90, TARGETDIFF 0, CAP 1, CST_SYNC 1, DEBUG 2);
 
-  bo_targetpl::BoTargetPacketloss(CHANNELSTATS CST, TARGETPL 10, DEBUG 4);
+  bo_targetpl::BoTargetPacketloss(CHANNELSTATS CST, TARGETPL 10, DEBUG 2);
 
-  bo_nbs::BoNeighbours(CHANNELSTATS CST, DEBUG 4);
+  bo_nbs::BoNeighbours(CHANNELSTATS CST, DEBUG 2);
 
-  bo_learning::BoLearning(MIN_CWMIN 32, MAX_CWMIN 1024, STRICT 1, CAP 1, DEBUG 4);
+  bo_learning::BoLearning(MIN_CWMIN 32, MAX_CWMIN 1024, STRICT 1, CAP 1, DEBUG 2);
 
-  bo_const::BoConstant(CHANNELSTATS CST, BO 32, DEBUG 4);
+  bo_const::BoConstant(CHANNELSTATS CST, BO 32, DEBUG 2);
 #endif
 #endif
 
@@ -145,18 +145,22 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef USE_RTS_CTS
 #ifdef PLE
 
+#ifndef RTS_CTS_STRATEGY
+#define RTS_CTS_STRATEGY 1
+#endif
+
 #ifdef RTSCTS_HN
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 1, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random rtscts_hiddennode")
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random rtscts_hiddennode")
 #else
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 1, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random")
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random")
 #endif
 
 #else
 
 #ifdef CERR
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 1, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random rtscts_hiddennode")
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random rtscts_hiddennode")
 #else
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY 1, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random")
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random")
 #endif
 
 #endif
