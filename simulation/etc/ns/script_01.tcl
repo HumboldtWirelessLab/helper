@@ -26,7 +26,12 @@ Agent/CBR set dport_		5000
 #
 # Standard ns-2 stuff here - create the simulator object.
 #
-Simulator set MacTrace_ ON
+if { $enable_trace == 1 } {
+  Simulator set MacTrace_ ON
+} else {
+  Simulator set MacTrace_ OFF
+}
+
 set ns_		[new Simulator]
 
 #$ns_ use-scheduler Calendar
