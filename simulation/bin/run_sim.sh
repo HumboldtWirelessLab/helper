@@ -403,6 +403,18 @@ case "$MODE" in
 			NODENAME_SEDARG="$NODENAME_SEDARG -e s#LASTNODE#$node#g"
 		fi
 
+                if [ "x$DISABLE_NAM" = "x1" ] && [ "x$DISABLE_TR" = "x1" ]; then
+                  DISABLE_TRACE=1
+                fi
+
+                if [ "x$DISABLE_TRACE" = "x1" ]; then
+                  DISABLE_NAM=1
+                  DISABLE_TR=1
+                  echo "set enable_trace 0" >> $TCLFILE
+                else
+                  echo "set enable_trace 1" >> $TCLFILE
+                fi
+
                 if [ "x$DISABLE_TR" = "x1" ]; then
                   echo "set enable_tr 0" >> $TCLFILE
                 else
