@@ -32,6 +32,14 @@ if { $enable_trace == 1 } {
   Simulator set MacTrace_ OFF
 }
 
+PacketHeaderManager set hdrlen_ 0
+
+# XXX Common header should ALWAYS be present
+PacketHeaderManager set tab_(Common) 1
+
+remove-all-packet-headers
+add-packet-header Raw IP TCP Mac LL ARP
+
 set ns_		[new Simulator]
 
 #$ns_ use-scheduler Calendar
@@ -143,6 +151,8 @@ for {set i 0} {$i < $nodecount } {incr i} {
     # NODENAME is set by run_sim.sh
     #
     [$node_($i) set classifier_] setnodename $node_name($i)
+
+    [$node_($i) entry] packetzerocopy true
 
     [$node_($i) entry] loadclick $clickfile($i)
 
