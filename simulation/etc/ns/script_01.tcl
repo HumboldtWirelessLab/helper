@@ -33,6 +33,7 @@ if { $enable_trace == 1 } {
 }
 
 PacketHeaderManager set hdrlen_ 0
+PacketHeaderManager set clear_packet_ 1
 
 # XXX Common header should ALWAYS be present
 PacketHeaderManager set tab_(Common) 1
