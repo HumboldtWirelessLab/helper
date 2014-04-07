@@ -33,7 +33,7 @@ if { $enable_trace == 1 } {
 }
 
 PacketHeaderManager set hdrlen_ 0
-PacketHeaderManager set clear_packet_ 1
+PacketHeaderManager set clear_packet_ 0
 
 # XXX Common header should ALWAYS be present
 PacketHeaderManager set tab_(Common) 1
@@ -153,7 +153,7 @@ for {set i 0} {$i < $nodecount } {incr i} {
     #
     [$node_($i) set classifier_] setnodename $node_name($i)
 
-    [$node_($i) entry] packetzerocopy true
+    [$node_($i) entry] packetzerocopy false
 
     [$node_($i) entry] loadclick $clickfile($i)
 
