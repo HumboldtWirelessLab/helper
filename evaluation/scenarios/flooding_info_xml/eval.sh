@@ -73,3 +73,8 @@ cat $EVALUATIONSDIR/floodingforwardstats.csv | sed -e "s#,# #g" $FULLIDSED > $EV
 xsltproc $DIR/flooding2pdr.xslt $DATAFILE > $EVALUATIONSDIR/flooding_pdr.csv
 cat $EVALUATIONSDIR/flooding_pdr.csv | sed "s#,# #g" | sed $FULLIDSED > $EVALUATIONSDIR/flooding_pdr.mat
 
+xsltproc $DIR/flooding_rateselection_summary.xslt $DATAFILE > $EVALUATIONSDIR/flooding_rateselection_summary.csv
+cat $EVALUATIONSDIR/flooding_rateselection_summary.csv | sed "s#,# #g" | sed $FULLIDSED > $EVALUATIONSDIR/flooding_rateselection_summary.mat
+
+xsltproc $DIR/flooding_rateselection.xslt $DATAFILE > $EVALUATIONSDIR/flooding_rateselection.csv
+cat $EVALUATIONSDIR/flooding_rateselection.csv | sed "s#,# #g" | sed $FULLIDSED > $EVALUATIONSDIR/flooding_rateselection.mat
