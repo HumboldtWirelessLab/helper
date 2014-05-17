@@ -3,10 +3,11 @@
 #include "iostream"
 #include "vector"
 
-
 #define DIRECTION_NONE 0
 #define DIRECTION_LEFT -1
 #define DIRECTION_RIGHT 1
+
+static const char *dir_string[] = { "left", "none", "right" };
 
 void FindRange(const cv::Mat &binary, int *center, int *size);
 
@@ -20,8 +21,17 @@ int main(int argc, char *argv[]) {
   cv::Mat binary;
   cv::Mat gray_frame;
 
-  //cv::VideoCapture cap("event_3.avi");
-  cv::VideoCapture cap(0);
+  cv::VideoCapture cap;
+
+  if ( argc == 1 ) {
+    cap = cv::VideoCapture(0);
+  } else {
+    cap = cv::VideoCapture(argv[1]);
+  }
+
+  double fps = cap.get(CV_CAP_PROP_FPS);
+  //printf("FPS: %f\n",fps);
+  //cap.set(CV_CAP_PROP_FPS, 1280);
 
   //cv::BackgroundSubtractorMOG2 bg(10000, 25, false);
   cv::BackgroundSubtractorMOG2 bg(10000, 100, false);
@@ -32,7 +42,7 @@ int main(int argc, char *argv[]) {
   std::vector<std::vector<cv::Point> > contours;
 
   cv::namedWindow("Frame");
-  //cv::namedWindow("Background");
+  cv::namedWindow("Original");
 
   int center[2];
   int size[2];
@@ -40,6 +50,10 @@ int main(int argc, char *argv[]) {
   int last_center_x = -1;
   int direction = DIRECTION_NONE;
 
+  int avg = 0;
+  int full_dir = DIRECTION_NONE;
+  int last_full_dir = DIRECTION_NONE;
+  int event_size = 0;
 
   for(;;) {
 
@@ -75,17 +89,42 @@ int main(int argc, char *argv[]) {
       direction = DIRECTION_NONE;
     }
 
+    if ( avg == 0 ) {
+      avg = direction * 10;
+    } else {
+      avg = (9 * avg + direction * 10) / 10;
+    }
+
+    full_dir = DIRECTION_NONE;
+    if ( avg > 1 ) {
+      full_dir = DIRECTION_RIGHT;
+      if ( event_size < size[1] ) event_size = size[1];
+    }
+    if ( avg < -1 ) {
+      full_dir = DIRECTION_LEFT;
+      if ( event_size < size[1] ) event_size = size[1];
+    }
+
+    if ( last_full_dir != full_dir ) {
+      //printf("DIR change: %d\n", full_dir);
+      if ( full_dir == DIRECTION_NONE ) {
+        printf("Detect Object: Direction to %s with size %d\n", dir_string[last_full_dir + 1], event_size);
+        event_size = 0;
+      }
+    }
+
+    last_full_dir = full_dir;
+
     last_center_x = center[0];
 
-    if ( direction != 0 )
-      printf("Center: %d %d Size: %d %d Direction: %d\n", center[0], center[1], size[0], size[1], direction);
+//    if ( direction != 0 )
+//      printf("Center: %d %d Size: %d %d Direction: %d\n", center[0], center[1], size[0], size[1], direction);
 
 
     cv::imshow("Frame",binary);
+    cv::imshow("Original",frame);
 
-    //cv::imshow("Background",back);
-
-    if(cv::waitKey(30) >= 0) break;
+    if(cv::waitKey(50) >= 0) break;
   }
 
   return 0;
