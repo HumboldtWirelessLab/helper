@@ -41,21 +41,16 @@ nur einmal die Passphrase für den SSH Schlüssel eingeben muss.
 Software auschecken
 -------------------
 
-#. In einem separaten Terminal SSH Verbindung zu gruenau herstellen (und geöffnet halten)::
+#. brn-tools auschecken::
 
-    ssh gruenau
-
-#. click-brn auschecken::
-
-    git clone ssh://gitsar/home/sombrutz/repository/click-brn/.git
+    git clone git@gitsar:brn-tools
 
 #. brn-tools.sh ausführen::
 
-    cp click-brn/elements/brn2/tools/brn-tools.sh .
-    chmod a+x brn-tools.sh
+    cd brn-tools
     ./brn-tools.sh
 
-#. Umgebungsvariablen setzen. Entweder per ``source /tmp/./brn-tools.bashrc`` oder durch das Kopieren der Einträge in ``brn-tools.bashrc`` in die eigene ``.bashrc``
+#. Umgebungsvariablen setzen. Entweder per ``source ./brn-tools.bashrc`` oder durch das Kopieren der Einträge in ``brn-tools.bashrc`` in die eigene ``.bashrc``
 
 Testen
 ------
