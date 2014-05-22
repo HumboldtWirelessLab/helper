@@ -360,7 +360,8 @@ case "$MODE" in
 
 			for nodedevice_click in $NODEDEVICELIST_CLICK; do
 
-				IFS=, read nodedevice_click_nospace <<< $nodedevice_click
+				IFS=","; read nodedevice_click_nospace <<< $nodedevice_click
+				IFS=" ";
 				read nodedevice CLICK <<< $nodedevice_click_nospace
 
 				if [ "x$NAME2MAC" = "xyes" ]; then
