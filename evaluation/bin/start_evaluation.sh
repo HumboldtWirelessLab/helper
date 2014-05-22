@@ -1,5 +1,4 @@
-
-#!/bin/sh
+#!/bin/bash
 
 dir=$(dirname "$0")
 pwd=$(pwd)
