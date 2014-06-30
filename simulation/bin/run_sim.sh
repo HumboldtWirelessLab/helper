@@ -85,6 +85,7 @@ else
 fi
 
 . $DESCRIPTIONFILE
+DESCRIPTIONFILE_TIME="$TIME"
 
 FINALRESULTDIR=`echo $RESULTDIR | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
 
@@ -569,11 +570,15 @@ case "$MODE" in
 		# Final stage: valgrind-check and experiment evaluation
 		if [ "x$USED_SIMULATOR" = "xns" ]; then
 			echo "echo \"Running NS2\"" >> $FINALRESULTDIR/run_again.sh
+			
 			# check running NS with a memory debugger and profiler
 			which valgrind > /dev/null 2> /dev/null
 			if [ $? -ne 0 ]; then
 				VALGRIND=0
 			fi
+
+			PRE_CMD=""
+			NS_CMD=""
 			if [ "x$VALGRIND" = "x1" ]; then
 				NS_FULL_PATH=`which ns`
 				# run NS (under valgrind)
@@ -586,23 +591,30 @@ case "$MODE" in
 				  SUPPRESSION="--suppressions=$DIR/../etc/ns/ns.supp"
 				fi
 
-				echo "$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1" >> $FINALRESULTDIR/run_again.sh
+				NS_CMD="$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE"
+			elif [ "x$PROFILE" = "x1" ]; then
+				NS_FULL_PATH=`which ns`
+				NS_CMD="$GETTIMESTATS valgrind --tool=callgrind --collect-jumps=yes --callgrind-out-file=$FINALRESULTDIR/callgrind.out $NS_FULL_PATH $TCLFILE"
+			elif [ "x$GDB" = "x1" ]; then
+				NS_FULL_PATH=`which ns`
+				echo "run" > $FINALRESULTDIR/gdb.cmd
+				( cd $FINALRESULTDIR; gdb -x gdb.cmd --args $NS_FULL_PATH $TCLFILE )
+				rm -f $FINALRESULTDIR/gdb.cmd
+				exit 0
 			else
-				if [ "x$PROFILE" = "x1" ]; then
-					NS_FULL_PATH=`which ns`
-					echo "$GETTIMESTATS valgrind --tool=callgrind --collect-jumps=yes --callgrind-out-file=$FINALRESULTDIR/callgrind.out $NS_FULL_PATH $TCLFILE > $LOGDIR/$LOGFILE  2>&1" >> $FINALRESULTDIR/run_again.sh
-				else
-					if [ "x$GDB" = "x1" ]; then
-						NS_FULL_PATH=`which ns`
-						echo "run" > $FINALRESULTDIR/gdb.cmd
-						( cd $FINALRESULTDIR; gdb -x gdb.cmd --args $NS_FULL_PATH $TCLFILE )
-						rm -f $FINALRESULTDIR/gdb.cmd
-						exit 0
-					else
-						echo "$GETTIMESTATS ns $TCLFILE > $LOGDIR/$LOGFILE 2>&1" >> $FINALRESULTDIR/run_again.sh
-					fi
-				fi
+				NS_CMD="$GETTIMESTATS ns $TCLFILE"
 			fi
+
+			if [ "x$PROGRESS" != "x" ]; then
+				PRE_CMD="set -o pipefail"
+				NS_CMD="${NS_CMD} 2>&1 | tee $LOGDIR/$LOGFILE | sim_progress_bar.py --max-time=${DESCRIPTIONFILE_TIME} "
+			else
+				NS_CMD="${NS_CMD} > $LOGDIR/$LOGFILE 2>&1"
+			fi
+
+			echo ${PRE_CMD} >> $FINALRESULTDIR/run_again.sh
+			echo ${NS_CMD} >> $FINALRESULTDIR/run_again.sh
+
 		else if [ "x$USED_SIMULATOR" = "xjist" ]; then
 			echo "Running Jist" >> $FINALRESULTDIR/run_again.sh
 			( cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties )
