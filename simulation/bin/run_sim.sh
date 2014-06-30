@@ -443,6 +443,7 @@ case "$MODE" in
 			fi
 			
 			if [ "x$USEPYTHON" != "x" ]; then
+				echo "Info: Use decode_ctl.py to decode CTL-file"
 				FIRST=""
 				for NODE in $NODELIST
 				do
@@ -455,7 +456,6 @@ case "$MODE" in
 						ORDERED_NUM_MAP="${ORDERED_NUM_MAP} ${node_to_num_map[$NODE]}"
 					fi
 				done
-				echo ${node_to_clickfile_map['sk1']}
 				decode_ctl.py  --control-file="${CONTROLFILE}" --tcl-file="$TCLFILE" --node-list="${NODELIST}" --used-simulator=${USED_SIMULATOR} --node-to-click-map="${ORDERED_CLICK_MAP}" --node-to-num-map="${ORDERED_NUM_MAP}" --node-name-sed-arg="${NODENAME_SEDARG}" --node-mac-sed-arg="${NODEMAC_SEDARG}" --jist-property-file="$FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties"
 			else
 				while read line; do
@@ -625,7 +625,6 @@ case "$MODE" in
 		#Prepare eval-script
 
 		echo "#!/bin/sh" > $FINALRESULTDIR/eval_again.sh
-		#echo "echo \"Evaluation...\"" >> $FINALRESULTDIR/eval_again.sh
 		echo "MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT" >> $FINALRESULTDIR/eval_again.sh
 
 		if [ "x$PREPARE_ONLY" = "x" ]; then
@@ -635,7 +634,7 @@ case "$MODE" in
 		# if the simulation was correctly execruted start the automatized evaluation of the experiment
 		if [ $? -eq 0 ]; then
 			if [ "x$DELAYEVALUATION" = "x" ] && [ "x$PREPARE_ONLY" = "x" ]; then
-			  echo "sh $FINALRESULTDIR/eval_again.sh"
+			  sh $FINALRESULTDIR/eval_again.sh
 			fi
 		else
 			exit 1
