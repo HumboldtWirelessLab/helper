@@ -441,82 +441,96 @@ case "$MODE" in
 			if [ "x$USED_SIMULATOR" = "xjist" ]; then
 				echo -n "handler.script = " > $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 			fi
-			while read line; do
-				ISCOMMENT=`echo $line | grep "#" | wc -l`
-				if [ $ISCOMMENT -eq 0 ]; then
-					# collect information of control file
-					#read TIME NODENAME NODEDEVICE MODE ELEMENT HANDLER <<< $line
-					#NODENAME=`echo $NODENAME | sed $NODENAME_SEDARG`
-
-					#OLD VERSION
-					TIME=`echo $line | awk '{print $1}'`
-					NODENAME=`echo $line | awk '{print $2}' | sed $NODENAME_SEDARG`
-					NODEDEVICE=`echo $line | awk '{print $3}'`
-					MODE=`echo $line | awk '{print $4}'`
-					ELEMENT=`echo $line | awk '{print $5}'`
-					HANDLER=`echo $line | awk '{print $6}'`
-
-					#Produces wrong clickfiles from controlfiles
-					#read TIME NODENAME NODEDEVICE MODE ELEMENT HANDLER <<< $line
-					#NODENAME=`echo $NODENAME | sed $NODENAME_SEDARG`
-
-					# if "ALL" is used, take all nodes of nodelist, else just the respective node
-					if [ "x$NODENAME" = "xALL" ]; then
-						HANDLERNODES=$NODELIST
+			
+			if [ "x$USEPYTHON" != "x" ]; then
+				FIRST=""
+				for NODE in $NODELIST
+				do
+					if [ "x$FIRST" == "x" ]; then
+						FIRST="X"
+						ORDERED_CLICK_MAP="${node_to_clickfile_map[$NODE]}"
+						ORDERED_NUM_MAP="${node_to_num_map[$NODE]}"
 					else
-						HANDLERNODES=$NODENAME
+						ORDERED_CLICK_MAP="${ORDERED_CLICK_MAP} ${node_to_clickfile_map[$NODE]}"
+						ORDERED_NUM_MAP="${ORDERED_NUM_MAP} ${node_to_num_map[$NODE]}"
 					fi
-
-					# Main stage: now we set up the click-handler which are going to be
-					# used by the simulator to dynamically control the process
-					# or get some information out of the network activities... yey!
-					for n in $HANDLERNODES; do
-
-						CLICKFILE=${node_to_clickfile_map[$n]}
-						#CLICKFILE=`cat $NODETABLE | grep "$n eth0 " | awk '{print $7}'`
-
-						if [ "x$CLICKFILE" = "x" ]; then
-							continue;
+				done
+				echo ${node_to_clickfile_map['sk1']}
+				decode_ctl.py  --control-file="${CONTROLFILE}" --tcl-file="$TCLFILE" --node-list="${NODELIST}" --used-simulator=${USED_SIMULATOR} --node-to-click-map="${ORDERED_CLICK_MAP}" --node-to-num-map="${ORDERED_NUM_MAP}" --node-name-sed-arg="${NODENAME_SEDARG}" --node-mac-sed-arg="${NODEMAC_SEDARG}" --jist-property-file="$FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties"
+			else
+				while read line; do
+					ISCOMMENT=`echo $line | grep "#" | wc -l`
+					if [ $ISCOMMENT -eq 0 ]; then
+						# collect information of control file
+						#read TIME NODENAME NODEDEVICE MODE ELEMENT HANDLER <<< $line
+						#NODENAME=`echo $NODENAME | sed $NODENAME_SEDARG`
+	
+						#OLD VERSION
+						TIME=`echo $line | awk '{print $1}'`
+						NODENAME=`echo $line | awk '{print $2}' | sed $NODENAME_SEDARG`
+						NODEDEVICE=`echo $line | awk '{print $3}'`
+						MODE=`echo $line | awk '{print $4}'`
+						ELEMENT=`echo $line | awk '{print $5}'`
+						HANDLER=`echo $line | awk '{print $6}'`
+	
+						#Produces wrong clickfiles from controlfiles
+						#read TIME NODENAME NODEDEVICE MODE ELEMENT HANDLER <<< $line
+						#NODENAME=`echo $NODENAME | sed $NODENAME_SEDARG`
+	
+						# if "ALL" is used, take all nodes of nodelist, else just the respective node
+						if [ "x$NODENAME" = "xALL" ]; then
+							HANDLERNODES=$NODELIST
+						else
+							HANDLERNODES=$NODENAME
 						fi
-
-						NODENUM=${node_to_num_map[$n]}
-						#NODENUM=`cat $FINALRESULTDIR/nodes.mac | egrep "^$n[[:space:]]" | awk '{print $4}'`
-						
-						let NODENUM=NODENUM-1
-						if [ "x$TIME" != "x" ]; then
-
-							# the write handler
-							if [ "x$MODE" = "xwrite" ]; then
-								VALUE=`get_params $line | sed $NODEMAC_SEDARG`
-								if [ "x$USED_SIMULATOR" = "xns" ]; then
-									echo "Script(wait $TIME, write  $ELEMENT.$HANDLER $VALUE);" >> $CLICKFILE
-									#echo "\$ns_ at $TIME \"set result \\[\\[\$node_($NODENUM) entry\\] writehandler $ELEMENT $HANDLER \\\"$VALUE\\\" \\]\"" >> $TCLFILE
-								else
-									echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,$VALUE;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
-								fi
-							# the read handler
-							elif [ "x$MODE" = "xread" ]; then
-								if [ "x$USED_SIMULATOR" = "xns" ]; then
-									echo "Script(wait $TIME, read $ELEMENT.$HANDLER);" >> $CLICKFILE
-									#echo "\$ns_ at $TIME \"puts \\\"\\[\\[\$node_($NODENUM) entry\\] readhandler $ELEMENT $HANDLER \\]\\\"\"" >> $TCLFILE
-								else
-									echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
-								fi
-							# for special purpose: move nodes in simulator
-							elif [ "x$MODE" = "xmove" ]; then
-								MOVE_MODE=$ELEMENT
-								MOVE_SPEED=$HANDLER
-								read TRASH1 TRASH2 TRASH3 TRASH4 TRASH5 TRASH6 MOVE_X MOVE_Y MOVE_Z <<< $line
-								if [ "x$USED_SIMULATOR" = "xns" ]; then
-									echo "\$ns_ at $TIME \"\$node_($NODENUM) setdest $MOVE_X $MOVE_Y $MOVE_SPEED\"" >> $TCLFILE
-								else
-									echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
+	
+						# Main stage: now we set up the click-handler which are going to be
+						# used by the simulator to dynamically control the process
+						# or get some information out of the network activities... yey!
+						for n in $HANDLERNODES; do
+	
+							CLICKFILE=${node_to_clickfile_map[$n]}
+	
+							if [ "x$CLICKFILE" = "x" ]; then
+								continue;
+							fi
+	
+							NODENUM=${node_to_num_map[$n]}
+							
+							let NODENUM=NODENUM-1
+							if [ "x$TIME" != "x" ]; then
+	
+								# the write handler
+								if [ "x$MODE" = "xwrite" ]; then
+									VALUE=`get_params $line | sed $NODEMAC_SEDARG`
+									if [ "x$USED_SIMULATOR" = "xns" ]; then
+										echo "Script(wait $TIME, write  $ELEMENT.$HANDLER $VALUE);" >> $CLICKFILE
+									else
+										echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,$VALUE;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
+									fi
+								# the read handler
+								elif [ "x$MODE" = "xread" ]; then
+									if [ "x$USED_SIMULATOR" = "xns" ]; then
+										echo "Script(wait $TIME, read $ELEMENT.$HANDLER);" >> $CLICKFILE
+									else
+										echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
+									fi
+								# for special purpose: move nodes in simulator
+								elif [ "x$MODE" = "xmove" ]; then
+									MOVE_MODE=$ELEMENT
+									MOVE_SPEED=$HANDLER
+									read TRASH1 TRASH2 TRASH3 TRASH4 TRASH5 TRASH6 MOVE_X MOVE_Y MOVE_Z <<< $line
+									if [ "x$USED_SIMULATOR" = "xns" ]; then
+										echo "\$ns_ at $TIME \"\$node_($NODENUM) setdest $MOVE_X $MOVE_Y $MOVE_SPEED\"" >> $TCLFILE
+									else
+										echo -n "$TIME,$NODENAME,$NODEDEVICE,$MODE,$ELEMENT,$HANDLER,;" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
+									fi
 								fi
 							fi
-						fi
-					done
-				fi
-			done < $CONTROLFILE
+						done
+					fi
+				done < $CONTROLFILE
+			fi
 			if [ "x$USED_SIMULATOR" = "xjist" ]; then
 				echo "" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
 			fi
@@ -621,7 +635,7 @@ case "$MODE" in
 		# if the simulation was correctly execruted start the automatized evaluation of the experiment
 		if [ $? -eq 0 ]; then
 			if [ "x$DELAYEVALUATION" = "x" ] && [ "x$PREPARE_ONLY" = "x" ]; then
-			  sh $FINALRESULTDIR/eval_again.sh
+			  echo "sh $FINALRESULTDIR/eval_again.sh"
 			fi
 		else
 			exit 1
