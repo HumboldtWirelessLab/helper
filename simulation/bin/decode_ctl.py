@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import csv
 import sys
+import time
 from optparse import OptionParser
 
 
@@ -91,6 +92,15 @@ def print_cfg():
 		print("  {0} -> {1}".format(key, value))
 
 
+def update_progress(cur, max):
+	progress = float(cur) / max
+	bar_len = 40
+	filled = int(bar_len * progress)
+	unfilled = int(bar_len * (1.0 - progress))
+	sys.stdout.write('\r[{0}{1}] {2}/{3} {4:.2f}%'.format('#'*(filled), ' '*(unfilled), cur, max, progress * 100))
+	sys.stdout.flush()
+
+
 def decode():
 	max_lines = len(open(cfg_control_file).readlines())
 
@@ -174,8 +184,24 @@ def decode():
 							new_line="{0},{1},{2},{3},{4},{5},;\n".format(time, node_name, node_dev, mode, element, handler)
 							outputfile.write(new_line)
 
+			if five_secs_gone():
+				update_progress(line_number, max_lines)
+	print
 
 
+def init_time_measurement():
+	global start_time
+	start_time = time.time()
 
+
+def five_secs_gone():
+	global start_time
+	is_gone = time.time() - start_time >= 5
+	if is_gone:
+		start_time = time.time()
+	return is_gone 
+
+
+init_time_measurement()
 check_args()
 decode()
