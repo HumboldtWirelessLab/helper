@@ -635,7 +635,7 @@ case "$MODE" in
 		# if the simulation was correctly execruted start the automatized evaluation of the experiment
 		if [ $? -eq 0 ]; then
 			if [ "x$DELAYEVALUATION" = "x" ] && [ "x$PREPARE_ONLY" = "x" ]; then
-			  echo "sh $FINALRESULTDIR/eval_again.sh"
+			  sh $FINALRESULTDIR/eval_again.sh
 			fi
 		else
 			exit 1
