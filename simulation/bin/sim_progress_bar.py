@@ -25,6 +25,7 @@ def check_args():
 def signal_handler(signal, frame):
     sys.exit(0)
 
+
 def update_progress(cur, max):
 	progress = float(cur) / max
 	bar_len = 40
@@ -34,7 +35,38 @@ def update_progress(cur, max):
 	sys.stdout.flush()
 
 
-def decode_line_to_time(line):
+def decode_error_msg_to_time(line):
+	line_array = line.split(' ')
+	if len(line_array) <= 2 or line_array[0] != "ERROR": 
+		return None
+
+	try:
+		result=float(line_array[1])
+	except ValueError:
+		result=None
+
+	if len(line_array) < 2 or len(line_array[1]) > 20 :
+		result=None
+
+	return result
+
+def decode_warn_msg_to_time(line):
+	line_array = line.split(' ')
+	if len(line_array) <= 2 or line_array[0] != "WARN": 
+		return None
+
+	try:
+		result=float(line_array[1])
+	except ValueError:
+		result=None
+
+	if len(line_array) < 2 or len(line_array[1]) > 20 :
+		result=None
+
+	return result
+
+
+def decode_printed_timestamp_to_time(line):
 	line_array = line.split(':')
 	try:
 		result=float(line_array[0])
@@ -45,6 +77,22 @@ def decode_line_to_time(line):
 		result=None
 
 	return result
+
+
+def decode_line_to_time(line):
+	result = decode_printed_timestamp_to_time(line)
+	if result is not None:
+		return result
+
+	result = decode_error_msg_to_time(line)
+	if result is not None:
+		return result
+
+	result = decode_warn_msg_to_time(line)
+	if result is not None:
+		return result
+
+	return None
 
 
 def init_time_measurement():
