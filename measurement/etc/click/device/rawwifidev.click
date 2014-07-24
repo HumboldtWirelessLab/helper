@@ -135,9 +135,20 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #define TOS2QUEUEMAPPER_STRATEGY 0
 #endif
 
+#ifndef TOS2QUEUEMAPPER_QUEUEMAPPING
+#define TOS2QUEUEMAPPER_QUEUEMAPPING 0
+#endif
+
+#ifndef TOS2QUEUEMAPPER_MAC_BO_SCHEME
+#define TOS2QUEUEMAPPER_MAC_BO_SCHEME 0
+#endif
+
 #ifdef SIMULATION
 #ifdef CST
-  -> tosq::Tos2QueueMapper( DEVICE $device, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_nbs bo_const", DEBUG 2)
+  -> tosq::Tos2QueueMapper( DEVICE $device, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_nbs bo_const",
+                            MAC_BO_SCHEME TOS2QUEUEMAPPER_MAC_BO_SCHEME,            /*   0 - Default (Exp)   1- Exp   2 - Fib   */
+                            QUEUEMODE 0, QUEUEVAL 1, CWMINMAXMODE 0, CWMINMAXVAL 7, /*   cwminmaxval -> retries; Mode: 0-Exp 1-Mul 2-Add 3-Fib    */
+                            QUEUEMAPPING TOS2QUEUEMAPPER_QUEUEMAPPING, DEBUG 4)
 #endif
 #endif //SIMULATION
 #endif
@@ -210,7 +221,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 #endif
 #ifdef FOREIGNRXSTATS
-  -> ForeignRxStats(DEVICE $device,TIMEOUT 5, DEBUG 2)
+  -> ForeignRxStats(DEVICE $device,TIMEOUT 15, DEBUG 2)
 #endif
   -> [0]output;
 
