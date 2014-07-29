@@ -143,11 +143,28 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #define TOS2QUEUEMAPPER_MAC_BO_SCHEME 0
 #endif
 
+#ifndef TOS2QUEUEMAPPER_QUEUEMODE
+#define TOS2QUEUEMAPPER_QUEUEMODE 0
+#endif
+
+#ifndef TOS2QUEUEMAPPER_QUEUEVAL
+#define TOS2QUEUEMAPPER_QUEUEVAL 1
+#endif
+
+#ifndef TOS2QUEUEMAPPER_CWMINMAXMODE
+#define TOS2QUEUEMAPPER_CWMINMAXMODE 0
+#endif
+
+#ifndef TOS2QUEUEMAPPER_CWMINMAXVAL
+#define TOS2QUEUEMAPPER_CWMINMAXVAL 7
+#endif
+
 #ifdef SIMULATION
 #ifdef CST
   -> tosq::Tos2QueueMapper( DEVICE $device, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_nbs bo_const",
-                            MAC_BO_SCHEME TOS2QUEUEMAPPER_MAC_BO_SCHEME,            /*   0 - Default (Exp)   1- Exp   2 - Fib   */
-                            QUEUEMODE 0, QUEUEVAL 1, CWMINMAXMODE 0, CWMINMAXVAL 7, /*   cwminmaxval -> retries; Mode: 0-Exp 1-Mul 2-Add 3-Fib    */
+                            MAC_BO_SCHEME TOS2QUEUEMAPPER_MAC_BO_SCHEME,                                        /*   0 - Default (Exp)   1- Exp   2 - Fib   */
+                            QUEUEMODE TOS2QUEUEMAPPER_QUEUEMODE, QUEUEVAL TOS2QUEUEMAPPER_QUEUEVAL,             /*   Mode: 0-Exp 1-Mul 2-Add 3-Fib    */
+                            CWMINMAXMODE TOS2QUEUEMAPPER_CWMINMAXMODE, CWMINMAXVAL TOS2QUEUEMAPPER_CWMINMAXVAL, /*   cwminmaxval -> retries; Mode: 0-Exp 1-Mul 2-Add 3-Fib    */
                             QUEUEMAPPING TOS2QUEUEMAPPER_QUEUEMAPPING, DEBUG 4)
 #endif
 #endif //SIMULATION
