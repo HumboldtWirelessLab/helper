@@ -55,7 +55,7 @@ for i in `find -name run_again.sh`; do
 
   SIMDIR=`dirname $i`
 
-  echo $SIMDIR
+  #echo $SIMDIR
   if [ $USE_DISTPARASIM -eq 1 ]; then
     JOBCOMMAND="cd $WORKINGDIR/$SIMDIR/;sh ./run_again.sh > run_again.log 2>&1; sh ./eval_again.sh > eval_again.log 2>&1; touch $WORKINGDIR/sim_finish_dir/$NUM" $DIR/../lib/parasim/para_sim_ctrl.sh commit
   else
