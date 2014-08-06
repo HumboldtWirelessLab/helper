@@ -108,7 +108,9 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
   bo_learning::BoLearning(MIN_CWMIN 32, MAX_CWMIN 1024, STRICT 1, CAP 1, DEBUG 2);
 
-  bo_const::BoConstant(CHANNELSTATS CST, BO 32, DEBUG 2);
+  bo_const::BoConstant(BO 32, DEBUG 2);
+
+  bo_minstrel::BoMinstrel(DEBUG 4);
 #endif
 #endif
 
@@ -161,7 +163,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef SIMULATION
 #ifdef CST
-  -> tosq::Tos2QueueMapper( DEVICE $device, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_nbs bo_const",
+  -> tosq::Tos2QueueMapper( DEVICE $device, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_nbs bo_const bo_minstrel",
                             MAC_BO_SCHEME TOS2QUEUEMAPPER_MAC_BO_SCHEME,                                        /*   0 - Default (Exp)   1- Exp   2 - Fib   */
                             QUEUEMODE TOS2QUEUEMAPPER_QUEUEMODE, QUEUEVAL TOS2QUEUEMAPPER_QUEUEVAL,             /*   Mode: 0-Exp 1-Mul 2-Add 3-Fib    */
                             CWMINMAXMODE TOS2QUEUEMAPPER_CWMINMAXMODE, CWMINMAXVAL TOS2QUEUEMAPPER_CWMINMAXVAL, /*   cwminmaxval -> retries; Mode: 0-Exp 1-Mul 2-Add 3-Fib    */
