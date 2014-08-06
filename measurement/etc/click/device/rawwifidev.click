@@ -100,7 +100,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef CST
   bo_maxtp::BoMaxThroughput(CHANNELSTATS CST, DEBUG 2);
 
-  bo_cla::BoChannelLoadAware(CHANNELSTATS CST, TARGETLOAD 90, TARGETDIFF 0, CAP 1, CST_SYNC 1, DEBUG 2);
+  bo_cla::BoChannelLoadAware(CHANNELSTATS CST, TARGETLOAD 95, TARGETDIFF 0, CAP 1, CST_SYNC 1, DEBUG 2);
 
   bo_targetpl::BoTargetPacketloss(CHANNELSTATS CST, TARGETPL 10, DEBUG 2);
 
