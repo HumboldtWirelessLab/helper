@@ -3,6 +3,7 @@
  */
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <linux/socket.h>
 #include <linux/netlink.h>
 #include <linux/connector.h>
@@ -37,6 +38,14 @@
       __u8 data[0];
   };
 */
+
+#define DEBUG_INFO   1
+#define DEBUG_DEV    2
+
+
+#define DEBUG_LEVEL_INFO (debug_level >= DEBUG_INFO)
+#define DEBUG_LEVEL_DEV (debug_level >= DEBUG_DEV)
+
 
 #define MAX_PAYLOAD 2048
 #define BUF_SIZE  4096
@@ -102,7 +111,7 @@ int format_type(char c) {
 void print_help()
 {
   int i;
-  printf("Use ./csi_tool mode output input format ap_name client_name\n");
+  printf("Use ./csi_tool mode output input format ap_name client_name debug\n");
   printf("Mode:");
   for ( i = 0; i < NO_MODES; i++) {
     printf("\t%s:\t%s -> %s\n",modes[i],input_types[io_type(modes[i][0],INPUT)], output_types[io_type(modes[i][2],TARGET)]);
@@ -153,6 +162,8 @@ int main(int argc, char** argv)
   char *csi_node = "0.0.0.0";
   char *tx_node = "0.0.0.1";
 
+  int debug_level = 0;
+
   if ( (argc < 5) || ((argc > 1) && (strcmp(argv[1], "help") == 0)) ) {
     print_help();
     exit(0);
@@ -168,6 +179,10 @@ int main(int argc, char** argv)
   if ( argc > 5 ) {
     csi_node = argv[5];
     tx_node = argv[6];
+  }
+
+  if ( argc > 7 ) {
+    debug_level = atoi(argv[7]);
   }
 
   struct cn_msg *cmsg;
@@ -229,7 +244,9 @@ int main(int argc, char** argv)
 
     /* Read the next entry size */
 
-    printf("\n----- Next Data -----\n\n");
+    if (DEBUG_LEVEL_DEV) {
+      printf("\n----- Next Data -----\n\n");
+    }
 
     switch (input) {
       case INPUT_FILE:
@@ -282,7 +299,7 @@ int main(int argc, char** argv)
     if ( (filter_rate != 0xFFFF) && (bfee->fake_rate_n_flags != filter_rate) ) continue;
     if ( (filter_Nrx != 0xFF) && (bfee->Nrx != filter_Nrx) ) continue;
 
-    printf("Entry size=%d, code=0x%X\n", cmsg->len, cmsg->data[0]);
+     if (DEBUG_LEVEL_DEV) printf("Entry size=%d, code=0x%X\n", cmsg->len, cmsg->data[0]);
 
     /* Evaluation */
     double eff_snrs[MAX_NUM_RATES][4];
@@ -291,18 +308,25 @@ int main(int argc, char** argv)
 
       calc_eff_snrs(bfee, eff_snrs);
 
-      /* Beamforming packet */
-      printf("\nBeamforming: rate=0x%x\n", bfee->fake_rate_n_flags);
-      /* Pull out the message portion and print some stats */
-      if (count % SLOW_MSG_CNT == 0)
-        printf("Received %d bytes: id: %d val: %d seq: %d clen: %d\n", cmsg->len, cmsg->id.idx, cmsg->id.val, cmsg->seq, cmsg->len);
+      struct timeval timeVal;
+      gettimeofday (&timeVal, NULL);
 
-      printf("\n--- Effektive SNR ---\n\n");
-      int i;
-      for ( i = 0; i < MAX_NUM_RATES; i++) {
-        printf("%d: %f %f %f %f\n", i, db(eff_snrs[i][0]), db(eff_snrs[i][1]), db(eff_snrs[i][2]), db(eff_snrs[i][3]));
+      if (DEBUG_LEVEL_INFO) printf("Rcvd pkt at <%ld.%06ld>\n", (long int)(timeVal.tv_sec), (long int)(timeVal.tv_usec));
+
+      if (DEBUG_LEVEL_DEV) {
+        /* Beamforming packet */
+        printf("\nBeamforming: rate=0x%x\n", bfee->fake_rate_n_flags);
+        /* Pull out the message portion and print some stats */
+        if (count % SLOW_MSG_CNT == 0)
+          printf("Received %d bytes: id: %d val: %d seq: %d clen: %d\n", cmsg->len, cmsg->id.idx, cmsg->id.val, cmsg->seq, cmsg->len);
+
+        printf("\n--- Effektive SNR ---\n\n");
+        int i;
+        for ( i = 0; i < MAX_NUM_RATES; i++) {
+          printf("%d: %f %f %f %f\n", i, db(eff_snrs[i][0]), db(eff_snrs[i][1]), db(eff_snrs[i][2]), db(eff_snrs[i][3]));
+        }
+        printf("\n---------------------\n\n");
       }
-      printf("\n---------------------\n\n");
     }
 
     /* Log the data remote */
@@ -320,7 +344,7 @@ int main(int argc, char** argv)
           sprintf(sendline, "bfee == NULL\n");
         }
 
-        printf("To tx:\n%s\n", sendline);
+        if (DEBUG_LEVEL_DEV) printf("To tx:\n%s\n", sendline);
         break;
       case OUTPUT_MODE_CLICK:
         len_sendline = click_output(sendline, bfee, cmsg, eff_snrs, csi_node_addr, tx_node_addr);
@@ -335,7 +359,7 @@ int main(int argc, char** argv)
         memcpy(&(sendline[len_sendline]), cmsg->data, 1 * l);
         len_sendline += 1 * l;
 
-        if (count % 100 == 0) printf("wrote %d bytes [msgcnt=%u]\n", len_sendline, count);
+        if ((count % 100 == 0) && (DEBUG_LEVEL_DEV)) printf("wrote %d bytes [msgcnt=%u]\n", len_sendline, count);
     }
 
     switch ( target ) {
