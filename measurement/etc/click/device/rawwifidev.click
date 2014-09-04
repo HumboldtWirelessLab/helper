@@ -98,19 +98,23 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef SIMULATION
 #ifdef CST
-  bo_maxtp::BoMaxThroughput(CHANNELSTATS CST, DEBUG 2);
+  bo_maxtp::BoMaxThroughput(CHANNELSTATS CST, OFFSET -50, DEBUG 2);
 
   bo_cla::BoChannelLoadAware(CHANNELSTATS CST, TARGETLOAD 95, TARGETDIFF 0, CAP 1, CST_SYNC 1, DEBUG 2);
 
   bo_targetpl::BoTargetPacketloss(CHANNELSTATS CST, TARGETPL 10, DEBUG 2);
 
-  bo_nbs::BoNeighbours(CHANNELSTATS CST, DEBUG 2);
+  bo_nbs::BoNeighbours(CHANNELSTATS CST, ALPHA 500 /*850*/, BETA 200 /*500*/, DEBUG 2);
 
   bo_learning::BoLearning(MIN_CWMIN 32, MAX_CWMIN 1024, STRICT 1, CAP 1, DEBUG 2);
 
   bo_const::BoConstant(BO 32, DEBUG 2);
 
   bo_minstrel::BoMinstrel(DEBUG 4);
+
+#ifdef COOPCST_STRING
+  bo_mshare::BoMediumShare(CHANNELSTATS CST, COOPCHANNELSTATSPATH COOPCST_STRING, HIDDENNODE hnd, BO 32, DEBUG 4);
+#endif
 #endif
 #endif
 
@@ -163,7 +167,11 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
 #ifdef SIMULATION
 #ifdef CST
+#ifdef COOPCST_STRING
+  -> tosq::Tos2QueueMapper( DEVICE $device, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_nbs bo_const bo_minstrel bo_mshare",
+#else
   -> tosq::Tos2QueueMapper( DEVICE $device, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_nbs bo_const bo_minstrel",
+#endif
                             MAC_BO_SCHEME TOS2QUEUEMAPPER_MAC_BO_SCHEME,                                        /*   0 - Default (Exp)   1- Exp   2 - Fib   */
                             QUEUEMODE TOS2QUEUEMAPPER_QUEUEMODE, QUEUEVAL TOS2QUEUEMAPPER_QUEUEVAL,             /*   Mode: 0-Exp 1-Mul 2-Add 3-Fib    */
                             CWMINMAXMODE TOS2QUEUEMAPPER_CWMINMAXMODE, CWMINMAXVAL TOS2QUEUEMAPPER_CWMINMAXVAL, /*   cwminmaxval -> retries; Mode: 0-Exp 1-Mul 2-Add 3-Fib    */
