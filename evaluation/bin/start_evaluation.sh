@@ -25,7 +25,7 @@ function handle_eval {
 
   for i in $@; do
 
-    EVAL_DONE=`cat $EVALUATION_DONE_FILE | grep "$i" | wc -l`
+    EVAL_DONE=`cat $EVALUATION_DONE_FILE | grep -e "^${i}" | wc -l`
 
     if [ $EVAL_DONE -eq 0 ]; then
 
