@@ -108,7 +108,11 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
   bo_learning::BoLearning(MIN_CWMIN 32, MAX_CWMIN 1024, STRICT 1, CAP 1, DEBUG 2);
 
-  bo_const::BoConstant(BO 32, DEBUG 2);
+#ifndef BOCONST_VALUE
+#define BOCONST_VALUE 32
+#endif
+
+  bo_const::BoConstant(BO BOCONST_VALUE, DEBUG 2);
 
   bo_minstrel::BoMinstrel(DEBUG 4);
 #endif
