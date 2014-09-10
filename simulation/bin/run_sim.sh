@@ -295,9 +295,9 @@ case "$MODE" in
 			FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
 		fi
 
-		POS_X_MAX=`cat $FINALPLMFILE | awk '{print $2}' | sort | tail -n 1`
-		POS_Y_MAX=`cat $FINALPLMFILE | awk '{print $3}' | sort | tail -n 1`
-		POS_Z_MAX=`cat $FINALPLMFILE | awk '{print $4}' | sort | tail -n 1`
+		POS_X_MAX=`cat $FINALPLMFILE | awk '{print $2}' | sort -n | tail -n 1`
+		POS_Y_MAX=`cat $FINALPLMFILE | awk '{print $3}' | sort -n | tail -n 1`
+		POS_Z_MAX=`cat $FINALPLMFILE | awk '{print $4}' | sort -n | tail -n 1`
 
 		let POS_X_MAX=POS_X_MAX+50
 		let POS_Y_MAX=POS_Y_MAX+50
