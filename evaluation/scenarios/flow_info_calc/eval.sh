@@ -26,4 +26,7 @@ fi
 
 EVALUATIONSDIR="$EVALUATIONSDIR""/flow_info"
 
-(cd $DIR; matwrapper.sh "flowstats('$EVALUATIONSDIR/flowstats_rx.mat','$EVALUATIONSDIR/flowtime.mat')")
+(cd $DIR; matwrapper.sh "flowstats('$EVALUATIONSDIR/flowstats_rx.mat','$EVALUATIONSDIR/flowtime.csv')")
+cat $EVALUATIONSDIR/flowtime.csv | sed "s#,# #g" > $EVALUATIONSDIR/flowtime.mat
+
+exit 0
