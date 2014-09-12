@@ -78,6 +78,49 @@ case "$1" in
 	    echo "$n $X $Y 0"
 	  done
           ;;
+    "gridrand")
+          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
+          NODECOUNT=`echo $NODES | wc -w`
+          SIDELEN=`echo "sqrt($NODECOUNT)" | bc`
+	  let SLSQR=SIDELEN*SIDELEN
+	  #echo "NODECOUNT: $NODECOUNT  SLSQR: $SLSQR"
+	  if [ $SLSQR -lt $NODECOUNT ]; then
+	    let SIDELEN=SIDELEN+1
+	  fi
+
+	  #echo "SL: $SIDELEN"
+
+	  NODEN=0
+	  if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
+	    SIDESTEP=$3
+	  else
+	    if [ $SIDELEN -eq 1 ]; then
+	      SIDESTEP=$3
+	    else
+	      SIDESTEP=`expr $3 / \( $SIDELEN - 1 \)`
+	    fi
+	  fi
+
+	  RANDSTEP=`expr $SIDESTEP / 10`
+
+	  #echo "ST: $SIDESTEP"
+	  for n in $NODES; do
+	    let X=NODEN%SIDELEN*SIDESTEP
+	    let Y=NODEN/SIDELEN*SIDESTEP
+
+	    N=`head -1 /dev/urandom | od -N 2 -t uL | head -n 1 | awk '{print $2}'`
+	    XADD=`expr $N % $RANDSTEP`
+	    N=`head -1 /dev/urandom | od -N 2 -t uL | head -n 1 | awk '{print $2}'`
+	    YADD=`expr $N % $RANDSTEP`
+
+	    let X=X+XADD
+	    let Y=Y+YADD
+
+	    let NODEN=NODEN+1
+
+	    echo "$n $X $Y 0"
+	  done
+          ;;
     "npart")
 	  NODES=`cat $2 | grep -v "#" | awk '{print $1"\n"}' | uniq`
           NODECOUNT=`echo $NODES | wc -w`
