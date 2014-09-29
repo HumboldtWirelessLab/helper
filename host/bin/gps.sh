@@ -58,23 +58,22 @@ gprmc_print() {
 #GPGGA
 gpgga_print() {
 #    echo "$1"
-    LINE=`echo "$1" | sed -e  "s#^.*:.G#G#g" -e "s#^.*:.PG#PG#g" -e "s#^.*:G#G#g" -e "s#\*#,#g" | sed -e "s#,,#,-,#g" -e "s#,,#,-,#g" -e "s#,# #g" `
+    LINE=`echo "$1" | sed -e "s#\*#,#g" | sed -e "s#,,#,-,#g" -e "s#,,#,-,#g" -e "s#,# #g" `
 #    echo "$LINE"
-    TIME=`echo "$LINE" | awk '{print $2}'`
-    LATITUDE=`echo "$LINE" | awk '{print $3}' | sed "s#^[0]*##g" | sed "s#^\.#0.#g"`
-    LATITUDE_POST=`echo "$LINE" | awk '{print $4}'`
-    LONGITUDE=`echo "$LINE" | awk '{print $5}' | sed "s#^[0]*##g" | sed "s#^\.#0.#g"`
-    LONGITUDE_POST=`echo "$LINE" | awk '{print $6}'`
-    QUALITY=`echo "$LINE" | awk '{print $7}'`
-    SATELLITES=`echo "$LINE" | awk '{print $8}' | sed "s#^[0]*##g" | sed "s#^\.#0.#g"`
-    HDOP=`echo "$LINE" | awk '{print $9}'`
-    HOG=`echo "$LINE" | awk '{print $10}'`
-    HOG_POST=`echo "$LINE" | awk '{print $11}'`
-    HGM=`echo "$LINE" | awk '{print $12}'`
-    HGM_POST=`echo "$LINE" | awk '{print $13}'`
-    EMPTY=`echo "$LINE" | awk '{print $14}'`
-    EMPTY2=`echo "$LINE" | awk '{print $15}'`
-    CHECKSUM=`echo "$LINE" | awk '{print $16}'`
+    TIME=`echo "$LINE" | awk '{print $2}' | sed -e "s#:\\$##g"`
+    LATITUDE=`echo "$LINE" | awk '{print $5}' | sed "s#^[0]*##g" | sed "s#^\.#0.#g"`
+    LATITUDE_POST=`echo "$LINE" | awk '{print $6}'`
+    LONGITUDE=`echo "$LINE" | awk '{print $7}' | sed "s#^[0]*##g" | sed "s#^\.#0.#g"`
+    LONGITUDE_POST=`echo "$LINE" | awk '{print $8}'`
+    QUALITY=`echo "$LINE" | awk '{print $9}'`
+    SATELLITES=`echo "$LINE" | awk '{print $10}' | sed "s#^[0]*##g" | sed "s#^\.#0.#g"`
+    HDOP=`echo "$LINE" | awk '{print $11}'`
+    HOG=`echo "$LINE" | awk '{print $12}'`
+    HOG_POST=`echo "$LINE" | awk '{print $13}'`
+    HGM=`echo "$LINE" | awk '{print $14}'`
+    HGM_POST=`echo "$LINE" | awk '{print $15}'`
+    EMPTY=`echo "$LINE" | awk '{print $16}'`
+    CHECKSUM=`echo "$LINE" | awk '{print $17}'`
 
     echo "Time: $TIME"
     echo "Latitude: $LATITUDE $LATITUDE_POST"
@@ -152,23 +151,23 @@ case "$1" in
 		else
 		    N=$2
 		fi
-		gpspipe -t -r -n $N	
+		gpspipe -t -r -n $N
 		;;
 	"getdata")
 		while true; do
-		    line=`gpspipe -t -r -n 5`
-		    echo $line
-		    TYPE=`echo $line | grep GPGGA | tail -n 1 | sed -e  "s#^.*:.G#G#g" -e "s#^.*:.PG#PG#g" -e "s#^.*:G#G#g" -e "s#,# #g" | awk '{print $1}'`
-		    line=`echo $line | grep GPGGA | tail -n 1`
-		    echo $TYPE
+		    line=`gpspipe -t -r -n 10 | grep -v class | grep GPGGA | tail -n 1`
+		    #echo $line
+		    TYPE=`echo $line | sed "s#,# #g" | awk '{print $3}' | sed -e "s#^.G#G#g"`
+		    #echo $TYPE
 		    if [ "$TYPE" = "GPGGA" ]; then
+		        #gpgga_print "$line"
 			QUAL=`gpgga_print "$line" | grep "Qualtity" | awk '{print $2}'`
-			echo $QUAL
+			#echo $QUAL
 			if [ $QUAL -eq 1 ] || [ $QUAL -eq 2 ]; then
 		    	    PREC=`gpgga_print "$line" | grep "HDOP" | awk '{print $2}' | sed "s#\..*##g"`
 			    echo "Pre: $PREC"
 		    	    if [ "x$PREC" != "x" ] && [ $PREC -le 4 ]; then
-				gpspipe -t -r -n 15	
+				gpspipe -t -r -n 15
 				exit 0
 			    fi
 			fi
@@ -234,17 +233,21 @@ case "$1" in
 		LATITUDE=`expr $LATPR2$LATPO / 6`
 		LONG=`echo "$BEST" | grep Longitude | awk '{print $2}'`
 		LONGPR=`echo $LONG | sed "s#\.# #g" | awk '{print $1}'`
-		LONGPO=`echo $LONG | sed "s#\.# #g" | awk '{print $2}'`
+qq		LONGPO=`echo $LONG | sed "s#\.# #g" | awk '{print $2}'`
 		LONGPR1=`echo $LONGPR | cut -b 1,2`
 		LONGPR2=`echo $LONGPR | cut -b 3,4`
 		LONGITUDE=`expr $LONGPR2$LONGPO / 6`
 		echo "$DATE $LATPR1.$LATITUDE $LONGPR1.$LONGITUDE"
 		;;
 	"maps")
-		GPS_DATA=`$0 getposition $2`
+		#GPS_DATA=`$0 getposition $2`
+		#echo "$GPS_DATA"
+		#LATITUDE=`echo "$GPS_DATA" | awk '{print $2}'`
+		#LONGITUDE=`echo "$GPS_DATA" | awk '{print $3}'`
+		GPS_DATA=`$0 getgpspos $2`
 		echo "$GPS_DATA"
-		LATITUDE=`echo "$GPS_DATA" | awk '{print $2}'`
-		LONGITUDE=`echo "$GPS_DATA" | awk '{print $3}'`
+		LATITUDE=`echo "$GPS_DATA" | awk '{print $1}'`
+		LONGITUDE=`echo "$GPS_DATA" | awk '{print $2}'`
 		URL="http://maps.google.com/maps?t=k&hl=de&ie=UTF8&ll=$LATITUDE,$LONGITUDE&spn=0.001521,0.004442&z=18"
 		firefox "$URL"
 		;;
@@ -302,10 +305,10 @@ case "$1" in
           VALID=`echo $LINE | grep "lat" | wc -l`
           if [ $VALID -eq 1 ]; then
             #new gps-tools
-            LAT=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $12}'`
-            LONG=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $14}'`
-            ALT=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $16}'`
-            SPEED=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $26}'`
+            LAT=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $16}'`
+            LONG=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $18}'`
+            ALT=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $20}'`
+            SPEED=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $30}'`
             LATH=`echo $LAT | sed "s#\.# #g" | awk '{print $1}'`
             LATL=`echo $LAT | sed "s#\.# #g" | awk '{print $2}' | cut -b 1-6`
             LONGH=`echo $LONG | sed "s#\.# #g" | awk '{print $1}'`
@@ -315,7 +318,7 @@ case "$1" in
             SPEEDH=`echo $SPEED | sed "s#\.# #g" | awk '{print $1}'`
             SPEEDL=`echo $SPEED | sed "s#\.# #g" | awk '{print $2}' | cut -b 1-6`
 
-            TIME=`echo $LINE | sed "s#:# #g" | sed "s#,# #g" | awk '{print $8}'`
+            TIME=`echo $LINE | sed "s#,# #g" | awk '{print $5}' | sed 's#"time":"##g' | sed 's#\.[0-9]*Z"##g'`
 
             LAT="$LATH.$LATL"
             if [ $LAT != "." ]; then
@@ -378,6 +381,11 @@ case "$1" in
       echo "$LAT $LONG $HOG 0.0"
     fi
     ;;
+    "getgpsposloop")
+    while true; do
+      GPSTIME=yes $0 getgpspos
+    done
+    ;;
 	"help")
 		echo "Take a look at http://www.kowoma.de/gps/zusatzerklaerungen/NMEA.htm"
 		;;
@@ -386,4 +394,4 @@ case "$1" in
 		;;
 esac
 
-exit 0		
+exit 0
