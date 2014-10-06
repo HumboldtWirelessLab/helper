@@ -84,7 +84,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef PLE
   pli::PacketLossInformation();
 #ifdef COOPCST
-  ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, COOPCHANNELSTATS cocst, DEVICE $device, HNWORST false, DEBUG 4);
+  ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, COOPCHANNELSTATS cocst, DEVICE $device, HNWORST false, DEBUG 2);
 #else
   ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, DEVICE $device, HNWORST false, DEBUG 2);
 #endif
@@ -114,10 +114,10 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 
   bo_const::BoConstant(BO BOCONST_VALUE, DEBUG 2);
 
-  bo_minstrel::BoMinstrel(DEBUG 4);
+  bo_minstrel::BoMinstrel(DEBUG 2);
 
 #ifdef COOPCST_STRING
-  bo_mshare::BoMediumShare(CHANNELSTATS CST, COOPCHANNELSTATSPATH COOPCST_STRING, HIDDENNODE hnd, BO 32, DEBUG 4);
+  bo_mshare::BoMediumShare(CHANNELSTATS CST, COOPCHANNELSTATSPATH COOPCST_STRING, HIDDENNODE hnd, BO 32, DEBUG 2);
 #endif
 #endif
 #endif
@@ -179,7 +179,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
                             MAC_BO_SCHEME TOS2QUEUEMAPPER_MAC_BO_SCHEME,                                        /*   0 - Default (Exp)   1- Exp   2 - Fib   */
                             QUEUEMODE TOS2QUEUEMAPPER_QUEUEMODE, QUEUEVAL TOS2QUEUEMAPPER_QUEUEVAL,             /*   Mode: 0-Exp 1-Mul 2-Add 3-Fib    */
                             CWMINMAXMODE TOS2QUEUEMAPPER_CWMINMAXMODE, CWMINMAXVAL TOS2QUEUEMAPPER_CWMINMAXVAL, /*   cwminmaxval -> retries; Mode: 0-Exp 1-Mul 2-Add 3-Fib    */
-                            QUEUEMAPPING TOS2QUEUEMAPPER_QUEUEMAPPING, DEBUG 4)
+                            QUEUEMAPPING TOS2QUEUEMAPPER_QUEUEMAPPING, DEBUG 2)
 #endif
 #endif //SIMULATION
 #endif
@@ -192,17 +192,17 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 
 #ifdef RTSCTS_HN
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random rtscts_hiddennode")
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random rtscts_hiddennode", DEBUG 2)
 #else
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random")
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random" DEBUG 2)
 #endif
 
 #else
 
 #ifdef CERR
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random rtscts_hiddennode")
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random rtscts_hiddennode", DEBUG 2)
 #else
-  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random")
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random", DEBUG 2)
 #endif
 
 #endif
