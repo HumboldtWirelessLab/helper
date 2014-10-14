@@ -83,7 +83,7 @@ def gen_nodes_mac():
 		if len(node_id_l) == 1:
 			node_id_l = "0" + node_id_l
 
-		print(line[0].rstrip('\n') + " " + line[1].rstrip('\n') + " 00-00-00-00-" + node_id_h + "-"+ node_id_l + " {0}".format(node_id))
+		print(line[0].rstrip('\n') + " " + line[1].rstrip('\n') + " 00-00-00-00-" + node_id_h.upper() + "-"+ node_id_l.upper() + " {0}".format(node_id))
 		
 
 check_args()
