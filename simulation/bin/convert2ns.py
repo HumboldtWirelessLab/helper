@@ -2,6 +2,7 @@
 import csv
 import sys
 import time
+import re
 from optparse import OptionParser
 
 
@@ -75,7 +76,7 @@ def print_ns():
 	for line in tsvfile:
 		#print("" + line[0] + " " + cfg_node_to_num_map[line[0]] + " " + cfg_node_mac_map[line[0]] + " " + cfg_node_to_x_map[line[0]] + " " + cfg_node_to_y_map[line[0]] + " " + cfg_node_to_z_map[line[0]])
 		print("set node_name(" + cfg_node_to_num_map[line[0]] + ") \"" + line[0] + "\"")
-		print("set node_mac(" + cfg_node_to_num_map[line[0]] + ") \"" + cfg_node_mac_map[line[0]] + "\"")
+		print("set node_mac(" + cfg_node_to_num_map[line[0]] + ") \"" + re.sub('-',':',cfg_node_mac_map[line[0]]) + "\"")
 		print("set pos_x(" + cfg_node_to_num_map[line[0]] + ") " + cfg_node_to_x_map[line[0]])
 		print("set pos_y(" + cfg_node_to_num_map[line[0]] + ") " + cfg_node_to_y_map[line[0]])
 		print("set pos_z(" + cfg_node_to_num_map[line[0]] + ") " + cfg_node_to_z_map[line[0]])

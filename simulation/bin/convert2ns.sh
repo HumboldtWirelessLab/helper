@@ -37,13 +37,13 @@ else
 fi
 
 if [ "x$CWMIN" = "x" ]; then
-	CWMIN=$DEFAULT_CWMIN
+	CWMIN="$DEFAULT_CWMIN"
 fi
 if [ "x$CWMAX" = "x" ]; then
-	CWMAX=$DEFAULT_CWMAX
+	CWMAX="$DEFAULT_CWMAX"
 fi
 if [ "x$AIFS" = "x" ]; then
-	AIFS=$DEFAULT_AIFS
+	AIFS="$DEFAULT_AIFS"
 fi
 
 TCLFILE="$RESULTDIR/$NAME.tcl"
