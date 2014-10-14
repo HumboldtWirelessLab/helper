@@ -23,53 +23,78 @@ def check_args():
 	optParser.add_option("", "--tcl-file", dest="tcl_file", help="TCL output file")
 	optParser.add_option("", "--node-list", dest="node_list", help="List of nodes")
 	optParser.add_option("", "--used-simulator", dest="used_simulator", help="Used simulator")
-	optParser.add_option("", "--node-to-click-map", dest="node_to_clickfile_map", help="list of click files ( used to map node to click file)")
-	optParser.add_option("", "--node-to-num-map", dest="node_to_num_map", help="list of nums")
-	optParser.add_option("", "--node-name-sed-arg", dest="node_name_sed_arg", help="used to replace FIRSTNODE, LASTNODE by node name")
-	optParser.add_option("", "--node-mac-sed-arg", dest="node_mac_sed_arg", help="used to replace node:eth by mac")
+	optParser.add_option("", "--node-to-click-map-file", dest="node_to_clickfile_map_file", help="file with list of click files ( used to map node to click file)")
+	optParser.add_option("", "--node-to-num-map-file", dest="node_to_num_map_file", help="file with list of nums")
 	optParser.add_option("", "--jist-property-file", dest="jist_property_file", help="path to jist property file")
 	(options, args) = optParser.parse_args()
 
 	if not options.control_file or not options.node_list or \
-		not options.used_simulator or not options.node_to_clickfile_map or \
-		not options.node_to_num_map or not options.node_name_sed_arg or \
-		not options.node_mac_sed_arg or not options.tcl_file:
+		not options.used_simulator or not options.node_to_clickfile_map_file or \
+		not options.node_to_num_map_file or \
+		not options.tcl_file:
 		optParser.print_help()
 		sys.exit(-1)
 	
 	cfg_control_file = options.control_file
 	cfg_used_simulator = options.used_simulator
 	cfg_tcl_file = options.tcl_file
+	
 	if options.jist_property_file:
 		cfg_jist_property_file = options.jist_property_file
 	else:
 		cfg_jist_property_file = ""
 	
 	cfg_node_list = options.node_list.split('\n')
-	node_to_clickfile_map = options.node_to_clickfile_map.split(" ")
-	node_to_num_map = options.node_to_num_map.split(" ")
+	
 	len_nodes = len(cfg_node_list)
-	len_click = len(node_to_clickfile_map)
-	len_nums = len(node_to_num_map)
+
+  #clickfilemap
+	cfg_node_to_clickfile_map = dict()
+	len_click = 0
+
+	f = open(options.node_to_clickfile_map_file)
+
+	## define csv reader object, assuming delimiter is tab
+	tsvfile = csv.reader(f, delimiter=' ')
+
+	## iterate through lines in file
+	for line in tsvfile:
+		len_click = len_click + 1
+		
+		cfg_node_to_clickfile_map[line[0]] = line[6]
+
+	f.close()
+	
+
+	
+  #nodesmacmap
+	cfg_node_to_num_map = dict()
+	cfg_node_mac_map = []
+	
+	len_nums = 0
+	
+	f = open(options.node_to_num_map_file)
+	tsvfile = csv.reader(f, delimiter=' ')
+	for line in tsvfile:
+		if len_nums == 0:
+			cfg_first_node = line[0]
+			cfg_node_to_num_map["FIRSTNODE"] = int(line[3])
+			cfg_node_mac_map.append(["FIRSTNODE:eth",line[2]])
+
+		cfg_node_to_num_map[line[0]] = int(line[3])
+		cfg_node_mac_map.append([line[0]+":eth", line[2]])
+
+		len_nums = len_nums + 1	
+
+	cfg_last_node = line[0]
+	cfg_node_to_num_map["LASTNODE"] = int(line[3])
+	cfg_node_mac_map.append(["LASTNODE:eth",line[2]])
+	
+	f.close()
+	
 	if len_nodes != len_nums or len_nodes != len_click:
 		print("Invalid input: Length of node-list({0}) needs to match length of click-map({1}) and length of num-map({2}).".format(len_nodes, len_click, len_nums))
 		sys.exit(-1)
-
-	cfg_node_to_clickfile_map = dict()
-	cfg_node_to_num_map = dict()
-	for i, node in enumerate(cfg_node_list):
-		cfg_node_to_clickfile_map[node] = node_to_clickfile_map[i]
-		cfg_node_to_num_map[node] = int(node_to_num_map[i])
-
-	node_name_sed_list = options.node_name_sed_arg.split("#")
-	cfg_first_node = node_name_sed_list[2]
-	cfg_last_node = node_name_sed_list[5]
-
-	node_mac_list = options.node_mac_sed_arg.replace("-e s#","").replace("#g","").split()
-	cfg_node_mac_map = []
-	for e in node_mac_list:
-		cfg_node_mac_map.append(tuple(e.split("#")))
-	
 
 def print_cfg():
 	print("control file      : " + cfg_control_file)
@@ -186,7 +211,7 @@ def decode():
 
 			if five_secs_gone():
 				update_progress(line_number, max_lines)
-	print
+#	print
 
 
 def init_time_measurement():
@@ -204,4 +229,5 @@ def five_secs_gone():
 
 init_time_measurement()
 check_args()
+#print_cfg()
 decode()
