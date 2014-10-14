@@ -52,7 +52,7 @@ $ns_ use-scheduler Heap
 # Create and activate trace files.
 #
 if { $enable_tr == 1 } {
-  set tracefd     [open "RESULTDIR/NAME.tr" w]
+  set tracefd     [open $trfilename w]
 } else {
   set tracefd     [open "/dev/null" w]
 }
@@ -60,7 +60,7 @@ if { $enable_tr == 1 } {
 $ns_ trace-all $tracefd
 
 if { $enable_nam == 1 } {
-  set namtrace    [open "RESULTDIR/NAME.nam" w]
+  set namtrace    [open $namfilename w]
 } else {
   set namtrace    [open "/dev/null" w]
 }
@@ -183,3 +183,10 @@ set xmitrate 4
 set xmitinterval 0.25
 set packetsize 64
 
+#
+# This sizes the nodes for use in nam. Currently, the trace files
+# produced by nsclick don't really work in nam.
+#
+for {set i 0} {$i < $nodecount} {incr i} {
+    $ns_ initial_node_pos $node_($i) 20
+}

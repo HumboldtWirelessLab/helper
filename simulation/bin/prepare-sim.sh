@@ -48,7 +48,7 @@ if [ "x$LOGLEVEL" = "x1" ]; then echo "sim is $USED_SIMULATOR"; fi
 
 case "$1" in
 	"help")
-		echo "Use $0 prepare dis-file"
+		echo "Use $0 prepare des-file"
 		;;
 	"prepare")
 		SIMDIS=$2
@@ -60,7 +60,10 @@ case "$1" in
 
 		ALLNODES="| "`cat $CONFIGDIR/$NODETABLE`
 
-		echo -n "" > $RESULTDIR/$NODETABLE.$POSTFIX
+		MES_VAR=""
+
+		declare -A nodes_in_map
+
 		while read line; do
 		    ISCOMMENT=`echo $line | grep "#" | wc -l`
 		    if [ $ISCOMMENT -eq 0 ]; then
@@ -81,7 +84,7 @@ case "$1" in
 			  GROUP_LIMIT=0
 			fi
 
-		        CNODES=`cat $CONFIGDIR/$GROUP | grep -v "#"`
+		        CNODES=`grep -v "#" $CONFIGDIR/$GROUP`
 		        #echo "NODES: $CNODE"
 		      else
 	                ISRANDOM=`echo $CNODE | grep "random:" | wc -l`
@@ -94,15 +97,15 @@ case "$1" in
 			
 			  CNODES=""
 			  while [ $NO_NODES -lt $LIMIT ]; do
-			    NEW_NODE="sk$AC_NODEID"
+			    NEW_NODE="node$AC_NODEID"
 
 			    let AC_NODEID=AC_NODEID+1
 
-			    NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$NEW_NODE[[:space:]]" | wc -l`
-			    #NODEINFILE2=`cat $CONFIGDIR/$NODETABLE | grep -e "^$NEW_NODE[[:space:]]*" | wc -l`
-			    NODEINFILE2=`echo $ALLNODES | grep -e "[[:space:]]$NEW_NODE[[:space:]]" | wc -l`
+			    NODEINFILE=`echo $ALLNODES | grep -e "[[:space:]]$NEW_NODE[[:space:]]" | wc -l`
 
-			    if [ $NODEINFILE -eq 0 ] && [ $NODEINFILE2 -eq 0 ]; then
+			    ncheck=${nodes_in_map[$NEW_NODE]}
+
+			    if [ "x$ncheck" = "x" ] && [ $NODEINFILE -eq 0 ]; then
 			      CNODES="$CNODES $NEW_NODE"
 			      let NO_NODES=NO_NODES+1
 			    fi
@@ -120,7 +123,7 @@ case "$1" in
                       NODES_OF_GROUP=0
 
 		      if [ "x$USED_SIMULATOR" = "xns" ] || [ "x$USED_SIMULATOR" = "xns3" ]; then
-			  DEVICE_TMPL=`echo $CDEV | grep "dev" | wc -l`
+			  DEVICE_TMPL=`echo $CDEV | grep "DEV" | wc -l`
 			  if [ $DEVICE_TMPL -eq 0 ]; then
 			    CDEV=eth0
 			  else
@@ -128,7 +131,7 @@ case "$1" in
 			    CDEV="eth$CDEV"
 			  fi
 		      else
-			  DEVICE_TMPL=`echo $CDEV | grep "dev" | wc -l`
+			  DEVICE_TMPL=`echo $CDEV | grep "DEV" | wc -l`
 			  if [ $DEVICE_TMPL -eq 0 ]; then
 			    CDEV=ath0
 			  else
@@ -157,7 +160,7 @@ case "$1" in
 
 		#echo "$WIFICONFIG"
 
-	        if [ "x$USED_SIMULATOR" = "xjist" ]; then	
+	  if [ "x$USED_SIMULATOR" = "xjist" ]; then
 		  cp $WIFICONFIG $RESULTDIR
 
 		  if [ "x$WIFITYPE" = "x" ] || [ "x$WIFITYPE" = "x0" ] || [ "x$WIFITYPE" = "xDEFAULT" ]; then
@@ -175,114 +178,117 @@ case "$1" in
 		  WIFITYPE=$WIFITYPE_EXTRA
 		fi
 
-                . $DIR/../../nodes/etc/wifi/default
-                if [ "x$CWMIN" = "x" ]; then
-                  CWMIN=$DEFAULT_CWMIN
-                fi
-	        if [ "x$CWMAX" = "x" ]; then
-	          CWMAX=$DEFAULT_CWMAX
-	        fi
-	        if [ "x$AIFS" = "x" ]; then
-	          AIFS=$DEFAULT_AIFS
-	        fi
-	
-		AIFS=`echo $AIFS | sed "s# #\\\\ #g"`
-		CWMIN=`echo $CWMIN | sed "s# #\\\\ #g"`
-		CWMAX=`echo $CWMAX | sed "s# #\\\\ #g"`
-
 		STARTCPPOPTS=""
-                STARTCPPOPTS="$STARTCPPOPTS -DNODEDEVICE=$CDEV -DTIME=$TIME"
-                STARTCPPOPTS="$STARTCPPOPTS -DDEBUGLEVEL=$DEBUG"
-                STARTCPPOPTS="$STARTCPPOPTS -DSIMULATION"
+    STARTCPPOPTS="$STARTCPPOPTS -DNODEDEVICE=$CDEV -DTIME=$TIME"
+    STARTCPPOPTS="$STARTCPPOPTS -DDEBUGLEVEL=$DEBUG"
+    STARTCPPOPTS="$STARTCPPOPTS -DSIMULATION"
 
 		if [ "x$USED_SIMULATOR" = "xns" ] && [ "x$GUICONNECTOR" = "xyes" ]; then
 		  STARTCPPOPTS="$STARTCPPOPTS -DGUICONNECTOR" 
 		fi
 
-                if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
-                  CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
-                  if [ -e $CLICK ] || [ -e $CONFIGDIR/$CLICK ]; then
-                     CLICKBASENAME=`basename $CLICK`
-                     HAS_BRNINCLUDE=`cat $CLICK | grep '#include "brn/helper.inc"' | wc -l`
+		if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
+			CLICK=`echo $CLICK | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g"`
+			if [ -e $CLICK ] || [ -e $CONFIGDIR/$CLICK ]; then
+				 CLICKBASENAME=`basename $CLICK`
+				 HAS_BRNINCLUDE=`grep '#include "brn/helper.inc"' $CLICK | wc -l`
 
-                     NODEID_INC=`(cd $CONFIGDIR; cat $CLICK | grep -v "^//" | grep "BRN2NodeIdentity" | wc -l)`
+				 NODEID_INC=`(cd $CONFIGDIR; grep -v "^//" $CLICK | grep "BRN2NodeIdentity" | wc -l)`
 
-                     if [ $NODEID_INC -gt 0 ]; then
-                       STARTCPPOPTS="$STARTCPPOPTS -DNODEID_NAME"
-                     fi
+				 if [ $NODEID_INC -gt 0 ]; then
+					 STARTCPPOPTS="$STARTCPPOPTS -DNODEID_NAME"
+				 fi
 
-                  else
-                     CLICK="-"
-                  fi
-                fi
+			else
+				 CLICK="-"
+			fi
+		fi
 
-                NODE_IN_CNODES=1
+		NODE_IN_CNODES=1
 
-		      for CNODE in $CNODES; do
+#		echo "tab start" >> $RESULTDIR/time.log
+#		date +"%s:%N" >> $RESULTDIR/time.log
 
-			if [ $GROUP_LIMIT -ne 0 ]; then
-			  if [ $NODES_OF_GROUP -eq $GROUP_LIMIT ]; then
+		declare -A cnodes_map
+
+		for CNODE in $CNODES; do
+
+			if [ $GROUP_LIMIT -ne 0 ] && [ $NODES_OF_GROUP -eq $GROUP_LIMIT ]; then
 			    #echo "Reach Nodeslimit: $NODES_OF_GROUP of $GROUP_LIMIT"
 			    break;
-			  fi
 			fi
 
-			
-		        NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$CNODE[[:space:]]*$CDEV" | wc -l`
-
-        		if [ $NODEINFILE -ne 0 ]; then
-            		    #echo "Found node $CNODE with device $CDEV. Step over"  
-			    continue
+			ncheckkey="$CNODE$CDEV"
+			#check whether node is already in group or in the file (e.g. other group)
+			ncheck=${cnodes_map[$ncheckkey]}
+			map_ncheck=${nodes_in_map[$CNODE]}
+			if [ "x$ncheck" != "x" ] || [ "x$map_ncheck" != "x" ]; then
+			  continue
 			else
 			  let NODES_OF_GROUP=NODES_OF_GROUP+1
 			fi
+			
+			cnodes_map[$ncheckkey]=$ncheckkey
+			nodes_in_map[$CNODE]=$CNODE
 
-            if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
-                if [ "x$USE_SINGLE_CLICKFILE" = "x1" ] ; then
-                  CLICKFINALNAME="$RESULTDIR/$CLICKBASENAME.$CDEV"
-                else
-                  CLICKFINALNAME="$RESULTDIR/$CLICKBASENAME.$CNODE.$CDEV"
-               fi
+      if [ ! "x$CLICK" = "x" ] && [ ! "x$CLICK" = "x-" ]; then
+        if [ "x$USE_SINGLE_CLICKFILE" = "x1" ] ; then
+          CLICKFINALNAME="$RESULTDIR/$CLICKBASENAME.$CDEV"
+        else
+          CLICKFINALNAME="$RESULTDIR/$CLICKBASENAME.$CNODE.$CDEV"
+  	    fi
 
-		NODEWIFITYPE=$WIFITYPE
+				NODEWIFITYPE=$WIFITYPE
 
-		CPPOPTS="$STARTCPPOPTS"
+				CPPOPTS="$STARTCPPOPTS"
 		
-		#echo "DUMP: $DUMPFILEDIR" >> $RESULTDIR/debug.txt
-		if [ "x$DUMPFILEDIR" != "x" ]; then
-		  if  [ -e $PWD/$DUMPFILEDIR ]; then
-		    DUMPFILEDIR=$PWD/$DUMPFILEDIR
-		  fi
-		  DUMPFILESRC="$DUMPFILEDIR/$CNODE.$CDEV.raw.dump"
-		  #echo "SRC: $DUMPFILESRC" >> $RESULTDIR/debug.txt
-		  if [ -e $DUMPFILESRC ]; then
-		    NODEWIFITYPE=`test_header.sh $DUMPFILESRC`
-		    #echo "WIFI: $NODEWIFITYPE" >> $RESULTDIR/debug.txt
-		    CPPOPTS="$CPPOPTS -DDUMPDEVICE -DDUMPFILESRC=\"$DUMPFILESRC\""
-		    #echo "CPPOPTS: $CPPOPTS" >> $RESULTDIR/debug.txt
-		  fi
-		fi
+				#echo "DUMP: $DUMPFILEDIR" >> $RESULTDIR/debug.txt
+				if [ "x$DUMPFILEDIR" != "x" ]; then
+					if  [ -e $PWD/$DUMPFILEDIR ]; then
+						DUMPFILEDIR=$PWD/$DUMPFILEDIR
+					fi
+					DUMPFILESRC="$DUMPFILEDIR/$CNODE.$CDEV.raw.dump"
+					#echo "SRC: $DUMPFILESRC" >> $RESULTDIR/debug.txt
+					if [ -e $DUMPFILESRC ]; then
+						NODEWIFITYPE=`test_header.sh $DUMPFILESRC`
+						#echo "WIFI: $NODEWIFITYPE" >> $RESULTDIR/debug.txt
+						CPPOPTS="$CPPOPTS -DDUMPDEVICE -DDUMPFILESRC=\"$DUMPFILESRC\""
+						#echo "CPPOPTS: $CPPOPTS" >> $RESULTDIR/debug.txt
+					fi
+				fi
 
+				CPPOPTS="$CPPOPTS -DNODEDEVICE=$CDEV"
 
-                if [ "x$USE_SINGLE_CLICKFILE" = "x1" ] ; then
-                  CPPOPTS="$CPPOPTS -DNODENAME=auto -DWIFITYPE=$NODEWIFITYPE"
-                  if [ $NODE_IN_CNODES -eq 1 ]; then
-                    ( cd $CONFIGDIR; cat $CLICK | add_include $HAS_BRNINCLUDE | cpp -I$DIR/../../measurement/etc/click $CPPOPTS | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" | grep -v "^#" > $CLICKFINALNAME ) &
-                  fi
-                  let NODE_IN_CNODES=NODE_IN_CNODES+1
-                else
-                  CPPOPTS="$CPPOPTS -DNODENAME=$CNODE -DWIFITYPE=$NODEWIFITYPE"
-                  ( cd $CONFIGDIR; cat $CLICK | add_include $HAS_BRNINCLUDE | cpp -I$DIR/../../measurement/etc/click $CPPOPTS | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" | grep -v "^#" > $CLICKFINALNAME ) &
-                fi
-            else
-              CLICKFINALNAME="-"
-            fi
+				if [ "x$USE_SINGLE_CLICKFILE" = "x1" ] ; then
+					if [ $NODE_IN_CNODES -eq 1 ]; then
+						CPPOPTS="$CPPOPTS -DNODENAME=auto -DWIFITYPE=$NODEWIFITYPE"
+						( cd $CONFIGDIR; cat $CLICK | add_include $HAS_BRNINCLUDE | cpp -I$DIR/../../measurement/etc/click $CPPOPTS | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" | grep -v "^#" > $CLICKFINALNAME ) &
+					fi
+					let NODE_IN_CNODES=NODE_IN_CNODES+1
+				else
+					CPPOPTS="$CPPOPTS -DNODENAME=$CNODE -DWIFITYPE=$NODEWIFITYPE"
+					( cd $CONFIGDIR; cat $CLICK | add_include $HAS_BRNINCLUDE | cpp -I$DIR/../../measurement/etc/click $CPPOPTS | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" | grep -v "^#" > $CLICKFINALNAME ) &
+				fi
+			else
+				CLICKFINALNAME="-"
+			fi
 
-            echo "$CNODE $CDEV $CMODDIR $CMODOPT $WIFICONFIG $CCMODDIR $CLICKFINALNAME $CCLOG $CAPP $CAPPL" | sed -e "s#LOGDIR#$LOGDIR#g" | sed -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" >> $RESULTDIR/$NODETABLE.$POSTFIX
+			MES_VAR="$MES_VAR$CNODE $CDEV $CMODDIR $CMODOPT $WIFICONFIG $CCMODDIR $CLICKFINALNAME $CCLOG $CAPP $CAPPL\n"
 
-          done
+	done
+
+	unset cnodes_map
+
+#          echo "tab fin" >> $RESULTDIR/time.log
+#          date +"%s:%N" >> $RESULTDIR/time.log
+
       fi
 		done < $CONFIGDIR/$NODETABLE
+
+		echo -e -n $MES_VAR | sed -e "s#LOGDIR#$LOGDIR#g" -e "s#WORKDIR#$RESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $RESULTDIR/$NODETABLE.$POSTFIX
+		
+		unset nodes_in_map
+
 		;;
 	"cleanup")
 		echo "Not supported"
