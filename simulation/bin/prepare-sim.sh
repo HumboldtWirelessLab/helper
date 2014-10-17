@@ -92,7 +92,8 @@ case "$1" in
 			  		GROUP_LIMIT=0
 					fi
 
-		    	CNODES=`grep -v "#" $CONFIGDIR/$GROUP`
+					#READ NODES OF GROUP FROM FILE, FIRST COL IS NAME OF NODES
+		    	CNODES=`grep -v "#" $CONFIGDIR/$GROUP | awk '{print $1}'`
 		    	#echo "NODES: $CNODE"
 		  	else
 	      	ISRANDOM=`echo $CNODE | grep "random:" | wc -l`
