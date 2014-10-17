@@ -134,10 +134,18 @@ case "$MODE" in
 
 		if [ "x$NODEPLACEMENT" != "xfile" ]; then
 			cat $DESCRIPTIONFILE | sed -e "s#[[:space:]]*NODEPLACEMENTFILE[[:space:]]*=.*##g" -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
+			
+			#make sure that there is a end of line
+			echo "" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
+		
 			echo "NODEPLACEMENTFILE=$FINALRESULTDIR/placementfile.plm" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 		else
 			cat $DESCRIPTIONFILE | sed -e "s#WORKDIR#$FINALRESULTDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" > $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
+
+			#make sure that there is a end of line
+			echo "" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 		fi
+
 
 		if [ "x$NODEPLACEMENT" = "x" ]; then
 			echo "use default plm"
