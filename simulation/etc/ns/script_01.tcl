@@ -43,6 +43,8 @@ add-packet-header Raw IP TCP Mac LL ARP
 
 set ns_		[new Simulator]
 
+Scheduler/Calendar set adjust_new_width_interval_ 10;	# the interval (in unit of resize times) we recalculate bin width. 0 means disable dynamic adjustment
+Scheduler/Calendar set min_bin_width_ 1e-21;		# the lower bound for the bin_width
 #$ns_ use-scheduler Calendar
 $ns_ use-scheduler Heap
 #$ns_ use-scheduler List
