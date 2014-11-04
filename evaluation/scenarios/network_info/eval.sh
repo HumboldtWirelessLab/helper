@@ -54,16 +54,8 @@ fi
 ###############################################################################
 echo "Create sed arg"
 
-FULLSED=""
-FULLMACSED=""
-while read line; do
-  SRCN=`echo $line | awk '{print $1}'`
-  SRCID=`echo $line | awk '{print $4}'`
-  SRCMAC=`echo $line | awk '{print $3}'`
-
-  FULLSED="$FULLSED -e s#^$SRCID\$#$SRCN#g"
-  FULLMACSED="$FULLMACSED -e s#$SRCMAC#$SRCID#g"
-done < $RESULTDIR/nodes.mac
+FULLSED=`generate_sedargs.py --nodesmacfile=$RESULTDIR/nodes.mac --mode=id2name`
+FULLMACSED=`generate_sedargs.py --nodesmacfile=$RESULTDIR/nodes.mac --mode=mac2id`
 
 ###############################################################################
 # set evaluation sub dir
@@ -81,8 +73,8 @@ echo "Create linkmetric matrix"
 THRESHOLD=400
 
 if [ ! -f $EVALUATIONSDIR/linksmetric.all ]; then
-  cat $DATAFILE | grep "link from" | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | grep -v "=" | sort -u > $EVALUATIONSDIR/linksmetric.all
-  cat $EVALUATIONSDIR/linksmetric.all | sed $FULLMACSED > $EVALUATIONSDIR/linksmetric.mat
+  grep "link from" $DATAFILE | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | grep -v "=" | sort -u > $EVALUATIONSDIR/linksmetric.all
+  sed $FULLMACSED $EVALUATIONSDIR/linksmetric.all > $EVALUATIONSDIR/linksmetric.mat
 fi
 
 NODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
@@ -92,8 +84,7 @@ echo "Create linkgraph (Threshold: $THRESHOLD)"
 if [ ! -f $EVALUATIONSDIR/graph.txt ]; then
 
   (cd $DIR; matwrapper "try,metric2graph('$EVALUATIONSDIR/linksmetric.mat','$EVALUATIONSDIR/graph.csv',$THRESHOLD),catch,exit(1),end,exit(0)" 1> /dev/null)
-  cat $EVALUATIONSDIR/graph.csv | sed "s#,# #g" > $EVALUATIONSDIR/graph.txt
-
+  sed "s#,# #g" $EVALUATIONSDIR/graph.csv > $EVALUATIONSDIR/graph.txt
 fi
 
 ###############################################################################
@@ -118,7 +109,7 @@ echo "Create clusterfiles and nodedegree!"
 
 if [ ! -f $EVALUATIONSDIR/cluster_0.csv ]; then
   #create cluster file for hole network
-  cat $RESULTDIR/nodes.mac | awk '{print $4}' > $EVALUATIONSDIR/cluster_0.csv
+  awk '{print $4}' $RESULTDIR/nodes.mac > $EVALUATIONSDIR/cluster_0.csv
 fi
 
 ( cd $EVALUATIONSDIR; for i in `ls cluster_*.csv`; do N=`echo $i | sed "s#csv#grp#g"`; cat $i | sed $FULLSED > $N; done )
