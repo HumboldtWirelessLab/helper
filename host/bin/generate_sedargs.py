@@ -59,6 +59,41 @@ def print_cfg():
 def gen_sedargs():
 	node_num = 0
 
+	if cfg_mode == "mac2id":
+		for line in lines:
+			node_mac = line[2]
+			node_id = line[3]
+
+			print(" -e s#" + node_mac + "#" + node_id +"#g"),
+
+	if cfg_mode == "mac2name":
+		for line in lines:
+			node_mac = line[2]
+			node_name = line[0]
+
+			print(" -e s#" + node_mac + "#" + node_name +"#g"),
+
+	if cfg_mode == "name2id":
+		for line in lines:
+			node_name = line[0]
+			node_id = line[3]
+
+			print(" -e s#" + node_name + "#" + node_id +"#g"),
+
+	if cfg_mode == "id2mac":
+		for line in lines:
+			node_mac = line[2]
+			node_id = line[3]
+
+			print(" -e \"s#\(^\|\s\+\)\(" + node_id + "\)\(\s\+\|\$\)#\\1" + node_mac + "\\3#g\""),
+
+	if cfg_mode == "id2name":
+		for line in lines:
+			node_name = line[0]
+			node_id = line[3]
+
+			print(" -e \"s#\(^\|\s\+\)\(" + node_id + "\)\(\s\+\|\$\)#\\1" + node_name + "\\3#g\""),
+
 	if cfg_mode == "nameeth2id":
 		for line in lines:
 			node_name = line[0]
