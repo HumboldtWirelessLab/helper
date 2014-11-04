@@ -52,6 +52,22 @@ if [ ! -e $RESULTDIR ]; then
 	mkdir -p $RESULTDIR
 fi
 
+#run localprocess
+if [ "x$LOCALPROCESS" != x ]; then
+  FULLLOCALPROCESS=""
+
+  if [ -f $LOCALPROCESS ]; then
+    FULLLOCALPROCESS=$LOCALPROCESS
+  elif [ -e $CONFIGDIR/$LOCALPROCESS ]; then
+    FULLLOCALPROCESS=$CONFIGDIR/$LOCALPROCESS
+  fi
+
+  if [ "x$FULLLOCALPROCESS" != "x" ]; then
+    MODE=sim RUNTIME=$TIME RESULTDIR=$RESULTDIR NODELIST=\"$NODELIST\" DESFILE=$DESFILE $FULLLOCALPROCESS start >> $RESULTDIR/localapp.log 2>&1
+  fi
+
+fi
+
 if [ -f /usr/bin/time ]; then
 	QUIETSUPPORT=`/usr/bin/time --help | grep "quiet" | wc -l`
 	if [ $QUIETSUPPORT -gt 0 ]; then
@@ -65,7 +81,7 @@ fi
 
 # Final stage: valgrind-check and experiment evaluation
 if [ "x$USED_SIMULATOR" = "xns" ]; then
-  TCLFILE=$NAME.tcl
+	TCLFILE=$NAME.tcl
 
 	echo "Running NS2"
 	
@@ -89,10 +105,13 @@ if [ "x$USED_SIMULATOR" = "xns" ]; then
 			SUPPRESSION="--suppressions=$DIR/../etc/ns/ns.supp"
 		fi
 
-		NS_CMD="$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$FINALRESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE"
+		NS_CMD="$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$RESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE"
 	elif [ "x$PROFILE" = "x1" ]; then
 		NS_FULL_PATH=`which ns`
 		NS_CMD="$GETTIMESTATS valgrind --tool=callgrind --collect-jumps=yes --callgrind-out-file=$RESULTDIR/callgrind.out $NS_FULL_PATH $TCLFILE"
+	elif [ "x$CACHEPROFILE" = "x1" ]; then
+		NS_FULL_PATH=`which ns`
+		NS_CMD="$GETTIMESTATS valgrind --tool=cachegrind --cachegrind-out-file=$RESULTDIR/cachegrind.out --log-file=$RESULTDIR/cachegrind.log $NS_FULL_PATH $TCLFILE"
 	elif [ "x$GDB" = "x1" ]; then
 		NS_FULL_PATH=`which ns`
 		echo "run" > $RESULTDIR/gdb.cmd
