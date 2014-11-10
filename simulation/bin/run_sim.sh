@@ -156,7 +156,11 @@ case "$MODE" in
 		fi
 
 		if [ "x$NODEPLACEMENT" != "xfile" ]; then
-			FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
+			if [ "x$NODEPLACEMENTFILE" = "x" ]; then
+				FINALPLMFILE=$FINALRESULTDIR/placementfile.plm
+			else
+				FINALPLMFILE=$FINALRESULTDIR/$NODEPLACEMENTFILE
+			fi
 		else
 			#use Placementfile
 			if [ -e $DIR/../etc/nodeplacement/$NODEPLACEMENTFILE ]; then
@@ -177,6 +181,8 @@ case "$MODE" in
 					fi
 				fi
 			fi
+			mv $FINALPLMFILE $FINALRESULTDIR/$NODEPLACEMENTFILE
+			FINALPLMFILE=$FINALRESULTDIR/$NODEPLACEMENTFILE
 		fi
 
 		echo "gen clickfile" >> $FINALRESULTDIR/time.log
