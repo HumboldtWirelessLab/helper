@@ -50,14 +50,6 @@ else
 fi
 
 ###############################################################################
-# create sed arg  for nodenamereplacement
-###############################################################################
-echo "Create sed arg"
-
-FULLSED=`generate_sedargs.py --nodesmacfile=$RESULTDIR/nodes.mac --mode=id2name`
-FULLMACSED=`generate_sedargs.py --nodesmacfile=$RESULTDIR/nodes.mac --mode=mac2id`
-
-###############################################################################
 # set evaluation sub dir
 ###############################################################################
 EVALUATIONSDIR="$EVALUATIONSDIR""/network_info"
@@ -74,7 +66,7 @@ THRESHOLD=400
 
 if [ ! -f $EVALUATIONSDIR/linksmetric.all ]; then
   grep "link from" $DATAFILE | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | grep -v "=" | sort -u > $EVALUATIONSDIR/linksmetric.all
-  sed $FULLMACSED $EVALUATIONSDIR/linksmetric.all > $EVALUATIONSDIR/linksmetric.mat
+  cat $EVALUATIONSDIR/linksmetric.all | MAC2NUM=1 human_readable.sh $RESULTDIR/nodes.mac > $EVALUATIONSDIR/linksmetric.mat
 fi
 
 NODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
@@ -112,7 +104,7 @@ if [ ! -f $EVALUATIONSDIR/cluster_0.csv ]; then
   awk '{print $4}' $RESULTDIR/nodes.mac > $EVALUATIONSDIR/cluster_0.csv
 fi
 
-( cd $EVALUATIONSDIR; for i in `ls cluster_*.csv`; do N=`echo $i | sed "s#csv#grp#g"`; cat $i | sed $FULLSED > $N; done )
+( cd $EVALUATIONSDIR; for i in `ls cluster_*.csv`; do N=`echo $i | sed "s#csv#grp#g"`; cat $i | NUM2NAME=1 human_readable.sh $RESULTDIR/nodes.mac > $N; done )
 
 for i in `(cd $EVALUATIONSDIR; ls cluster_*.csv)`; do
   CLUSTERID=`echo $i | sed "s#_# #g" | sed "s#\.# #g" | awk '{print $2}'`
@@ -123,6 +115,7 @@ done
 ###############################################################################
 # placement (sim only)
 ###############################################################################
+#echo $NODEPLACEMENTFILE
 
 if [ "x$MODE" = "xsim" ]; then
   cat $NODEPLACEMENTFILE | awk '{print $2" "$3" "$4}' > $EVALUATIONSDIR/nodes.plm
@@ -145,7 +138,7 @@ fi
 
 echo "Networkstats!"
 
-cat $EVALUATIONSDIR/bcaststats.csv | sed "s#,# #g" | sed $FULLMACSED > $EVALUATIONSDIR/bcaststats.mat
+cat $EVALUATIONSDIR/bcaststats.csv | sed "s#,# #g" | MAC2NUM=1 human_readable.sh $RESULTDIR/nodes.mac > $EVALUATIONSDIR/bcaststats.mat
 BCASTSIZE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $3}' | sort -u`
 BCASTRATE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $4}' | sort -u`
 BCASTNODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
@@ -155,7 +148,7 @@ BCASTNODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
 for r in $BCASTRATE; do
   for s in $BCASTSIZE; do
     GRAPHCSVFILE="$EVALUATIONSDIR/graph_psr_$r""_""$s.csv"
-    GRAPHFILE="$EVALUATIONSDIR/graph_psr_$r""_""$s.txt"
+    GRAPHFILE="$EVALUATIONSDIR/graph_psr_$r""_""$s.mat"
 
     if [ -f $GRAPHCSVFILE ]; then
       cat $GRAPHCSVFILE | sed "s#,# #g" > $GRAPHFILE
@@ -180,21 +173,26 @@ for r in $BCASTRATE; do
     PARAMS="$r""_""$s"
     TARGET="$EVALUATIONSDIR/cluster_""$PARAMS""_"
 
+    #echo "$GRAPHFILE -> $TARGET"
+    #echo "cd $DIR; matwrapper "try,partitions_psr\('$GRAPHFILE',[70 85],'$TARGET'\),catch,exit\(1\),end,exit\(0\)" 1> /dev/null"
+
     (cd $DIR; matwrapper "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/','$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
     (cd $DIR; matwrapper "try,partitions_psr('$GRAPHFILE',[70 85],'$TARGET'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
+    #echo "Sim"
     if [ "x$MODE" = "xsim" ]; then
       CLUSTERSIZEFILE="$EVALUATIONSDIR/cluster_""$PARAMS""_psr_85_clustersize.csv"
       MAX_CLUSTER=`cat $CLUSTERSIZEFILE | sed "s#,# #g" | tail -n 1 | awk '{print $1}'`
       CLUSTERFILE="$EVALUATIONSDIR/cluster_""$PARAMS""_psr_85_cluster_"$MAX_CLUSTER".csv"
       CLUSTERCSVFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".csv"
       CLUSTERPLMFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".plm"
-      if [ -e CLUSTERCSVFILE ]; then
-        echo "partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE')"
+      if [ -e $CLUSTERFILE ]; then
+        #echo "partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE')"
         (cd $DIR; matwrapper "try,partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE'),catch,exit(1),end,exit(0)" 1> /dev/null)
-        cat $CLUSTERCSVFILE | sed "s#,# #g" | awk '{print "sk"$0}' > $CLUSTERPLMFILE
+        cat $CLUSTERCSVFILE | sed "s#,# #g" | awk '{print "node"$0}' > $CLUSTERPLMFILE
       fi
     fi
+    #echo "Sim end"
 
   done
 done

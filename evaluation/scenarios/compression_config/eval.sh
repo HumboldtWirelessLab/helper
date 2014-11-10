@@ -21,7 +21,7 @@ esac
 . $CONFIGFILE
 
 if [ ! -f $RESULTDIR/$NAME\_click_scripts.tar.bz2 ]; then
-  (cd $RESULTDIR; tar cfj $NAME\_click_scripts.tar.bz2 `cat $NODETABLE | awk '{print $7}' | sed "s#$RESULTDIR/##g" | grep -v -e "^-$"`; cat $NODETABLE | awk '{print $7}' | grep -v -e "^-$" | xargs rm -rf )
+  (cd $RESULTDIR; tar cfj $NAME\_click_scripts.tar.bz2 `cat $NODETABLE | awk '{print $7}' | sed "s#$RESULTDIR/##g" | grep -v -e "^-$" | sort -u`; cat $NODETABLE | awk '{print $7}' | grep -v -e "^-$" | xargs rm -rf )
 fi
 
 exit 0
