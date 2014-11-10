@@ -49,6 +49,9 @@ elif [ "x$MAC2NAME" = "x1" ]; then
 elif [ "x$NUM2MAC" = "x1" ]; then
   SEDARG=`$DIR/generate_sedargs.py --nodesmacfile=$FILE --mode=id2mac`
   SEDARG="sed $SEDARG -e \"s#65535#FF-FF-FF-FF-FF-FF#g\""
+elif [ "x$NUM2NAME" = "x1" ]; then
+  SEDARG=`$DIR/generate_sedargs.py --nodesmacfile=$FILE --mode=id2name`
+  SEDARG="sed $SEDARG -e \"s#65535#Broadcast#g\""
 else
   echo "$0: Unknown mode!"
   exit 1
