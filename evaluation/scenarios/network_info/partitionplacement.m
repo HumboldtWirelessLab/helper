@@ -1,8 +1,10 @@
 function partitionplacement(clusterfile, placementfile, finalfile)
 
-c=load(clusterfile);
-p=load(placementfile);
+c=load(clusterfile,'-ASCII');
+p=load(placementfile,'-ASCII');
 
+size(c)
+size(p)
 cpmat=p(c,:);
 
 cpmat=[ [1:size(c)]' cpmat];

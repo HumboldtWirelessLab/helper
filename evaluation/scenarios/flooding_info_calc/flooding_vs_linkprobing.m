@@ -35,7 +35,6 @@ function flooding_vs_linkprobing( floodfilename, floodpktfile, bcastfilename, ba
   csvwrite(strcat(basedir,'flooding_vs_linkprobing_diff_',params,'.csv'),lp_bc_diff);
 
   lp_bc_diff=reshape(lp_bc_diff,size(lp_bc_diff,1)*size(lp_bc_diff,1),1);
-  
 
 end
 

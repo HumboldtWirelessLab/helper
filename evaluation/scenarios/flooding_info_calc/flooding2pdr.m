@@ -1,36 +1,52 @@
 function flooding2pdr( filename, basedir )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
+LASTNODE=1;
+NODE=2;
+SRCNODE=3;
+PKTSIZE=4;
+PKTCNT=10;
+
+ID=11;
+FWD_CNT=12;
+SENT_CNT=13;
+
+RCV_CNT=18;
 
   data=load(filename,'-ASCII');
 
-  nodes=unique(data(:,3)); 
-  allnodes=unique(data(:,2));
+  nodes=unique(data(:,SRCNODE)); 
+  allnodes=unique(data(:,NODE));
 
+  max_nodes= max(allnodes);
+  
   for i = 1:size(nodes,1)
 
-     pdr_mat=zeros(max(allnodes),max(allnodes));
-     tx_pdr_lasthop_mat=zeros(max(allnodes),max(allnodes));
-     fwd_pdr_lasthop_mat=zeros(max(allnodes),max(allnodes));
-     pdr_hop_tx_pkt_cnt_mat=zeros(max(allnodes),max(allnodes));
-     pdr_hop_fwd_pkt_cnt_mat=zeros(max(allnodes),max(allnodes));
+     pdr_mat=zeros(max_nodes,max_nodes);                  %overall pdr (src to node)
+     tx_pdr_lasthop_mat=zeros(max_nodes,max_nodes);       %pdr tx last hop
+     fwd_pdr_lasthop_mat=zeros(max_nodes,max_nodes);      %pdr fwd last hop
+     pdr_hop_tx_pkt_cnt_mat=zeros(max_nodes,max_nodes);
+     pdr_hop_fwd_pkt_cnt_mat=zeros(max_nodes,max_nodes);
 
      node=nodes(i);
      
-     data3=data(data(:,3)==node,:);
-     data3s=data3(data3(:,13)==1,:);
-     data3r=data3(data3(:,12)==1,:);
-     
-     packets=max(data(data(:,3)==node,10)); %src
-     %pkt_fwd=unique(data((data(:,3)==node) & (data(:,12)==1),11));
-    
-     for a = 1:size(allnodes,1)     %last
+     data3=data(data(:,SRCNODE)==node,:);   %quellknoten
+     data3s=data3(data3(:,SENT_CNT) > 0,:); %infos zu sent
+     data3r=data3(data3(:,RCV_CNT) > 0,:);  %infos zu rx
+     data3f=data3(data3(:,FWD_CNT) > 0,:);  %infos zu fwd
+        
+     packets=max(data3(:,PKTCNT));          %pkt ids
+
+     for a = 1:size(allnodes,1)             %last
          
-         lastpackets_sent=unique(data3s(data3s(:,2)==allnodes(a),11));
-         lastpackets_fwd=unique(data3r(data3r(:,2)==allnodes(a),11));
-         rx1=data3(data3(:,1)==allnodes(a),:);
-         for b = 1:size(allnodes,1) %dst
-            rxpackets=rx1(rx1(:,2)==allnodes(b),11); %lasthop
+         lastpackets_sent=unique(data3s(data3s(:,NODE)==allnodes(a),ID));
+         lastpackets_fwd=unique(data3f(data3f(:,NODE)==allnodes(a),ID));
+         rx1=data3r(data3r(:,LASTNODE)==allnodes(a),:);
+         
+         for b = 1:size(allnodes,1)         %dst
+             
+            rxpackets=rx1(rx1(:,NODE)==allnodes(b),ID); %lasthop
+            
             %rxpackets=data((data(:,3)==node) & (data(:,1)==allnodes(a)) & (data(:,2)==allnodes(b)),11); %lasthop
 
             %lastpackets_sent=unique(data((data(:,3)==node) & (data(:,2)==allnodes(a)) & (data(:,13)==1),11));

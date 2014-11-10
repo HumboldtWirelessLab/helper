@@ -64,8 +64,8 @@ sed "s#,# #g" $EVALUATIONSDIR/flood_reach.csv > $EVALUATIONSDIR/flood_reach.mat
 (cd $DIR; matwrapper.sh "try,flooding_forward('$EVALUATIONSDIR/floodingforwardstats.mat','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
 sed "s#,# #g" $EVALUATIONSDIR/flooding_forward_probability.csv > $EVALUATIONSDIR/flooding_forward_probability.mat
 
-for i in `(cd $EVALUATIONSDIR/../network_info; ls graph_psr_*)`; do
-  PARAMS=`echo $i | sed "s#graph_psr_##g" | sed "s#\.txt##g"`
+for i in `(cd $EVALUATIONSDIR/../network_info; ls graph_psr_*mat)`; do
+  PARAMS=`echo $i | sed "s#graph_psr_##g" | sed "s#\.mat##g"`
   (cd $DIR; matwrapper.sh "try,flooding_vs_linkprobing('$EVALUATIONSDIR/flooding_lasthop_fwd_pdr.mat', '$EVALUATIONSDIR/flooding_lasthop_fwd_pkt_cnt.mat', '$EVALUATIONSDIR/../network_info/$i', '$EVALUATIONSDIR/', '$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
   sed "s#,# #g" $EVALUATIONSDIR/flooding_vs_linkprobing_diff_$PARAMS.csv > $EVALUATIONSDIR/flooding_vs_linkprobing_diff_$PARAMS.mat
 done
