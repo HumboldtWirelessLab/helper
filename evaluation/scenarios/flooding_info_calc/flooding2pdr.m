@@ -38,9 +38,10 @@ RCV_CNT=18;
      packets=max(data3(:,PKTCNT));          %pkt ids
 
      for a = 1:size(allnodes,1)             %last
-         
-         lastpackets_sent=unique(data3s(data3s(:,NODE)==allnodes(a),ID));
-         lastpackets_fwd=unique(data3f(data3f(:,NODE)==allnodes(a),ID));
+         allnodes(a)
+         lastpackets_sent=unique(data3s(data3s(:,NODE)==allnodes(a),SENT_CNT));
+         sum(lastpackets_sent)
+         lastpackets_fwd=unique(data3f(data3f(:,NODE)==allnodes(a),SENT_CNT));
          rx1=data3r(data3r(:,LASTNODE)==allnodes(a),:);
          
          for b = 1:size(allnodes,1)         %dst
