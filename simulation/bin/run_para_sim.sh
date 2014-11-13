@@ -39,7 +39,14 @@ NUM=0
 
 WORKINGDIR=$PWD
 
-echo -n "" > $WORKINGDIR/sim_finish
+if [ -f $WORKINGDIR/sim_finish ]; then
+  echo "Continue para-sim"
+  CONT=1
+else
+  CONT=0
+  echo -n "" > $WORKINGDIR/sim_finish
+fi
+
 echo -n "" > $WORKINGDIR/sim_run
 
 COUNT_SIMS=`find -name *.des.sim | wc -l`
@@ -59,7 +66,16 @@ for i in `find -name *.des.sim`; do
   if [ $USE_DISTPARASIM -eq 1 ]; then
     JOBCOMMAND="cd $WORKINGDIR/$SIMDIR/;run_again.sh > run_again.log 2>&1; sh ./eval_again.sh > eval_again.log 2>&1; touch $WORKINGDIR/sim_finish_dir/$NUM" $DIR/../lib/parasim/para_sim_ctrl.sh commit
   else
-    (cd $SIMDIR/;run_again.sh > run_again.log 2>&1; sh ./eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; touch $WORKINGDIR/sim_finish_dir/$NUM ) &
+    if [ $CONT -eq 0 ]; then
+      (cd $SIMDIR/;run_again.sh > run_again.log 2>&1; sh ./eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; touch $WORKINGDIR/sim_finish_dir/$NUM ) &
+    else
+      DONE=`grep "^$NUM\$" $WORKINGDIR/sim_finish | wc -l`
+      if [ $DONE -eq 0 ]; then
+        (cd $SIMDIR/;run_again.sh > run_again.log 2>&1; sh ./eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; touch $WORKINGDIR/sim_finish_dir/$NUM ) &
+      else
+        touch $WORKINGDIR/sim_finish_dir/$NUM
+      fi
+    fi
   fi
 
   let SIM_RUN=SIM_RUN+1
