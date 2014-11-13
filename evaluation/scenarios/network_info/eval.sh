@@ -65,7 +65,8 @@ echo "Create linkmetric matrix"
 THRESHOLD=400
 
 if [ ! -f $EVALUATIONSDIR/linksmetric.all ]; then
-  grep "link from" $DATAFILE | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | grep -v "=" | sort -u > $EVALUATIONSDIR/linksmetric.all
+  #grep "link from" $DATAFILE | grep -v 'metric="9999"' | sed 's#"# #g' | awk '{print $3" "$5" "$7}' | grep -v "=" | sort -u > $EVALUATIONSDIR/linksmetric.all
+  xsltproc $DIR/linksmetric.xslt $DATAFILE > $EVALUATIONSDIR/linksmetric.all
   cat $EVALUATIONSDIR/linksmetric.all | MAC2NUM=1 human_readable.sh $RESULTDIR/nodes.mac > $EVALUATIONSDIR/linksmetric.mat
 fi
 
@@ -74,10 +75,11 @@ NODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
 echo "Create linkgraph (Threshold: $THRESHOLD)"
 
 if [ ! -f $EVALUATIONSDIR/graph.txt ]; then
-
   (cd $DIR; matwrapper "try,metric2graph('$EVALUATIONSDIR/linksmetric.mat','$EVALUATIONSDIR/graph.csv',$THRESHOLD),catch,exit(1),end,exit(0)" 1> /dev/null)
   sed "s#,# #g" $EVALUATIONSDIR/graph.csv > $EVALUATIONSDIR/graph.txt
 fi
+
+exit 0
 
 ###############################################################################
 # create partition (etx linktable based)
