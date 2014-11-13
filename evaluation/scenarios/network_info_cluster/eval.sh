@@ -54,7 +54,7 @@ fi
 
 echo "Create partitions files"
 
-(cd $DIR; matwrapper "try,partitions('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+(cd $DIR; matwrapper "try,partitions('$EVALUATIONSDIR/graph.mat','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
 if [ $? -ne 0 ]; then
   echo "Ohh, matlab error."
@@ -62,7 +62,7 @@ fi
 
 #echo "Get Bridges and Articulation points"
 
-(cd $DIR; matwrapper "try,get_bridges_and_articulation_points('$EVALUATIONSDIR/graph.txt','$EVALUATIONSDIR/','none'),catch,exit(1),end,exit(0)" 1> /dev/null)
+(cd $DIR; matwrapper "try,get_bridges_and_articulation_points('$EVALUATIONSDIR/graph.mat','$EVALUATIONSDIR/','none'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
 
 ###############################################################################
@@ -81,7 +81,7 @@ fi
 for i in `(cd $EVALUATIONSDIR; ls cluster_*.csv)`; do
   CLUSTERID=`echo $i | sed "s#_# #g" | sed "s#\.# #g" | awk '{print $2}'`
   echo "Cluster: $CLUSTERID"
-  (cd $DIR; matwrapper "try,nodedegree('$EVALUATIONSDIR/$i', '$EVALUATIONSDIR/graph.txt', '$EVALUATIONSDIR/', $CLUSTERID ),catch,exit(1),end,exit(0)" 1> /dev/null)
+  (cd $DIR; matwrapper "try,nodedegree('$EVALUATIONSDIR/$i', '$EVALUATIONSDIR/graph.mat', '$EVALUATIONSDIR/', $CLUSTERID ),catch,exit(1),end,exit(0)" 1> /dev/null)
 done
 
 ###############################################################################
