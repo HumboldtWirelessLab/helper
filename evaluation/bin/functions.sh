@@ -31,7 +31,7 @@ function matwrapper {
     matlab -nodesktop -nosplash -nojvm -nodisplay -r "$@" > /dev/null 2>&1
   else
     if [ $NO_OCTAVE -eq 0 ]; then
-      octave -q --eval "$@" > /dev/null 2>&1
+      octave -qf --eval "$@" > /dev/null 2>&1
     else
       echo "Matlab/Ocatve not found!"
       exit 1
