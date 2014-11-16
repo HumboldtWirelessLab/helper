@@ -12,6 +12,7 @@ v = g(:,1) * nonodes + g(:,2) - (nonodes);
 
 res(v) = 1;
 
-csvwrite(finalfile,res);
+dlmwrite(strcat(finalfile,'.csv'), res, ',')
+dlmwrite(strcat(finalfile,'.mat'), res, ' ')
 
 end

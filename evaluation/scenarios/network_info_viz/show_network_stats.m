@@ -16,9 +16,9 @@ rfchannel = 1;
 
 % Plot params
 show_lnk_asym = 0;
-show_ng = 0;
+show_ng = 1;
 show_sp = 0;
-show_mcg = 1;
+show_mcg = 0;
 
 addpath(path,'./scheduling');
 addpath(path,'./graphviz');
@@ -47,13 +47,9 @@ if (show_lnk_asym)
         metric_asyms = [metric_asyms; m_asym];
     end
 
-    if (~isempty(metric_asyms))
-      %hist(node_deg, 1:max(node_deg));
-      %grid on;
-      %title(['Histogram of Node Degree, PSR-THR=', int2str(thr)]);
-      %xlabel('Node Degree');
-      %ylabel('# Occurence');
+    metric_asyms
 
+    if (~isempty(metric_asyms))
       [h,stats] = cdfplot(metric_asyms);
       set(h,'LineWidth',2);
       grid on;
@@ -61,6 +57,7 @@ if (show_lnk_asym)
       xlabel('Link Asymmetry (abs(PDRfwd - PDRrev))');
       ylabel('CDF of links');
 
+      saveas(f, strcat(basedir,'linkasymmetry_', params,'.eps'),'epsc');
       print(strcat(basedir,'linkasymmetry_', params,'.png'),'-dpng');
     end
 
@@ -86,24 +83,30 @@ if (show_ng)
             node_deg(ii) = size(find(adj(ii,:) > thr),2);
         end
 
-        %hist(node_deg, 1:max(node_deg));
-        %grid on;
-        %title(['Histogram of Node Degree, PSR-THR=', int2str(thr)]);
-        %xlabel('Node Degree');
-        %ylabel('# Occurence');
 
         if (~isempty(node_deg))
-          [h,stats] = cdfplot(node_deg);
-          set(h,'LineWidth',2);
+          hist(node_deg, 1:max(node_deg));
           grid on;
-          title(['CDFPlot of Node Degree, PSR-THR=', int2str(thr)]);
+          title(['Histogram of Node Degree, PSR-THR=', int2str(thr)]);
           xlabel('Node Degree');
-          ylabel('CDF of nodes');
+          ylabel('# Occurence');
+
+          saveas(f, strcat(basedir,'nodedegree_hist_', params,'.eps'),'epsc');
+
+          clf(f);
+
+          %[h,stats] = cdfplot(node_deg);
+          %set(h,'LineWidth',2);
+          %grid on;
+          %title(['CDFPlot of Node Degree, PSR-THR=', int2str(thr)]);
+          %xlabel('Node Degree');
+          %ylabel('CDF of nodes');
+
+          %saveas(f, strcat(basedir,'nodedegree_', params,'.eps'),'epsc');
 
         end
 
     end
-    print(strcat(basedir,'nodedegree_', params,'.png'),'-dpng');
 end
 
 %
@@ -211,7 +214,7 @@ if (show_mcg)
 
               s.connected_graphs.connected_graph{succ_i}.clusters.cluster{kk}.Attributes.id = kk;
               s.connected_graphs.connected_graph{succ_i}.clusters.cluster{kk}.Attributes.size = size(find(C==kk),2);
-              
+ 
               cl_nodes = [];
 
               for pp=1:size(cluster_nodes,2)  % for each node in the group

@@ -90,7 +90,6 @@ done
 
 echo "Cluster!"
 
-cat $EVALUATIONSDIR/bcaststats.csv | sed "s#,# #g" | MAC2NUM=1 human_readable.sh $RESULTDIR/nodes.mac > $EVALUATIONSDIR/bcaststats.mat
 BCASTSIZE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $3}' | sort -u`
 BCASTRATE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $4}' | sort -u`
 BCASTNODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
