@@ -66,7 +66,6 @@ sed "s#,# #g" $EVALUATIONSDIR/flooding_forward_probability.csv > $EVALUATIONSDIR
 
 for i in `(cd $EVALUATIONSDIR/../network_info; ls graph_psr_*mat)`; do
   PARAMS=`echo $i | sed "s#graph_psr_##g" | sed "s#\.mat##g"`
-  #(cd $DIR; matlab -nodesktop -nosplash -nojvm -nodisplay -r "flooding_vs_linkprobing('$EVALUATIONSDIR/flooding_pdr.mat', '$EVALUATIONSDIR/../network_info/$i', '$EVALUATIONSDIR/', '$PARAMS'),exit(0)" 1> /dev/null)
   (cd $DIR; matwrapper.sh "try,flooding_vs_linkprobing('$EVALUATIONSDIR/flooding_pdr.mat', '$EVALUATIONSDIR/../network_info/$i', '$EVALUATIONSDIR/', '$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
   sed "s#,# #g" $EVALUATIONSDIR/flooding_vs_linkprobing_diff_$PARAMS.csv > $EVALUATIONSDIR/flooding_vs_linkprobing_diff_$PARAMS.mat
 done
