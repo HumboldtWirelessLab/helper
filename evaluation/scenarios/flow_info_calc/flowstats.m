@@ -53,6 +53,7 @@ function flowstats(f,of)
 
   %res
   %disp(res);
-  csvwrite(of,res);
+  dlmwrite(strcat(of, '.csv'), res, ',')
+  dlmwrite(strcat(of, '.mat'), res, ' ')
 
 end
