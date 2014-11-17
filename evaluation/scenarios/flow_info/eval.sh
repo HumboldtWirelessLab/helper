@@ -20,6 +20,8 @@ esac
 
 . $CONFIGFILE
 
+EVALUATIONSDIR="$EVALUATIONSDIR""/flow_info"
+
 if [ ! -e $EVALUATIONSDIR ]; then
   mkdir -p $EVALUATIONSDIR
 fi

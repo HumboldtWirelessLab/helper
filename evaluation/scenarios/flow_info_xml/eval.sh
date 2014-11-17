@@ -20,10 +20,6 @@ esac
 
 . $CONFIGFILE
 
-if [ ! -e $EVALUATIONSDIR ]; then
-  mkdir -p $EVALUATIONSDIR
-fi
-
 if [ -f $RESULTDIR/measurement.xml ]; then
   DATAFILE=$RESULTDIR/measurement.xml
 else
@@ -35,10 +31,10 @@ else
 fi
 
 EVALUATIONSDIR="$EVALUATIONSDIR""/flow_info"
+
 if [ ! -e $EVALUATIONSDIR ]; then
   mkdir -p $EVALUATIONSDIR
 fi
-
 
 xsltproc $DIR/flowstats_rx.xslt $DATAFILE | grep -v ",," > $EVALUATIONSDIR/flowstats_rx.csv
 xsltproc $DIR/flowstats_tx.xslt $DATAFILE | grep -v ",," > $EVALUATIONSDIR/flowstats_tx.csv
