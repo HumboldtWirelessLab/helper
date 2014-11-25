@@ -14,9 +14,9 @@
 //[1]output: To other brn nodes
 //[2]output - Feedback packets for upper layer
 
-elementclass BROADCAST {ID $id, LT $lt |
+elementclass BROADCAST {ID $id, LT $lt, LINKSTAT $linkstat |
 
-  bcf::BROADCASTFLOODING(ID $id, LT $lt);
+  bcf::BROADCASTFLOODING(ID $id, LT $lt, LINKSTAT $linkstat);
   bcr::BROADCASTROUTING(ID $id);
 
   input[0]
