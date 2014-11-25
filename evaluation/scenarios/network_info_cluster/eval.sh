@@ -98,6 +98,7 @@ for r in $BCASTRATE; do
   for s in $BCASTSIZE; do
     PARAMS="$r""_""$s"
     TARGET="$EVALUATIONSDIR/cluster_""$PARAMS""_"
+    GRAPHFILE="$EVALUATIONSDIR/graph_psr_""$PARAMS"".csv"
 
     (cd $DIR; matwrapper "try,partitions_psr('$GRAPHFILE',[70 85],'$TARGET'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
