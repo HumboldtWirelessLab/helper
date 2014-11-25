@@ -306,14 +306,6 @@ case "$MODE" in
 		echo "DEFAULT_NOSUPP=$NOSUPP" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 		echo "DEFAULT_GDB=$GDB" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 
-		#Prepare eval-script
-
-		echo "#!/bin/sh" > $FINALRESULTDIR/eval_again.sh
-		echo "MODE=sim SIM=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR CONFIGFILE=$FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX RESULTDIR=$FINALRESULTDIR $DIR/../../evaluation/bin/start_evaluation.sh 1>&$EVAL_LOG_OUT" >> $FINALRESULTDIR/eval_again.sh
-
-		echo "Finished gen" >> $FINALRESULTDIR/time.log
-		date +"%s:%N" >> $FINALRESULTDIR/time.log
-
 		if [ "x$PREPARE_ONLY" = "x" ]; then
 		  ( cd $FINALRESULTDIR; run_again.sh )
 		fi
@@ -321,7 +313,7 @@ case "$MODE" in
 		# if the simulation was correctly execruted start the automatized evaluation of the experiment
 		if [ $? -eq 0 ]; then
 			if [ "x$DELAYEVALUATION" = "x" ] && [ "x$PREPARE_ONLY" = "x" ]; then
-			  sh $FINALRESULTDIR/eval_again.sh
+			  ( cd $FINALRESULTDIR; eval_again.sh )
 			fi
 		else
 			exit 1
