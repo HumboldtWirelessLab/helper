@@ -22,7 +22,7 @@
 #define FLOODING_MAXNBMETRIC 500
 #endif
 
-elementclass BROADCASTFLOODING {ID $id, LT $lt |
+elementclass BROADCASTFLOODING {ID $id, LT $lt, LINKSTAT $linkstat |
 
   fl_database::FloodingDB(NODEIDENTITY $id);
 
@@ -162,6 +162,9 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 #endif
 
   fl_piggyback::FloodingPiggyback(NODEIDENTITY $id, FLOODING fl, FLOODINGHELPER fl_helper, FLOODINGDB fl_database, LASTNODESPERPKT FLOODING_LASTNODES_PP, DEBUG FLOODING_DEBUG);
+
+  fl_linktable::FloodingLinktable(LINKSTAT $linkstat, ETXLINKTABLE $lt, DEBUG FLOODING_DEBUG);
+  fl_prenegotiation::FloodingPrenegotiation(LINKSTAT $linkstat, FLOODINGLINKTABLE fl_linktable, FLOODINGDB fl_database, DEBUG FLOODING_DEBUG);
 
   routing_peek::FloodingRoutingPeek(DEBUG FLOODING_DEBUG);
 

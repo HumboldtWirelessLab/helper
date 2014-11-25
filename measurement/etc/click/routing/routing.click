@@ -70,7 +70,7 @@ elementclass ROUTING { ID $id, ETHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTA
 #else
 #ifdef ROUTINGBROADCAST
 
-  routing::BROADCAST(ID $id, LT $lt);
+  routing::BROADCAST(ID $id, LT $lt, LINKSTAT $linkstat);
 
 #define BRN_PORT_ROUTING BRN_PORT_FLOODING
 #define HAVEROUTING
