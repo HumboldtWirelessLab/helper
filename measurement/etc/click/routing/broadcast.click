@@ -14,9 +14,16 @@
 //[1]output: To other brn nodes
 //[2]output - Feedback packets for upper layer
 
+#ifdef DISABLE_FLOODING_LINKTABLE
+elementclass BROADCAST {ID $id, LT $lt |
+
+  bcf::BROADCASTFLOODING(ID $id, LT $lt);
+#else
 elementclass BROADCAST {ID $id, LT $lt, LINKSTAT $linkstat |
 
   bcf::BROADCASTFLOODING(ID $id, LT $lt, LINKSTAT $linkstat);
+#endif
+
   bcr::BROADCASTROUTING(ID $id);
 
   input[0]
