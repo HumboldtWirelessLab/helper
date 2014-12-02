@@ -28,14 +28,24 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt |
 elementclass BROADCASTFLOODING {ID $id, LT $lt, LINKSTAT $linkstat |
 #endif
 
-  fl_database::FloodingDB(NODEIDENTITY $id);
+  fl_database::FloodingDB(DEBUG FLOODING_DEBUG);
 
-  fl_helper::FloodingHelper(LINKTABLE $lt, MAXNBMETRIC FLOODING_MAXNBMETRIC, CACHETIMEOUT 5000000, DEBUG FLOODING_DEBUG);
+#ifdef DISABLE_FLOODING_LINKTABLE
+  fl_linktable::FloodingLinktable(ETXLINKTABLE $lt, DEBUG FLOODING_DEBUG);
+#else
+  fl_lt::Brn2LinkTable(NODEIDENTITY $id, STALE 500, DEBUG 2);
+
+  fl_linktable::FloodingLinktable(LINKSTAT $linkstat, ETXLINKTABLE $lt, LOCALTABLE fl_lt, DEBUG FLOODING_DEBUG);
+
+  fl_prenegotiation::FloodingPrenegotiation(LINKSTAT $linkstat, LINKTABLE fl_lt, FLOODINGDB fl_database, DEBUG FLOODING_DEBUG);
+#endif
+
+  fl_helper::FloodingHelper(LINKTABLE fl_linktable, MAXNBMETRIC FLOODING_MAXNBMETRIC, CACHETIMEOUT 5000000, DEBUG FLOODING_DEBUG);
+
 
 /************************************************************************************************************************/
 /********************* F L O O D I N G   P O L I C I E S ****************************************************************/
 /************************************************************************************************************************/
-
 
 #ifndef PROBABILITYFLOODING_FWDPROBALILITY
 #define PROBABILITYFLOODING_FWDPROBALILITY 90
@@ -166,14 +176,6 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt, LINKSTAT $linkstat |
 #endif
 
   fl_piggyback::FloodingPiggyback(NODEIDENTITY $id, FLOODING fl, FLOODINGHELPER fl_helper, FLOODINGDB fl_database, LASTNODESPERPKT FLOODING_LASTNODES_PP, DEBUG FLOODING_DEBUG);
-
-#ifdef DISABLE_FLOODING_LINKTABLE
-  fl_linktable::FloodingLinktable(ETXLINKTABLE $lt, DEBUG FLOODING_DEBUG);
-#else
-  fl_linktable::FloodingLinktable(LINKSTAT $linkstat, ETXLINKTABLE $lt, DEBUG FLOODING_DEBUG);
-
-  fl_prenegotiation::FloodingPrenegotiation(LINKSTAT $linkstat, FLOODINGLINKTABLE fl_linktable, FLOODINGDB fl_database, DEBUG FLOODING_DEBUG);
-#endif
 
   routing_peek::FloodingRoutingPeek(DEBUG FLOODING_DEBUG);
 
