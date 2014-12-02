@@ -52,6 +52,7 @@ fi
 
 #summary. Small info
 xsltproc $DIR/simstats_summary.xslt $DATAFILE > $EVALUATIONSDIR/simstats_summary.csv
+sed "s#,# #g" $EVALUATIONSDIR/simstats_summary.csv > $EVALUATIONSDIR/simstats_summary.mat
 
 xsltproc $DIR/simstats.xslt $DATAFILE | sed $FULLIDSED > $EVALUATIONSDIR/simstats.csv
-cat $EVALUATIONSDIR/simstats.csv | sed "s#,# #g" > $EVALUATIONSDIR/simstats.mat
+sed "s#,# #g" $EVALUATIONSDIR/simstats.csv > $EVALUATIONSDIR/simstats.mat
