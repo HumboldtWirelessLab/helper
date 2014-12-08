@@ -20,15 +20,15 @@ esac
 
 if [ "x$1" = "xhelp" ] || [ "x$1" = "x" ]; then
   echo "Skript to run measurements as much as you want. After each measurement you'll be ask whether you want one more."
-  echo "Use $0 disfile to start. Options (ENVIRONMENTVARS):"
+  echo "Use $0 DESFILE to start. Options (ENVIRONMENTVARS):"
   echo "FIRSTRUNMODE (REBOOT|CLICK): What should be done before the first measuremnt (TESTBED)"
   echo 
   exit 0
 fi 
 
-DISFILE=$1
+DESFILE=$1
 
-. $DISFILE
+. $DESFILE
 
 if [ "x$FIRSTRUNMODE" = "x" ]; then
   RUNMODE=REBOOT
@@ -58,7 +58,7 @@ key=y
 
 #echo "RUNS $RUNS"
 #echo "$PWD"
-#echo "$DISFILE"
+#echo "$DESFILE"
 
 while [ "x$key" = "xy" ]; do
       RUNNUMBER=`expr $RUNNUMBER + 1`
@@ -76,10 +76,10 @@ while [ "x$key" = "xy" ]; do
       NEXT=`expr $HIGHESTDIR + 1`
 
       if [ $SIMULATION -eq 0 ]; then
-        TESTONLY=$TESTONLY RUNMODE=$RUNMODE $DIR/run_measurement.sh $DISFILE $NEXT
+        TESTONLY=$TESTONLY RUNMODE=$RUNMODE $DIR/run_measurement.sh $DESFILE $NEXT
         RUNMODE=$MULTIRUNMODE
       else
-        $DIR/../../simulation/bin/run_sim.sh ns $DISFILE $NEXT
+        PREPARE_ONLY=$PREPARE_ONLY $DIR/../../simulation/bin/run_sim.sh ns $DESFILE $NEXT
       fi
 
       if [ "$MULTIREPEAT" = "ASK" ]; then
