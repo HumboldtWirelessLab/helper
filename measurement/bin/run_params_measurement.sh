@@ -92,17 +92,19 @@ case "$1" in
 	echo "Skript to run measurement with different parameters (e.g. TXPOWER, CHANNEL,...). The collectionfile include the parameter and the name of the templatefiles (configfile with Vars as parameters)."
 	;;
     "run"|"sim")
-    
+
         if [ "$1" = "sim" ]; then
           SIMULATION=1
+          PREPARE_ONLY=1
         else
           SIMULATION=0
+          PREPARE_ONLY=
         fi
-        
+
         if [ "x$PARAMSRUNMODE" = "x" ]; then
           PARAMSRUNMODE="REBOOT"
         fi
-         
+
 		MDIR=`dirname $2`
 		. $2
 		
@@ -145,22 +147,33 @@ case "$1" in
 		
 		#echo $ALLDIRS
 		
-     	for acdir in $ALLDIRS; do
-     	
-     	  if [ "x$PARAMSWAIT" = "x1" ]; then
-     	    echo -n "Press any key to run $CURRUN. params measurement"
-     	    read -n 1 trash
-     	  fi
-     	  echo "Run $CURRUN. params"
+	for acdir in $ALLDIRS; do
+
+	  if [ "x$PARAMSWAIT" = "x1" ]; then
+	    echo -n "Press any key to run $CURRUN. params measurement"
+	    read -n 1 trash
+	  fi
+	  if [ $SIMULATION -eq 0 ]; then
+		echo "Run $CURRUN. params"
+	  else
+		echo "Prepare $CURRUN. params"
+	  fi
 		  NOW=`pwd`
-		  ( cd $acdir; SIMULATION=$SIMULATION TESTONLY=$TESTONLY FIRSTRUNMODE=$FIRSTRUNMODE MULTIRUNMODE=$MULTIRUNMODE MULTIMODE="LOOP" RUNS=$MULTIREPEAT MULTIWAIT=$MULTIWAIT $DIR/run_multiple_measurments.sh $2; cd $NOW)
+		  ( cd $acdir; SIMULATION=$SIMULATION TESTONLY=$TESTONLY PREPARE_ONLY=$PREPARE_ONLY FIRSTRUNMODE=$FIRSTRUNMODE MULTIRUNMODE=$MULTIRUNMODE MULTIMODE="LOOP" RUNS=$MULTIREPEAT MULTIWAIT=$MULTIWAIT $DIR/run_multiple_measurments.sh $2; cd $NOW)
 		  let "CURRUN=$CURRUN + 1"
-		  
+
 		  #TODO think about
 		  FIRSTRUNMODE=$PARAMSRUNMODE
-		done
-	
-	
+	done
+
+	if [ $SIMULATION -eq 1 ]; then
+	  run_para_sim.sh
+	fi
+
+	if [ "x$PARAMSEVALUATION" != "x" ]; then
+	  $PARAMSEVALUATION
+	fi
+
 	;;
 esac
 

@@ -5,7 +5,7 @@
 set netchan     Channel/WirelessChannel
 set netphy      Phy/WirelessPhy
 set netmac      Mac/802_11
-set netprop     Propagation/TwoRayGround
+set netprop     Propagation/Ricean
 set antenna     Antenna/OmniAntenna
 
-set channel_model "tworayground"
+set channel_model "ricean"
