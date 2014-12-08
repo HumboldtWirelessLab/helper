@@ -22,7 +22,6 @@
 #define WIFITYPE 805
 #endif
 
-#define wifitype_ns         800
 #define wifitype_wifi       801
 #define wifitype_prism      802
 #define wifitype_radiotap   803
@@ -30,11 +29,6 @@
 #define wifitype_ath2       805
 #define wifitype_extra      806
 #define wifitype_openbeacon 807
-
-#if WIFITYPE == wifitype_ns
-#define __WIFIENCAP__ AddEtherNsclick()
-#define __WIFIDECAP__ Strip(14)
-#endif
 
 #if WIFITYPE == wifitype_wifi
 #define __WIFIENCAP__ Null()

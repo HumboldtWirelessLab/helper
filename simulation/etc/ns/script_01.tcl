@@ -89,6 +89,12 @@ Simulator set node_factory_ Node/MobileNode/ClickNode
 set chan_1_ [new $netchan]
 set prop_ [new $netprop]
 
+if { $channel_model == "ricean" } {
+  $prop_ MaxVelocity  2.5;
+  $prop_ RiceanK        6;
+  $prop_ LoadRiceFile  $brntoolsbase/helper/simulation/etc/ns/radio/rice_table.txt;
+}
+
 #
 # In nsclick we have to worry about assigning IP and MAC addresses
 # to out network interfaces. Here we generate a list of IP and MAC
