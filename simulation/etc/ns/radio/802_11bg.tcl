@@ -51,6 +51,23 @@ Phy/WirelessPhy set Rate9  5.5e6
 Phy/WirelessPhy set Rate10   2e6
 Phy/WirelessPhy set Rate11   1e6
 
+if { $single_sensitivity == 1 } {
+
+Phy/WirelessPhy set RXThresh0   7;
+Phy/WirelessPhy set RXThresh1   7;
+Phy/WirelessPhy set RXThresh2   7;
+Phy/WirelessPhy set RXThresh3   7;
+Phy/WirelessPhy set RXThresh4   7;
+Phy/WirelessPhy set RXThresh5   7;
+Phy/WirelessPhy set RXThresh6   7;
+Phy/WirelessPhy set RXThresh7   7;
+Phy/WirelessPhy set RXThresh8   7;
+Phy/WirelessPhy set RXThresh9   7;
+Phy/WirelessPhy set RXThresh10  7;
+Phy/WirelessPhy set RXThresh11  7;
+
+} else {
+
 Phy/WirelessPhy set RXThresh0  30;
 Phy/WirelessPhy set RXThresh1  28;
 Phy/WirelessPhy set RXThresh2  24;
@@ -63,6 +80,8 @@ Phy/WirelessPhy set RXThresh8  12;
 Phy/WirelessPhy set RXThresh9   9; #2.5119e-9  -86dbm //-95dbm Noise
 Phy/WirelessPhy set RXThresh10  8; #1.9953e-9  -87dbm //-95dbm Noise
 Phy/WirelessPhy set RXThresh11  7; #1.5849e-9  -88dbm //-95dbm Noise
+
+}
 
 # Mac Layer
 Mac/802_11 set dataRate_  1Mb
