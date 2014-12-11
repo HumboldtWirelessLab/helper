@@ -31,9 +31,7 @@ done
 
 cat > simulation.des << EOF
 NAME=simulation
-SIMULATOR=ns2
 RADIO=shadowing11b
-FORGEINNODES=no
 
 TIME=$3
 
