@@ -20,12 +20,12 @@ esac
 
 if [ "x$1" = "x" ]; then
   DESFILE=`ls *.des.sim`
+  DESFILE=$PWD/$DESFILE
 else
   DESFILE=$1
 fi
 
 . $DESFILE
-
 
 # REWRITEEVALUATION : use complete diff eval scripts
 # PREEVALUATION : run before eval
@@ -35,6 +35,7 @@ if [ "x$DEFAULT_USED_SIMULATOR" != "x" ]; then
   MODE=sim
   SIM=$DEFAULT_USED_SIMULATOR
 fi
+
 
 CONFIGDIR=$CONFIGDIR
 

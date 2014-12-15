@@ -74,14 +74,14 @@ for i in `find -name *.des.sim`; do
         fi
       fi
       if [ ! -e $SIMDIR/time.stats ]; then
-        (cd $SIMDIR/; run_again.sh > run_again.log 2>&1; sh eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; touch $WORKINGDIR/sim_finish_dir/$NUM ) &
+        (cd $SIMDIR/; run_again.sh > run_again.log 2>&1; eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; touch $WORKINGDIR/sim_finish_dir/$NUM ) &
       else
         (touch $WORKINGDIR/sim_finish_dir/$NUM ) &
       fi
     else
       DONE=`grep "^$NUM\$" $WORKINGDIR/sim_finish | wc -l`
       if [ $DONE -eq 0 ]; then
-        (cd $SIMDIR/; run_again.sh > run_again.log 2>&1; sh eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; touch $WORKINGDIR/sim_finish_dir/$NUM ) &
+        (cd $SIMDIR/; run_again.sh > run_again.log 2>&1; eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; touch $WORKINGDIR/sim_finish_dir/$NUM ) &
       else
         touch $WORKINGDIR/sim_finish_dir/$NUM
       fi
