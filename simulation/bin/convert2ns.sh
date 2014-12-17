@@ -148,6 +148,7 @@ set shadowing_channel_model $SHADOWING_PATHLOSS_MODEL
 
 set ricean_k $RICEAN_K
 set ricean_max_velocity $RICEAN_MAX_VELOCITY
+
 set nakagami_use_dist $nakagami_use_dist
 
 set nakagami_gamma0 $nakagami_gamma0
