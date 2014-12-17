@@ -59,6 +59,7 @@ recursive() {
 
           if [ $RESULT -eq 1 ]; then
             let CONSTRAINTS_HIT=CONSTRAINTS_HIT+1
+            break;
           fi
         done
         if [ $CONSTRAINTS_HIT -gt 0 ]; then
@@ -79,6 +80,7 @@ recursive() {
 
           if [ $RESULT -eq 0 ]; then
             let EXCLUSIONS_HIT=EXCLUSIONS_HIT+1
+            break;
           fi
         done
         if [ $EXCLUSIONS_HIT -gt 0 ]; then
@@ -111,7 +113,7 @@ recursive() {
 	  else
 	    #echo "foo $MDIR $acfile"
 	    if [ -f $MDIR/$acfile ]; then
-        	cat $MDIR/$acfile | sed $SEDARG > $MDIR/PARAMS_$CONFIGS/$acfile
+        	sed $SEDARG $MDIR/$acfile > $MDIR/PARAMS_$CONFIGS/$acfile
 	    else
 		if [ "x$acfile" = "xevaluation" ]; then
 		  cp -r $MDIR/$acfile $MDIR/PARAMS_$CONFIGS/$acfile

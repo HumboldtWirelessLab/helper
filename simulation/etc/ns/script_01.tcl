@@ -250,8 +250,8 @@ switch $channel_model {
 set fading_ [new $netfading]
 
 if { $fading_model == "ricean" } {
-  $fading_ MaxVelocity  2.5;
-  $fading_ RiceanK        6;
+  $fading_ MaxVelocity   $ricean_max_velocity;
+  $fading_ RiceanK       $ricean_k;
   $fading_ LoadRiceFile  $brntoolsbase/helper/simulation/etc/ns/radio/rice_table.txt;
 }
 
