@@ -83,9 +83,12 @@ fi
 
 rm -f $EVALUATIONSDIR/links.dot.tmp $EVALUATIONSDIR/links.dot $EVALUATIONSDIR/linksmetric.dot.tmp $EVALUATIONSDIR/linksmetric.dot
 
-for i in `(cd $EVALUATIONSDIR/; ls graph_psr_*_*.mat)`; do
-    PARAMS=`echo $i | sed -e "s#graph_psr_##g" -e "s#\.mat##g"`
-#    echo "$PARAMS"
-    (cd $DIR; matwrapper "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/','$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
-done
+HAS_BCAST_STATS=`du -s $EVALUATIONSDIR/bcaststats.mat | awk '{print $1}'`
 
+if [ $HAS_BCAST_STATS -ne 0 ]; then
+  for i in `(cd $EVALUATIONSDIR/; ls graph_psr_*_*.mat)`; do
+    PARAMS=`echo $i | sed -e "s#graph_psr_##g" -e "s#\.mat##g"`
+    #echo "$PARAMS"
+    (cd $DIR; matwrapper "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/','$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
+  done
+fi

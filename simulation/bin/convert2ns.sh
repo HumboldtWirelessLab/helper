@@ -119,6 +119,7 @@ fi
 . $DIR/../etc/ns/radio/default
 
 if [ "x$RADIO" != "x" ]; then
+  #TODO: check for predefined radios (tworayground, shadowing, indoor, outdoor
   PATHLOSS=$RADIO
 fi
 

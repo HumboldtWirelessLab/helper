@@ -116,3 +116,15 @@ for r in $BCASTRATE; do
 
   done
 done
+
+###############################################################################
+# create partition (etx linktable based)
+###############################################################################
+
+#echo "Count part"
+
+#(cd $DIR; matwrapper "try,cnt_partitions('$EVALUATIONSDIR/graph.mat','$EVALUATIONSDIR/cnt_partitions.csv'),catch,exit(1),end,exit(0)" 1> /dev/null)
+
+#if [ $? -ne 0 ]; then
+#  echo "Ohh, matlab error."
+#fi
