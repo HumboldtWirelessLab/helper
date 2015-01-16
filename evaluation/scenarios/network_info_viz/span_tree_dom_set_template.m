@@ -1,6 +1,6 @@
 function span_tree_dom_set_template(graphfile,min_pdr,node)
 
-graph = load(graphfile);
+graph = load(graphfile,'-ASCII');
 
 %min_pdr = 1;
 

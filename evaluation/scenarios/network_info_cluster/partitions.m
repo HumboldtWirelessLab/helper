@@ -1,6 +1,6 @@
 function partitions(graphfile, basedir)
 %TODO: use recursive func
-g=load(graphfile);
+g=load(graphfile,'-ASCII');
 
 %size(g)
 

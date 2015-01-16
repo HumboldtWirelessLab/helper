@@ -1,7 +1,7 @@
 function nodedegree(vertices, edges, basedir, id)
 
-  v=load(vertices);
-  e=load(edges);
+  v=load(vertices,'-ASCII');
+  e=load(edges,'-ASCII');
 
   degree=zeros(size(v,1),1);
 

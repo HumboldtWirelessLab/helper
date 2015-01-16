@@ -8,7 +8,7 @@
 
 function get_bridges_and_articulation_points(graphfile, basedir, params)
 
-graph = load(graphfile);
+graph = load(graphfile,'-ASCII');
 
 % store original cluster size
 cluster_size = cnt_partitions(graph);
