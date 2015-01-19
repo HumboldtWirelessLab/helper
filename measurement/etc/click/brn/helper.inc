@@ -154,37 +154,6 @@ BRNAddressInfo(ipdev eth0:ip);
 
 #else
 
-#ifdef USEBRNDEVICE
-//brndevice
-
-#ifndef NOPCAP
-
-#if PCAP_STRIP_SIZE == 0
-
-#define FROMRAWDEVICE(x) BrnFromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, CAPTURE PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64)
-#define TORAWDEVICE(x) BrnToDevice(DEVNAME x, IGNOREFROMDEV true, DEBUG false)
-
-//pcap size
-#else
-#define FROMRAWDEVICE(x) BrnFromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, CAPTUR PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64) -> Strip(PCAP_STRIP_SIZE)
-#define TORAWDEVICE(x) BrnToDevice(DEVNAME x, IGNOREFROMDEV true, DEBUG false)
-//end pcap size
-#endif
-
-//nopcap
-#else
-//use_pcap
-
-#define FROMRAWDEVICE(x) BrnFromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, CAPTURE LINUX, HEADROOM 64)
-#define TORAWDEVICE(x) BrnToDevice(DEVNAME x, DEBUG false)
-
-//end usepcap
-#endif
-/* END NOPCAP */
-
-//nobrndevice
-#else
-
 #ifndef NOPCAP
 
 #if PCAP_STRIP_SIZE == 0
@@ -204,9 +173,6 @@ BRNAddressInfo(ipdev eth0:ip);
 #define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, METHOD LINUX, HEADROOM 64, BURST PACKETBURST)
 #define TORAWDEVICE(x) ToDevice(DEVNAME x, METHOD LINUX, DEBUG false, BURST PACKETBURST)
 //end no pcap
-#endif
-
-//end USEBRNDEVICE
 #endif
 
 //else for dumpdevice
