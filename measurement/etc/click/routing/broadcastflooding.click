@@ -31,11 +31,15 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt, LINKSTAT $linkstat |
   fl_database::FloodingDB(DEBUG FLOODING_DEBUG);
 
 #ifdef DISABLE_FLOODING_LINKTABLE
-  fl_linktable::FloodingLinktable(ETXLINKTABLE $lt, DEBUG FLOODING_DEBUG);
+  fl_linktable::FloodingLinktable(ETXLINKTABLE $lt, MODE 7, DEBUG FLOODING_DEBUG);
 #else
   fl_lt::Brn2LinkTable(NODEIDENTITY $id, STALE 500, DEBUG 2);
 
-  fl_linktable::FloodingLinktable(LINKSTAT $linkstat, ETXLINKTABLE $lt, LOCALTABLE fl_lt, DEBUG FLOODING_DEBUG);
+#ifdef PDR_LINKTABLE
+  fl_linktable::FloodingLinktable(LINKSTAT $linkstat, ETXLINKTABLE $lt, PDRLINKTABLE PDR_LINKTABLE, LOCALTABLE fl_lt, MODE 7, DEBUG FLOODING_DEBUG);
+#else
+  fl_linktable::FloodingLinktable(LINKSTAT $linkstat, ETXLINKTABLE $lt, LOCALTABLE fl_lt, MODE 7, DEBUG FLOODING_DEBUG);
+#endif
 
   fl_prenegotiation::FloodingPrenegotiation(LINKSTAT $linkstat, LINKTABLE fl_lt, FLOODINGDB fl_database, DEBUG FLOODING_DEBUG);
 #endif
