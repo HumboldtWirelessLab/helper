@@ -44,7 +44,9 @@ fi
 
 if [ "x$MODE" = "xsim" ]; then
   cat $NODEPLACEMENTFILE | awk '{print $2" "$3" "$4}' > $EVALUATIONSDIR/nodes.plm
-  mkdir $EVALUATIONSDIR/clusterplacement/
+  if [ ! -e $EVALUATIONSDIR/clusterplacement ]; then
+    mkdir $EVALUATIONSDIR/clusterplacement/
+  fi
 fi
 
 

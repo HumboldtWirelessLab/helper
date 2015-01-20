@@ -25,6 +25,10 @@ for s = 1:size(SIZES,1)
   dlmwrite(strcat(finalfileprefix, 'graph_psr_', num2str(n_r), '_', num2str(n_s), '.csv'), res, ',')
   dlmwrite(strcat(finalfileprefix, 'graph_psr_', num2str(n_r), '_', num2str(n_s), '.mat'), res, ' ')
 
+  if ((s == 1) && (r==1))
+    dlmwrite(strcat(finalfileprefix, 'graph_psr.mat'), res, ' ')
+  end
+
  end
 end
 

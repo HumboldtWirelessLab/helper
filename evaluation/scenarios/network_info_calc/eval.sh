@@ -47,3 +47,6 @@ fi
 echo "Networkstats!"
 
 (cd $DIR; matwrapper "try,bcaststats2graph('$EVALUATIONSDIR/bcaststats.mat','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+
+
+(cd $DIR; matwrapper "try,nodedegree('$EVALUATIONSDIR/graph_psr.mat', [25 50 75], '$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
