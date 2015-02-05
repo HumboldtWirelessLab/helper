@@ -45,6 +45,7 @@ if [ -f $WORKINGDIR/sim_finish ]; then
 else
   CONT=0
   echo -n "" > $WORKINGDIR/sim_finish
+  echo -n "" > $WORKINGDIR/sim_finish_err
 fi
 
 echo -n "" > $WORKINGDIR/sim_run
@@ -55,8 +56,12 @@ FINISHEDSIMS=0
 rm -rf $WORKINGDIR/sim_finish_dir
 mkdir $WORKINGDIR/sim_finish_dir
 
+rm -rf $WORKINGDIR/sim_finish_err_dir
+mkdir $WORKINGDIR/sim_finish_err_dir
+
 SIM_RUN=0
 SIM_FIN=0
+SIM_ERR=0
 
 for i in `find -name *.des.sim`; do
 
@@ -64,7 +69,7 @@ for i in `find -name *.des.sim`; do
 
   #echo $SIMDIR
   if [ $USE_DISTPARASIM -eq 1 ]; then
-    JOBCOMMAND="cd $WORKINGDIR/$SIMDIR/; run_again.sh > run_again.log 2>&1; sh eval_again.sh > eval_again.log 2>&1; touch $WORKINGDIR/sim_finish_dir/$NUM" $DIR/../lib/parasim/para_sim_ctrl.sh commit
+    JOBCOMMAND="cd $WORKINGDIR/$SIMDIR/; run_again.sh > run_again.log 2>&1; if [ \$? -eq 0 ]; then eval_again.sh > eval_again.log 2>&1; else echo \"$SIMDIR\" > $WORKINGDIR/sim_finish_err_dir/$NUM; fi; touch $WORKINGDIR/sim_finish_dir/$NUM" $DIR/../lib/parasim/para_sim_ctrl.sh commit
   else
     if [ $CONT -eq 0 ]; then
       if [ -e $SIMDIR/time.stats ]; then
@@ -74,14 +79,14 @@ for i in `find -name *.des.sim`; do
         fi
       fi
       if [ ! -e $SIMDIR/time.stats ]; then
-        (cd $SIMDIR/; run_again.sh > run_again.log 2>&1; eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; touch $WORKINGDIR/sim_finish_dir/$NUM ) &
+        (cd $SIMDIR/; run_again.sh > run_again.log 2>&1; if [ $? -eq 0 ]; then eval_again.sh > eval_again.log 2>&1; else echo "$SIMDIR" > $WORKINGDIR/sim_finish_err_dir/$NUM; fi; cd $WORKINGDIR; touch $WORKINGDIR/sim_finish_dir/$NUM ) &
       else
         (touch $WORKINGDIR/sim_finish_dir/$NUM ) &
       fi
     else
       DONE=`grep "^$NUM\$" $WORKINGDIR/sim_finish | wc -l`
       if [ $DONE -eq 0 ]; then
-        (cd $SIMDIR/; run_again.sh > run_again.log 2>&1; eval_again.sh > eval_again.log 2>&1; cd $WORKINGDIR; touch $WORKINGDIR/sim_finish_dir/$NUM ) &
+        (cd $SIMDIR/; run_again.sh > run_again.log 2>&1; if [ $? -eq 0 ]; then eval_again.sh > eval_again.log 2>&1; else echo "$SIMDIR" > $WORKINGDIR/sim_finish_err_dir/$NUM; fi; cd $WORKINGDIR; touch $WORKINGDIR/sim_finish_dir/$NUM ) &
       else
         touch $WORKINGDIR/sim_finish_dir/$NUM
       fi
@@ -96,35 +101,66 @@ for i in `find -name *.des.sim`; do
   for fs in `(cd $WORKINGDIR/sim_finish_dir; ls)`; do
     echo $fs >> $WORKINGDIR/sim_finish
     rm $WORKINGDIR/sim_finish_dir/$fs
+    if [ -f $WORKINGDIR/sim_finish_err_dir/$fs ]; then
+      cat $WORKINGDIR/sim_finish_err_dir/$fs >> $WORKINGDIR/sim_finish_err
+      rm $WORKINGDIR/sim_finish_err_dir/$fs
+    fi
   done
 
   SIM_FIN=`cat $WORKINGDIR/sim_finish | wc -l`
+  SIM_ERR=`cat $WORKINGDIR/sim_finish_err | wc -l`
 
   let SIM_DIFF=SIM_RUN-SIM_FIN
 
   while [ $SIM_DIFF -gt $MAX_THREADS ]; do
     sleep 1
-    echo -n -e "Finished $SIM_FIN of $COUNT_SIMS sims         \033[1G"
+    echo -n -e "Finished $SIM_FIN ($SIM_ERR) of $COUNT_SIMS sims         \033[1G"
     for fs in `(cd $WORKINGDIR/sim_finish_dir; ls)`; do
       echo $fs >> $WORKINGDIR/sim_finish
       rm $WORKINGDIR/sim_finish_dir/$fs
+      if [ -f $WORKINGDIR/sim_finish_err_dir/$fs ]; then
+        cat $WORKINGDIR/sim_finish_err_dir/$fs >> $WORKINGDIR/sim_finish_err
+        rm $WORKINGDIR/sim_finish_err_dir/$fs
+      fi
     done
     SIM_FIN=`cat $WORKINGDIR/sim_finish | wc -l`
     let SIM_DIFF=SIM_RUN-SIM_FIN
+    SIM_ERR=`cat $WORKINGDIR/sim_finish_err | wc -l`
   done
 
 done
 
+if [ $SIM_RUN -eq 0 ]; then
+  echo "No Simulation"
+  rm -f $WORKINGDIR/sim_finish $WORKINGDIR/sim_run
+  rm -rf $WORKINGDIR/sim_finish_dir $WORKINGDIR/sim_finish_err_dir $WORKINGDIR/sim_finish_err
+
+  exit 0
+fi
+
 while [ $SIM_DIFF -ne 0 ]; do
     sleep 1
-    echo -n -e "Finished $SIM_FIN of $COUNT_SIMS sims         \033[1G"
+    echo -n -e "Finished $SIM_FIN ($SIM_ERR) of $COUNT_SIMS sims         \033[1G"
     for fs in `(cd $WORKINGDIR/sim_finish_dir; ls)`; do
       echo $fs >> $WORKINGDIR/sim_finish
       rm $WORKINGDIR/sim_finish_dir/$fs
+      if [ -f $WORKINGDIR/sim_finish_err_dir/$fs ]; then
+        cat $WORKINGDIR/sim_finish_err_dir/$fs >> $WORKINGDIR/sim_finish_err
+        rm $WORKINGDIR/sim_finish_err_dir/$fs
+      fi
     done
     SIM_FIN=`cat $WORKINGDIR/sim_finish | wc -l`
     let SIM_DIFF=SIM_RUN-SIM_FIN
+    SIM_ERR=`cat $WORKINGDIR/sim_finish_err | wc -l`
 done
 
+echo "Finished $SIM_FIN of $COUNT_SIMS sims. $SIM_ERR Simulation ends with an error."
+
+if [ $SIM_ERR -ne 0 ]; then
+  echo "Check out sim_finish_err for all faulty simulations"
+else
+  rm -f $WORKINGDIR/sim_finish_err
+fi
+
 rm -f $WORKINGDIR/sim_finish $WORKINGDIR/sim_run
-rm -rf sim_finish_dir
+rm -rf $WORKINGDIR/sim_finish_dir $WORKINGDIR/sim_finish_err_dir
