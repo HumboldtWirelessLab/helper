@@ -89,6 +89,7 @@ FINALRESULTDIR=`echo $RESULTDIR | sed -e "s#WORKDIR#$WORKDIR#g" -e "s#CONFIGDIR#
 
 
 # check for result directory
+if [ "x$NOSUBDIR" = "x" ]; then
 if [ "x$3" = "x" ]; then
 	echo "RESULTDIR is target. No Subdir."
 
@@ -116,6 +117,7 @@ else
 	else
 		FINALRESULTDIR=$FINALRESULTDIR/$3
 	fi
+fi
 fi
 
 if [ ! -e $FINALRESULTDIR ]; then
@@ -181,7 +183,10 @@ case "$MODE" in
 					fi
 				fi
 			fi
-			cp $FINALPLMFILE $FINALRESULTDIR/$NODEPLACEMENTFILE
+			
+			if [ ! -e $FINALRESULTDIR/$NODEPLACEMENTFILE ]; then
+				cp $FINALPLMFILE $FINALRESULTDIR/$NODEPLACEMENTFILE
+			fi
 			FINALPLMFILE=$FINALRESULTDIR/$NODEPLACEMENTFILE
 		fi
 
