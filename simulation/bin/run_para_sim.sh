@@ -33,6 +33,8 @@ else
   fi
 fi
 
+let MIN_THREADS=MAX_THREADS/2
+
 echo "Use dist_para_sim: $USE_DISTPARASIM max. threads: $MAX_THREADS"
 
 NUM=0
@@ -110,11 +112,13 @@ for i in `find -name *.des.sim`; do
   SIM_FIN=`cat $WORKINGDIR/sim_finish | wc -l`
   SIM_ERR=`cat $WORKINGDIR/sim_finish_err | wc -l`
 
+  #waiting loop
   let SIM_DIFF=SIM_RUN-SIM_FIN
+  LOADAVG=`cat /proc/loadavg | awk -F. '{print $1}'`
 
-  while [ $SIM_DIFF -gt $MAX_THREADS ]; do
+  while [ $SIM_DIFF -gt $MAX_THREADS ] || [ [ $LOADAVG -gt $MAX_THREADS ] && [ $SIM_DIFF -gt $MIN_THREADS ] ]; do
     sleep 1
-    echo -n -e "Finished $SIM_FIN ($SIM_ERR) of $COUNT_SIMS sims         \033[1G"
+    echo -n -e "Finished $SIM_FIN ($SIM_ERR) of $COUNT_SIMS sims ($SIM_DIFF/$LOADAVG)        \033[1G"
     for fs in `(cd $WORKINGDIR/sim_finish_dir; ls)`; do
       echo $fs >> $WORKINGDIR/sim_finish
       rm $WORKINGDIR/sim_finish_dir/$fs
@@ -124,8 +128,11 @@ for i in `find -name *.des.sim`; do
       fi
     done
     SIM_FIN=`cat $WORKINGDIR/sim_finish | wc -l`
-    let SIM_DIFF=SIM_RUN-SIM_FIN
     SIM_ERR=`cat $WORKINGDIR/sim_finish_err | wc -l`
+
+    let SIM_DIFF=SIM_RUN-SIM_FIN
+    LOADAVG=`cat /proc/loadavg | awk -F. '{print $1}'`
+
   done
 
 done
@@ -140,7 +147,7 @@ fi
 
 while [ $SIM_DIFF -ne 0 ]; do
     sleep 1
-    echo -n -e "Finished $SIM_FIN ($SIM_ERR) of $COUNT_SIMS sims         \033[1G"
+    echo -n -e "Finished $SIM_FIN ($SIM_ERR) of $COUNT_SIMS sims ($SIM_DIFF/$LOADAVG)         \033[1G"
     for fs in `(cd $WORKINGDIR/sim_finish_dir; ls)`; do
       echo $fs >> $WORKINGDIR/sim_finish
       rm $WORKINGDIR/sim_finish_dir/$fs
@@ -150,8 +157,10 @@ while [ $SIM_DIFF -ne 0 ]; do
       fi
     done
     SIM_FIN=`cat $WORKINGDIR/sim_finish | wc -l`
-    let SIM_DIFF=SIM_RUN-SIM_FIN
     SIM_ERR=`cat $WORKINGDIR/sim_finish_err | wc -l`
+
+    let SIM_DIFF=SIM_RUN-SIM_FIN
+    LOADAVG=`cat /proc/loadavg | awk -F. '{print $1}'`
 done
 
 echo "Finished $SIM_FIN of $COUNT_SIMS sims. $SIM_ERR Simulation ends with an error."
