@@ -116,9 +116,10 @@ for i in `find -name *.des.sim`; do
   let SIM_DIFF=SIM_RUN-SIM_FIN
   LOADAVG=`cat /proc/loadavg | awk -F. '{print $1}'`
 
-  while [ $SIM_DIFF -gt $MAX_THREADS ] || [ [ $LOADAVG -gt $MAX_THREADS ] && [ $SIM_DIFF -gt $MIN_THREADS ] ]; do
+
+  while  [ $SIM_DIFF -gt $MAX_THREADS ] || ( [ $LOADAVG -gt $MAX_THREADS ] && [ $SIM_DIFF -gt $MIN_THREADS ] ); do
     sleep 1
-    echo -n -e "Finished $SIM_FIN ($SIM_ERR) of $COUNT_SIMS sims ($SIM_DIFF/$LOADAVG)        \033[1G"
+    echo -n -e "Finished $SIM_FIN ($SIM_ERR) of $COUNT_SIMS sims ($SIM_RUN/$SIM_DIFF/$LOADAVG)        \033[1G"
     for fs in `(cd $WORKINGDIR/sim_finish_dir; ls)`; do
       echo $fs >> $WORKINGDIR/sim_finish
       rm $WORKINGDIR/sim_finish_dir/$fs
