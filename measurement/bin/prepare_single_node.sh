@@ -494,6 +494,10 @@ CRUNMODENUM=4
 if [ $RUNMODENUM -le 4 ]; then
 
   echo "Setup Wifi" > status/$LOGMARKER\_wificonfig.log 2>&1
+  for node in $NODELIST; do
+	NODEDEVICELIST=`cat $CONFIGFILE | egrep "^$node[[:space:]]" | awk '{print $2}'`
+	echo "$node $NODEDEVICELIST" >> status/$LOGMARKER\_wificonfig.log 2>&1
+  done
   CURRENTMODE="CREATE WIFI"
   CREATEWIFI=0
 

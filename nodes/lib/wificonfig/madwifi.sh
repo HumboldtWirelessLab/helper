@@ -361,6 +361,16 @@ case "$1" in
 
 	    sleep $POST_START_SLEEP
 
+#	    ${IWPRIV} $DEVICE bgscan        0
+#	    ${IWPRIV} $DEVICE protmode      0
+#	    ${IWPRIV} $DEVICE rssi11a       11
+#	    ${IWPRIV} $DEVICE rssi11b       11
+#	    ${IWPRIV} $DEVICE rssi11g       11
+#	    ${IWPRIV} $DEVICE bintval       500
+#	    ${IWPRIV} $DEVICE ff            0
+#	    ${IWPRIV} $DEVICE burst         0
+#	    ${IWPRIV} $DEVICE abolt         0
+
 #Step3
 	    if [ "x$FAST_FRAME" != "x" ]; then
 	      # no fast frame
