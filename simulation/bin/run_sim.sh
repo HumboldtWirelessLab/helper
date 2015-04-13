@@ -110,7 +110,9 @@ else
 		  if [ $LOGLEVEL -gt 0 ]; then echo "Use $FINALRESULTDIR/$i"; fi
 
 		else
-		  rm -rf $FINALRESULTDIR/$i
+		  if [ "x$FORCE_DIR" != "xkeep" ]; then
+		    rm -rf $FINALRESULTDIR/$i
+		  fi
 		fi
 
 		FINALRESULTDIR=$FINALRESULTDIR/$i

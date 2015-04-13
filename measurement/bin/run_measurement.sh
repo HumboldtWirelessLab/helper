@@ -60,14 +60,21 @@ if [ "x$2" = "x" ]; then
     echo "RESULTDIR is target. no Subdir."
 else
     if [ -e $FINALRESULTDIR/$2 ]; then
-	echo "Measurement already exits"
-	exit 0
-    else
-	FINALRESULTDIR=$FINALRESULTDIR/$2
+       if [ "x$FORCE_DIR" = "x" ]; then
+          echo "Measurement already exits"
+          exit 0
+        else
+          if [ "x$FORCE_DIR" != "xkeep" ]; then
+            rm -rf $FINALRESULTDIR/$2
+          fi
+        fi
     fi
+    FINALRESULTDIR=$FINALRESULTDIR/$2
 fi
 
-mkdir $FINALRESULTDIR
+if [ ! -e $FINALRESULTDIR ]; then
+  mkdir $FINALRESULTDIR
+fi
 chmod 777 $FINALRESULTDIR
 
 NODELIST=`cat $CONFIGDIR/$NODETABLE | grep -v "^#" | awk '{print $1}' | uniq`

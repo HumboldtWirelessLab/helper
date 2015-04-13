@@ -278,7 +278,9 @@ case "$1" in
 		POWER=$DEFAULT_POWER
 	    fi
 	    echo "$IWCONFIG $DEVICE txpower $POWER"
-	    ${IWCONFIG} $DEVICE txpower $POWER
+	    if [ "x$POWER" != "xMAX" ]; then
+                ${IWCONFIG} $DEVICE txpower $POWER
+            fi
 
 	    sleep $POST_START_SLEEP
 
