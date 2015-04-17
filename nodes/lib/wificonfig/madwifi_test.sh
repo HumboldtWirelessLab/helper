@@ -70,6 +70,7 @@ case "$1" in
 #	       exit 1
 #	     fi
 	    DEV_PREFIX=`echo $DEVICE | cut -b 1-3`
+	    #bth instead of ath to avoid that madwifi_test
 	    if [ "x$DEV_PREFIX" = "xbth" ]; then
 	      exit 1
 #	      exit 0

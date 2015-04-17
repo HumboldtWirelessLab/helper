@@ -398,7 +398,7 @@ case "$1" in
 
 	    sleep $POST_START_SLEEP
 
-#Step3            if [ "x" = "Y" ]; then
+#Step4            if [ "x" = "Y" ]; then
 	    if [ "$MODE" = "monitor" ]; then
 
 			if [ "x$CRCERROR" = "x" ]; then
@@ -414,6 +414,12 @@ case "$1" in
 			fi
 			echo "echo \"$PHYERROR\" > /proc/sys/net/$DEVICE/monitor_phy_errors"
 			echo "$PHYERROR" > /proc/sys/net/$DEVICE/monitor_phy_errors
+
+			if [ "x$TXFEEDBACK_LEN" = "x" ]; then
+				TXFEEDBACK_LEN=$DEFAULT_TXFEEDBACK_LEN
+			fi
+			echo "echo \"$TXFEEDBACK_LEN\" > /proc/sys/net/$DEVICE/monitor_txf_len"
+			echo "$TXFEEDBACK_LEN" > /proc/sys/net/$DEVICE/monitor_txf_len
 			
 			sleep $POST_START_SLEEP
 			
@@ -451,9 +457,9 @@ case "$1" in
 			    sleep $POST_START_SLEEP
 			fi
 	    fi
-#end step 3	   fi
+#end step 4	   fi
 
-#step 3
+#step 5
 	    if [ "x$DISABLECCA" = "x" ]; then
 		DISABLECCA=$DEFAULT_DISABLECCA
 	    fi
@@ -467,7 +473,7 @@ case "$1" in
 		sysctl -w dev.$PHYDEV.cca_thresh=$CCA_THRESHOLD
 		sleep $POST_START_SLEEP
 	    fi
-#end step 3
+#end step 5
 	
 	    if [ "x$CWMIN" != "x" ]; then
 		QUEUE=0
