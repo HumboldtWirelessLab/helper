@@ -1,14 +1,25 @@
 CC = g++
+AR = ar
 
-SRCS= csclient.cc lzw.cc base64.cc csclient_main.cc click_ctrl.cc
+LIBSRCS= csclient.cc lzw.cc base64.cc
+BINSRCS= click_client.cc click_ctrl.cc
 
-OBJS = $(foreach src, $(SRCS), $(src:.cc=.o))
+
+LIBOBJS = $(foreach src, $(LIBSRCS), $(src:.cc=.o))
+BINOBJS = $(foreach src, $(BINSRCS), $(src:.cc=.o))
 
 %.o : %.cc
 	$(CC) -c $(CFLAGS) $< -o $@
 
-all:  $(OBJS)
-	g++ -o csclient csclient.o csclient_main.o
-	g++ -o click_ctrl csclient.o click_ctrl.o lzw.o base64.o
+all: libclickctrl.a  $(BINOBJS)
+	g++ -o click_client click_client.o -L. -lclickctrl
+	g++ -o click_ctrl click_ctrl.o -L. -lclickctrl
+
+libclickctrl.a:  $(LIBOBJS)
+	$(AR) r $@ $?
+
+libclickctrl.so:  $(LIBOBJS)
+	$(CC) $(CFLAGS) -shared -o $@ -Wl,-soname,$@ $?
+
 clean:
-	rm -f *.o click_ctrl csclient
+	rm -f *.o click_ctrl csclient *.so *.a
