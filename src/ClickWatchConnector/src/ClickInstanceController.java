@@ -50,7 +50,7 @@ public class ClickInstanceController extends Thread {
    // readHandler.add(new String("version"));
    // readHandler.add(new String("classes"));
    // readHandler.add(new String("config"));
-   //readHandler.add(new String("flatconfig"));
+   // readHandler.add(new String("flatconfig"));
   }
 
   public void run() {

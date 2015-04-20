@@ -179,6 +179,12 @@ case "$1" in
 					fi
 					#TODO: don't force to use extra encap
 					WIFITYPE=$WIFITYPE_EXTRA
+				elif [ "x$USED_SIMULATOR" = "xns3" ]; then
+				
+					#read wificonfig for aifs, cwmin etc.
+					#Hint: already done
+					#but overwrite wifitype, since ns2 only support wifiextra
+					WIFITYPE=$WIFITYPE_PRISM
 				else
 					#read wificonfig for aifs, cwmin etc.
 					#Hint: already done
