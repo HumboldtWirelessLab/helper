@@ -56,30 +56,14 @@ echo "foo"
       echo "eval dump"
       OUTPUT_FILLER="$OUTPUT_FILLER$EXTRAENCAP_FILLER"
       echo "$OUTPUT_FILLER"
-      ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=extra $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk -v outfiller="$OUTPUT_FILLER" '{print outfiller""$0}' > $EVALUATIONDIR/$d.all.dat )
+      ( cd $RESULTDIR; GPS=$GPS SEQ=yes $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk -v outfiller="$OUTPUT_FILLER" '{print outfiller""$0}' > $EVALUATIONDIR/$d.all.dat )
       echo "fine"
     else
-      WIFIFILE=`cat $NODETABLE | grep "$NODENAME[[:space:]]*$NODEDEVICE" | awk '{print $5}'`
-      DIRNAMEWF=`dirname $WIFIFILE`
-
-      echo $WIFIFILE
-      if [ -f $WIFIFILE ]; then
-        . $WIFIFILE
-      else
-        WIFIFILE=`echo $WIFIFILE | sed "s#$DIRNAMEWF##g"`
-	if [ -f $PWD/$WIFIFILE ]; then
-	  WIFIFILE="$PWD/$WIFIFILE"
-	  . $WIFIFILE
-	else
-          echo "ERROR while getting WIFIINFOFILE ($WIFIFILE). ABORT!!!"
-          exit 1
-	fi
-      fi
- echo $WIFIFILE
+      WIFITYPE=`testheader.sh $RESULTDIR/$d`
       if [ $WIFITYPE -ne 805 ]; then
         OUTPUT_FILLER="$OUTPUT_FILLER$EXTRAENCAP_FILLER"
       fi
-      ( cd $RESULTDIR; GPS=$GPS SEQ=yes WIFI=$WIFITYPE $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk -v outfiller="$OUTPUT_FILLER" '{print outfiller""$0}' > $EVALUATIONDIR/$d.all.dat )
+      ( cd $RESULTDIR; GPS=$GPS SEQ=yes $DIR/../../bin/fromdump.sh $RESULTDIR/$d | awk -v outfiller="$OUTPUT_FILLER" '{print outfiller""$0}' > $EVALUATIONDIR/$d.all.dat )
     fi
 done
 

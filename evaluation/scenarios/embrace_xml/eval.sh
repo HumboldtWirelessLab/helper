@@ -20,7 +20,10 @@ esac
 
 . $CONFIGFILE
 
-echo "<$NAME>" > $EVALUATIONSDIR/measurement.xml
+
+XMLNAME=XML_$NAME
+
+echo "<$XMLNAME>" > $EVALUATIONSDIR/measurement.xml
 
 if [ "x$MODE" = "xsim" ]; then
   if [ -f $RESULTDIR/measurement.log ]; then
@@ -45,7 +48,7 @@ else
   fi
 fi
 
-echo "</$NAME>" >> $EVALUATIONSDIR/measurement.xml
+echo "</$XMLNAME>" >> $EVALUATIONSDIR/measurement.xml
 
 exit 0
 

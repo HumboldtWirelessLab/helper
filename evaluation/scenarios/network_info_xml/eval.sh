@@ -74,3 +74,21 @@ if [ ! -f $EVALUATIONSDIR/bcaststats.csv ]; then
   xsltproc $DIR/bcaststats.xslt $DATAFILE > $EVALUATIONSDIR/bcaststats.csv
   cat $EVALUATIONSDIR/bcaststats.csv | sed "s#,# #g" | MAC2NUM=1 human_readable.sh $RESULTDIR/nodes.mac > $EVALUATIONSDIR/bcaststats.mat
 fi
+
+if [ -f $EVALUATIONSDIR/linksmetric.mat ]; then
+  lm_size=`wc -c $EVALUATIONSDIR/linksmetric.mat | awk '{printf $1}'`
+else
+  lm_size=0;
+fi
+
+if [ -f $EVALUATIONSDIR/bcaststats.mat ]; then
+  bs_size=`wc -c $EVALUATIONSDIR/bcaststats.mat | awk '{printf $1}'`
+else
+  bs_size=0;
+fi
+
+if [ $lm_size -eq 0 ]; then
+  rm -f $EVALUATIONSDIR/linksmetric.mat $EVALUATIONSDIR/linksmetric.all
+fi
+
+exit 0

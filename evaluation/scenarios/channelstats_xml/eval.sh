@@ -34,25 +34,20 @@ else
   fi
 fi
 
-FULLSED=""
-FULLIDSED=""
-while read line; do
-  SRCN=`echo $line | awk '{print $1}'` 
-  SRCM=`echo $line | awk '{print $3}'`
-  SRCID=`echo $line | awk '{print $4}'`
-
-  FULLSED="$FULLSED -e s#$SRCM#$SRCN#g"
-  FULLIDSED="$FULLIDSED -e s#$SRCM#$SRCID#g"
-done < $RESULTDIR/nodes.mac
-
 EVALUATIONSDIR="$EVALUATIONSDIR""/channelstats"
 if [ ! -e $EVALUATIONSDIR ]; then
   mkdir -p $EVALUATIONSDIR
 fi
 
-#summary. Small info
-xsltproc $DIR/simstats_summary.xslt $DATAFILE > $EVALUATIONSDIR/simstats_summary.csv
-sed "s#,# #g" $EVALUATIONSDIR/simstats_summary.csv > $EVALUATIONSDIR/simstats_summary.mat
+if [ "x$MODE" = "xsim" ]; then
+  #summary. Small info
+  xsltproc $DIR/simstats_summary.xslt $DATAFILE | MAC2NUM=1 human_readable.sh $RESULTDIR/nodes.mac > $EVALUATIONSDIR/simstats_summary.csv
+  sed "s#,# #g" $EVALUATIONSDIR/simstats_summary.csv > $EVALUATIONSDIR/simstats_summary.mat
 
-xsltproc $DIR/simstats.xslt $DATAFILE | sed $FULLIDSED > $EVALUATIONSDIR/simstats.csv
-sed "s#,# #g" $EVALUATIONSDIR/simstats.csv > $EVALUATIONSDIR/simstats.mat
+  xsltproc $DIR/simstats.xslt $DATAFILE | MAC2NUM=1 human_readable.sh $RESULTDIR/nodes.mac > $EVALUATIONSDIR/simstats.csv
+  sed "s#,# #g" $EVALUATIONSDIR/simstats.csv > $EVALUATIONSDIR/simstats.mat
+fi
+
+xsltproc $DIR/channelstats.xslt $DATAFILE | grep -v ",0.000000,0,0,0,0,0,0,0,0,0,0,0,0" | MAC2NUM=1 human_readable.sh $RESULTDIR/nodes.mac > $EVALUATIONSDIR/channelstats.csv
+sed "s#,# #g" $EVALUATIONSDIR/channelstats.csv > $EVALUATIONSDIR/channelstats.mat
+
