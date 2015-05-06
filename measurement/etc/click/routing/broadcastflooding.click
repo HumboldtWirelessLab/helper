@@ -201,9 +201,7 @@ elementclass BROADCASTFLOODING {ID $id, LT $lt, LINKSTAT $linkstat |
   -> [0]output;
 
   fl[1]
-#ifdef SIMULATION
   -> rdq
-#endif
 #ifdef PRIO_QUEUE
   -> FrontDropQueue(100)
 #endif
