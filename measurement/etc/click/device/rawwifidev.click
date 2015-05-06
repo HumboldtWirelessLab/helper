@@ -68,6 +68,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #define COLLINFO
 #define CERR
 #endif
+#endif
 
 #ifdef COLLINFO
   cinfo::CollisionInfo();
@@ -89,9 +90,6 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
   ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, DEVICE $device, HNWORST false, DEBUG 2);
 #endif
 #endif
-#endif
-
-
 
   // RAWDEV from include rawdev.click
   rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);

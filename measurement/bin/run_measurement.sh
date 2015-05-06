@@ -198,7 +198,7 @@ if [ "x$DISABLE_WIRELESS_BACKBONE" = "x" ]; then
   DISABLE_WIRELESS_BACKBONE=no
 fi
 
-if [ "x$TESTONLY" = "x" ]; then
+if [ "x$TESTONLY" = "x" ] && [ "x$PREPARE_ONLY" = "x" ]; then
   echo "Start measurement !"
 
   echo "#!/bin/sh" > $FINALRESULTDIR/run_again.sh
