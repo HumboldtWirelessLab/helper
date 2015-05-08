@@ -27,7 +27,7 @@ elementclass ADHOC_OR_INFRASTRUCTURE_CLIENT {
   channel_list::AvailableChannels($channel);
 #endif
 
-    isc :: BRN2InfrastructureClient(WIRELESS_INFO $auth_info, RT auth_rates,
+    isc :: BRN2InfrastructureClient(DEVICE $device, WIRELESS_INFO $auth_info, RT auth_rates,
                                     BEACONSCANNER bs, PROBE_REQUESTER probe_req, AUTH_REQUESTER auth_req, 
                                     ASSOC_REQUESTER assoc_req, WIFIENCAP $clientwifiencap, ACTIVESCAN $active,
 #ifdef SIMULATION
