@@ -151,7 +151,11 @@ else #ns3
 	# run simulation with NS3
 	if [ "x$NS3_HOME" != "x" ] && [ -e $NS3_HOME/ ]; then
 		 ( rm -rf $NS3_HOME/scratch/$NAME; mkdir $NS3_HOME/scratch/$NAME; cp $RESULTDIR/$NAME.cc $NS3_HOME/scratch/$NAME; cd $NS3_HOME; ./waf ) > $LOGDIR/ns3_build.log 2>&1
-		 ( cd $NS3_HOME; ./waf --run $NAME > $LOGDIR/$LOGFILE 2>&1 ) > $LOGDIR/$LOGFILE 2>&1
+		 if  [ "x$GDB" = "x1" ]; then
+		    ( cd $NS3_HOME; ./waf --run $NAME --command-template="gdb --args %s <args>" )
+		 else
+		    ( cd $NS3_HOME; ./waf --run $NAME > $LOGDIR/$LOGFILE > $LOGDIR/$LOGFILE 2>&1 ) > $LOGDIR/$LOGFILE 2>&1
+		 fi
 		 ( cp $NS3_HOME/scratch/$NAME/* $RESULTDIR ) >> $LOGDIR/ns3_build.log 2>&1
 	fi
 	exit 0

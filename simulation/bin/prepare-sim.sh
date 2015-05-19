@@ -184,7 +184,7 @@ case "$1" in
 					#read wificonfig for aifs, cwmin etc.
 					#Hint: already done
 					#but overwrite wifitype, since ns2 only support wifiextra
-					WIFITYPE=$WIFITYPE_PRISM
+					WIFITYPE=$WIFITYPE_RADIOTAP
 				else
 					#read wificonfig for aifs, cwmin etc.
 					#Hint: already done
