@@ -132,7 +132,7 @@ elementclass ROUTING { ID $id, ETHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTA
 
   routing[1]      //BRN (Routing)
 #ifdef ROUTINGDSR
-    -> SetEtherAddr(SRC $ea)
+    -> BRN2EtherEncap(SRC $ea, PUSHHEADER false)
 #endif
 #ifdef ROUTING_PERFORMANCE_CNT
     -> routing_out_cnt_brn::Counter()
