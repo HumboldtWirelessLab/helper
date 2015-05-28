@@ -67,7 +67,7 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
   -> SetTimestamp()
   -> Print("NODENAME: DSR: query", 100, TIMESTAMP true)
 #endif
- -> BRN2EtherEncap() 
+ -> querier_etherencap::BRN2EtherEncap(USEANNO true)
  -> [1]output;                                             // rreq packets (broadcast)
 
   querier[1] 
@@ -86,7 +86,7 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
   -> Print("NODENAME: Forward", 100, TIMESTAMP true)
 #endif
   -> dsr_stats
-  -> BRN2EtherEncap(USEANNO true)
+  -> src_fwd_ethernecap::BRN2EtherEncap(USEANNO true)
   -> [1]output;
 
   src_forwarder[1]
@@ -126,7 +126,7 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
   -> SetTimestamp()
   -> Print("NODENAME: Req_fwd_out", 100, TIMESTAMP true)
 #endif
-  -> BRN2EtherEncap()
+  -> req_fwd_etherencap::BRN2EtherEncap(USEANNO true)
   -> [1]output;
 
   req_forwarder[1]
@@ -135,7 +135,7 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
   -> Print("NODENAME: Target! now send reply", 100, TIMESTAMP true)
 #endif
   -> [0]rep_forwarder
-  -> BRN2EtherEncap()
+  -> rep_fwd_etherencap::BRN2EtherEncap(USEANNO true)
   -> [1]output;
 
   dsrclf[1] 
@@ -147,7 +147,7 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
 
   dsrclf[2]
   -> [1]err_forwarder
-  -> BRN2EtherEncap()
+  -> err_fwd_ethencap::BRN2EtherEncap(USEANNO true)
   -> [1]output;
 
   dsrclf[3]

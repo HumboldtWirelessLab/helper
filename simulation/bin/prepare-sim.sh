@@ -72,6 +72,8 @@ case "$1" in
     #echo "start" >> $RESULTDIR/time.log
   	#date +"%s:%N" >> $RESULTDIR/time.log
 
+		NODENUM=1
+
 		while read line; do
 		 	ISCOMMENT=`echo $line | grep "#" | wc -l`
 		  if [ $ISCOMMENT -eq 0 ]; then
@@ -265,6 +267,9 @@ case "$1" in
 
 							fi
 						fi
+
+						CPPOPTS="$CPPOPTS -DNODEID=$NODENUM"
+						let NODENUM=NODENUM+1
 
 						if [ "x$USE_SINGLE_CLICKFILE" = "x1" ] ; then
 						  if [ $NODE_IN_CNODES -eq 1 ]; then

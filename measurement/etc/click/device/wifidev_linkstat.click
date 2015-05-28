@@ -160,6 +160,13 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 //  -> Print("Data")
     -> brn_ether_clf :: Classifier( 12/BRN_ETHERTYPE, - )
     -> lp_clf :: Classifier( 14/BRN_PORT_LINK_PROBE, - )
+
+#ifdef CORRELATED_DROP_PATTERN
+#ifdef CORRELATED_DROP_SRC
+    -> BRNCorrelatedDrop(PATTERN CORRELATED_DROP_PATTERN, SKEW 0, ETHERADDRESS CORRELATED_DROP_SRC)
+#endif
+#endif
+
     -> BRN2EtherDecap()
 //  -> Print("Linkprobe",320)
     -> link_stat
