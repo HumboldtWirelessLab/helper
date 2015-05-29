@@ -268,7 +268,7 @@ case "$1" in
 							fi
 						fi
 
-						CPPOPTS="$CPPOPTS -DNODEID=$NODENUM"
+						CPPOPTS="$CPPOPTS -DNODENUM=$NODENUM"
 						let NODENUM=NODENUM+1
 
 						if [ "x$USE_SINGLE_CLICKFILE" = "x1" ] ; then
