@@ -19,6 +19,8 @@
 #define BRN_PORT_GATEWAY                 03
 #define BRN_PORT_EVENTHANDLER            04
 #define BRN_PORT_ALARMINGPROTOCOL        05
+#define BRN_PORT_RPC                     06
+
 /*Routing*/
 #define BRN_PORT_DSR                     0a
 #define BRN_PORT_BCASTROUTING            0b
@@ -29,15 +31,19 @@
 #define BRN_PORT_HAWK                    10
 #define BRN_PORT_OLSR                    11
 #define BRN_PORT_AODV                    12
+
 /*Clustering*/
 #define BRN_PORT_DCLUSTER                1e
 #define BRN_PORT_NHOPCLUSTER             1f
+
 /*Topology*/
 #define BRN_PORT_TOPOLOGY_DETECTION      23
 #define BRN_PORT_NHOPNEIGHBOURING        24
+
 /*P2P*/
 #define BRN_PORT_DHTROUTING              28
 #define BRN_PORT_DHTSTORAGE              29
+
 /*Data transfer*/
 #define BRN_PORT_SDP                     32
 #define BRN_PORT_TFTP                    33
@@ -45,8 +51,10 @@
 #define BRN_PORT_COMPRESSION             35
 #define BRN_PORT_FRAGMENTATION           36
 #define BRN_PORT_FLOWCONTROL             37
+
 /*Info*/
 #define BRN_PORT_CHANNELSTATSINFO        3c
+
 /*Application*/
 #define BRN_PORT_SHAMIR                  3e
 #define BRN_PORT_SEISMO_COOPERATIVE      3f
