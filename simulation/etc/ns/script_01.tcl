@@ -264,8 +264,20 @@ $ns_ rtproto Empty
 #
 # Here is where we actually create all of the nodes.
 #
+# setup label first (if not, the nam-file doesn't work)
+#
 for {set i 0} {$i < $nodecount } {incr i} {
     set node_($i) [$ns_ node]
+    
+    $node_($i) label $nodelabel($i)
+}
+
+#
+# Here is where we actually setup all of the nodes.
+#
+
+for {set i 0} {$i < $nodecount } {incr i} {
+    #set node_($i) [$ns_ node]
 
     #
     # After creating the node, we add one wireless network interface to
@@ -293,7 +305,7 @@ for {set i 0} {$i < $nodecount } {incr i} {
     $node_($i) set X_ $pos_x($i)
     $node_($i) set Y_ $pos_y($i)
     $node_($i) set Z_ $pos_z($i)
-    $node_($i) label $nodelabel($i)
+    #$node_($i) label $nodelabel($i)
 
     #
     # The node name is used by Click to distinguish information
