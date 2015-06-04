@@ -36,6 +36,10 @@ function handle_eval {
 
         if [ -f $DIR/../scenarios/$i/eval.sh ]; then
           ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $DIR/../scenarios/$i/eval.sh )
+          RESULT=$?
+          if [ $RESULT -ne 0 ]; then
+            exit 2
+          fi
         fi
       else
         EVALDIR=`dirname $CONFIGDIR/$i`
@@ -45,6 +49,10 @@ function handle_eval {
 
         if [ -f $CONFIGDIR/$i ]; then
           ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $CONFIGDIR/$i )
+          RESULT=$?
+          if [ $RESULT -ne 0 ]; then
+            exit 2
+          fi
         fi
       fi
 
@@ -67,7 +75,7 @@ if [ "x$1" != "x" ]; then
     cat $OLDNODETABLE | sed "s#$OLDRESULTDIR/##g" > $NODETABLE
   else
     echo "$1 not found."
-    exit 1
+    exit 2
   fi
 else
   . $CONFIGFILE
@@ -102,3 +110,5 @@ if [ "x$EVALUATION" != "x" ]; then
 else
   echo "No evaluation"
 fi
+
+exit 0

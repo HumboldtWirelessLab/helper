@@ -114,6 +114,9 @@ elementclass ROUTING { ID $id, ETHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTA
     -> [1]routing;
 
   input[2]        //BRN-Feedback (Failed)
+#ifdef ROUTING_PERFORMANCE_CNT
+    -> routing_in_cnt_brn_failed::Counter()
+#endif
     -> Print("NODENAME: Failed")
     -> [2]routing;
 
@@ -162,8 +165,8 @@ elementclass ROUTING { ID $id, ETHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTA
 #endif
 
 #ifdef ROUTING_PERFORMANCE_CNT
-  routing_pkt_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.count routing_in_cnt_brn.count routing_in_cnt_passive.count routing_out_cnt_brn.count routing_out_cnt_cl.count routing_out_cnt_me.count routing_out_cnt_bcast.count", DEBUG 2);
-  routing_byte_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.byte_count routing_in_cnt_brn.byte_count routing_in_cnt_passive.byte_count routing_out_cnt_brn.byte_count routing_out_cnt_cl.byte_count routing_out_cnt_me.byte_count routing_out_cnt_bcast.byte_count", DEBUG 2);
+  routing_pkt_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.count routing_in_cnt_brn.count routing_in_cnt_passive.count routing_out_cnt_brn.count routing_out_cnt_cl.count routing_out_cnt_me.count routing_out_cnt_bcast.count routing_in_cnt_brn_failed.count", DEBUG 2);
+  routing_byte_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.byte_count routing_in_cnt_brn.byte_count routing_in_cnt_passive.byte_count routing_out_cnt_brn.byte_count routing_out_cnt_cl.byte_count routing_out_cnt_me.byte_count routing_out_cnt_bcast.byte_count routing_in_cnt_brn_failed.byte_count", DEBUG 2);
 #endif
 
 }

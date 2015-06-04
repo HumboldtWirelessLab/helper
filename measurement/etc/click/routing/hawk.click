@@ -39,6 +39,7 @@ hawkfwd::HawkForwarder( NODEIDENTITY $ID, ROUTINGTABLE rt,FRT $dhtroutingtable, 
   routing_peek :: HawkRoutingPeek(DEBUG 2);
 
   input[0]
+  //-> Print("To Routeq")
   -> hawkroutequerier[0]
   //-> Print("On the road to fwd")
   -> [1]hawkfwd[0]

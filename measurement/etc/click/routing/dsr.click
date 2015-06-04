@@ -17,7 +17,7 @@
 #endif
 
 #ifndef DSR_PARAM_PASSIVE_ACK_INTERVAL
-#define DSR_PARAM_PASSIVE_ACK_INTERVAL 0
+#define DSR_PARAM_PASSIVE_ACK_INTERVAL 20
 #endif
 
 #ifndef DSR_PARAM_FORCE_PASSIVE_ACK_RETRIES
@@ -56,7 +56,7 @@ elementclass DSR {$ID, $LT, $METRIC, $ROUTEMAINT |
   err_forwarder :: BRN2ErrorForwarder(NODEIDENTITY $ID, LINKTABLE $LT, DSRENCAP dsr_encap, DSRDECAP dsr_decap, ROUTEQUERIER querier, DEBUG 2);
   routing_peek :: DSRPeek(DEBUG 2);
 
-  feedback_handler :: DSRHandleFeedback(NODEIDENTITY $ID, DEBUG 2);
+  feedback_handler :: DSRHandleFeedback(NODEIDENTITY $ID, LINKTABLE $LT, DEBUG 2);
 
   input[0]
 #ifdef DEBUG_DSR
