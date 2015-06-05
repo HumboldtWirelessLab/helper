@@ -46,7 +46,18 @@ fi
 
 echo "Networkstats!"
 
-(cd $DIR; matwrapper "try,bcaststats2graph('$EVALUATIONSDIR/bcaststats.mat','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+if [ -f $EVALUATIONSDIR/bcaststats.mat ]; then
+  FILESIZE=`wc -c $EVALUATIONSDIR/bcaststats.mat | awk '{print $1}'`
+  if [ $FILESIZE -gt 0 ]; then
+    (cd $DIR; matwrapper "try,bcaststats2graph('$EVALUATIONSDIR/bcaststats.mat','$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+  fi
+fi
 
+if [ -f $EVALUATIONSDIR/graph_psr.mat ]; then
+  FILESIZE=`wc -c $EVALUATIONSDIR/graph_psr.mat | awk '{print $1}'`
+  if [ $FILESIZE -gt 0 ]; then
+    (cd $DIR; matwrapper "try,nodedegree('$EVALUATIONSDIR/graph_psr.mat', [25 50 75], '$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+  fi
+fi
 
-(cd $DIR; matwrapper "try,nodedegree('$EVALUATIONSDIR/graph_psr.mat', [25 50 75], '$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+#echo "Result: $?"

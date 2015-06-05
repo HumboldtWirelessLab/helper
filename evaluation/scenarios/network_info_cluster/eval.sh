@@ -60,6 +60,7 @@ echo "Create partitions files"
 
 if [ $? -ne 0 ]; then
   echo "Ohh, matlab error."
+  echo 1
 fi
 
 #echo "Get Bridges and Articulation points"
@@ -92,32 +93,37 @@ done
 
 echo "Cluster!"
 
-BCASTSIZE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $3}' | sort -u`
-BCASTRATE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $4}' | sort -u`
-BCASTNODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
+if [ -f $EVALUATIONSDIR/bcaststats.csv ]; then
+  FILESIZE=`wc -c $EVALUATIONSDIR/bcaststats.csv | awk '{print $1}'`
+  if [ $FILESIZE -gt 0 ]; then
+    BCASTSIZE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $3}' | sort -u`
+    BCASTRATE=`cat $EVALUATIONSDIR/bcaststats.csv | awk -F , '{print $4}' | sort -u`
+    BCASTNODES=`cat $RESULTDIR/nodes.mac | awk '{print $3}'`
 
-for r in $BCASTRATE; do
-  for s in $BCASTSIZE; do
-    PARAMS="$r""_""$s"
-    TARGET="$EVALUATIONSDIR/cluster_""$PARAMS""_"
-    GRAPHFILE="$EVALUATIONSDIR/graph_psr_""$PARAMS"".csv"
+    for r in $BCASTRATE; do
+      for s in $BCASTSIZE; do
+        PARAMS="$r""_""$s"
+        TARGET="$EVALUATIONSDIR/cluster_""$PARAMS""_"
+        GRAPHFILE="$EVALUATIONSDIR/graph_psr_""$PARAMS"".csv"
 
-    (cd $DIR; matwrapper "try,partitions_psr('$GRAPHFILE',[70 85],'$TARGET'),catch,exit(1),end,exit(0)" 1> /dev/null)
+        (cd $DIR; matwrapper "try,partitions_psr('$GRAPHFILE',[70 85],'$TARGET'),catch,exit(1),end,exit(0)" 1> /dev/null)
 
-    if [ "x$MODE" = "xsim" ]; then
-      CLUSTERSIZEFILE="$EVALUATIONSDIR/cluster_""$PARAMS""_psr_85_clustersize.csv"
-      MAX_CLUSTER=`cat $CLUSTERSIZEFILE | sed "s#,# #g" | tail -n 1 | awk '{print $1}'`
-      CLUSTERFILE="$EVALUATIONSDIR/cluster_""$PARAMS""_psr_85_cluster_"$MAX_CLUSTER".csv"
-      CLUSTERCSVFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".csv"
-      CLUSTERPLMFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".plm"
-      if [ -e $CLUSTERFILE ]; then
-        (cd $DIR; matwrapper "try,partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE'),catch,exit(1),end,exit(0)" 1> /dev/null)
-        cat $CLUSTERCSVFILE | sed "s#,# #g" | awk '{print "node"$0}' > $CLUSTERPLMFILE
-      fi
-    fi
+        if [ "x$MODE" = "xsim" ]; then
+          CLUSTERSIZEFILE="$EVALUATIONSDIR/cluster_""$PARAMS""_psr_85_clustersize.csv"
+          MAX_CLUSTER=`cat $CLUSTERSIZEFILE | sed "s#,# #g" | tail -n 1 | awk '{print $1}'`
+          CLUSTERFILE="$EVALUATIONSDIR/cluster_""$PARAMS""_psr_85_cluster_"$MAX_CLUSTER".csv"
+          CLUSTERCSVFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".csv"
+          CLUSTERPLMFILE="$EVALUATIONSDIR/clusterplacement/cluster_""$PARAMS"".plm"
+          if [ -e $CLUSTERFILE ]; then
+            (cd $DIR; matwrapper "try,partitionplacement('$CLUSTERFILE','$EVALUATIONSDIR/nodes.plm','$CLUSTERCSVFILE'),catch,exit(1),end,exit(0)" 1> /dev/null)
+            cat $CLUSTERCSVFILE | sed "s#,# #g" | awk '{print "node"$0}' > $CLUSTERPLMFILE
+          fi
+        fi
 
-  done
-done
+      done
+    done
+  fi
+fi
 
 ###############################################################################
 # create partition (etx linktable based)
