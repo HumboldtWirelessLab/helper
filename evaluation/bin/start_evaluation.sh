@@ -38,6 +38,7 @@ function handle_eval {
           ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $DIR/../scenarios/$i/eval.sh )
           RESULT=$?
           if [ $RESULT -ne 0 ]; then
+            echo "$DIR/../scenarios/$i/eval.sh failed with $RESULT"
             exit 2
           fi
         fi
@@ -51,6 +52,7 @@ function handle_eval {
           ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $CONFIGDIR/$i )
           RESULT=$?
           if [ $RESULT -ne 0 ]; then
+            echo "$CONFIGDIR/$i failed with $RESULT"
             exit 2
           fi
         fi
