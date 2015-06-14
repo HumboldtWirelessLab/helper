@@ -1,4 +1,4 @@
-FromDump("DUMP",STOP true)
+FromDump("DUMP", MMAP true, STOP true)
 //COMPRESSION -> pdc::PacketDecompression(CMODE 0)
 //COMPRESSION -> n::Null();
 //COMPRESSION pdc[1]
@@ -9,15 +9,16 @@ FromDump("DUMP",STOP true)
   -> Print("Sync", TIMESTAMP true)
   -> toosmall :: Counter
   -> Discard;
-	    
+
 minl
-  -> Print("DumpError", TIMESTAMP true)
+ -> Print("DumpError", TIMESTAMP true)
  -> Discard;
-		
+
 maxl[1]
 //GPS  -> GPSPrint(NOWRAP true)
 //GPS  -> GPSDecap()
-  -> rtap_decap :: RadiotapDecap()
+  -> rtap_decap :: BrnRadiotapDecap()
+//  -> Print("OK",200)
   -> filter_tx :: FilterTX()
   -> filter_err :: FilterPhyErr()
   -> ok :: Counter

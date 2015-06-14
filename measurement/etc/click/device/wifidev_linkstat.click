@@ -14,12 +14,13 @@
 #ifdef SIMULATION
 #define DEFAULT_LINKPROBE_PERIOD            2000
 #define DEFAULT_LINKPROBE_TAU              30000
-#define DEFAULT_LINKPROBE_PROBES         "2 500"
+#define DEFAULT_LINKPROBE_PROBES      "2 500 24"
+//4 500 11 500 22 500"
 #else
-#define DEFAULT_LINKPROBE_PERIOD            1000
-#define DEFAULT_LINKPROBE_TAU             100000
-#define DEFAULT_LINKPROBE_PROBES  "2 100 2 1000"
-//#define DEFAULT_LINKPROBE_PROBES         "2 500 HT20 15 500 HT20 0 500 4 300 HT40 7 500"
+#define DEFAULT_LINKPROBE_PERIOD                  1000
+#define DEFAULT_LINKPROBE_TAU                   100000
+#define DEFAULT_LINKPROBE_PROBES  "2 100 24 2 1000 24"
+//#define DEFAULT_LINKPROBE_PROBES         "2 500 24 HT20 15 500 24 HT20 0 500 24 4 300 24 HT40 7 500 24"
 #endif
 
 #ifndef DEFAULT_DATARATE
@@ -31,12 +32,11 @@
 #endif
 
 elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddress, LT $lt |
-	
-	availablerates::BrnAvailableRates(DEFAULT 2 4 11 22 12 18 24 36 48 72 96 108); //rates, that are used by that node
-	etx_metric :: BRN2ETXMetric($lt);
-	//ett_metric :: BRNETTMetric($lt);
 
-	link_stat :: BRN2LinkStat(DEVICE              $device,
+  availablerates::BrnAvailableRates(DEFAULT 2 4 11 22 12 18 24 36 48 72 96 108); //rates, that are used by that node
+  etx_metric :: BRN2ETXMetric($lt);
+
+  link_stat :: BRN2LinkStat(DEVICE              $device,
 #ifdef LINKPROBE_PERIOD
                             PERIOD           LINKPROBE_PERIOD,
 #else
@@ -57,31 +57,42 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
                             METRIC     "etx_metric",
                             DEBUG            0 );
 
+#ifdef DTS
+  dts::DistTimeSync(LINKSTAT link_stat, TIMEDRIFT -1, OFFSET -1, DEBUG 2);
+#endif
+
   brnToMe::BRN2ToThisNode(NODEIDENTITY id);
   wifidevice::RAWWIFIDEV(DEVNAME $devname, DEVICE $device);
 
   input[0]
 #if WIFITYPE == 805
-  -> data_power::BrnSetTXPower(DEVICE $device, POWER 61)
+  -> data_power::SetTXPower(POWER 48)
 #else
-  -> data_power::BrnSetTXPower(DEVICE $device, POWER 16)
+  -> data_power::SetTXPower(POWER 24)
 #endif
-  -> data_rate::SetTXRates(RATE0 DEFAULT_DATARATE, TRIES0 DEFAULT_DATATRIES, TRIES1 0, TRIES2 0, TRIES3 0)
+  -> data_rate::SetTXRate(RATE DEFAULT_DATARATE, TRIES DEFAULT_DATATRIES)
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
+
 //  -> SetTimestamp()
 //  -> Print("NODENAME: In Queue", 100, TIMESTAMP true)
+
   -> data_queue::NotifierQueue(100)
 //  -> SetTimestamp()
 //  -> Print("NODENAME: Out Queue", 100, TIMESTAMP true)
+
   -> data_suppressor::Suppressor()
   -> [1]lp_data_scheduler::PrioSched()
 #ifdef PRIO_QUEUE
   -> [2]x_prio_q::PrioSched()
 #endif
+
 //  -> SetTimestamp()
 //  -> Print("NODENAME: To Wifidev", 100, TIMESTAMP true)
+
   -> wifidevice                                            //rawWifiDevice
-//-> PrintWifi("Fromdev", TIMESTAMP true)
+
+  //-> PrintWifi("Fromdev", TIMESTAMP true)
+
   -> filter_tx :: FilterTX()
 #if WIFITYPE == 805
   -> error_clf :: WifiErrorClassifier()
@@ -142,22 +153,25 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   wififrame_clf[2]
 //  -> BRN2PrintWifi("RX")
+#ifdef DTS
+    -> dts
+#endif
     -> WifiDecap()
 //  -> Print("Data")
     -> brn_ether_clf :: Classifier( 12/BRN_ETHERTYPE, - )
     -> lp_clf :: Classifier( 14/BRN_PORT_LINK_PROBE, - )
+
+#ifdef CORRELATED_DROP_PATTERN
+#ifdef CORRELATED_DROP_SRC
+    -> BRNCorrelatedDrop(PATTERN CORRELATED_DROP_PATTERN, SKEW 0, ETHERADDRESS CORRELATED_DROP_SRC)
+#endif
+#endif
+
     -> BRN2EtherDecap()
 //  -> Print("Linkprobe",320)
     -> link_stat
 //  -> Print("Linkprobe_out",320)
     -> lp_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
-#ifndef DISABLE_LP_POWER
-#if WIFITYPE == 805
-    -> lp_power::BrnSetTXPower(DEVICE $device, POWER 61)
-#else
-    -> lp_power::BrnSetTXPower(DEVICE $device, POWER 16)
-#endif
-#endif
     -> lp_wifiencap::WifiEncap(0x00, 0:0:0:0:0:0)
     -> lp_queue::FrontDropQueue(2)
     -> lp_suppressor::Suppressor()
@@ -169,12 +183,10 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 
   lp_clf[1]                               //brn, but no lp
 #ifdef CST
-#ifdef SIMULATION
 #ifdef COOPCST
   -> co_cst_clf :: Classifier( 14/BRN_PORT_CHANNELSTATSINFO, - );
 
   co_cst_clf[1]
-#endif
 #endif
 #endif
   //-> Print("Data, no LP")
@@ -182,7 +194,6 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> brnToMe;
 
 #ifdef CST
-#ifdef SIMULATION
 #ifdef COOPCST
   co_cst_clf[0]
   //-> Print("ChannelStats")
@@ -192,7 +203,6 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
   -> cocst_etherencap::EtherEncap(BRN_ETHERTYPE_HEX, deviceaddress, ff:ff:ff:ff:ff:ff)
   -> cocst_rate::SetTXRate(RATE 2, TRIES 1)
   -> brnwifi;
-#endif
 #endif
 #endif
 
@@ -205,40 +215,40 @@ elementclass WIFIDEV { DEVNAME $devname, DEVICE $device, ETHERADDRESS $etheraddr
 #ifdef PRIO_QUEUE
 
   input[2]
-  -> x_data_rate::SetTXRates(RATE0 DEFAULT_DATARATE, TRIES0 DEFAULT_DATATRIES, TRIES1 0, TRIES2 0, TRIES3 0)
+  //-> x_data_rate::SetTXRate(RATE DEFAULT_DATARATE, TRIES DEFAULT_DATATRIES)
   -> x_brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> [1]x_prio_q;
 
-  qc_q::NotifierQueue(500);
-  qc_suppressor::Suppressor();
+  Idle()
+  -> ig_flow::BRN2SimpleFlow(EXTRADATA "Interferenzgraph", ELEMENTID 255, DEBUG 2);
 
   ig_feedback_clf[0]
-  -> qc::BRN2PacketQueueControl(QUEUESIZEHANDLER qc_q.length, QUEUERESETHANDLER qc_q.reset, MINP 200, MAXP 500, SUPPRESSORHANDLER qc_suppressor.active0, DISABLE_QUEUE_RESET false, TXFEEDBACK_REUSE true, DEBUG 2)
+  -> BRN2EtherDecap()
+  -> Classifier( 0/BRN_PORT_FLOW )
+  -> BRN2Decap()
+  -> [1]ig_flow
   -> Print("packet")
   -> EtherEncap(0x8888, $etheraddress, ff:ff:ff:ff:ff:ff)
   -> WifiEncap(0x00, 0:0:0:0:0:0)
-  -> qc_rate :: SetTXRate(2)
+  -> ig_rate :: SetTXRate(2)
 #if WIFITYPE == 805
-  -> qc_power :: BrnSetTXPower(DEVICE $device, POWER 61)
+  -> ig_power :: SetTXPower(POWER 24)
 #else
-  -> qc_power :: BrnSetTXPower(DEVICE $device, POWER 16)
+  -> ig_power :: SetTXPower(POWER 48)
 #endif
   -> SetTimestamp()
-  -> qc_q
-  -> qc_suppressor
-//  -> SetTimestamp()
-//  -> Print(TIMESTAMP true)
+  -> ig_notifierqueue::NotifierQueue(500)
+  -> ig_suppressor::Suppressor()
+  //-> SetTimestamp()
+  //-> Print(TIMESTAMP true)
   -> [0]x_prio_q;
 
-/*
-  qc_q[1]
-  -> SetTimestamp()
-  -> Print(TIMESTAMP true)
-  -> Discard;
-*/
 #endif
 
   error_clf[1]
+#ifdef SIMULATION
+  -> PrintCRCError(LABEL "CRC")
+#endif
 //  -> Print("RXPHYERR")
   -> Discard;
 

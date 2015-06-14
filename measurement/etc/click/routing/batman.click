@@ -18,6 +18,7 @@ elementclass BATMAN {$ID, $LT |
   br::BatmanRouting(NODEID $ID, BATMANTABLE brt);
 
   bfd::BatmanFailureDetection( NODEID $ID, BATMANTABLE brt, ACTIVE true);
+  bef::BatmanErrorForwarder( NODEID $ID, BATMANTABLE brt);
 
   input[1]
   -> BRN2Decap()
@@ -82,5 +83,8 @@ elementclass BATMAN {$ID, $LT |
 #ifdef ROUTING_TXFEEDBACK
   Idle -> [2]output;
 #endif
+
+  Idle -> [0]bef[0] -> Discard;
+  Idle -> [1]bef[1] -> Discard;
 
 }

@@ -23,26 +23,27 @@ elementclass RAWDEV { DEVNAME $devname, DEVICE $device |
   -> SetTimestamp()
   -> Print("NODENAME: To Device", 100, TIMESTAMP true)
 #endif
+  -> pullstats::PullStats()
 #ifdef PACKET_REUSE
 #ifdef SIMULATION
   -> simpacketreuse::PullTee()
-  -> toraw::TORAWDEVICE($devname);
-  
+  -> todev::TORAWDEVICE($devname);
+
   simpacketreuse[1]
   -> [1]output;
 #else
-  -> toraw::TORAWDEVICE($devname)
+  -> todev::TORAWDEVICE($devname)
   -> [1]output;
 
-  toraw[1]
+  todev[1]
   -> [1]output;
 #endif
 #else
-  -> TORAWDEVICE($devname);
+  -> todev::TORAWDEVICE($devname);
 #endif
 
 
-  FROMRAWDEVICE($devname)
+  fromdev::FROMRAWDEVICE($devname)
 #ifdef RAWDEV_DEBUG
   -> SetTimestamp()
   -> Print("NODENAME: From Device", 100, TIMESTAMP true)

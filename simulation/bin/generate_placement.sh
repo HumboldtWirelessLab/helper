@@ -25,59 +25,25 @@ FAILURELOG=/dev/null
 
 echo $1 >> $FAILURELOG
 
+if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
+  RELATIVE=1
+else
+  RELATIVE=0
+fi
+
 case "$1" in
     "random")
-          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
-          NODECOUNT=`echo $NODES | wc -w`
-
-	  if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
-	    NODEDIST=$3
-	    SIDELEN=`echo "sqrt(${NODECOUNT})*${NODEDIST}" | bc`
-	  else
-	    SIDELEN=$3
-	  fi
-    
-          for n in $NODES; do
-	    N=`head -1 /dev/urandom | od -N 2 -t uL | head -n 1 | awk '{print $2}'`
-	    X=`expr $N % $SIDELEN`
-	    N=`head -1 /dev/urandom | od -N 2 -t uL | head -n 1 | awk '{print $2}'`
-	    Y=`expr $N % $SIDELEN`
-	    echo "$n $X $Y 0"
-	  done
+	  $DIR/generate_placement.py --node-list-file=$2 --placement=random --sidelen=$3 --relative=$RELATIVE
 	  ;;
     "grid")
-          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
-          NODECOUNT=`echo $NODES | wc -w`
-          SIDELEN=`echo "sqrt($NODECOUNT)" | bc`
-	  let SLSQR=SIDELEN*SIDELEN
-	  #echo "NODECOUNT: $NODECOUNT  SLSQR: $SLSQR"
-	  if [ $SLSQR -lt $NODECOUNT ]; then
-	    let SIDELEN=SIDELEN+1
-	  fi
-
-	  #echo "SL: $SIDELEN"
-
-	  NODEN=0
-	  if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
-	    SIDESTEP=$3
-	  else
-	    if [ $SIDELEN -eq 1 ]; then
-	      SIDESTEP=$3
-	    else
-	      SIDESTEP=`expr $3 / \( $SIDELEN - 1 \)`
-	    fi
-	  fi
-
-	  #echo "ST: $SIDESTEP"
-	  for n in $NODES; do
-	    let X=NODEN%SIDELEN*SIDESTEP
-	    let Y=NODEN/SIDELEN*SIDESTEP
-	    #X=`expr \( $NODEN % $SIDELEN \) \* $SIDESTEP`
-	    #Y=`expr \( $NODEN / $SIDELEN \) \* $SIDESTEP`
-	    let NODEN=NODEN+1
-	    echo "$n $X $Y 0"
-	  done
+	  $DIR/generate_placement.py --node-list-file=$2 --placement=grid --sidelen=$3 --relative=$RELATIVE
           ;;
+    "gridrand")
+	  $DIR/generate_placement.py --node-list-file=$2 --placement=gridrand --sidelen=$3 --relative=$RELATIVE
+          ;;
+    "string")
+	  $DIR/generate_placement.py --node-list-file=$2 --placement=string --sidelen=$3 --relative=$RELATIVE
+	  ;;
     "npart")
 	  NODES=`cat $2 | grep -v "#" | awk '{print $1"\n"}' | uniq`
           NODECOUNT=`echo $NODES | wc -w`
@@ -95,29 +61,6 @@ case "$1" in
 	  #echo "$REPLACE"
 	  DEGREE_DIR="$DIR/../../src/DegreePlacement"
 	  java -classpath $DEGREE_DIR/bin/production/DegreePlacement:$DEGREE_DIR/lib DegreePlacementGenerator -n $NODECOUNT -r $3 -d 4 -x 1000 -y 1000
-	  ;;	  
-    "string")
-          NODES=`cat $2 | grep -v "#" | awk '{print $1}' | uniq`
-          NODECOUNT=`echo $NODES | wc -w`
-	  NODEN=0
-
-	  if [ "x$NODEPLACEMENTOPTS" = "xrelative" ]; then
-	    SIDESTEP=$3
-	  else
-	    if [ $NODECOUNT -eq 1 ]; then
-	      SIDESTEP=$3
-	    else
-	      SIDESTEP=`expr $3 / \( $NODECOUNT - 1 \)`
-	    fi
-	  fi
-
-  	  Y=`expr $3 / 2`
-
-	  for n in $NODES; do
-	    X=`expr $NODEN \* $SIDESTEP`
-	    echo "$n $X $Y 0"
-	    NODEN=`expr $NODEN + 1`
-	  done
 	  ;;
        *)
           if [ -f $1 ]; then

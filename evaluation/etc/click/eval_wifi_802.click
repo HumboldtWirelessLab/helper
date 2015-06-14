@@ -17,7 +17,7 @@ minl
 maxl[1]
 //GPS  -> GPSPrint(NOWRAP true)
 //GPS  -> GPSDecap()
-  -> rtap_decap :: BrnRadiotapDecap()
+  -> prism_decap :: Prism2Decap()
   -> filter_tx :: FilterTX()
   -> error_clf :: WifiErrorClassifier()
   -> ok :: Counter

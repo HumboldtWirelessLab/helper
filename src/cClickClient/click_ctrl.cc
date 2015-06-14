@@ -52,14 +52,12 @@ main(int argc, char **argv)
     ip = inet_addr("127.0.0.1");
   }
 
-  if (argc > 2)
-    port = (unsigned short) atoi(argv[2]);
+  if (argc > 2) port = (unsigned short) atoi(argv[2]);
 
-  typedef ControlSocketClient csc_t;
-  csc_t cs;
+  ControlSocketClient cs;
 
-  typedef csc_t::err_t err_t;
-  err_t err = cs.configure(ip, port); 
+  ControlSocketClient::err_t err = cs.configure(ip, port); 
+
   if ( err != ControlSocketClient::no_err ) {
     cerr << "No connection\n";
     return 1;
@@ -74,41 +72,36 @@ main(int argc, char **argv)
     string data2;
     err = cs.read( argv[3], argv[4], data2);
     ok(err);
-    
-    if ( strstr((char *)data2.c_str(),"<compressed_data") != NULL ) {
-      
-      char *raw_data = (char *)data2.c_str();
-    	int res, uncompressed, compressed, base64comp;
-    	char buffer[151], *data_enc;
 
-      //strncpy(buffer,data2.c_str(),150);
-      //buffer[150] = '\0';
-      //printf("%s\n",buffer);
+    if ( strstr((char *)data2.c_str(),"<compressed_data") != NULL ) {
+
+      char *raw_data = (char *)data2.c_str();
+      int res, uncompressed, compressed, base64comp;
+      char buffer[151], *data_enc;
+
       /* Compile regex */
 
-    	regex_t r1;
-    	regmatch_t matchptr[5];
-    	regcomp(&r1, "type=\"\\(.*\\)\" uncompressed=\"\\(.*\\)\" compressed=\"\\(.*\\)\"><!\\[CDATA\\[\\(.*\\)\\]\\]",
-    	                REG_ICASE);
+      regex_t r1;
+      regmatch_t matchptr[5];
+      regcomp(&r1, "type=\"\\(.*\\)\" uncompressed=\"\\(.*\\)\" compressed=\"\\(.*\\)\"><!\\[CDATA\\[\\(.*\\)\\]\\]", REG_ICASE);
 
-    	/* Execute regex against string */
-    	res=regexec(&r1, raw_data, 5, matchptr, 0);
-    	if ( !res ) {
-			  for(int i = 1; i < 5; i++) {
-				  if (i<4) {
-					  strncpy(buffer, &raw_data[matchptr[i].rm_so], matchptr[i].rm_eo-matchptr[i].rm_so);
-					  buffer[matchptr[i].rm_eo-matchptr[i].rm_so] = '\0';
-				  }
+      /* Execute regex against string */
+      res = regexec(&r1, raw_data, 5, matchptr, 0);
+
+      if ( !res ) {
+        for(int i = 1; i < 5; i++) {
+          if (i<4) {
+            strncpy(buffer, &raw_data[matchptr[i].rm_so], matchptr[i].rm_eo-matchptr[i].rm_so);
+            buffer[matchptr[i].rm_eo-matchptr[i].rm_so] = '\0';
+          }
 
           if (i == 2) uncompressed = atoi(buffer);
           if (i == 3) compressed = atoi(buffer);
           if (i == 4) {
-              base64comp = matchptr[i].rm_eo-matchptr[i].rm_so;
-              data_enc = &(raw_data[matchptr[i].rm_so]);
+            base64comp = matchptr[i].rm_eo-matchptr[i].rm_so;
+            data_enc = &(raw_data[matchptr[i].rm_so]);
           }
-      	}
-        //data_enc[base64comp] = '\0';
-        //printf("%d %d %d \n%s\n", uncompressed, compressed, base64comp,data_enc);
+        }
 
         unsigned char *data_base64_decoded = (unsigned char *)malloc(compressed+10);
 
@@ -121,18 +114,17 @@ main(int argc, char **argv)
         int size = lzw.decode(data_base64_decoded, compressed, data_lzw_uncompressed, uncompressed);
         data_lzw_uncompressed[size] = '\0';
 
-        printf("%s\n", data_lzw_uncompressed);
-        
-        delete data_base64_decoded;
-        delete data_lzw_uncompressed;
-    	} else {
-    	  cout << data2 << "\n";
-    	}
+        data2 = String(data_lzw_uncompressed);
 
-    	regfree(&r1);
-    } else {
-      cout << data2;
+        delete data_base64_decoded;
+      }
+
+      regfree(&r1);
+
     }
+
+    cout << data2 << "\n";
+
   }
 
   return 0;

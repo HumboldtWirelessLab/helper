@@ -49,14 +49,14 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 #ifdef LINKSTAT_ENABLE
   proberates::BrnAvailableRates(DEFAULT 2 22);
   etx_metric :: BRN2ETXMetric($lt);
-  
+
   link_stat :: BRN2LinkStat(ETHTYPE          0x0a04,
                             DEVICE          $device,
                             PERIOD             3000,
                             TAU               30000,
                             METRIC     "etx_metric",
-//                          PROBES  "2 250 22 1000",
-                            PROBES  "2 250",
+//                          PROBES  "2 250 24 22 1000 24",
+                            PROBES  "2 250 24",
                             RT           proberates);
 #endif
 
@@ -81,25 +81,29 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   prios::PrioSched()
   -> wifidevice;
 
-  qc_suppressor::Suppressor();
-  q::NotifierQueue(500);
-
-  qc::BRN2PacketQueueControl(QUEUESIZEHANDLER q.length, QUEUERESETHANDLER q.reset, MINP 100 , MAXP 500, SUPPRESSORHANDLER qc_suppressor.active0,DISABLE_QUEUE_RESET false, TXFEEDBACK_REUSE false, UNICAST_RETRIES 0)
-  -> EtherEncap(0x0800, $etheraddress , ff:ff:ff:ff:ff:ff)
+ Idle()
+  -> ig_flow::BRN2SimpleFlow(EXTRADATA "Interferenzgraph", ELEMENTID 255, DEBUG 2)
+  //-> Print("packet", TIMESTAMP true)
+  -> EtherEncap(0x8888, $etheraddress, ff:ff:ff:ff:ff:ff)
   -> WifiEncap(0x00, 0:0:0:0:0:0)
-  -> SetTXRate(2)
-  -> SetTXPower(15)
+  -> ig_rate :: SetTXRate(2)
+#if WIFITYPE == 805
+  -> ig_power :: SetTXPower(POWER 61)
+#else
+  -> ig_power :: SetTXPower(POWER 24)
+#endif
   -> SetTimestamp()
-  -> q
-  -> qc_suppressor
-  // -> cnt::Counter()
-  
+  -> ig_notifierqueue::NotifierQueue(500)
+  -> ig_suppressor::Suppressor()
+  //-> SetTimestamp()
+  //-> Print(TIMESTAMP true)
+
 #ifdef PQUEUE_ENABLE
   -> [1]prios;
 
   input[2]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
-  -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
+  -> SetTXRate(RATE 2, TRIES 7)
   -> [0]prios;
 
   wifioutq
@@ -133,12 +137,12 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
 #endif
 
-  input[0] 
+  input[0]
   -> brnwifi::WifiEncap(0x00, 0:0:0:0:0:0)
   -> SetTXPower(0)
-  -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
+  -> SetTXRate(RATE 2, TRIES 7)
   -> wifioutq;
-  
+
   wifidevice[0]
   -> filter_tx :: FilterTX()
 #if WIFITYPE == 805
@@ -159,7 +163,7 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
   wififrame_clf[0]
     -> fb::FilterBSSID(ACTIVE true, DEBUG 1, WIRELESS_INFO ap/winfo)
     -> ap
-    -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
+    -> SetTXRate(RATE 2, TRIES 7)
     -> wifioutq;
 
   fb[1]
@@ -186,28 +190,28 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
     -> wep
 #endif
     -> SetTXPower(0)
-    -> SetTXRates(RATE0 2, TRIES0 7, TRIES1 0, TRIES2 0, TRIES3 0)
+    -> SetTXRate(RATE 2, TRIES 7)
     -> wifioutq;
 
-  toStation[1]                
+  toStation[1]
     //-> Print("Broadcast",TIMESTAMP true)
     -> brn_ap_clf;
-    
-    toAP[1] 
+
+    toAP[1]
     //-> Print("a")
     -> brn_ap_clf;
-    
+
     toAP[2]
     //-> Print("b")
     -> [2]output;
-    
+
     brn_ap_clf[1] -> [3]output;
-        
+
   wififrame_clf[2]
     -> WifiDecap()
     -> toMe[1]          //it's broadcast
     -> brn_bc_clf :: Classifier( 12/8086, - );
-  
+
   brn_bc_clf[0]
     -> lp_clf :: Classifier( 14/BRN_PORT_LINK_PROBE, - )
 #ifdef LINKSTAT_ENABLE
@@ -222,42 +226,52 @@ elementclass WIFIDEV_AP { DEVNAME $devname, DEVICE $device, ETHERADDRESS $ethera
 
   lp_clf[1]
   -> [1]output;
-  
+
   brn_bc_clf[1]
   -> [4]output;
 
   toMe[0]         //it's me
   -> brn_ether_clf :: Classifier( 12/8086, - )
   -> [0]output;
-  
+
   brn_ether_clf[1]                        //For  me or broadcast and no BRN
   -> Discard;
-  
-  
+
+
   toMe[2]         //Foreign
   -> foreign_brn_ether_clf :: Classifier( 12/8086, - )
   //-> Print("BRN for a foreign station")
   -> Discard;//[2]output;
-     
+
   foreign_brn_ether_clf[1]
   //-> Print("For a foreign station")
   -> Discard; //-> [5]output;
-    
-                          
+
   input[1] -> fromNodetoStation::BRN2ToStations(ASSOCLIST ap/assoclist);
-  
+
   fromNodetoStation[0]  //For Station
   -> clientwifi;
-  
+
   fromNodetoStation[1]  //Broadcast
   -> clientwifi;
-  
+
   fromNodetoStation[2]  //For Unknown
   -> Discard;
 
   Idle -> [1]ap[1] -> Discard;
   Idle -> [2]ap[2] -> Discard;
- 
+
   Idle -> [5]output;
-} 
+
+#ifdef IG_ENABLE
+  filter_tx[1]
+  -> WifiDecap()
+  -> ig_feedback_clf :: Classifier( 12/8888 )
+  -> BRN2EtherDecap()
+  -> Classifier( 0/BRN_PORT_FLOW )
+  -> BRN2Decap()
+  -> [1]ig_flow;
+#endif
+
+}
 

@@ -36,13 +36,13 @@ elementclass ROUTING { ID $id, ETHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTA
 
 #endif
 
-routingtable::BrnRoutingTable(DEBUG 2, ACTIVE true, DROP 0 /* 1/20 = 5% */, SLICE 500 /* 500ms */, TTL 10 /* 10*500ms */);
-routingalgo::Dijkstra(NODEIDENTITY $id, LINKTABLE $lt, MIN_LINK_METRIC_IN_ROUTE 6000, MAXGRAPHAGE 30000, DEBUG 2);
-routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE routingtable, ROUTINGALGORITHM routingalgo, DEBUG 2);
+  routingtable::BrnRoutingTable(DEBUG 2, ACTIVE true, DROP 0 /* 1/20 = 5% */, SLICE 500 /* 500ms */, TTL 10 /* 10*500ms */);
+  routingalgo::Dijkstra(NODEIDENTITY $id, LINKTABLE $lt, MIN_LINK_METRIC_IN_ROUTE 6000, MAXGRAPHAGE 30000, DEBUG 2);
+  routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE routingtable, ROUTINGALGORITHM routingalgo, DEBUG 2);
 
 #ifdef ROUTINGDSR
 #ifdef DSRLPR
-  lpr::LPRLinkProbeHandler(LINKSTAT $linkstat, ETXMETRIC $metric);
+  lpr::LPRLinkProbeHandler(LINKSTAT $linkstat, METRIC $metric);
 #endif
 
   routing::DSR($id, $lt, $metric, routingmaint);
@@ -70,7 +70,7 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 #else
 #ifdef ROUTINGBROADCAST
 
-  routing::BROADCAST(ID $id, LT $lt);
+  routing::BROADCAST(ID $id, LT $lt, LINKSTAT $linkstat);
 
 #define BRN_PORT_ROUTING BRN_PORT_FLOODING
 #define HAVEROUTING
@@ -114,6 +114,9 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
     -> [1]routing;
 
   input[2]        //BRN-Feedback (Failed)
+#ifdef ROUTING_PERFORMANCE_CNT
+    -> routing_in_cnt_brn_failed::Counter()
+#endif
     -> Print("NODENAME: Failed")
     -> [2]routing;
 
@@ -132,7 +135,7 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 
   routing[1]      //BRN (Routing)
 #ifdef ROUTINGDSR
-    -> SetEtherAddr(SRC $ea)
+    -> dsr_etherancap::BRN2EtherEncap(SRC $ea, PUSHHEADER false)
 #endif
 #ifdef ROUTING_PERFORMANCE_CNT
     -> routing_out_cnt_brn::Counter()
@@ -162,8 +165,8 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 #endif
 
 #ifdef ROUTING_PERFORMANCE_CNT
-  routing_pkt_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.count routing_in_cnt_brn.count routing_in_cnt_passive.count routing_out_cnt_brn.count routing_out_cnt_cl.count routing_out_cnt_me.count routing_out_cnt_bcast.count", DEBUG 2);
-  routing_byte_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.byte_count routing_in_cnt_brn.byte_count routing_in_cnt_passive.byte_count routing_out_cnt_brn.byte_count routing_out_cnt_cl.byte_count routing_out_cnt_me.byte_count routing_out_cnt_bcast.byte_count", DEBUG 2);
+  routing_pkt_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.count routing_in_cnt_brn.count routing_in_cnt_passive.count routing_out_cnt_brn.count routing_out_cnt_cl.count routing_out_cnt_me.count routing_out_cnt_bcast.count routing_in_cnt_brn_failed.count", DEBUG 2);
+  routing_byte_cnt::BrnCompoundHandler(HANDLER "routing_in_cnt_mecl.byte_count routing_in_cnt_brn.byte_count routing_in_cnt_passive.byte_count routing_out_cnt_brn.byte_count routing_out_cnt_cl.byte_count routing_out_cnt_me.byte_count routing_out_cnt_bcast.byte_count routing_in_cnt_brn_failed.byte_count", DEBUG 2);
 #endif
 
 }

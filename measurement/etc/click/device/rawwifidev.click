@@ -29,7 +29,7 @@
 #define CST_STATS_DURATION 1000
 #endif
 
-//define CST_PROCFILE for simulation. Path is not really used, but no path means no hw channel stats 
+//define CST_PROCFILE for simulation. Path is not really used, but no path means no hw channel stats
 #ifndef CST_PROCFILE
 
 #ifdef SIMULATION
@@ -64,24 +64,74 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 
 #ifdef SIMULATION
+#ifdef PLE
+#define COLLINFO
+#define CERR
+#endif
+#endif
+
 #ifdef COLLINFO
   cinfo::CollisionInfo();
 #endif
-#ifdef USE_RTS_CTS
-  pli::PacketLossInformation();
+
+#ifdef CERR
+#ifdef COOPCST_STRING
+  hnd::HiddenNodeDetection(DEVICE $device, TIMEOUT 1000, COOPCHANNELSTATSPATH COOPCST_STRING, DEBUG 2);
+#else
+  hnd::HiddenNodeDetection(DEVICE $device, TIMEOUT 1000, DEBUG 2);
+#endif
+#endif
+
 #ifdef PLE
-#ifdef PLE_COCST
-  ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, COOPCHANNELSTATS cocst, DEVICE $device, HNWORST false, DEBUG 4);
+  pli::PacketLossInformation();
+#ifdef COOPCST
+  ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, COOPCHANNELSTATS cocst, DEVICE $device, HNWORST false, DEBUG 2);
 #else
   ple::PacketLossEstimator(CHANNELSTATS cst, COLLISIONINFO cinfo, HIDDENNODE hnd, PLI pli, DEVICE $device, HNWORST false, DEBUG 2);
 #endif
 #endif
-#endif
-#endif
-
 
   // RAWDEV from include rawdev.click
   rawdev::RAWDEV(DEVNAME $devname, DEVICE $device);
+
+#ifdef SIMULATION
+#ifdef CST
+  bo_maxtp::BoMaxThroughput(CHANNELSTATS CST, OFFSET -50, DEBUG 2);
+
+  bo_cla::BoChannelLoadAware(CHANNELSTATS CST, TARGETLOAD 95, TARGETDIFF 0, CAP 1, CST_SYNC 1, DEBUG 2);
+
+  bo_targetpl::BoTargetPacketloss(CHANNELSTATS CST, TARGETPL 10, DEBUG 2);
+
+  bo_nbs::BoNeighbours(CHANNELSTATS CST, ALPHA 500 /*850*/, BETA 200 /*500*/, DEBUG 2);
+
+  bo_learning::BoLearning(MIN_CWMIN 32, MAX_CWMIN 1024, STRICT 1, CAP 1, DEBUG 2);
+
+#ifndef BOCONST_VALUE
+#define BOCONST_VALUE 32
+#endif
+
+  bo_const::BoConstant(BO BOCONST_VALUE, DEBUG 2);
+
+  bo_minstrel::BoMinstrel(DEBUG 2);
+
+#ifdef COOPCST_STRING
+  bo_mshare::BoMediumShare(CHANNELSTATS CST, COOPCHANNELSTATSPATH COOPCST_STRING, HIDDENNODE hnd, BO 32, DEBUG 2);
+#endif
+#endif
+#endif
+
+#ifdef USE_RTS_CTS
+#ifdef PLE
+  rtscts_ple::RtsCtsPLI(PLI pli);
+#endif
+  rtscts_packetsize::RtsCtsPacketSize(PACKETSIZE 1032);
+  rtscts_random::RtsCtsRandom(PROBABILITY 50);
+#ifdef CERR
+  rtscts_hiddennode::RtsCtsHiddenNode(HIDDENNODE hnd);
+#define RTSCTS_HN
+#endif
+#endif
+
 
   input[0]
 #if defined(SIMULATION) || (WIFITYPE == 803)
@@ -93,27 +143,78 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #define TOS2QUEUEMAPPER_STRATEGY 0
 #endif
 
+#ifndef TOS2QUEUEMAPPER_QUEUEMAPPING
+#define TOS2QUEUEMAPPER_QUEUEMAPPING 0
+#endif
+
+#ifndef TOS2QUEUEMAPPER_MAC_BO_SCHEME
+#define TOS2QUEUEMAPPER_MAC_BO_SCHEME 0
+#endif
+
+#ifndef TOS2QUEUEMAPPER_QUEUEMODE
+#define TOS2QUEUEMAPPER_QUEUEMODE 0
+#endif
+
+#ifndef TOS2QUEUEMAPPER_QUEUEVAL
+#define TOS2QUEUEMAPPER_QUEUEVAL 1
+#endif
+
+#ifndef TOS2QUEUEMAPPER_CWMINMAXMODE
+#define TOS2QUEUEMAPPER_CWMINMAXMODE 0
+#endif
+
+#ifndef TOS2QUEUEMAPPER_CWMINMAXVAL
+#define TOS2QUEUEMAPPER_CWMINMAXVAL 7
+#endif
+
 #ifdef SIMULATION
 #ifdef CST
-#ifdef COLLINFO
-  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, COLLISIONINFO cinfo, STRATEGY TOS2QUEUEMAPPER_STRATEGY, DEBUG 2)
+#ifdef COOPCST_STRING
+  -> tosq::Tos2QueueMapper( DEVICE $device, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_nbs bo_const bo_minstrel bo_mshare",
 #else
-  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, CHANNELSTATS cst, STRATEGY TOS2QUEUEMAPPER_STRATEGY, DEBUG 2)
-#endif //RTS_CTS
-#else //CST
-  -> tosq::Tos2QueueMapper( CWMIN CWMINPARAM, CWMAX CWMAXPARAM, AIFS AIFSPARAM, STRATEGY TOS2QUEUEMAPPER_STRATEGY, DEBUG 4)
-#endif //CST
+  -> tosq::Tos2QueueMapper( DEVICE $device, STRATEGY TOS2QUEUEMAPPER_STRATEGY, BO_SCHEMES "bo_maxtp bo_cla bo_targetpl bo_learning bo_nbs bo_const bo_minstrel",
+#endif
+                            MAC_BO_SCHEME TOS2QUEUEMAPPER_MAC_BO_SCHEME,                                        /*   0 - Default (Exp)   1- Exp   2 - Fib   */
+                            QUEUEMODE TOS2QUEUEMAPPER_QUEUEMODE, QUEUEVAL TOS2QUEUEMAPPER_QUEUEVAL,             /*   Mode: 0-Exp 1-Mul 2-Add 3-Fib    */
+                            CWMINMAXMODE TOS2QUEUEMAPPER_CWMINMAXMODE, CWMINMAXVAL TOS2QUEUEMAPPER_CWMINMAXVAL, /*   cwminmaxval -> retries; Mode: 0-Exp 1-Mul 2-Add 3-Fib    */
+                            QUEUEMAPPING TOS2QUEUEMAPPER_QUEUEMAPPING, DEBUG 2)
+#endif
 #endif //SIMULATION
 #endif
+
 #ifdef USE_RTS_CTS
-  ->setrtscts::Brn2_SetRTSCTS(PLI pli)
+#ifdef PLE
+
+#ifndef RTS_CTS_STRATEGY
+#define RTS_CTS_STRATEGY 1
 #endif
+
+#ifdef RTSCTS_HN
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random rtscts_hiddennode", DEBUG 2)
+#else
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_ple rtscts_packetsize rtscts_random" DEBUG 2)
+#endif
+
+#else
+
+#ifdef CERR
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random rtscts_hiddennode", DEBUG 2)
+#else
+  -> setrtscts::Brn2_SetRTSCTS(STRATEGY RTS_CTS_STRATEGY, RTSCTS_SCHEMES "rtscts_packetsize rtscts_random", DEBUG 2)
+#endif
+
+#endif
+#endif
+
+  //-> Print("Wifi", TIMESTAMP true)
+
 #ifdef SETCHANNEL
   -> sc::BRN2SetChannel(DEVICE $device, CHANNEL 0)
 #endif
   -> __WIFIENCAP__
 
 #ifndef NOATHOPERATION
+
 #if WIFITYPE == 805                                                 /***  for ath2 add priority scheduler to prefer operation packet ***/
   -> [1]op_prio_s::PrioSched();                                     /**/
                                                                     /**/
@@ -140,13 +241,16 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #endif
 #endif
 #ifdef CERR
-  -> hnd::HiddenNodeDetection(DEVICE $device, DEBUG 2)
+  //-> BRN2PrintWifi()
+  -> hnd
 #endif
 #ifdef SIMULATION
-  -> Tos2QueueMapperTXFeedback(TOS2QM tosq)
+#ifdef CST
+  -> Tos2QueueMapperTXFeedback(TOS2QM tosq, DEBUG 2)
+#endif
 #endif
 #ifdef FOREIGNRXSTATS
-  -> ForeignRxStats(DEVICE $device,TIMEOUT 5, DEBUG 2)
+  -> ForeignRxStats(DEVICE $device,TIMEOUT 15, DEBUG 2)
 #endif
   -> [0]output;
 

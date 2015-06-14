@@ -2,11 +2,12 @@
 #define __HELPER_INC__
 
 /* NOPCAP (don't use pcap) is default */
-#ifndef ENABLE_PCAP
+/*#ifndef ENABLE_PCAP
 #ifndef NOPCAP
 #define NOPCAP
 #endif
 #endif
+*/
 
 #ifndef PACKETBURST
 #define PACKETBURST 1
@@ -22,7 +23,6 @@
 #define WIFITYPE 805
 #endif
 
-#define wifitype_ns         800
 #define wifitype_wifi       801
 #define wifitype_prism      802
 #define wifitype_radiotap   803
@@ -30,11 +30,6 @@
 #define wifitype_ath2       805
 #define wifitype_extra      806
 #define wifitype_openbeacon 807
-
-#if WIFITYPE == wifitype_ns
-#define __WIFIENCAP__ AddEtherNsclick()
-#define __WIFIDECAP__ Strip(14)
-#endif
 
 #if WIFITYPE == wifitype_wifi
 #define __WIFIENCAP__ Null()
@@ -160,59 +155,29 @@ BRNAddressInfo(ipdev eth0:ip);
 
 #else
 
-#ifdef USEBRNDEVICE
-//brndevice
-
 #ifndef NOPCAP
+
+#ifndef TODEVICE_METHOD
+#define TODEVICE_METHOD LINUX
+#endif
 
 #if PCAP_STRIP_SIZE == 0
 
-#define FROMRAWDEVICE(x) BrnFromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, CAPTURE PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64)
-#define TORAWDEVICE(x) BrnToDevice(DEVNAME x, IGNOREFROMDEV true, DEBUG false)
-
-//pcap size
-#else
-#define FROMRAWDEVICE(x) BrnFromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, CAPTUR PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64) -> Strip(PCAP_STRIP_SIZE)
-#define TORAWDEVICE(x) BrnToDevice(DEVNAME x, IGNOREFROMDEV true, DEBUG false)
-//end pcap size
-#endif
-
-//nopcap
-#else
-//use_pcap
-
-#define FROMRAWDEVICE(x) BrnFromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, CAPTURE LINUX, HEADROOM 64)
-#define TORAWDEVICE(x) BrnToDevice(DEVNAME x, DEBUG false)
-
-//end usepcap
-#endif
-/* END NOPCAP */
-
-//nobrndevice
-#else
-
-#ifndef NOPCAP
-
-#if PCAP_STRIP_SIZE == 0
-
-#define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, METHOD PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64, BURST PACKETBURST)
-#define TORAWDEVICE(x) ToDevice(DEVNAME x, METHOD PCAP, DEBUG false, BURST PACKETBURST)
+#define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND true, SNIFFER false, METHOD PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64, BURST PACKETBURST)
+#define TORAWDEVICE(x) ToDevice(DEVNAME x, METHOD TODEVICE_METHOD, DEBUG false, BURST PACKETBURST)
 //pcap size
 #else
 
-#define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, METHOD PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64, BURST PACKETBURST) -> Strip(PCAP_STRIP_SIZE)
-#define TORAWDEVICE(x) ToDevice(DEVNAME x, METHOD PCAP, DEBUG false, BURST PACKETBURST)
+#define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND true, SNIFFER false, METHOD PCAP, ENCAP PCAP_ENCAP_TYPE, HEADROOM 64, BURST PACKETBURST) -> Strip(PCAP_STRIP_SIZE)
+#define TORAWDEVICE(x) ToDevice(DEVNAME x, METHOD TODEVICE_METHOD, DEBUG false, BURST PACKETBURST)
 //end pcap size
 #endif
 //nopcap
 #else
 
-#define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND false, SNIFFER false, METHOD LINUX, HEADROOM 64, BURST PACKETBURST)
+#define FROMRAWDEVICE(x) FromDevice(DEVNAME x, PROMISC true, SNAPLEN 8190, OUTBOUND true, SNIFFER false, METHOD LINUX, HEADROOM 64, BURST PACKETBURST)
 #define TORAWDEVICE(x) ToDevice(DEVNAME x, METHOD LINUX, DEBUG false, BURST PACKETBURST)
 //end no pcap
-#endif
-
-//end USEBRNDEVICE
 #endif
 
 //else for dumpdevice
@@ -251,7 +216,7 @@ BRNAddressInfo(ipdev eth0:ip);
 #define FROMRAWDEVICE(x) FromDump(FILENAME DUMPFILESRC, TIMING true)
 #define TORAWDEVICE(x) Discard()
 #else 
-#define FROMRAWDEVICE(x) FromSimDevice(x, SNAPLEN 8190, HEADROOM 192)
+#define FROMRAWDEVICE(x) FromSimDevice(x, SNAPLEN 8190, HEADROOM 192, ZEROCOPY true)
 #ifdef POLLING
 #define TORAWDEVICE(x) ToSimDevice(x, ENCAP UNKNOWN )
 #else

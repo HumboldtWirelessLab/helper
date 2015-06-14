@@ -33,21 +33,28 @@ else
   fi
 fi
 
-if [ "x$FILE" != "x" ]; then
-  while read line; do
-    NODENAME=`echo $line | awk '{print $1}'`
-    NODEMAC=`echo $line | awk '{print $3}'`
-    NODENUM=`echo $line | awk '{print $4}'`
-    NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#$NODEMAC#$NODENAME#g"
-    NODEMAC2NUM_SEDARG="$NODEMAC2NUM_SEDARG -e s#$NODEMAC#$NODENUM#g"
-  done < $FILE
+if [ "x$FILE" = "x" ]; then
+  exit 1
 fi
-
-NODEMAC_SEDARG="$NODEMAC_SEDARG -e s#FF-FF-FF-FF-FF-FF#Broadcast#g"
-NODEMAC2NUM_SEDARG="$NODEMAC2NUM_SEDARG -e s#FF-FF-FF-FF-FF-FF#65535#g"
 
 if [ "x$MAC2NUM" = "x1" ]; then
-  sed $NODEMAC2NUM_SEDARG
+  SEDARG=`$DIR/generate_sedargs.py --nodesmacfile=$FILE --mode=mac2id`
+  SEDARG="sed $SEDARG -e \"s#FF-FF-FF-FF-FF-FF#65535#g\""
+elif [ "x$NAME2NUM" = "x1" ]; then
+  SEDARG=`$DIR/generate_sedargs.py --nodesmacfile=$FILE --mode=name2id`
+  SEDARG="sed $SEDARG -e \"s#Broadcast#65535#g\""
+elif [ "x$MAC2NAME" = "x1" ]; then
+  SEDARG=`$DIR/generate_sedargs.py --nodesmacfile=$FILE --mode=mac2name`
+  SEDARG="sed $SEDARG -e \"s#FF-FF-FF-FF-FF-FF#Broadcast#g\""
+elif [ "x$NUM2MAC" = "x1" ]; then
+  SEDARG=`$DIR/generate_sedargs.py --nodesmacfile=$FILE --mode=id2mac`
+  SEDARG="sed $SEDARG -e \"s#65535#FF-FF-FF-FF-FF-FF#g\""
+elif [ "x$NUM2NAME" = "x1" ]; then
+  SEDARG=`$DIR/generate_sedargs.py --nodesmacfile=$FILE --mode=id2name`
+  SEDARG="sed $SEDARG -e \"s#65535#Broadcast#g\""
 else
-  sed $NODEMAC_SEDARG
+  echo "$0: Unknown mode!"
+  exit 1
 fi
+
+eval $SEDARG

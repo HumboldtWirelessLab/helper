@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 dir=$(dirname "$0")
 pwd=$(pwd)
@@ -18,6 +18,54 @@ case "$SIGN" in
 	;;
 esac
 
+
+function handle_eval {
+
+  local i=""
+
+  for i in $@; do
+
+    EVAL_DONE=`cat $EVALUATION_DONE_FILE | grep -e "^${i}" | wc -l`
+
+    if [ $EVAL_DONE -eq 0 ]; then
+
+      if [ -e $DIR/../scenarios/$i ]; then
+        if [ -e $DIR/../scenarios/$i/.depends ]; then
+          handle_eval `cat $DIR/../scenarios/$i/.depends`
+        fi
+
+        if [ -f $DIR/../scenarios/$i/eval.sh ]; then
+          ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $DIR/../scenarios/$i/eval.sh )
+          RESULT=$?
+          if [ $RESULT -ne 0 ]; then
+            echo "$DIR/../scenarios/$i/eval.sh failed with $RESULT"
+            exit 2
+          fi
+        fi
+      else
+        EVALDIR=`dirname $CONFIGDIR/$i`
+        if [ -e $EVALDIR/.depends ]; then
+          handle_eval `cat $EVALDIR/.depends`
+        fi
+
+        if [ -f $CONFIGDIR/$i ]; then
+          ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $CONFIGDIR/$i )
+          RESULT=$?
+          if [ $RESULT -ne 0 ]; then
+            echo "$CONFIGDIR/$i failed with $RESULT"
+            exit 2
+          fi
+        fi
+      fi
+
+      echo "$i" >> $EVALUATION_DONE_FILE
+    #else
+    #  echo "$i already done"
+    fi
+  done
+
+}
+
 if [ "x$1" != "x" ]; then
   if [ -f $1 ]; then
     . $1
@@ -29,7 +77,7 @@ if [ "x$1" != "x" ]; then
     cat $OLDNODETABLE | sed "s#$OLDRESULTDIR/##g" > $NODETABLE
   else
     echo "$1 not found."
-    exit 1
+    exit 2
   fi
 else
   . $CONFIGFILE
@@ -53,18 +101,16 @@ if [ "x$REWRITEEVALUATION" != "x" ]; then
   EVALUATION=$REWRITEEVALUATION
 fi
 
+EVALUATION_DONE_FILE=$EVALUATIONDIR/.evaluation_done
+
+echo -n "" > $EVALUATION_DONE_FILE
+
 EVALUATION="$PREEVALUATION $EVALUATION $ADDEVALUATION"
 
 if [ "x$EVALUATION" != "x" ]; then
-  for i in $EVALUATION; do
-    if [ -e $DIR/../scenarios/$i ]; then
-      ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $DIR/../scenarios/$i/eval.sh )
-    else
-      if [ -f $CONFIGDIR/$i ]; then
-        ( cd $EVALUATIONDIR; MODE=$MODE SIM=$SIM CONFIGDIR=$CONFIGDIR CONFIGFILE=$CONFIGFILE RESULTDIR=$RESULTDIR $CONFIGDIR/$i )
-      fi
-    fi
-  done
+  handle_eval "$EVALUATION"
 else
   echo "No evaluation"
 fi
+
+exit 0

@@ -26,14 +26,12 @@ fi
 echo "#NODE DEVICE MODULSDIR MODOPTIONS WIFICONFIG CLICKMODDIR CLICKSCRIPT CLICKLOGFILE APPLICATION APPLICATIONLOGFILE" > simulation.mes
 
 for i in `seq $1`; do
-  echo "node$i ath0 - - monitor.default - CONFIGDIR/$2 node$i.log - -" >> simulation.mes
+  echo "node$i DEV0 - - monitor.default - CONFIGDIR/$2 node$i.log - -" >> simulation.mes
 done
 
-cat > simulation.dis << EOF
+cat > simulation.des << EOF
 NAME=simulation
-SIMULATOR=ns2
 RADIO=shadowing11b
-FORGEINNODES=no
 
 TIME=$3
 

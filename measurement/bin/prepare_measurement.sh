@@ -146,7 +146,7 @@ case "$1" in
 			    
 			    for CNODE in $CNODES; do
 			    
-			      CPPOPTS="-DNODENAME=$CNODE -DNODEDEVICE=$CDEV -DTIME=$TIME"
+			      CPPOPTS="$EXTRACLICKFLAGS -DNODENAME=$CNODE -DNODEDEVICE=$CDEV -DTIME=$TIME"
 			      
 			      NODEINFILE=`cat $RESULTDIR/$NODETABLE.$POSTFIX | grep -e "^$CNODE[[:space:]]*$CDEV" | wc -l`
 			      

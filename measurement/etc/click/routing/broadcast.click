@@ -14,9 +14,16 @@
 //[1]output: To other brn nodes
 //[2]output - Feedback packets for upper layer
 
+#ifdef DISABLE_FLOODING_LINKTABLE
 elementclass BROADCAST {ID $id, LT $lt |
 
   bcf::BROADCASTFLOODING(ID $id, LT $lt);
+#else
+elementclass BROADCAST {ID $id, LT $lt, LINKSTAT $linkstat |
+
+  bcf::BROADCASTFLOODING(ID $id, LT $lt, LINKSTAT $linkstat);
+#endif
+
   bcr::BROADCASTROUTING(ID $id);
 
   input[0]
@@ -24,15 +31,15 @@ elementclass BROADCAST {ID $id, LT $lt |
                               -       );
 
   bc_clf[0]
-  -> Print("NODENAME: BC: broadcast", TIMESTAMP true)
+  //-> Print("NODENAME: BC: broadcast", TIMESTAMP true)
   -> [0]bcf;
 
   bc_clf[1]
-  -> Print("NODENAME: BC: unicast", TIMESTAMP true)
+  //-> Print("NODENAME: BC: unicast", TIMESTAMP true)
   -> [0]bcr;
 
   input[1]
-  -> Print("BRNin", TIMESTAMP true)
+  //-> Print("BRNin", TIMESTAMP true)
   -> bcr_clf::Classifier( 0/BRN_PORT_FLOODING,     //Flooding
                           0/BRN_PORT_BCASTROUTING, //BroadcastRouting
                           -  ); //other
@@ -44,35 +51,35 @@ elementclass BROADCAST {ID $id, LT $lt |
   -> [1]bcr;
 
   bcr_clf[2]
-  -> Print("NODENAME: Unknown type in broadcast",TIMESTAMP true)
+  //-> Print("NODENAME: Unknown type in broadcast",TIMESTAMP true)
   -> Discard;
 
   input[2] -> [2]bcf;
 
   bcf[0]
-  -> Print("NODENAME: Local Copy",TIMESTAMP true)
+  //-> Print("NODENAME: Local Copy",TIMESTAMP true)
   -> bcrouting_clf::Classifier( 12/BRN_ETHERTYPE 14/BRN_PORT_BCASTROUTING,  //BrnBroadcastRouting
                                     - );
 
   bcrouting_clf[0]
   -> BRN2EtherDecap()
-  -> Print("NODENAME: broadcastrouting",TIMESTAMP true)
+  //-> Print("NODENAME: broadcastrouting",TIMESTAMP true)
   -> [1]bcr;
 
   bcrouting_clf[1]
-  -> Print("NODENAME: SimpleFlood-Ether-OUT",TIMESTAMP true)
+  //-> Print("NODENAME: SimpleFlood-Ether-OUT",TIMESTAMP true)
   -> [0]output;
 
   bcf[1]
-  -> Print("NODENAME: Forward Copy",TIMESTAMP true)
+  //-> Print("NODENAME: Forward Copy",TIMESTAMP true)
   -> [1]output;
 
   bcr[0]
-  -> Print("NODENAME: BCR: fin dest",TIMESTAMP true)
+  //-> Print("NODENAME: BCR: fin dest",TIMESTAMP true)
   -> [0]output;
 
   bcr[1]
-  -> Print("NODENAME: Flood",TIMESTAMP true)
+  //-> Print("NODENAME: Flood",TIMESTAMP true)
   -> [0]bcf;
 
   input[3]
