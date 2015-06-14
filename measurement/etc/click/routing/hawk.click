@@ -15,7 +15,7 @@ elementclass HAWK {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting, $lt, $lph, $
 #else
 #define UMETRIC false 
 #endif
-  rt::HawkRoutingtable(LPRH $lph, SUCCM $dht/dhtsuccessormaintenance, RTM $dht/dhtroutemaintenance, LINKTABLE $lt,USE_METRIC UMETRIC, DEBUG 4);
+  rt::HawkRoutingtable(LPRH $lph, SUCCM $dht/dhtsuccessormaintenance, RTM $dht/dhtroutemaintenance, LINKTABLE $lt,USE_METRIC UMETRIC, DEBUG 2);
   hawkroutequerier::HawkRouteQuerier( NODEIDENTITY $ID, DHTSTORAGE $dhtstorage, DHTROUTING $dhtrouting, RT rt, FRT $dhtroutingtable, DEBUG 0);
 
 
@@ -34,7 +34,7 @@ elementclass HAWK {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting, $lt, $lph, $
 #define SUCC_FORWARD false
 #endif
 #endif
-hawkfwd::HawkForwarder( NODEIDENTITY $ID, ROUTINGTABLE rt,FRT $dhtroutingtable, FALCONROUTING $dhtrouting,OPTSUCCESSORFORWARD SUCC_FORWARD, OPTFIRSTDST FIRSTDST, OPTBETTERFINGER BETTERFINGER, DEBUG 4);
+hawkfwd::HawkForwarder( NODEIDENTITY $ID, ROUTINGTABLE rt,FRT $dhtroutingtable, FALCONROUTING $dhtrouting,OPTSUCCESSORFORWARD SUCC_FORWARD, OPTFIRSTDST FIRSTDST, OPTBETTERFINGER BETTERFINGER, DEBUG 0);
 
   routing_peek :: HawkRoutingPeek(DEBUG 0);
 

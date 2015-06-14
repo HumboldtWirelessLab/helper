@@ -77,7 +77,7 @@ routingmaint::RoutingMaintenance(NODEIDENTITY $id, LINKTABLE $lt, ROUTETABLE rou
 #else
 #ifdef ROUTINGDART
 
-  routing::DART($id, $dht/dhtrouting/dhtroutingtable, $dht/dhtstorage/dhtstorage, $dht/dhtrouting/dhtrouting);
+  routing::DART($id, $dht/dhtrouting/dhtroutingtable, $dht/dhtstorage/dhtstorage, $dht/dhtrouting/dhtrouting,$lt);
 
 #define BRN_PORT_ROUTING BRN_PORT_DART
 #define HAVEROUTING
