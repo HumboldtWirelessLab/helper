@@ -10,9 +10,9 @@
 // [1]output - BRN GEOR packets to internal nodes (BRN GEOR protocol)
 // [2]output - Feedback packets for upper layer
 
-elementclass DART {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting |
+elementclass DART {$ID, $dhtroutingtable, $dhtstorage, $dhtrouting, $lt |
 
-  DartIDStore( NODEIDENTITY  $ID, DHTSTORAGE $dhtstorage, DRT $dhtroutingtable, DEBUG 2);
+  DartIDStore( NODEIDENTITY  $ID, DHTSTORAGE $dhtstorage, DRT $dhtroutingtable, LT $lt, DEBUG 2);
 
   dartidcache::DartIDCache();
   dartroutequerier::DartRouteQuerier( NODEIDENTITY $ID, DHTSTORAGE $dhtstorage, DARTIDCACHE dartidcache, DRT $dhtroutingtable, DEBUG 4);
