@@ -32,7 +32,8 @@ function flooding_vs_linkprobing( floodfilename, floodpktfile, bcastfilename, ba
   title('PDR Flooding vs. Linkprobing');
 
   csvwrite(strcat(basedir,'flooding_vs_linkprobing_diff_',params,'.csv'),lp_bc_diff);
-  
+  dlmwrite(strcat(basedir,'flooding_vs_linkprobing_diff_',params,'.mat'),lp_bc_diff, ' ');
+
   %print(strcat(basedir,'flooding_vs_linkprobing_',params ,'.png'),'-dpng');
   saveas(h1, strcat(basedir,'flooding_vs_linkprobing_',params ,'.png'),'png');
   saveas(h1, strcat(basedir,'flooding_vs_linkprobing_',params ,'.eps'),'epsc');

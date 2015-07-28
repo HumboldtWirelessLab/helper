@@ -78,6 +78,7 @@ function flooding_vs_linkprobing( floodfilename, bcastfilename, basedir, params 
 
   lp_bc_diff = flooddata - bcastdata;
   csvwrite(strcat(basedir,'flooding_vs_linkprobing_diff_',params,'.csv'),lp_bc_diff);
+  dlmwrite(strcat(basedir,'flooding_vs_linkprobing_diff_',params,'.mat'),lp_bc_diff, ' ');
 
 end
 
