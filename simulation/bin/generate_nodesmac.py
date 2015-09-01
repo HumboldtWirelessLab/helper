@@ -75,11 +75,11 @@ def gen_nodes_mac():
 		else:
 			mac = node_id
 
-		node_id_h = hex(int(math.ceil(mac/256)))[2:]
+		node_id_h = hex(int(math.floor(mac / 256)))[2:]
 		if len(node_id_h) == 1:
 			node_id_h = "0" + node_id_h
 
-		node_id_l = hex(int(math.ceil(math.fmod(mac,256))))[2:]
+		node_id_l = hex(int(mac % 256))[2:]
 		if len(node_id_l) == 1:
 			node_id_l = "0" + node_id_l
 
