@@ -18,6 +18,7 @@ case "$SIGN" in
 	;;
 esac
 
+
 if [ "x$1" = "xhelp" ] || [ "x$1" = "x" ]; then
   echo "Skript to run measurements as much as you want. After each measurement you'll be ask whether you want one more."
   echo "Use $0 DESFILE to start. Options (ENVIRONMENTVARS):"
@@ -49,7 +50,12 @@ if [ "x$MULTIWAIT" = "x" ]; then
 fi
 
 if [ "x$SIMULATION" = "x" ]; then
-  SIMULATION="0"
+  COMMAND=`echo $0 | sed "s#$DIR##g" | sed "s#/##g"`
+  if [ "$COMMAND" = "run_multiple_sims.sh" ]; then
+    SIMULATION="1"
+  else
+    SIMULATION="0"
+  fi
 fi
 
 

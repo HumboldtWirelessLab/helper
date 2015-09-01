@@ -1,0 +1,1 @@
+/usr/src/develop/BerlinRoofNet/brn-tools/helper/measurement/bin/run_multiple_measurments.sh

@@ -18,10 +18,19 @@ case "$SIGN" in
 	;;
 esac
 
-if [ "x$1" = "x" ]; then
-    $0 help
-    exit 0
+if [ "x$1" = "xsim" ]; then
+  SIMULATION="1"
 fi
+
+if [ "x$SIMULATION" = "x" ]; then
+  COMMAND=`echo $0 | sed "s#$DIR##g" | sed "s#/##g"`
+  if [ "$COMMAND" = "run_params_sim.sh" ]; then
+    SIMULATION="1"
+  else
+    SIMULATION="0"
+  fi
+fi
+
 
 CONFIGS=0
 
@@ -139,32 +148,52 @@ recursive() {
 
 }
 
-case "$1" in
+if [ "x$1" = "xhelp" ]; then
+  COMMAND=help
+else
+  COMMAND=run
+fi
+
+case "$COMMAND" in
     "help")
 	echo "Use $0 [sim|measurement] desfile"
 	echo "Skript to run measurement with different parameters (e.g. TXPOWER, CHANNEL,...). The collectionfile include the parameter and the name of the templatefiles (configfile with Vars as parameters)."
 	;;
-    "run"|"sim")
+    *)
+	echo "Count $#"
 
-        if [ "$1" = "sim" ]; then
-          SIMULATION=1
-        else
-          SIMULATION=0
+        DESFILE=`ls *.des | awk '{print $1}'`
+  
+	if [ $# -gt 0 ]; then
+	  if [ -f $1 ]; then
+	    DESFILE=$1
+	  else
+	    if [ $# -gt 1 ]; then
+		if [ -f $2 ]; then
+		    DESFILE=$2
+		fi
+	    fi
+	  fi
+	fi
+
+        if [ "x$DESFILE" = "x" ]; then
+                echo "No description-file"
+                exit 0
         fi
 
         if [ "x$PARAMSRUNMODE" = "x" ]; then
           PARAMSRUNMODE="REBOOT"
         fi
 
-		MDIR=`dirname $2`
-		. $2
+		MDIR=`dirname $DESFILE`
+		. $DESFILE
 		
 		if [ "x$MDIR" = "x." ]; then
 		  MDIR=$(pwd)
 		fi
 		
 		if [ "x$PARAMSFILE" = "x" ]; then
-		  echo "Missing PARAMSFILE in $2"
+		  echo "Missing PARAMSFILE in $DESFILE"
 		  exit 0
 		fi
 		
@@ -231,7 +260,11 @@ case "$1" in
 		echo "Prepare $CURRUN. params"
 	  fi
 		  NOW=`pwd`
-		  ( cd $acdir; SIMULATION=$SIMULATION TESTONLY=$TESTONLY PREPARE_ONLY=1 FIRSTRUNMODE=$FIRSTRUNMODE MULTIRUNMODE=$MULTIRUNMODE MULTIMODE="LOOP" RUNS=$MULTIREPEAT MULTIWAIT=$MULTIWAIT $DIR/run_multiple_measurments.sh $2; cd $NOW)
+		  if [ "x$SIMULATION" = "x1" ]; then
+		      ( cd $acdir; SIMULATION=$SIMULATION TESTONLY=$TESTONLY PREPARE_ONLY=1 FIRSTRUNMODE=$FIRSTRUNMODE MULTIRUNMODE=$MULTIRUNMODE MULTIMODE="LOOP" RUNS=$MULTIREPEAT MULTIWAIT=$MULTIWAIT $DIR/run_multiple_sims.sh $DESFILE)
+		  else
+		      ( cd $acdir; SIMULATION=$SIMULATION TESTONLY=$TESTONLY PREPARE_ONLY=1 FIRSTRUNMODE=$FIRSTRUNMODE MULTIRUNMODE=$MULTIRUNMODE MULTIMODE="LOOP" RUNS=$MULTIREPEAT MULTIWAIT=$MULTIWAIT $DIR/run_multiple_measurments.sh $DESFILE)
+		  fi
 		  let "CURRUN=$CURRUN + 1"
 
 		  #TODO think about

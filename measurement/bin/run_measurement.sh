@@ -18,7 +18,7 @@ case "$SIGN" in
 esac
 
 if [ "x$1" = "x" ]; then
-  echo "Use RUNMODE=[REBOOT|CLICK] $0 dis.file [targetdir]"
+  echo "Use RUNMODE=[REBOOT|CLICK] $0 des.file [targetdir]"
   exit 0
 fi
 
