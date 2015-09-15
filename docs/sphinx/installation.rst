@@ -81,6 +81,14 @@ Troubleshooting
     Systemen evtl. daran, dass die dash als System Shell verwendet wird. Eine mögliche Lösung
     besteht darin, eine andere System Shell mittels ``sudo dpkg-reconfigure dash`` festzulegen.
 
+
+Testbedinstallation
+-------------------
+
+Fuer Messungen im Testbed muss ein prvater Schuessel unter helper/host/etc/keys/id_dsa zu finden sein. der oeffentliche Schluessel muss im Verzeichnis /root
+auf den Knoten liegen. Hierzu bitte auch de Dokumentation zu OpenWRT (brn-testbed) lesen.
+
+
 Simulationen
 ============
 
