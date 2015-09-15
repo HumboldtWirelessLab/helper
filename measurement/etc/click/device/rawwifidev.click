@@ -98,7 +98,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef CST
   bo_maxtp::BoMaxThroughput(CHANNELSTATS CST, OFFSET -50, DEBUG 2);
 
-  bo_cla::BoChannelLoadAware(CHANNELSTATS CST, TARGETLOAD 95, TARGETDIFF 0, CAP 1, CST_SYNC 1, DEBUG 2);
+  bo_cla::BoChannelLoadAware(CHANNELSTATS CST, TARGETLOAD 90, TARGETDIFF 0, CAP 1, CST_SYNC 1, DEBUG 4);
 
   bo_targetpl::BoTargetPacketloss(CHANNELSTATS CST, TARGETPL 10, DEBUG 2);
 
@@ -117,6 +117,7 @@ elementclass RAWWIFIDEV { DEVNAME $devname, DEVICE $device |
 #ifdef COOPCST_STRING
   bo_mshare::BoMediumShare(CHANNELSTATS CST, COOPCHANNELSTATSPATH COOPCST_STRING, HIDDENNODE hnd, BO 32, DEBUG 2);
 #endif
+
 #endif
 #endif
 
