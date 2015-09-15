@@ -1,11 +1,9 @@
 
-elementclass MAINSERVICES {
-    ETH $eth, SSID $ssid, CHANNEL $channel , WIFIENCAP $clientwifiencap, 
-    WIRELESS_INFO $auth_info |
+elementclass IPSERVICES { ETHERADDRESS $ea, DHT $dht |
 
 dsnl::BRN2DHCPSubnetList();
 
-dhcps::BRN2DHCPServer( ETHERADDRESS 00:0f:00:00:00:00, ADDRESSPREFIX 192.168.0.0/24 , ROUTER 192.168.0.1,
+dhcps::BRN2DHCPServer( ETHERADDRESS 00:0:00:00:00:00, ADDRESSPREFIX 192.168.0.0/24 , ROUTER 192.168.0.1,
                        SERVER 192.168.0.1, DNS 192.168.0.1, SERVERNAME foo, DOMAIN bla, 
                        DHCPSUBNETLIST dsnl, VLANTABLE vlt, DHTSTORAGE dhtomni/dhtstorage)
 
