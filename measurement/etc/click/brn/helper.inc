@@ -109,8 +109,8 @@
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
 
 #ifdef REMOTEDUMP
-BRNAddressInfo(ethdev eth0:eth);
-BRNAddressInfo(ipdev eth0:ip);
+AddressInfo(ethdev eth0:eth);
+AddressInfo(ipdev eth0:ip);
 #endif
 
 #define DUMPPORTBASE DUMPPORT@__LINE__
@@ -189,8 +189,8 @@ BRNAddressInfo(ipdev eth0:ip);
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)
 
 #ifdef REMOTEDUMP
-BRNAddressInfo(ethdev eth0:eth);
-BRNAddressInfo(ipdev eth0:ip);
+AddressInfo(ethdev eth0:eth);
+AddressInfo(ipdev eth0:ip);
 
 #define DUMPPORTBASE DUMPPORT@__LINE__
 #define TODUMP(x) TimestampEncap() \
