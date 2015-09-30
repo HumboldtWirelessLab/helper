@@ -28,7 +28,8 @@ function matwrapper {
   NO_OCTAVE=$?
 
   if [ $NO_MATLAB -eq 0 ]; then
-    matlab -nodesktop -nosplash -nojvm -nodisplay -r "$@" > /dev/null 2>&1
+    #matlab -nodesktop -nosplash -nojvm -nodisplay -r "$@" > /dev/null 2>&1
+    matlab -nodesktop -nosplash -nodisplay -r "$@" > /dev/null 2>&1
   else
     if [ $NO_OCTAVE -eq 0 ]; then
       octave -qf --eval "$@" > /dev/null 2>&1
@@ -52,4 +53,16 @@ function calculate {
    echo ""
  fi
 
+}
+
+function get_cpu_count {
+  NO_CPUS=`cat /proc/cpuinfo | grep processor | wc -l`
+
+  if [ "x$MAX_NO_CPUS" != "x" ]; then
+    if [ $MAX_NO_CPUS -lt $NO_CPUS ]; then
+      NO_CPUS=$MAX_NO_CPUS
+    fi
+  fi
+
+  echo $NO_CPUS
 }

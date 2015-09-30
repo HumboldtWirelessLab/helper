@@ -1,1 +1,1 @@
-/usr/src/develop/BerlinRoofNet/brn-tools/helper/measurement/bin/run_params_measurement.sh
+../../measurement/bin/run_params_measurement.sh

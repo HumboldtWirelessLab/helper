@@ -18,6 +18,8 @@ case "$SIGN" in
       ;;
 esac
 
+. $DIR/../../evaluation/bin/functions.sh
+
 $DIR/../lib/parasim/para_sim_ctrl.sh status
 
 USE_DISTPARASIM=$?
@@ -28,9 +30,7 @@ if [ $USE_DISTPARASIM -eq 1 ]; then
   $DIR/../lib/parasim/para_sim_ctrl.sh cpus
   MAX_THREADS=$?
 else
-  if [ -e /proc/cpuinfo ]; then
-    MAX_THREADS=`cat /proc/cpuinfo | grep processor | wc -l`
-  fi
+  MAX_THREADS=`get_cpu_count`
 fi
 
 let MIN_THREADS=MAX_THREADS/2

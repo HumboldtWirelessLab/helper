@@ -92,5 +92,7 @@ if [ $HAS_BCAST_STATS -ne 0 ]; then
     (cd $DIR; matwrapper "try,show_network_stats('$GRAPHFILE','$EVALUATIONSDIR/','$PARAMS'),catch,exit(1),end,exit(0)" 1> /dev/null)
   done
 
-  (cd $DIR; matwrapper "try,nodedegree_plot('$EVALUATIONSDIR/graph_psr.mat', [25 50 75], '$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+  if [ -f $EVALUATIONSDIR/graph_psr.mat ]; then
+    (cd $DIR; matwrapper "try,nodedegree_plot('$EVALUATIONSDIR/graph_psr.mat', [25 50 75], '$EVALUATIONSDIR/'),catch,exit(1),end,exit(0)" 1> /dev/null)
+  fi
 fi
