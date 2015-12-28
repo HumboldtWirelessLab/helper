@@ -69,6 +69,9 @@ case "$1" in
 			fi
 		fi
 		
+		#needed for new backports versions
+		modprobe aead
+		
                 KERNELVERSION=`uname -r`
                 NODEARCH=`$DIR/../../bin/system.sh get_arch`
 
