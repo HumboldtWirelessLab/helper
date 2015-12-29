@@ -68,11 +68,17 @@ case "$1" in
 			AVAILABLE=`node_available $node`
 		    done
 
-		    SSH_RUNNING=`nmap --host-timeout 2s -p22 $node 2>/dev/null | grep 22 | grep tcp | awk '{print $2}'`
-		    while [ "x$SSH_RUNNING" != "xopen" ]; do
-			sleep 5;
+		    which nmap > /dev/null 2>&1
+
+		    if [ $? -eq 0 ]; then
+
 			SSH_RUNNING=`nmap --host-timeout 2s -p22 $node 2>/dev/null | grep 22 | grep tcp | awk '{print $2}'`
-		    done
+			while [ "x$SSH_RUNNING" != "xopen" ]; do
+			    sleep 5;
+			    SSH_RUNNING=`nmap --host-timeout 2s -p22 $node 2>/dev/null | grep 22 | grep tcp | awk '{print $2}'`
+			done
+
+		    fi
 
 		    ARCH=`run_on_node $node "uname -m" "/" $DIR/../etc/keys/id_dsa $DIR/../etc/keys/ssh_config 2> /dev/null`
 		    while [ "x$ARCH" = "x" ]; do
