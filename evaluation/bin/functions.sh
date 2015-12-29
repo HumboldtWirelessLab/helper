@@ -66,3 +66,38 @@ function get_cpu_count {
 
   echo $NO_CPUS
 }
+
+
+function comp_cat {
+  if [ -f $1 ]; then
+    GZIP=`file $1 | grep gzip | wc -l`
+
+    if [ $GZIP -ne 0 ]; then
+      gunzip --stdout $1
+    else
+      BZ2=`file $1 | grep bzip2 | wc -l`
+
+      if [ $BZ2 -ne 0 ]; then
+        bzcat $1
+      else
+        XZ=`file $1 | grep XZ | wc -l`
+
+        if [ $XZ -ne 0 ]; then
+          xzcat $1
+        else
+          cat $1
+        fi
+      fi
+    fi
+  else
+    if [ -f $1.gz ]; then
+      gunzip --stdout $1.gz
+    elif [ -f $1.bz2 ]; then
+       bzcat $1.bz2
+    elif [ -f $1.xz ]; then
+      xzcat $1.xz
+    else
+      echo "$0: $1 not found."
+    fi
+  fi
+}
