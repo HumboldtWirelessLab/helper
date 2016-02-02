@@ -42,8 +42,8 @@
 #endif
 
 #if WIFITYPE == wifitype_radiotap
-#define __WIFIENCAP__ BrnRadiotapEncap()
-#define __WIFIDECAP__ BrnRadiotapDecap(DEBUG false)
+#define __WIFIENCAP__ RadiotapEncap()
+#define __WIFIDECAP__ RadiotapDecap(DEBUG false)
 
 #define PCAP_ENCAP_TYPE 802_11_RADIO
 #define PCAP_STRIP_SIZE 0

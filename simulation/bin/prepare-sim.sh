@@ -277,7 +277,7 @@ case "$1" in
 							
 								CPPOPTS="$CPPOPTS -DNODEDEVICE=$CDEV $CPPOPTS -DNODENAME=auto -DWIFITYPE=$WIFITYPE"
 							
-								( cd $CONFIGDIR; cat $CLICK | add_include $HAS_BRNINCLUDE | cpp -I$DIR/../../measurement/etc/click $CPPOPTS | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#$CNODE#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" | grep -v "^#" > $CLICKFINALNAME ) &
+								( cd $CONFIGDIR; cat $CLICK | add_include $HAS_BRNINCLUDE | cpp -I$DIR/../../measurement/etc/click $CPPOPTS | sed -e "s#NODEDEVICE#$CDEV#g" -e"s#NODENAME#auto#g" -e "s#RESULTDIR#$RESULTDIR#g" -e "s#WORKDIR#$WORKDIR#g" -e "s#BASEDIR#$BASEDIR#g" -e "s#CONFIGDIR#$CONFIGDIR#g" | grep -v "^#" > $CLICKFINALNAME ) &
 							fi
 							let NODE_IN_CNODES=NODE_IN_CNODES+1
 						else

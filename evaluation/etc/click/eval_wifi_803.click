@@ -17,7 +17,7 @@ minl
 maxl[1]
 //GPS  -> GPSPrint(NOWRAP true)
 //GPS  -> GPSDecap()
-  -> rtap_decap :: BrnRadiotapDecap()
+  -> rtap_decap :: RadiotapDecap(DEBUG true)
 //  -> Print("OK",200)
   -> filter_tx :: FilterTX()
   -> filter_err :: FilterPhyErr()

@@ -13,7 +13,7 @@ ControlSocket(tcp, CONTROLSOCKETPORT);
 
 #ifdef SIMULATION
 #ifdef GUICONNECTOR
-gc::GuiConnector(ADDR 127.0.0.1, PORT 2000);
+gc::GuiConnector(NODEIDENTITY id, ADDR 127.0.0.1, PORT 2000);
 #endif
 #endif
 

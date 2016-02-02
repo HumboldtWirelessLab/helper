@@ -43,6 +43,8 @@ fi
 
 RESULT=`cat $DIR/../etc/click/oracle.click | sed -e "s#DUMP#$1#g" -e "s#//COMPRESSION#$COMPRESSION#g" | click-align 2> /dev/null | click 2>&1 | grep -v "expensive"`
 
+#echo "$RESULT"
+
 ERROR=`echo "$RESULT" | grep "Router could not be initialized!" | wc -l`
 
 if [ $ERROR -ne 0 ]; then

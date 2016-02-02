@@ -114,12 +114,12 @@ ath_clf[1]
 
 /*********************   Radiotap   *************************/
 tee[3]
-	-> BrnRadiotapDecap()
-	-> brnradiotap_filter::WIFIFILTER()
+	-> RadiotapDecap()
+	-> radiotap_filter::WIFIFILTER()
 	-> wifi_header_cnt_803 :: Counter
 	-> Discard;
 
-brnradiotap_filter[1]
+radiotap_filter[1]
 	-> Discard;
 
 
