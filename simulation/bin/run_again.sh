@@ -104,8 +104,11 @@ if [ "x$USED_SIMULATOR" = "xns" ]; then
 		else
 			SUPPRESSION="--suppressions=$DIR/../etc/ns/ns.supp"
 		fi
-
-		NS_CMD="$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$RESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE"
+		if [ "x$VALGRINDXML" = "x1" ]; then
+			NS_CMD="$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$RESULTDIR/valgrind.log --xml=yes --xml-file=$RESULTDIR/valgrind.xml $NS_FULL_PATH $TCLFILE"
+		else
+			NS_CMD="$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$RESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE"
+		fi
 	elif [ "x$PROFILE" = "x1" ]; then
 		NS_FULL_PATH=`which ns`
 		NS_CMD="$GETTIMESTATS valgrind --tool=callgrind --collect-jumps=yes --callgrind-out-file=$RESULTDIR/callgrind.out $NS_FULL_PATH $TCLFILE"
