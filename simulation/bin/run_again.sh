@@ -99,15 +99,27 @@ if [ "x$USED_SIMULATOR" = "xns" ]; then
 		#--track-origins=yes
 		#--gen-suppressions=all
 		#--suppressions=$DIR/../etc/ns/ns.supp
-		if [ "x$NOSUPP" = "x1" ]; then
-			SUPPRESSION=""
+		if [ "x$GENSUPP" = "x1" ]; then
+			SUPPRESSION="--error-limit=no --gen-suppressions=all"
 		else
-			SUPPRESSION="--suppressions=$DIR/../etc/ns/ns.supp"
+			if [ "x$NOSUPP" = "x1" ]; then
+				SUPPRESSION="--error-limit=no"
+			else
+				SUPPRESSION="--suppressions=$DIR/../etc/ns/ns.supp --error-limit=no"
+				if [ -e $CONFIGDIR/ns_extra.supp ]; then
+					SUPPRESSION="$SUPPRESSION --suppressions=$CONFIGDIR/ns_extra.supp"
+				fi
+			fi
 		fi
+		
+		if [ "x$VALGRINDOPTION" = "x" ]; then
+			VALGRINDOPTION="--leak-resolution=high --leak-check=full --show-reachable=yes"
+		fi
+		
 		if [ "x$VALGRINDXML" = "x1" ]; then
-			NS_CMD="$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$RESULTDIR/valgrind.log --xml=yes --xml-file=$RESULTDIR/valgrind.xml $NS_FULL_PATH $TCLFILE"
+			NS_CMD="$GETTIMESTATS valgrind $SUPPRESSION $VALGRINDOPTION --log-file=$RESULTDIR/valgrind.log --xml=yes --xml-file=$RESULTDIR/valgrind.xml $NS_FULL_PATH $TCLFILE"
 		else
-			NS_CMD="$GETTIMESTATS valgrind $SUPPRESSION --leak-resolution=high --leak-check=full --show-reachable=yes --log-file=$RESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE"
+			NS_CMD="$GETTIMESTATS valgrind $SUPPRESSION $VALGRINDOPTION --log-file=$RESULTDIR/valgrind.log $NS_FULL_PATH $TCLFILE"
 		fi
 	elif [ "x$PROFILE" = "x1" ]; then
 		NS_FULL_PATH=`which ns`
