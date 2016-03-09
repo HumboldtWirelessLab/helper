@@ -61,9 +61,11 @@ elementclass ROUTING { ID $id, ETHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTA
 
   routing::GEOR(ID $id, LT $lt, LINKSTAT $linkstat, DEBUG 2);
 
+/*
   Script(
     write routing/gps.cart_coord NODEPOSITIONX NODEPOSITIONY NODEPOSITIONZ,
   );
+*/
 
 #define BRN_PORT_ROUTING BRN_PORT_GEOROUTING
 #define HAVEROUTING
@@ -127,7 +129,7 @@ elementclass ROUTING { ID $id, ETHERADDRESS $ea, LT $lt, METRIC $metric, LINKSTA
     -> [3]routing;
 
   input[4]        //BRN-Feedback (success)
-    -> Print("NODENAME: Succ")
+    -> Print("NODENAME: Succ",22)
     -> [4]routing;
 
   routing[0]      //Ethernet
