@@ -21,8 +21,15 @@ esac
 
 function matwrapper {
 
-  which matlab > /dev/null 2>&1
-  NO_MATLAB=$?
+  if [ "x$NO_MATLAB" != "x1" ]; then
+    which matlab > /dev/null 2>&1
+    NO_MATLAB=$?
+    if [ $NO_MATLAB -eq 0 ]; then
+      # matlab is present but we have to check wether it works
+      matlab  -nodesktop -nosplash -nojvm -nodisplay -r "quit" > /dev/null 2>&1
+      NO_MATLAB=$?
+    fi
+  fi
 
   which octave > /dev/null 2>&1
   NO_OCTAVE=$?
@@ -32,7 +39,7 @@ function matwrapper {
     matlab -nodesktop -nosplash -nodisplay -r "$@" > /dev/null 2>&1
   else
     if [ $NO_OCTAVE -eq 0 ]; then
-      octave -qf --eval "$@" > /dev/null 2>&1
+      octave -q --eval "$@" > /dev/null 2>&1
     else
       echo "Matlab/Ocatve not found!"
       exit 1
