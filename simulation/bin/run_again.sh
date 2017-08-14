@@ -141,7 +141,14 @@ if [ "x$USED_SIMULATOR" = "xns" ]; then
 		set -o pipefail
 		${NS_CMD} 2>&1 | tee $LOGDIR/$LOGFILE | $DIR/sim_progress_bar.py --max-time=${TIME}
 	else
-		${NS_CMD} > $LOGDIR/$LOGFILE 2>&1
+		OTHER_MALLOC=`ls /usr/lib/libtcmalloc* 2> /dev/null | grep -v debug | head -n 1`
+		
+		#OTHER_MALLOC=`ls /usr/lib/i386-linux-gnu/libjemalloc.so* 2> /dev/null | grep -v debug | head -n 1`
+		if [ "x$TCMALLOC" != "x" ]; then
+			LD_PRELOAD="$TCMALLOC" ${NS_CMD} > $LOGDIR/$LOGFILE 2>&1
+		else
+			${NS_CMD} > $LOGDIR/$LOGFILE 2>&1
+		fi
 	fi
 
   exit $?

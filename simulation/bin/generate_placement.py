@@ -13,6 +13,7 @@ def check_args():
 	global cfg_placement
 	global cfg_sidelen
 	global cfg_relative
+	global cfg_seed
 	global len_nodes
 
 	#echo "Translate " --control-file="${CONTROLFILE}" --node-list="${NODELIST}" --used-simulator="${USED_SIMULATOR}" --node-to-click-map="${node_to_clickfile_map[@]}" --node-to-num-map="${node_to_num_map[@]}"
@@ -21,12 +22,14 @@ def check_args():
 	optParser.add_option("", "--placement", dest="placement", help="placement")
 	optParser.add_option("", "--sidelen", dest="sidelen", type="int", help="sidelen")
 	optParser.add_option("", "--relative", dest="relative", type="int", help="relative")
+	optParser.add_option("", "--seed", dest="seed", type="int", help="seed")
 	(options, args) = optParser.parse_args()
 	
 	if not options.node_list_file or \
 		not options.placement or not options.sidelen:
 		optParser.print_help()
 		sys.exit(-1)
+	
 	
 	
 	cfg_node_list_file = options.node_list_file
@@ -36,6 +39,11 @@ def check_args():
 		cfg_relative = options.relative
 	else:
 		cfg_relative = 0
+	
+	if options.seed:
+		cfg_seed = options.seed
+	else:
+		cfg_seed = 0
 	
 	f = open(cfg_node_list_file)
 	per_row = []
@@ -58,6 +66,7 @@ def print_cfg():
 	print("placement         : " + cfg_placement)
 	print("relative          : {0}".format(cfg_relative))
 	print("sidelen           : {0}".format(cfg_sidelen))
+	print("seed              : {0}".format(cfg_seed))
 	print("list of nodes     :") 
 #	for e in cfg_node_list:
 #		print("1  " + e.rstrip('\n'))
@@ -70,7 +79,7 @@ def gen_random():
 		sidelen = (len_nodes*cfg_sidelen)
 	else:
 		sidelen = cfg_sidelen
-
+	
 	for e in cfg_node_list:
 		x = random.randint(0,sidelen)
 		y = random.randint(0,sidelen)
@@ -140,6 +149,8 @@ def gen_string():
 
 check_args()
 #print_cfg()
+
+random.seed(cfg_seed)
 
 if cfg_placement == "random":
 	gen_random()

@@ -31,15 +31,20 @@ else
   RELATIVE=0
 fi
 
+if [ "x$SEED" = "x" ]; then
+  SEED="-1"
+fi
+
+
 case "$1" in
     "random")
-	  $DIR/generate_placement.py --node-list-file=$2 --placement=random --sidelen=$3 --relative=$RELATIVE
+	  $DIR/generate_placement.py --node-list-file=$2 --placement=random --sidelen=$3 --relative=$RELATIVE --seed=$SEED
 	  ;;
     "grid")
 	  $DIR/generate_placement.py --node-list-file=$2 --placement=grid --sidelen=$3 --relative=$RELATIVE
           ;;
     "gridrand")
-	  $DIR/generate_placement.py --node-list-file=$2 --placement=gridrand --sidelen=$3 --relative=$RELATIVE
+	  $DIR/generate_placement.py --node-list-file=$2 --placement=gridrand --sidelen=$3 --relative=$RELATIVE  --seed=$SEED
           ;;
     "string")
 	  $DIR/generate_placement.py --node-list-file=$2 --placement=string --sidelen=$3 --relative=$RELATIVE

@@ -60,13 +60,16 @@ def check_args():
 
 	
 	f = open(options.node_to_position_map_file)
+	#todo: allow multiple spaces as delimiter
 	tsvfile = csv.reader(f, delimiter=' ')
 	for line in tsvfile:
 		cfg_node_to_x_map[line[0]] = line[1]
 		cfg_node_to_y_map[line[0]] = line[2]
-		cfg_node_to_z_map[line[0]] = line[3]
+		if len(line) < 4:
+			cfg_node_to_z_map[line[0]] = "0"
+		else:
+			cfg_node_to_z_map[line[0]] = line[3]
 
-	
 	f.close()
 
 
