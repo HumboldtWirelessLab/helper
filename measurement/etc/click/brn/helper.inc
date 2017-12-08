@@ -221,7 +221,7 @@ AddressInfo(ipdev eth0:ip);
 
 #ifdef USED_SIMULATOR_JIST
 #define FROMRAWDEVICE(x) FromSimDevice(x, SNAPLEN 8190, HEADROOM 192, ZEROCOPY false)
-else
+#else
 #define FROMRAWDEVICE(x) FromSimDevice(x, SNAPLEN 8190, HEADROOM 192, ZEROCOPY true)
 #endif
 
