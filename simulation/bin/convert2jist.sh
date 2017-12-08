@@ -52,27 +52,11 @@ case "$1" in
       fi
     done < $NODEPLACEMENTFILE
 
-    if [ -f $DIR/../etc/ns/distances/$RADIO ]; then
-      . $DIR/../etc/ns/distances/$RADIO
-      if [ "x$FIELDSIZE" = "xRXRANGE" ]; then
-        FIELDSIZE=$RXRANGE
-      fi
-    fi
-
+    #linebreak at the end
     echo ""
-    FIELDSIZE=`expr $FIELDSIZE + 1`
-    
-    if [ $FIELDSIZE -lt $MAX_X ]; then
-      FIELDSIZE=$MAX_X
-      FIELDSIZE=`expr $FIELDSIZE + 1`
-    fi
-    if [ $FIELDSIZE -lt $MAX_Y ]; then
-      FIELDSIZE=$MAX_Y
-      FIELDSIZE=`expr $FIELDSIZE + 1`
-    fi
-    
-    echo "field.size.x = $FIELDSIZE"
-    echo "field.size.y = $FIELDSIZE"
+
+    echo "field.size.x = $POS_X_MAX"
+    echo "field.size.y = $POS_Y_MAX"
 
     NODE=1
 		while read line; do
