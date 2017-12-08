@@ -22,7 +22,7 @@ esac
 
 PATH=$PATH:$BRN_TOOLS_PATH/click-brn-libs/bin
 
-cuneiform $CONFIGDIR/evaluation.cuf
+cuneiform -w $RESULTDIR $CONFIGDIR/evaluation.cuf
 
 exit 0
 

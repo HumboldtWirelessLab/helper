@@ -194,7 +194,7 @@ case "$MODE" in
 
 		echo "gen clickfile" >> $FINALRESULTDIR/time.log
 		date +"%s:%N" >> $FINALRESULTDIR/time.log
-		
+
 		DUMPFILEDIR=$DUMPFILEDIR USED_SIMULATOR=$USED_SIMULATOR CONFIGDIR=$CONFIGDIR POSTFIX=$POSTFIX NODEPLACEMENTFILE=$FINALPLMFILE $DIR/prepare-sim.sh prepare $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX
 
 #		echo "run_sim" >> $FINALRESULTDIR/time.log
@@ -293,12 +293,12 @@ case "$MODE" in
 		else if [ "x$USED_SIMULATOR" = "xjist" ]; then
   		
   		if [ "x$CONTROLFILE" != "x" ]; then
-				echo -n "handler.script = " > $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
-				$DIR/decode_ctl.py --control-file="${CONTROLFILE}" --tcl-file="$TCLFILE" --node-list="${NODELIST}" --used-simulator=${USED_SIMULATOR} --node-to-click-map-file=$NODETABLE --node-to-num-map-file=$FINALRESULTDIR/nodes.mac --jist-property-file="$FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties"
-				echo "" >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties
+				echo -n "handler.script = " > $FINALRESULTDIR/$NAME.jist.properties
+				$DIR/decode_ctl.py --control-file="${CONTROLFILE}" --tcl-file="$TCLFILE" --node-list="${NODELIST}" --used-simulator=${USED_SIMULATOR} --node-to-click-map-file=$NODETABLE --node-to-num-map-file=$FINALRESULTDIR/nodes.mac --jist-property-file="$FINALRESULTDIR/$NAME.jist.properties"
+				echo "" >> $FINALRESULTDIR/$NAME.jist.properties
 			fi
 
-			(cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$DESCRIPTIONFILENAME.jist.properties )
+			(cd $FINALRESULTDIR; $DIR/convert2jist.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$NAME.jist.properties )
 		
 		else #ns3
 	    ( cd $FINALRESULTDIR; $DIR/convert2ns3.sh convert $FINALRESULTDIR/$DESCRIPTIONFILENAME.$POSTFIX >> $FINALRESULTDIR/$NAME.cc )

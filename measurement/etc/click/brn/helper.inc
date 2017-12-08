@@ -213,15 +213,24 @@ AddressInfo(ipdev eth0:ip);
 #ifdef SIMULATION
 
 #ifdef DUMPDEVICE
+
 #define FROMRAWDEVICE(x) FromDump(FILENAME DUMPFILESRC, TIMING true)
 #define TORAWDEVICE(x) Discard()
-#else 
+
+#else
+
+#ifdef USED_SIMULATOR_JIST
+#define FROMRAWDEVICE(x) FromSimDevice(x, SNAPLEN 8190, HEADROOM 192, ZEROCOPY false)
+else
 #define FROMRAWDEVICE(x) FromSimDevice(x, SNAPLEN 8190, HEADROOM 192, ZEROCOPY true)
+#endif
+
 #ifdef POLLING
 #define TORAWDEVICE(x) ToSimDevice(x, ENCAP UNKNOWN )
 #else
 #define TORAWDEVICE(x) ToSimDevice(x, ENCAP UNKNOWN, POLLING false, HAVETXFEEDBACKANNO true )
 #endif
+
 #endif
 
 #define TODEVICE(x) __WIFIENCAP__ -> TORAWDEVICE(x)

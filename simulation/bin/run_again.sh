@@ -156,7 +156,7 @@ if [ "x$USED_SIMULATOR" = "xns" ]; then
 else if [ "x$USED_SIMULATOR" = "xjist" ]; then
 	# run simulation with jist
 	if [ "x$JISTBASEDIR" = "x" ]; then
-    JISTBASEDIR=$BRN_TOOLS_PATH/brn.sim
+    JISTBASEDIR=$BRN_TOOLS_PATH/jist-brn
   fi
 
   JISTCLICK_HOME=$JISTBASEDIR/brn.jist.click
@@ -165,7 +165,7 @@ else if [ "x$USED_SIMULATOR" = "xjist" ]; then
   export JISTCLICK_HOME=$JISTBASEDIR/brn.jist.click
   export JIST_HOME=$JISTBASEDIR/jist.swans
 
-  (cd $JISTCLICK_HOME; $GETTIMESTATS ant run -Drun.class=brn.sim.scenario.jistsimulation.JistSimulation -Drun.args="$RESULTDIR/$NAME.jist.properties"; RESULT=$?) | grep "\[java\]" | grep -v "Controller:INFO:" | sed "s#^[[:space:]]*\[java\][[:space:]]##g" > $LOGDIR/$LOGFILE 2>&1
+  (cd $JISTCLICK_HOME; . $JISTBASEDIR/brn-install/bashrc.jist; $GETTIMESTATS ant run -Drun.class=brn.sim.scenario.jistsimulation.JistSimulation -Drun.args="$RESULTDIR/$NAME.jist.properties"; RESULT=$?) | grep "\[java\]" | grep -v "Controller:INFO:" | sed "s#^[[:space:]]*\[java\][[:space:]]##g" > $LOGDIR/$LOGFILE 2>&1
 
   exit $RESULT
 
